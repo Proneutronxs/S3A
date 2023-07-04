@@ -43,6 +43,7 @@ def insert_anticipos(request):
                                 sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                                 values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                                 #cursor.execute(sql, values)
+                                cursor.close()
                             nota = "Los registros se guardaron exitosamente."
                             return JsonResponse({'Message': 'Success', 'Nota': nota})
                         else:
@@ -50,6 +51,7 @@ def insert_anticipos(request):
                                 sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                                 values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                                 #cursor.execute(sql, values)
+                                cursor.close()
                             nota = "Los registros se guardaron exitosamente."
                             return JsonResponse({'Message': 'Success', 'Nota': nota})
                     else:
@@ -60,6 +62,7 @@ def insert_anticipos(request):
                             sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                             values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                             #cursor.execute(sql, values)
+                            cursor.close()
                         nota = "Los registros se guardaron exitosamente."
                         return JsonResponse({'Message': 'Success', 'Nota': nota})
 

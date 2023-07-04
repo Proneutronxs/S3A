@@ -31,6 +31,7 @@ def insert_fichada(request):
                     sql = "INSERT INTO T_Fichadas (ficTarjeta, ficFecha, ficHora, ficES12, ficNodo, ficSimulacion, legCodigo, ficEstado, ficOrden) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (tarjeta, fecha, hora, tipo, nodo, simulacion, codigo, estado, orden)
                     #cursor.execute(sql, values)
+                    cursor.close()
                 #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + codigo + " - " + estado + " - " + orden)
             nota = "Los registros se guardaron exitosamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})
