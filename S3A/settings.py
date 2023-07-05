@@ -79,6 +79,7 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+###### ORIGINAL S3A
 DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
@@ -124,9 +125,9 @@ DATABASES = {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     }
-
 }
 
+###### LOCAL S3A
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'sql_server.pyodbc',
