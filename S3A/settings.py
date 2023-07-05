@@ -217,7 +217,6 @@ STATIC_URL = '/static/'
 
 CRONJOBS = [
     #('0 */2 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA DOS HORAS
-
     ('0 */1 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA UNA HORAS
     #('35 11,16 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')# EJECUTAR TODOS LOS DIAS A LAS  12 Y 16 HS
     #('*/2 * * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')  # Ejecutar cada 5 minutos
