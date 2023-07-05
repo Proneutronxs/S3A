@@ -61,6 +61,7 @@ def traeLegTarjeta(legCodigo, legTarjeta):
 
 @csrf_exempt
 def data(request):
+    #DATA
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
