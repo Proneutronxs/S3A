@@ -26,7 +26,7 @@ def traeLegajosISIS():
             sql = "SELECT        Empleados.CodEmpleado AS LEGAJO " \
                 "FROM            Empleados INNER JOIN " \
                                         "CentrosCostos cc  ON Empleados.Regis_CCo = cc.Regis_CCo " \
-                "WHERE cc.DescrCtroCosto  LIKE 'C%' " \
+                "WHERE cc.DescrCtroCosto  = 'C10F2-CHACRA ALQ.FIJO A92' " \
                 "ORDER BY Empleados.CodEmpleado "
             cursor.execute(sql)
             consulta = cursor.fetchall()
@@ -36,6 +36,7 @@ def traeLegajosISIS():
                     lista_Legajos_ISIS.append(str(row[0]))
             return lista_Legajos_ISIS
     except Exception as e:
+        #"WHERE cc.DescrCtroCosto  LIKE 'C%' " \
         print(e)
 
 
@@ -107,19 +108,21 @@ def insertaSonidosLegajos(legLegajo):
         print(e)
 
 def insertaTarjetaPeriodo_A(legLegajo):
+    legTarjeta = str(legLegajo.zfill(8))
     try:
         with connections ['principal'].cursor() as cursor:
             sql = "INSERT INTO T_Tarjetas_Por_Periodo (legCodigo, tarNumero, tarDesde, tarHasta) VALUES (%s, %s, '1900-01-01T00:00:00.000', '9999-12-31T00:00:00.000')"
-            values = (str(legLegajo), str(legLegajo))
+            values = (str(legLegajo), legTarjeta)
             cursor.execute(sql, values)
     except Exception as e:
         print(e)
 
 def insertaTarjetaPeriodo_B(legLegajo):
+    legTarjeta = str(legLegajo.zfill(8))
     try:
         with connections ['principal'].cursor() as cursor:
             sql = " INSERT INTO T_Tarjetas_Por_Periodo (legCodigo, tarNumero, tarDesde, tarHasta) VALUES (%s, %s, '2023-07-01T00:00:00.000', '9999-12-31T00:00:00.000')"
-            values = (str(legLegajo), str(legLegajo))
+            values = (str(legLegajo), legTarjeta)
             cursor.execute(sql, values)
     except Exception as e:
         print(e)

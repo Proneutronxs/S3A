@@ -172,7 +172,6 @@ DATABASES = {
 #             'driver': 'ODBC Driver 17 for SQL Server',
 #         },
 #     }
-
 # }
 
 
@@ -216,7 +215,8 @@ STATIC_URL = '/static/'
 
 
 CRONJOBS = [
-    ('0 12,16 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')# EJECUTAR TODOS LOS DIAS A LAS  12 Y 16 HS
+    #('0 */2 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA DOS HORAS
+    ('35 11,16 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')# EJECUTAR TODOS LOS DIAS A LAS  12 Y 16 HS
     #('*/2 * * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')  # Ejecutar cada 5 minutos
     #('15 7 * * *', 'Applications.TareasProgramadas.tasks.sumar_numeros')  # Ejecutar a las 07:15
 ]
