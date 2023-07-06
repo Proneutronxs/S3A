@@ -25,8 +25,8 @@ def traeLegajosISIS():
         with connections['ISISPayroll'].cursor() as cursor:
             sql = "SELECT        Empleados.CodEmpleado AS LEGAJO " \
                 "FROM            Empleados INNER JOIN " \
-                                        "CentrosCostos cc  ON Empleados.Regis_CCo = cc.Regis_CCo " \
-                "WHERE cc.DescrCtroCosto  = 'C10F2-CHACRA ALQ.FIJO A92' " \
+                                        "CentrosCostos CC  ON Empleados.Regis_CCo = CC.Regis_CCo " \
+                "WHERE CC.DescrCtroCosto  LIKE 'C%' AND Empleados.BajaDefinitivaEmple = '2' " \
                 "ORDER BY Empleados.CodEmpleado "
             cursor.execute(sql)
             consulta = cursor.fetchall()
