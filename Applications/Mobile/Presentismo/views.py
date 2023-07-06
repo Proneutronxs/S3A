@@ -38,6 +38,8 @@ def insert_fichada(request):
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['principal'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
@@ -57,6 +59,8 @@ def traeLegTarjeta(legCodigo, legTarjeta):
     except Exception as e:
         error = str(e)
         return error
+    finally:
+        connections['principal'].close()
 
 
 @csrf_exempt

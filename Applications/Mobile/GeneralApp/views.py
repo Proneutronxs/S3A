@@ -48,6 +48,8 @@ def login_app(request):
                 'Nota': error
             }
             return JsonResponse(response_data)
+        finally:
+            connections['default'].close()
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
@@ -86,6 +88,8 @@ def id_Nombre_Ccostos(request, legajo):
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['default'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -119,6 +123,8 @@ def personal_por_Ccostos_asistencia(request, codigo):
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
@@ -158,6 +164,8 @@ def traePersonal(id):
     except Exception as e:
         error = str(e)
         return error
+    finally:
+        connections['ISISPayroll'].close()
     
 def traeMotivos():
     try:
@@ -180,6 +188,8 @@ def traeMotivos():
     except Exception as e:
         error = str(e)
         return error
+    finally:
+        connections['S3A'].close()
     
 def traeMontoMax():
     try:
@@ -197,3 +207,5 @@ def traeMontoMax():
     except Exception as e:
         error = str(e)
         return error
+    finally:
+        connections['default'].close()

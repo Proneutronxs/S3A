@@ -38,6 +38,8 @@ def traeLegajosISIS():
     except Exception as e:
         #"WHERE cc.DescrCtroCosto  LIKE 'C%' " \
         print(e)
+    finally:
+        connections['ISISPayroll'].close()
 
 
 def buscaLegajosPRINCIPAL():
@@ -58,6 +60,8 @@ def buscaLegajosPRINCIPAL():
         return legajos_no_principal
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def traeLegLegajo(legajo):
     try:
@@ -72,6 +76,8 @@ def traeLegLegajo(legajo):
                 return 0
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 
 def insertaLegajosDatos(legLegajo):
@@ -81,6 +87,8 @@ def insertaLegajosDatos(legLegajo):
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 
 def insertaLegajosTurnos_A(legLegajo):
@@ -90,6 +98,8 @@ def insertaLegajosTurnos_A(legLegajo):
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def insertaLegajosTurnos_B(legLegajo):
     try:
@@ -98,6 +108,8 @@ def insertaLegajosTurnos_B(legLegajo):
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def insertaSonidosLegajos(legLegajo):
     try:
@@ -106,6 +118,8 @@ def insertaSonidosLegajos(legLegajo):
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def insertaTarjetaPeriodo_A(legLegajo):
     legTarjeta = str(legLegajo.zfill(8))
@@ -116,6 +130,8 @@ def insertaTarjetaPeriodo_A(legLegajo):
             cursor.execute(sql, values)
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def insertaTarjetaPeriodo_B(legLegajo):
     legTarjeta = str(legLegajo.zfill(8))
@@ -126,6 +142,8 @@ def insertaTarjetaPeriodo_B(legLegajo):
             cursor.execute(sql, values)
     except Exception as e:
         print(e)
+    finally:
+        connections['principal'].close()
 
 def traeNombreISIS(legajo):
     try:
@@ -140,6 +158,8 @@ def traeNombreISIS(legajo):
                 return nombre
     except Exception as e:
         print(e)
+    finally:
+        connections['ISISPayroll'].close()
 
 def TrasladoLegajos():
     legajos_no_principal = buscaLegajosPRINCIPAL()
@@ -163,6 +183,8 @@ def TrasladoLegajos():
                 cursor.execute(sql, values)
         except Exception as e:
             print(e)
+        finally:
+            connections['principal'].close()
 
         legLegajo = traeLegLegajo(legajo)
 
