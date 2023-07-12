@@ -153,8 +153,8 @@ def traePersonal(id):
             lista_data = []
             if consulta:
                 for row in consulta:
-                    legajo = str(row[0])
-                    Regis_Epl = str(row[1])
+                    legajo = str(row[1])
+                    Regis_Epl = str(row[0])
                     nombre = str(row[2])
                     datos = {'Legajo': legajo, 'Regis_Epl': Regis_Epl, 'Nombre': nombre}
                     lista_data.append(datos)

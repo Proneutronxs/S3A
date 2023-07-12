@@ -7,7 +7,7 @@ urlpatterns = [
     path('mostrar/motivos/horasextras', views.motrar_MotivosHE, name="mostrar_MotivosHorasExtras"),
 
     ### INSERTA LAS HORAS EXTRAS ENVÍADAS HORAS EXTRAS A AUTORIZAR (POST BODY REQUEST)
-    path('inserta/horasextras', views.insert_HoraExtra, name="inserta_horasExtras"),
+    path('inserta/horas_extras', views.insert_HoraExtra, name="inserta_horasExtras"),
 
     ### MUESTRA HORAS EXTRAS ACTIVAS - PETICIONES DE HORAS EXTRAS (GET BODY REQUEST)
     path('mostrar/horasextras/activas', views.mostrarHoraExtrasActivas, name="muestra_horasExtras_activas"),

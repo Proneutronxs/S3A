@@ -51,13 +51,14 @@ def insert_HoraExtra(request):
             body = request.body.decode('utf-8')
             datos = json.loads(body)['Data']
             for item in datos:
-                CodEmpleado = item['CodEmpleado'] ### LEGAJO
+                Legajo = item['Legajo'] ### LEGAJO
                 Regis_Epl = item['Regis_Epl']### ID LEGAJO
-                Nombre_Apellido = item['Nombre_Apellido'] ### NOMBRE Y APELLIDO
-                Desde = item['Desde'] ### DATETIME DESDE
-                Hasta = item['Hasta'] ### DATETIME HASTA
-                idMotivo = item['idMotivo'] ### MOTIVO
+                Desde = item['DateTimeDesde'] ### DATETIME DESDE
+                Hasta = item['DateTimeHasta'] ### DATETIME HASTA
+                idMotivo = item['Motivo'] ### MOTIVO
                 Descripcion = item['Descripcion'] ### DESCRIPCION DE LA TAREA
+                Arreglo = item['Arreglo'] ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
+                Usuario = item['Usuario'] ### USUARIO DE LA APLICACIÓN
                 Autorizado = item['Autorizado'] ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 EstadoPreCarga = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
@@ -66,7 +67,7 @@ def insert_HoraExtra(request):
                     #values = (CodEmpleado, Regis_Epl, Nombre_Apellido, Desde, Hasta, idMotivo, Descripcion, Autorizado, EstadoPreCarga)
                     #cursor.execute(sql, values)            
 
-                print(CodEmpleado + " - " + Regis_Epl + " - " + Nombre_Apellido + " - " + Desde + " - " + Hasta + " - " + idMotivo + " - " + Descripcion + " - " + Autorizado + " - " + EstadoPreCarga)
+                print(Legajo + " - " + Regis_Epl +  " - " + Desde + " - " + Hasta +  " - " + Arreglo + " - " + idMotivo + " - " + Descripcion + " - " + Autorizado + " - " + EstadoPreCarga + " - " + Usuario)
             nota = "Los Horas Extras se envíaron correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
