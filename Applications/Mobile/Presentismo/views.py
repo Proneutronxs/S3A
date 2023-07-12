@@ -30,7 +30,7 @@ def insert_fichada(request):
                 with connections['principal'].cursor() as cursor:
                     sql = "INSERT INTO T_Fichadas (ficTarjeta, ficFecha, ficHora, ficES12, ficNodo, ficSimulacion, legCodigo, ficEstado, ficOrden) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (tarjeta, fecha, hora, tipo, nodo, simulacion, codigo, estado, orden)
-                    #cursor.execute(sql, values)
+                    cursor.execute(sql, values)
                     cursor.close()
                 #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + codigo + " - " + estado + " - " + orden)
             nota = "Los registros se guardaron exitosamente."
