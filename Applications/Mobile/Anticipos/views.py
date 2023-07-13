@@ -42,7 +42,7 @@ def insert_anticipos(request):
                             with connections['ISISPayroll'].cursor() as cursor:
                                 sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                                 values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
-                                #cursor.execute(sql, values)
+                                cursor.execute(sql, values)
                                 cursor.close()
                             nota = "Los registros se guardaron exitosamente."
                             return JsonResponse({'Message': 'Success', 'Nota': nota})
@@ -50,7 +50,7 @@ def insert_anticipos(request):
                             with connections['ISISPayroll'].cursor() as cursor:
                                 sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                                 values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
-                                #cursor.execute(sql, values)
+                                cursor.execute(sql, values)
                                 cursor.close()
                             nota = "Los registros se guardaron exitosamente."
                             return JsonResponse({'Message': 'Success', 'Nota': nota})
@@ -61,7 +61,7 @@ def insert_anticipos(request):
                         with connections['ISISPayroll'].cursor() as cursor:
                             sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                             values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
-                            #cursor.execute(sql, values)
+                            cursor.execute(sql, values)
                             cursor.close()
                         nota = "Los registros se guardaron exitosamente."
                         return JsonResponse({'Message': 'Success', 'Nota': nota})
