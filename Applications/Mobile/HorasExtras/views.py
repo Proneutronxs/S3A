@@ -48,34 +48,124 @@ def motrar_MotivosHE(request):
 def insert_HoraExtra(request):
     if request.method == 'POST':
         try:
+            lista_tieneHE_asignada = []
             body = request.body.decode('utf-8')
             datos = json.loads(body)['Data']
             for item in datos:
-                Legajo = item['Legajo'] ### LEGAJO
-                Regis_Epl = item['Regis_Epl']### ID LEGAJO
-                Desde = item['DateTimeDesde'] ### DATETIME DESDE
-                Hasta = item['DateTimeHasta'] ### DATETIME HASTA
-                idMotivo = item['Motivo'] ### MOTIVO
-                Descripcion = item['Descripcion'] ### DESCRIPCION DE LA TAREA
-                Arreglo = item['Arreglo'] ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
-                Usuario = item['Usuario'] ### USUARIO DE LA APLICACIÓN
-                Autorizado = item['Autorizado'] ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
-                EstadoPreCarga = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
+                Legajo = str(item['Legajo']) ### LEGAJO
+                Regis_Epl = str(item['Regis_Epl'])### ID LEGAJO
+                Desde = str(item['DateTimeDesde']) ### DATETIME DESDE
+                Hasta = str(item['DateTimeHasta']) ### DATETIME HASTA
+                idMotivo = str(item['Motivo']) ### MOTIVO
+                Descripcion = str(item['Descripcion']) ### DESCRIPCION DE LA TAREA
+                Arreglo = str(item['Arreglo']) ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
+                Usuario = str(item['Usuario']) ### USUARIO DE LA APLICACIÓN
+                Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
+                Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
+                
+                horaDesde, horaHasta = retornaHHMM(Desde,Hasta)
+                fechaDesde, fechaHasta = retornaYYYYMMDD(Desde,Hasta)
+                print(horaDesde,horaHasta,fechaDesde,fechaHasta)
 
-                #with connections['default'].cursor() as cursor:
-                    #sql = "INSERT INTO PRE_CARGA_HE (CodEmpleado, Regis_Epl, ApellidoNombre, Desde, Hasta, idMotivo, DescripcionTarea, EstadoPreCarga, ficOrden) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    #values = (CodEmpleado, Regis_Epl, Nombre_Apellido, Desde, Hasta, idMotivo, Descripcion, Autorizado, EstadoPreCarga)
-                    #cursor.execute(sql, values)            
-
-                print(Legajo + " - " + Regis_Epl +  " - " + Desde + " - " + Hasta +  " - " + Arreglo + " - " + idMotivo + " - " + Descripcion + " - " + Autorizado + " - " + EstadoPreCarga + " - " + Usuario)
-            nota = "Los Horas Extras se envíaron correctamente."
-            return JsonResponse({'Message': 'Success', 'Nota': nota})
+                if verificaHoraExtra(horaDesde, horaHasta, fechaDesde, fechaHasta) == False:
+                    lista_tieneHE_asignada.append(Legajo)
+                else:
+                    with connections['default'].cursor() as cursor:
+                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, Estado)
+                        cursor.execute(sql, values)            
+                        cursor.close()
+            if len(lista_tieneHE_asignada) == 0:
+                nota = "Los Horas Extras se envíaron correctamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})
+            else:
+                nombres = []
+                for legajo in lista_tieneHE_asignada:
+                    Apellido = traeApellidos(str(legajo))
+                    nombres.append(Apellido)
+                nota = "Los siguientes Apellidos ya tienen asignadas horas extras en ese rango horario: \n" + ', \n'.join(nombres) + '.'
+                return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
+            print(e)
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['default'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+### RETORNA HH:MM DE UN DATE TIME
+def retornaHHMM(hora1,hora2):
+    formato_entrada = "%Y-%m-%dT%H:%M:%S.%f"
+    formato_salida = "%H:%M"
+    horaUno = datetime.strptime(hora1, formato_entrada)
+    horaDos = datetime.strptime(hora2, formato_entrada)
+    horaDesde = horaUno.strftime(formato_salida)
+    horaHasta = horaDos.strftime(formato_salida)
+    return horaDesde, horaHasta
+
+### RETORNA YYYY-MM-DD DE UN DATE TIME
+def retornaYYYYMMDD(f1,f2):
+    formato_entrada = "%Y-%m-%dT%H:%M:%S.%f"
+    formato_salida = "%Y-%m-%d"
+    fechaUno = datetime.strptime(f1, formato_entrada)
+    fechaDos = datetime.strptime(f2, formato_entrada)
+    fechaDesde = fechaUno.strftime(formato_salida)
+    fechaHasta = fechaDos.strftime(formato_salida)
+    return fechaDesde, fechaHasta
+
+def verificaHoraExtra(horaDesde,horaHasta,fechaDesde,fechaHasta):
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT  CONVERT(VARCHAR(5), DateTimeDesde, 108) AS H_DESDE, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS H_HASTA "\
+                    "FROM HorasExtras_Sin_Procesar " \
+                    "WHERE TRY_CONVERT(DATE, DateTimeDesde) >= %s AND TRY_CONVERT(DATE, DateTimeHasta) <= %s"
+            cursor.execute(sql, [fechaDesde, fechaHasta])
+            consulta = cursor.fetchone()
+            if consulta:
+                horaD = str(consulta[0])
+                horaH =str(consulta[1])
+                if verificar_rango(horaDesde,horaHasta,horaD,horaH):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+    except Exception as e:
+        error = str(e)
+        return error
+    finally:
+        connections['default'].close()
+
+### TRAE EL APELLIDO DE LA HORA QUE EXISTE
+def traeApellidos(legajo):
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT  CONVERT(VARCHAR(25), (ApellidoEmple + ' ' + NombresEmple)) "\
+                    "FROM Empleados " \
+                    "WHERE CodEmpleado = %s"
+            cursor.execute(sql, [legajo])
+            consulta = cursor.fetchone()
+            if consulta:
+                apellido = str(consulta[0])
+            return apellido
+    except Exception as e:
+        error = str(e)
+        return error
+    finally:
+        connections['ISISPayroll'].close()
+
+### VERIFICA SI LA HORA INGRESADA YA TIENE ASIGNADO UNA HORA EXTRA
+def verificar_rango(hora_desde_a, hora_hasta_a, hora_desde_b, hora_hasta_b):
+    hora_a_minutos_desde = int(hora_desde_a.split(':')[0]) * 60 + int(hora_desde_a.split(':')[1])
+    hora_a_minutos_hasta = int(hora_hasta_a.split(':')[0]) * 60 + int(hora_hasta_a.split(':')[1])
+    hora_b_minutos_desde = int(hora_desde_b.split(':')[0]) * 60 + int(hora_desde_b.split(':')[1])
+    hora_b_minutos_hasta = int(hora_hasta_b.split(':')[0]) * 60 + int(hora_hasta_b.split(':')[1])
+
+    if hora_b_minutos_desde >= hora_a_minutos_desde and hora_b_minutos_hasta <= hora_a_minutos_hasta:
+        return True
+    else:
+        return False
 
 ### FUNCIÓN QUE CALCULA LA CANTIDAD DE HORAS EXTRAS CON DOS VALORES DATE TIME
 def calcular_CantHoras(hora1, hora2):

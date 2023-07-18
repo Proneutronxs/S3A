@@ -1,23 +1,26 @@
 from django.db import connections
-from datetime import datetime
+# from datetime import datetime
+import datetime
+import locale
 
 
-def sumar_numeros():
-    now = datetime.now()
-    hora_actual = str(now.strftime("%H:%M:%S"))
-    id = '34882177'
-    legajo = '58015'
-    user = "JCHAMBI " + hora_actual
 
-    try:
-        #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + legCodigo + " - " + estado + " - " + orden)
-        with connections['default'].cursor() as cursor:
-            sql = "INSERT INTO CopiaUsuarios (ID, legajo, usuario) VALUES (%s, %s, %s)"
-            values = (id,legajo,user)
-            cursor.execute(sql, values)
+# def sumar_numeros():
+#     now = datetime.now()
+#     hora_actual = str(now.strftime("%H:%M:%S"))
+#     id = '34882177'
+#     legajo = '58015'
+#     user = "JCHAMBI " + hora_actual
 
-    except Exception as e:
-        print(e)
+#     try:
+#         #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + legCodigo + " - " + estado + " - " + orden)
+#         with connections['default'].cursor() as cursor:
+#             sql = "INSERT INTO CopiaUsuarios (ID, legajo, usuario) VALUES (%s, %s, %s)"
+#             values = (id,legajo,user)
+#             cursor.execute(sql, values)
+
+#     except Exception as e:
+#         print(e)
 
 
 def traeLegajosISIS():
@@ -40,7 +43,6 @@ def traeLegajosISIS():
         print(e)
     finally:
         connections['ISISPayroll'].close()
-
 
 def buscaLegajosPRINCIPAL():
     try:
@@ -79,7 +81,6 @@ def traeLegLegajo(legajo):
     finally:
         connections['principal'].close()
 
-
 def insertaLegajosDatos(legLegajo):
     try:
         with connections ['principal'].cursor() as cursor:
@@ -89,7 +90,6 @@ def insertaLegajosDatos(legLegajo):
         print(e)
     finally:
         connections['principal'].close()
-
 
 def insertaLegajosTurnos_A(legLegajo):
     try:
@@ -197,9 +197,987 @@ def TrasladoLegajos():
             insertaTarjetaPeriodo_B(legLegajo)
 
 
+############################################################################################################################
+############################################################################################################################
+###################################### PROCESA HORAS EXTRAS ################################################################
+############################################################################################################################
+############################################################################################################################
+
+
+def obtener_solo_fecha(fechaYhora):
+    fecha = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    fecha_str = fecha.strftime("%Y-%m-%d")
+    return fecha_str
+
+##### DOMINGO HORAS INICIALES
+def Domingo_HoraExtraNocturna_00_a_05_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 0)  
+    hora_fin = datetime.time(4, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def Domingo_HoraExtra100_05_a_20_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 0)  
+    hora_fin = datetime.time(19, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def Domingo_HoraExtraNocturna_20_a_00_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 0)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+
+##### DOMINGO HORAS FINALES
+def Domingo_HoraExtraNocturna_00_a_05_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 1)  
+    hora_fin = datetime.time(5, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def Domingo_HoraExtra100_05_a_20_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 1)  
+    hora_fin = datetime.time(20, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def Domingo_HoraExtraNocturna_20_a_00_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 1)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+##### SÁBADO HORAS INICIALES
+def Sabado_HoraExtraNocturna_00_a_05_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 0)  
+    hora_fin = datetime.time(4, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def Sabado_HoraExtraAl50_05_a_13_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 0)  
+    hora_fin = datetime.time(12, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+
+def Sabado_HoraExtraAl100_13_a_20_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(13, 0)  
+    hora_fin = datetime.time(19, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def Sabado_HoraExtraNocturnas_20_a_00_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 0)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+##### SÁBADO HORAS FINALES
+def Sabado_HoraExtraNocturna_00_a_05_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 1)  
+    hora_fin = datetime.time(5, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def Sabado_HoraExtraAl50_05_a_13_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 1)  
+    hora_fin = datetime.time(13, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+
+def Sabado_HoraExtraAl100_13_a_20_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(13, 1)  
+    hora_fin = datetime.time(20, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def Sabado_HoraExtraNocturnas_20_a_00_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 1)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+##### LUNES A VIERNES INICIALES
+def LV_HoraExtraNocturna_00_a_05_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 0)  
+    hora_fin = datetime.time(4, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def LV_HoraExtraAl50_05_a_20_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 0)  
+    hora_fin = datetime.time(19, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+    
+def LV_HoraExtraNocturna_20_a_00_Inicio(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 0)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora >= hora_inicio and hora < hora_fin:
+        return True
+    else:
+        return False
+
+##### LUNES A VIERNES HORAS
+def LV_HoraExtraNocturna_00_a_05_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(0, 1)  
+    hora_fin = datetime.time(5, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def LV_HoraExtraAl50_05_a_20_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(5, 1)  
+    hora_fin = datetime.time(20, 0)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+    
+def LV_HoraExtraNocturna_20_a_00_Final(fechaYhora):
+    fecha_hora = datetime.datetime.strptime(fechaYhora, "%Y-%m-%d %H:%M")
+    hora_inicio = datetime.time(20, 1)  
+    hora_fin = datetime.time(23, 59)  
+    hora = fecha_hora.time()
+
+    if hora > hora_inicio and hora <= hora_fin:
+        return True
+    else:
+        return False
+
+### OBTENGO EL DIA SIGUIENTE SI LA HORA ES 23:59
+def obtener_dia_siguiente(fechaHora):
+    from datetime import datetime, timedelta
+    fechaHora = datetime.strptime(fechaHora, '%Y-%m-%d %H:%M')
+    if fechaHora.hour == 23 and fechaHora.minute == 59:
+        dia_siguiente = fechaHora + timedelta(days=1)
+        dia_siguiente = dia_siguiente.replace(hour=0, minute=0)
+        return dia_siguiente.strftime('%Y-%m-%d %H:%M')
+    else:
+        return fechaHora.strftime('%Y-%m-%d %H:%M')
+
+### CALCULA LA CANTIDAD DE HORAS
+def calcular_diferencia_horas(hora_inicial, hora_final):
+    formato = "%Y-%m-%d %H:%M"
+    hora_inicial_dt = datetime.datetime.strptime(hora_inicial, formato)
+    hora_final_dt = datetime.datetime.strptime(hora_final, formato)
+    diferencia = hora_final_dt - hora_inicial_dt
+    horas = diferencia.total_seconds() / 3600
+    return round(horas, 2)
+
+### VERFICO SI LA HORA ESTA EN EL MISMO O DIFERENTE DÍA
+def Mismo_o_Diferente_dia(ID,fecha1, fecha2):
+    formato = "%Y-%m-%d %H:%M"
+    f1 = datetime.datetime.strptime(fecha1, formato)
+    f2 = datetime.datetime.strptime(fecha2, formato)
+
+    # VERIFICA SI LAS FECHAS ESTÁN EN DIFERENTE DIA
+    if f1.date() != f2.date():
+        # SI ESTÁN EN DIFERENTE DÍA MANDA 4 FECHAS
+        f1_a = f1
+        f1_b = datetime.datetime(f1.year, f1.month, f1.day, 23, 59)
+        f2_a = datetime.datetime(f2.year, f2.month, f2.day, 0, 0)
+        f2_b = f2
+        lista_diferente_dia = [ID + "*" + str(f1_a.strftime(formato)), ID + "*" + str(f1_b.strftime(formato)), ID + "*" + str(f2_a.strftime(formato)), ID + "*" + str(f2_b.strftime(formato))]
+        
+        return lista_diferente_dia
+    
+    lista_mismo_dia = [ID + "*" + str(fecha1),ID + "*" + str(fecha2)]
+
+    return lista_mismo_dia
+
+### OBTENGO EL DÍA DE LA SEMANA DADO LA CADENA DE FECHA HORA
+def obtener_dia_semana(fecha):
+    fechas = datetime.datetime.strptime(fecha, "%Y-%m-%d %H:%M")
+    locale.setlocale(locale.LC_ALL, 'es_ES.utf8')
+    dia_semana = fechas.strftime("%A")
+    return dia_semana.capitalize()
+
+### ME TRAE UNA LISTA QUE CONTIENE LISTAS CON LA CANTIDAD DE DÍAS QUE ENCUENTRA
+def trae_lista_con_listado():
+    listado_HE_por_dia = []
+    lista_HE_sin_proceso = llama_horas_extras_no_procesadas()
+    for item in lista_HE_sin_proceso:
+        ID = str(item[0])
+        Desde = str(item[1])
+        Hasta = str(item[2])
+        listado_dias = Mismo_o_Diferente_dia(ID,Desde,Hasta)
+        listado_HE_por_dia.append(listado_dias)
+    return listado_HE_por_dia
+
+#### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
+def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado):
+    values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado]
+    try:
+        with connections['default'].cursor() as cursor:
+            # Realizar la inserción en la tabla HorasExtras_Procesadas
+            sql_insert = "INSERT INTO HorasExtras_Procesadas (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, ID_HESP, EstadoEnvia) "\
+                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql_insert, values)
+
+            # Realizar la actualización en la tabla HorasExtras_Sin_Procesar
+            sql_update = "UPDATE HorasExtras_Sin_Procesar SET Estado = '0' WHERE ID_HESP = %s"
+            cursor.execute(sql_update, [id_HESP])
+
+    except Exception as e:
+        print("Error al insertar o actualizar en la base de datos:")
+        print(e)
+
+    finally:
+        cursor.close()
+        connections['default'].close()
+
+#### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
+def buscaDatos_paraInsertar(id):
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT Legajo AS LEGAJO,IdMotivo AS IDMOTIVO, DescripcionMotivo AS DESCRIPCION, Autorizado AS AUTORIZADO, UsuarioEncargado AS ENCARGADO, ID_HESP AS ID " \
+                "FROM HorasExtras_Sin_Procesar " \
+                "WHERE ID_HESP = %s "
+            cursor.execute(sql, [id])
+            consulta = cursor.fetchone()
+            if consulta:
+                legajo = str(consulta[0])
+                idMotivo = str(consulta[1])
+                descripcion = str(consulta[2])
+                autorizado = str(consulta[3])
+                encargado = str(consulta[4])
+                idSinProceso = str(consulta[5])
+            return legajo, idMotivo, descripcion, autorizado, encargado, idSinProceso
+    except Exception as e:
+        print("Error")
+        print(e)
+    finally:
+        cursor.close()
+        connections['default'].close()
+
+#### LLAMA LAS HORAS EXTRAS NO PROCESADAS
+def llama_horas_extras_no_procesadas():
+    listado_horas_extras_sin_proceso = []
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT ID_HESP AS ID, CONVERT(VARCHAR(16), DateTimeDesde, 120) AS DESDE, CONVERT(VARCHAR(16), DateTimeHasta, 120) AS HASTA " \
+                "FROM HorasExtras_Sin_Procesar " \
+                "WHERE Arreglo = '0' AND Estado = '1' "
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for i in consulta:
+                    horas = [str(i[0]), str(i[1]), str(i[2])]
+                    listado_horas_extras_sin_proceso.append(horas)
+            return listado_horas_extras_sin_proceso
+    except Exception as e:
+        print("Error")
+        print(e)
+    finally:
+        cursor.close()
+        connections['default'].close()
+
+### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
+def InsertaInicioFinal(ID,Inicio,Final):
+    diaSemana = obtener_dia_semana(Inicio)
+
+################################# LUNES A VIERNES ##################################
+    if diaSemana in ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"]:
+        soloFecha = obtener_solo_fecha(Inicio)
+
+        Inicio_Nocturna_00_05 = LV_HoraExtraNocturna_00_a_05_Inicio(Inicio)
+        Inicio_Al50_05_20 = LV_HoraExtraAl50_05_a_20_Inicio(Inicio)
+        Inicio_Nocturna_20_00 = LV_HoraExtraNocturna_20_a_00_Inicio(Inicio)
+
+        Final_Nocturna_00_05 = LV_HoraExtraNocturna_00_a_05_Final(Final)
+        Final_Al50_05_20 = LV_HoraExtraAl50_05_a_20_Final(Final)
+        Final_Nocturna_20_00 = LV_HoraExtraNocturna_20_a_00_Final(Final)
+
+        if Inicio_Nocturna_00_05:
+            if Final_Nocturna_00_05:
+                ##### HORA EMPIEZA Y TERMINA ENTRE LAS 00/05
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Al50_05_20:
+                #### EMPIEZA ENTRE 00/05 Y TERMINA ENTRE 05/20 AL 50%
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                #### EMPIEZA 00/05 PASA POR 05/20 Y TERMINA EN 20/00
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)               
+
+        if Inicio_Al50_05_20:
+            if Final_Al50_05_20:
+                #### INICIA EN 05/20 Y TERMINE 05/20
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                #### INICIA 05/20 Y TERMINA 20/00
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                        
+        if Inicio_Nocturna_20_00:
+            #### INICIA 20/00 Y TERMINA 20/00
+            horaInicio = Inicio
+            horaFinal = obtener_dia_siguiente(Final)
+            estado = "1"
+            tipoHora = "N"
+            cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+            legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+            desdeSin = horaInicio.replace(' ', 'T')
+            hastaSin = horaFinal.replace(' ', 'T')
+            desde = desdeSin + ":00.000"
+            hasta = hastaSin + ":00.000"
+            insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+            
+
+################################## SÁBADO #########################################
+    if diaSemana == "Sábado":
+        soloFecha = obtener_solo_fecha(Inicio)
+
+        Inicio_Nocturna_00_05 = Sabado_HoraExtraNocturna_00_a_05_Inicio(Inicio)
+        Inicio_Al50_05_13 = Sabado_HoraExtraAl50_05_a_13_Inicio(Inicio)
+        Inicio_Al100_13_20 = Sabado_HoraExtraAl100_13_a_20_Inicio(Inicio)
+        Inicio_Nocturna_20_00 = Sabado_HoraExtraNocturnas_20_a_00_Inicio(Inicio)
+
+        Final_Nocturna_00_05 = Sabado_HoraExtraNocturna_00_a_05_Final(Final)
+        Final_Al50_05_13 = Sabado_HoraExtraAl50_05_a_13_Final(Final)
+        Final_Al100_13_20 = Sabado_HoraExtraAl100_13_a_20_Final(Final)
+        Final_Nocturna_20_00 = Sabado_HoraExtraNocturnas_20_a_00_Final(Final)
+
+        if Inicio_Nocturna_00_05:
+            if Final_Nocturna_00_05:
+                #### INICIA Y TERMINA ENTRE 00/05
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                        
+            if Final_Al50_05_13:
+                #### INICIA ENTRE 00/05 Y TERMINA ENTRE 05/13
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                print(diaSemana)
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            
+            if Final_Al100_13_20:
+                #### INICIA ENTRE 00/05, PASA ENTRE 05/13 Y TERMINA ENTRE LAS 13/20
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = soloFecha + " 13:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 13:00"
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                #### INICIA EN 00/05 PASA POR 05/13, 13/20 Y TERMINA 20/00
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = soloFecha + " 13:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 13:00"
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+        if Inicio_Al50_05_13:
+            if Final_Al50_05_13:
+                #### INICIA  Y TERMINA ENTRE 05/13
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                            
+            if Final_Al100_13_20:
+                #### INICIA ENTRE  05/13 Y TERMINA ENTRE LAS 13/20
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 13:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 13:00"
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                #### INICIA EN 05/13 PASA  13/20 Y TERMINA 20/00
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 13:00"
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 13:00"
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+        if Inicio_Al100_13_20:
+            if Final_Al100_13_20:
+                #### INICIA Y TERMINA ENTRE LAS 13/20
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                #### INICIA EN  13/20 Y TERMINA 20/00
+                horaInicio = Inicio
+                horaInicio = soloFecha + " 13:00"
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+        if Inicio_Nocturna_20_00:
+            #### INICIA Y TERMINA ENTRE LAS 20/00
+            horaInicio = Inicio
+            horaFinal = obtener_dia_siguiente(Final)
+            estado = "1"
+            tipoHora = "N"
+            cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+            legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+            desdeSin = horaInicio.replace(' ', 'T')
+            hastaSin = horaFinal.replace(' ', 'T')
+            desde = desdeSin + ":00.000"
+            hasta = hastaSin + ":00.000"
+            insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+
+################################ DOMINGO ##########################################
+    if diaSemana == "Domingo":
+        soloFecha = obtener_solo_fecha(Inicio)
+        
+        Inicio_Nocturna_00_05 = Domingo_HoraExtraNocturna_00_a_05_Inicio(Inicio)
+        Inicio_Al100_05_20 = Domingo_HoraExtra100_05_a_20_Inicio(Inicio)
+        Inicio_Nocturna_20_00 = Domingo_HoraExtraNocturna_20_a_00_Inicio(Inicio)
+
+        Final_Nocturna_00_05 = Domingo_HoraExtraNocturna_00_a_05_Final(Final)
+        Final_Al100_05_20 = Domingo_HoraExtra100_05_a_20_Final(Final)
+        Final_Nocturna_20_00 = Domingo_HoraExtraNocturna_20_a_00_Final(Final)
+
+        if Inicio_Nocturna_00_05:
+            if Final_Nocturna_00_05:
+                ##### HORA EMPIEZA Y TERMINA ENTRE LAS 00/05
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Al100_05_20:
+                ##### EMPIEZA ENTRE 00/05 Y TERMINA ENTRE 05/20
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+
+            if Final_Nocturna_20_00:
+                #### INICIA EN 00/05 PASA POR 05/20 Y TERMINA EN 20/00
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 05:00"
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 05:00"
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+        if Inicio_Al100_05_20:
+            if Final_Al100_05_20:
+                horaInicio = Inicio
+                horaFinal = Final
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+            if Final_Nocturna_20_00:
+                horaInicio = Inicio
+                horaFinal = soloFecha + " 20:00"
+                estado = "1"
+                tipoHora = "100"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+                horaInicio = soloFecha + " 20:00"
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "N"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                
+        if Inicio_Nocturna_20_00:
+            horaInicio = Inicio
+            horaFinal = obtener_dia_siguiente(Final)
+            estado = "1"
+            tipoHora = "N"
+            cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+            legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+            desdeSin = horaInicio.replace(' ', 'T')
+            hastaSin = horaFinal.replace(' ', 'T')
+            desde = desdeSin + ":00.000"
+            hasta = hastaSin + ":00.000"
+            insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+
+#### FUNCION PAR APROCESAR CADA 30 MINUTOS
+def procesoHorasExtras():
+    listado_de_listado_de_HE = trae_lista_con_listado()
+    for diasLista in listado_de_listado_de_HE:
+        cantidad = len(diasLista)
+
+        if cantidad == 2:
+            DT1 = str(diasLista[0])
+            DT2 = str(diasLista[1])
+            ListaDiaUno = DT1.split('*')
+            ListaDiaDos = DT2.split('*')
+            ID_HoraExtra_MD = str(ListaDiaUno[0])
+            Inicio = str(ListaDiaUno[1])
+            Final = str(ListaDiaDos[1])
+            InsertaInicioFinal(ID_HoraExtra_MD,Inicio,Final)
+
+        if cantidad == 4:
+            DT1A = str(diasLista[0])
+            DT1B = str(diasLista[1])
+            DT2A = str(diasLista[2])
+            DT2B = str(diasLista[3])
+            ListaDiaUnoA = DT1A.split('*')
+            ListaDiaUnoB = DT1B.split('*')
+            ListaDiaDosA = DT2A.split('*')
+            ListaDiaDosB = DT2B.split('*')
+            ID_HoraExtra_DD = str(ListaDiaUnoA[0])
+            Inicio_Uno_A = str(ListaDiaUnoA[1])
+            Final_Uno_B = str(ListaDiaUnoB[1])
+            Inicio_Dos_A = str(ListaDiaDosA[1])
+            Final_Dos_B = str(ListaDiaDosB[1])
+            InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Uno_A,Final_Uno_B)
+            InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Dos_A,Final_Dos_B)
 
 
 
+############################################################################################################################
+############################################################################################################################
+###################################### FINAL PROCESA HORAS EXTRAS ##########################################################
+############################################################################################################################
+############################################################################################################################
 
 
 

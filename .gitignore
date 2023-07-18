@@ -1,0 +1,14 @@
+
+### CACHÉ MAIN
+__pycache__/*
+
+### CHACHÉ DE S3A 51051
+S3A/__pycache__/*
+
+### CHACHE DE APLICACIONES
+Applications/Mobile/Anticipos/__pycache__/*
+Applications/Mobile/GeneralApp/__pycache__/*
+Applications/Mobile/HorasExtras/__pycache__/*
+Applications/Mobile/Presentismo/__pycache__/*
+
+Applications/TareasProgramadas/__pycache__/*
