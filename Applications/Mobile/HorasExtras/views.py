@@ -67,7 +67,7 @@ def insert_HoraExtra(request):
                 fechaDesde, fechaHasta = retornaYYYYMMDD(Desde,Hasta)
                 print(horaDesde,horaHasta,fechaDesde,fechaHasta)
 
-                if verificaHoraExtra(horaDesde, horaHasta, fechaDesde, fechaHasta) == False:
+                if verificaHoraExtra(horaDesde, horaHasta, fechaDesde, fechaHasta):
                     lista_tieneHE_asignada.append(Legajo)
                 else:
                     with connections['default'].cursor() as cursor:
