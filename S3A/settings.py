@@ -221,7 +221,7 @@ CRONJOBS = [
     ('0 */1 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos'), # EJECUTAR CADA UNA HORAS
 
     ################################## PROCESO DE HORAS EXTRAS ################################## 
-    ('*/30 * * * *', 'Applications.TareasProgramadas.tasks.procesoHorasExtras ') # EJECUTAR CADA 30 MIN
+    ('*/30 * * * *', 'Applications.TareasProgramadas.tasks.procesoHorasExtras') # EJECUTAR CADA 30 MIN
     #('35 11,16 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')# EJECUTAR TODOS LOS DIAS A LAS  12 Y 16 HS
     #('*/2 * * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos')  # Ejecutar cada 5 minutos
     #('15 7 * * *', 'Applications.TareasProgramadas.tasks.sumar_numeros')  # Ejecutar a las 07:15
