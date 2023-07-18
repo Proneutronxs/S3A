@@ -218,7 +218,7 @@ STATIC_URL = '/static/'
 CRONJOBS = [
     #('0 */2 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA DOS HORAS
     ################################## TRASPASO DE LEGAJOS DE ISIS A PRINCIPAL ################################## 
-    ('0 */1 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA UNA HORAS
+    ('0 */1 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos'), # EJECUTAR CADA UNA HORAS
 
     ################################## PROCESO DE HORAS EXTRAS ################################## 
     ('*/30 * * * *', 'Applications.TareasProgramadas.tasks.procesoHorasExtras ') # EJECUTAR CADA 30 MIN
