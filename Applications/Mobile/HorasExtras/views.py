@@ -65,9 +65,9 @@ def insert_HoraExtra(request):
                 
                 horaDesde, horaHasta = retornaHHMM(Desde,Hasta)
                 fechaDesde, fechaHasta = retornaYYYYMMDD(Desde,Hasta)
-                print(horaDesde,horaHasta,fechaDesde,fechaHasta)
+                #print(horaDesde,horaHasta,fechaDesde,fechaHasta)
 
-                if verificaHoraExtra(horaDesde, horaHasta, fechaDesde, fechaHasta):
+                if verificaHoraExtra(Legajo, horaDesde, horaHasta, fechaDesde, fechaHasta):
                     lista_tieneHE_asignada.append(Legajo)
                 else:
                     with connections['default'].cursor() as cursor:
@@ -114,13 +114,13 @@ def retornaYYYYMMDD(f1,f2):
     fechaHasta = fechaDos.strftime(formato_salida)
     return fechaDesde, fechaHasta
 
-def verificaHoraExtra(horaDesde,horaHasta,fechaDesde,fechaHasta):
+def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
     try:
         with connections['default'].cursor() as cursor:
             sql = "SELECT  CONVERT(VARCHAR(5), DateTimeDesde, 108) AS H_DESDE, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS H_HASTA "\
                     "FROM HorasExtras_Sin_Procesar " \
-                    "WHERE TRY_CONVERT(DATE, DateTimeDesde) >= %s AND TRY_CONVERT(DATE, DateTimeHasta) <= %s"
-            cursor.execute(sql, [fechaDesde, fechaHasta])
+                    "WHERE Legajo = %s AND TRY_CONVERT(DATE, DateTimeDesde) >= %s AND TRY_CONVERT(DATE, DateTimeHasta) <= %s"
+            cursor.execute(sql, [legajo, fechaDesde, fechaHasta])
             consulta = cursor.fetchone()
             if consulta:
                 horaD = str(consulta[0])
