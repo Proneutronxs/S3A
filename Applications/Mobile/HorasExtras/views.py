@@ -125,7 +125,7 @@ def verificaHoraExtra(horaDesde,horaHasta,fechaDesde,fechaHasta):
             if consulta:
                 horaD = str(consulta[0])
                 horaH =str(consulta[1])
-                if verificar_rango(horaDesde,horaHasta,horaD,horaH):
+                if verificar_solapamiento(horaDesde,horaHasta,horaD,horaH):
                     return True
                 else:
                     return False
@@ -156,16 +156,24 @@ def traeApellidos(legajo):
         connections['ISISPayroll'].close()
 
 ### VERIFICA SI LA HORA INGRESADA YA TIENE ASIGNADO UNA HORA EXTRA
-def verificar_rango(hora_desde_a, hora_hasta_a, hora_desde_b, hora_hasta_b):
-    hora_a_minutos_desde = int(hora_desde_a.split(':')[0]) * 60 + int(hora_desde_a.split(':')[1])
-    hora_a_minutos_hasta = int(hora_hasta_a.split(':')[0]) * 60 + int(hora_hasta_a.split(':')[1])
-    hora_b_minutos_desde = int(hora_desde_b.split(':')[0]) * 60 + int(hora_desde_b.split(':')[1])
-    hora_b_minutos_hasta = int(hora_hasta_b.split(':')[0]) * 60 + int(hora_hasta_b.split(':')[1])
+def verificar_solapamiento(hora_a_desde, hora_a_hasta, hora_b_desde, hora_b_hasta):
+    formato = "%H:%M"
 
-    if hora_b_minutos_desde >= hora_a_minutos_desde and hora_b_minutos_hasta <= hora_a_minutos_hasta:
+    hora_a_desde = datetime.datetime.strptime(hora_a_desde, formato).time()
+    hora_a_hasta = datetime.datetime.strptime(hora_a_hasta, formato).time()
+    hora_b_desde = datetime.datetime.strptime(hora_b_desde, formato).time()
+    hora_b_hasta = datetime.datetime.strptime(hora_b_hasta, formato).time()
+
+    if hora_a_desde >= hora_b_desde and hora_a_desde <= hora_b_hasta:
         return True
-    else:
-        return False
+    if hora_a_hasta >= hora_b_desde and hora_a_hasta <= hora_b_hasta:
+        return True
+    if hora_b_desde >= hora_a_desde and hora_b_desde <= hora_a_hasta:
+        return True
+    if hora_b_hasta >= hora_a_desde and hora_b_hasta <= hora_a_hasta:
+        return True
+
+    return False
 
 ### FUNCIÓN QUE CALCULA LA CANTIDAD DE HORAS EXTRAS CON DOS VALORES DATE TIME
 def calcular_CantHoras(hora1, hora2):
