@@ -569,7 +569,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
 
 ################################# LUNES A VIERNES ##################################
-    if diaSemana in ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"]:
+    if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
         soloFecha = obtener_solo_fecha(Inicio)
 
         Inicio_Nocturna_00_05 = LV_HoraExtraNocturna_00_a_05_Inicio(Inicio)
