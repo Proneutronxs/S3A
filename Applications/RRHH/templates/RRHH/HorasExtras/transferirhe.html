@@ -1,0 +1,87 @@
+{% extends "RRHH/HorasExtras/horasExtras.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row">
+            <h4>TRANSFERENCIA DE HORAS EXTRAS</h4>
+            <label class="letras" for="TipoHora">Buscar por:</label>
+            <select class="selectores" type="checkbox" id="ComboxBuscarPor" name="ComboxBuscarPor">
+            <option value="0">Seleccione</option>
+            <option value="h">Horas</option>
+            <option value="l">Legajos</option>
+            </select>
+            <form style="display: none;" id="formMostrarHorasExtras" method="POST" action="">
+              <label class="letras" for="TipoHora">Horas: </label>
+              <select class="selectores" type="checkbox" id="ComboxTipoHoraTransf" name="ComboxTipoHoraTransf">
+              <option value="0">Seleccione</option>
+              <option value="50">Horas al 50 %</option>
+              <option value="100">Horas al 100 %</option>
+              <option value="N">Horas Nocturnas</option>
+              <option value="A">Horas Arregladas</option>
+              </select>
+            </form>
+            <form style="display: none;" id="formMostrarHorasExtrasLegajo" method="POST" action="">
+              <label class="letras" for="TipoHora">Legajos: </label>
+              <select class="selectores" type="checkbox" id="ComboxTipoLegajoTransf" name="ComboxTipoLegajoTransf">
+              </select>
+            </form>
+        </div>
+    </div>
+    <div class="transferir">
+        <form id="formEnviaHorasExtras" method="POST" action="#">
+            <div class="formularios">
+              <div class="row_items">
+                <div class="items-row">
+                  <label class="letras" for="valor">Valor: </label>
+                  <input class="input-number" type="number" id="HeImporte" step="0.01" min="0" name="valor" placeholder="0000,00">
+                </div>
+                <div class="items-row">
+                  <label class="letras" for="HePagada">Pagada: </label>
+                  <input class="input-checkbox" type="checkbox" id="HePagada" name="HePagada" value="P">
+                </div>
+                <div class="items-row">
+                    <button id="enviaElFormHorasExtras" class="btn-submit botones" type="button"><b>Guardar</b></button>
+                </div>
+              </div>
+            </div>
+          
+            <div class="container-tabla-he">
+                <table class="pre-hs-ex">
+                    <thead>
+                      <tr>
+                        <th style="width: 40px;"><i class='bx bx-check icon'></i></th>
+                        <th style="width: 60px;">Tipo</th>
+                        <th style="width: 80px;">Legajo</th>
+                        <th style="width: 280px;">Nombre y Apellido</th>
+                        <th style="width: 180px;">Desde - Fecha y Hora</th>
+                        <th style="width: 180px;">Hasta - Fecha y Hora</th>
+                        <th>Motivo</th>
+                        <th style="width: 80px;">Horas</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaHorasProcesadas">
+                    </tbody>
+                  </table>                          
+            </div>                    
+        </form>
+    </div>                  
+</div>
+
+<div class="modal-overlay">
+    <div class="modal-container">
+      <div class="demo-container">
+        <div class="progress-bar">
+          <div class="progress-bar-value"></div>
+        </div>
+      </div>
+    </div>
+</div>
+  
+  
+  
+<script src="{%static 'TresAses/js/HorasExtras/horasExtras.js' %}"></script>
+{% endblock %}

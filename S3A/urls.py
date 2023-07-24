@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+
+    ### ADMINISTRACION DE PANEL DJANGO
+    path('administracion/', admin.site.urls),
 
     ### API GENERAL APPLICATIONS
     path('api/general/', include('Applications.Mobile.GeneralApp.urls')),
@@ -30,4 +32,11 @@ urlpatterns = [
 
     #### MOBILE HORAS EXTRAS
     path('api/hextras/', include('Applications.Mobile.HorasExtras.urls')),
+
+    ### URL APLICACIÓN TRES ASES GENERAL
+    path('', include('Applications.TresAses.urls')),
+
+    ### URL APLICACIÓN RRHH
+    path('rrhh/', include('Applications.RRHH.urls'))
+
 ]

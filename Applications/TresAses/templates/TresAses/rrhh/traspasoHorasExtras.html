@@ -1,0 +1,222 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    
+    <title>Tres Ases</title> 
+</head>
+<body>
+    <nav class="sidebar">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="TA.png" alt="">
+                </span>
+
+                <div class="text logo-text">
+                    <span class="name"></span>
+                    <span class="profession"> <b>Tres Ases</b> </span>
+                </div>
+            </div>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-home-alt icon' ></i>
+                            <span class="text nav-text">Inicio</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-space-bar icon' ></i>
+                            <span class="text nav-text">Báscula</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bxs-factory icon' ></i>
+                            <span class="text nav-text">Empaque</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-bar-chart-alt-2 icon' ></i>
+                            <span class="text nav-text">ETE</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bxs-truck icon' ></i>
+                            <span class="text nav-text">Expedición</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-money icon' ></i>
+                            <span class="text nav-text">Liquidación</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-cog icon' ></i>
+                            <span class="text nav-text">Mantenimiento</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-trending-up icon' ></i>
+                            <span class="text nav-text">Producción</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-file icon' ></i>
+                            <span class="text nav-text">Reportes</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bx-group icon' ></i>
+                            <span class="text nav-text">RRHH</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="bottom-content">
+                <li class="">
+                    <a href="#">
+                        <i class='bx bx-log-out icon' ></i>
+                        <span class="text"><b>Usuario</b></span>
+                    </a>
+                </li>                
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="container">            
+            <div class="encabezado" style="background-color: #a72626">
+                <div class="text" style="font-size: 20px;">AUTORIZACIÓN DE HORAS EXTRAS PRE-CARGADAS</div>
+            </div>
+            <div class="contenedor">
+                <!-- <div class="text letras">FORMULARIO COMPLETO CON TABLAS CARGADAS</div> -->
+                <form method="POST" action="#">
+                    <div class="formularios">
+                      <div class="row_items">
+                        <div class="items-row">
+                          <label class="letras" for="TipoHora">Tipo de Hora: </label>
+                          <select class="selectores" type="checkbox" id="TipoHora" name="TipoHora">
+                            <option value="0">Seleccione</option>
+                            <option value="50">50 %</option>
+                            <option value="100">100 %</option>
+                            <option value="N">Nocturna</option>
+                            <option value="A">Arreglo</option>
+                            <option value="S">Simple</option>
+                          </select>
+                        </div>
+                        <div class="items-row">
+                          <label class="letras" for="valor">Valor: </label>
+                          <input class="input-number" type="number" step="0.01" min="0" name="valor" placeholder="0000,00">
+                        </div>
+                        <div class="items-row">
+                          <label class="letras" for="HePagada">Pagada: </label>
+                          <input class="input-checkbox" type="checkbox" id="HePagada" name="HePagada" value="valor">
+                        </div>
+                        <div class="items-row">
+                            <button class="btn-submit botones" type="submit"><b>Guardar</b></button>
+                        </div>
+                      </div>
+                    </div>
+                  
+                    <div class="container-tabla-he">
+                        <table class="pre-hs-ex">
+                            <thead>
+                              <tr>
+                                <th style="width: 40px;"><i class='bx bx-check icon'></i></th>
+                                <th style="width: 60px;">Tipo</th>
+                                <th style="width: 80px;">Legajo</th>
+                                <th style="width: 280px;">Nombre y Apellido</th>
+                                <th style="width: 180px;">Desde - Fecha y Hora</th>
+                                <th style="width: 180px;">Hasta - Fecha y Hora</th>
+                                <th>Motivo</th>
+                                <th style="width: 80px;">Horas</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                  <td style="width: 40px;"><input class="input-checkbox" type="checkbox"></td>
+                                  <td style="width: 60px;">100</td>
+                                  <td style="width: 80px;">1234</td>
+                                  <td style="width: 280px;">John Doe</td>
+                                  <td style="width: 180px;">09/06/2023 - 07:15</td>
+                                  <td style="width: 180px;">9/06/2023 - 17:00</td>
+                                  <td>Vacaciones</td>
+                                  <td style="width: 80px;">8.00</td>
+                                </tr>
+                                <tr>
+                                  <td style="width: 40px;"><input class="input-checkbox" type="checkbox"></td>
+                                  <td style="width: 60px;">50</td>
+                                  <td style="width: 80px;">5678</td>
+                                  <td style="width: 280px;">Jane Smith</td>
+                                  <td style="width: 180px;">09/06/2023 - 07:15</td>
+                                  <td style="width: 180px;">9/06/2023 - 17:00</td>
+                                  <td>Enfermedad</td>
+                                  <td style="width: 80px;">6.50</td>
+                                </tr>
+                                <tr>
+                                  <td style="width: 40px;"><input class="input-checkbox" type="checkbox"></td>
+                                  <td style="width: 60px;">NOC</td>
+                                  <td style="width: 80px;">9012</td>
+                                  <td style="width: 280px;">Michael Johnson</td>
+                                  <td style="width: 180px;">09/06/2023 - 07:15</td>
+                                  <td style="width: 180px;">9/06/2023 - 17:00</td>
+                                  <td>Permiso</td>
+                                  <td style="width: 80px;">7.25</td>
+                                </tr>
+                                <tr>
+                                  <td style="width: 40px;"><input class="input-checkbox" type="checkbox"></td>
+                                  <td style="width: 60px;">50</td>
+                                  <td style="width: 80px;">3456</td>
+                                  <td style="width: 280px;">Sarah Williams</td>
+                                  <td style="width: 180px;">09/06/2023 - 07:15</td>
+                                  <td style="width: 180px;">9/06/2023 - 17:00</td>
+                                  <td>Home Office</td>
+                                  <td style="width: 80px;">7.50</td>
+                                </tr>
+                                <tr>
+                                  <td style="width: 40px;"><input class="input-checkbox" type="checkbox"></td>
+                                  <td style="width: 60px;">100</td>
+                                  <td style="width: 80px;">58015</td>
+                                  <td style="width: 280px;">Chambí Josué Rubén</td>
+                                  <td style="width: 180px;">09/06/2023 - 07:15</td>
+                                  <td style="width: 180px;">9/06/2023 - 17:00</td>
+                                  <td>Home Office</td>
+                                  <td style="width: 80px;">8.75</td>
+                                </tr>
+                            </tbody>
+                          </table>                          
+                    </div>                    
+                  </form>                  
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:sans-serif;
+}
+
+:root{
+    --body-color: #f0f0f0;
+    --sidebar-color: #FFF;
+    --primary-color: #a72626;
+    --primary-color-light: #f0f0f1;
+    --toggle-color: #b4adad;
+    --text-color: #444343;
+
+    --tran-03: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.3s ease;
+    --tran-05: all 0.3s ease;
+}
+
+body{
+    min-height: 100vh;
+    background-color: var(--body-color);
+    transition: var(--tran-05);
+}
+
+::selection{
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 170px;
+    padding: 8px 2px;
+    background: var(--sidebar-color);
+    transition: var(--tran-05);
+    z-index: 100;  
+}
+
+.sidebar li{
+    height: 34px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.sidebar header .image,
+.sidebar .icon{
+    min-width: 60px;
+    border-radius: 6px;
+
+}
+
+.sidebar .icon{
+    min-width: 60px;
+    border-radius: 6px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.sidebar .text,
+.sidebar .icon{
+    color: var(--text-color);
+    transition: var(--tran-03);
+}
+
+.sidebar .text{
+    font-size: 15px;
+    font-weight: 100;
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.sidebar header{
+    position: relative;
+}
+
+.sidebar header .image-text{
+    display: flex;
+    align-items: center;
+}
+.sidebar header .logo-text{
+    display: flex;
+    flex-direction: column;
+}
+header .image-text .name {
+    margin-top: 2px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+header .image-text .profession{
+    font-size: 16px;
+    margin-top: -2px;
+    display: block;
+}
+
+.sidebar header .image{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar header .image img{
+    width: 45px;
+    border-radius: 6px;
+}
+
+.sidebar.close .toggle{
+    transform: translateY(-50%) rotate(0deg);
+}
+
+.sidebar .menu{
+    margin-top: 40px;
+}
+
+.sidebar li.search-box{
+    border-radius: 6px;
+    background-color: var(--primary-color-light);
+    cursor: pointer;
+    transition: var(--tran-05);
+}
+
+.sidebar li.search-box input{
+    height: 100%;
+    width: 100%;
+    outline: none;
+    border: none;
+    background-color: var(--primary-color-light);
+    color: var(--text-color);
+    border-radius: 6px;
+    font-size: 17px;
+    font-weight: 500;
+    transition: var(--tran-05);
+}
+.sidebar li a{
+    list-style: none;
+    height: 100%;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: var(--tran-03);
+}
+
+.sidebar li a:hover{
+    background-color: var(--primary-color);
+}
+.sidebar li a:hover .icon,
+.sidebar li a:hover .text{
+    color: var(--sidebar-color);
+}
+
+.sidebar .menu-bar{
+    height: calc(100% - 55px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: scroll;
+}
+.menu-bar::-webkit-scrollbar{
+    display: none;
+}
+.sidebar .menu-bar .mode{
+    border-radius: 6px;
+    background-color: var(--primary-color-light);
+    position: relative;
+    transition: var(--tran-05);
+}
+
+.home{
+    position: fixed;
+    top: 0;
+    top: 0;
+    left: 170px; 
+    height: 100vh;
+    width: calc(100% - 170px);
+    background-color: var(--body-color);
+    transition: var(--tran-05);
+}
+.home .text{
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 60px;
+}
+
+.menu{
+  overflow-x: auto;
+  background-color: #2653a721;
+}
+
+.menu::-webkit-scrollbar {
+  width: 5px; /* Ancho de la barra */
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background-color: #a72626; /* Color de la barra de desplazamiento */
+  border-radius: 3px; /* Radio de las esquinas de la barra de desplazamiento */
+}
+
+.menu::-webkit-scrollbar-thumb:hover {
+  background-color: #821e1e; /* Color de la barra de desplazamiento al pasar el cursor */
+}
+
+/* Estilo para la barra de desplazamiento en Firefox */
+.menu {
+  scrollbar-width: thin;
+}
+
+.menu::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Color del fondo de la barra de desplazamiento */
+}
+
+
+.imageInicio{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+}
+
+.logoInicio img {
+  width: 200px; /* Cambiar el ancho a 200px */
+  height: 130px; /* Cambiar el alto a 150px */
+}
+
+
+
+/* ACÁ  INICIO TODO LAS PANTALLAS A RECORRER */
+
+.container{
+    height: 100%;
+}
+.encabezado{
+    height: 60px;
+    color: #fff;
+}
+
+.contenedor{
+    color: #fff;
+}
+
+.formularios{
+    color: #fff;
+}
+
+.letras{
+  color: black;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.selectores {
+  color: black;
+  background-color: #fff;
+  border: 1px solid #a72626;
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 10px;
+  height: 30px;
+}
+  
+.selectores option {
+  color: black;
+}
+
+.row_items{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.items-row{
+  padding: 15px;
+  justify-content: flex-start;
+}
+
+.botones{
+  height: 35px;
+}
+
+.input-number {
+  height: 35px;
+  appearance: none;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  padding: 5px;
+  font-size: 14px;
+  width: 110px;
+  height: 30px;
+}
+
+.input-number:focus {
+  outline: none;
+  border-color: #a72626;
+  box-shadow: 0 0 4px rgba(167, 38, 38, 0.6);
+}
+
+input[type="checkbox"].input-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #a72626;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.btn-submit {
+  border: 1px solid #ccc;
+  padding: 2px 16px;
+  background-color: #ffffff;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  color: #000000;
+  transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+  height: 30px;
+}
+
+.btn-submit:hover {
+  border-color: #a72626;
+  background-color: #a72626;
+  color: #ffffff;
+}
+
+
+.container-tabla-he{
+  height: 75%;
+}
+
+.pre-hs-ex {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pre-hs-ex th,
+.pre-hs-ex td {
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.pre-hs-ex th {
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+.pre-hs-ex tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.pre-hs-ex tbody tr:hover {
+  background-color: #e9e9e9;
+}
+
+.pre-hs-ex thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #fff; /* ajusta el color de fondo según tus necesidades */
+}
+
+.container-tabla-he{
+  overflow-x: auto;
+}
+
+
+.text.letras {
+  display: flex;
+  align-items: center; /* Alinea verticalmente los elementos */
+}
+
+.text.letras .row {
+  display: flex;
+  align-items: center; /* Alinea verticalmente los elementos */
+  gap: 5px; /* Espacio entre los elementos */
+}
+
+.text.letras .row h4 {
+  margin: 0; /* Elimina el margen por defecto del h4 */
+  margin-right: 50px; /* Agrega margen a la derecha del h4 */
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+  z-index: 9999;
+}
+
+.demo-container {
+  width: 280px;
+  height: 80%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-bar {
+  height: 5px;
+  background-color: #a72626;
+  width: 100%;
+  overflow: hidden;
+}
+
+.progress-bar-value {
+  width: 100%;
+  height: 100%;
+  background-color: #b67373;
+  animation: indeterminateAnimation 1s infinite linear;
+  transform-origin: 0% 50%;
+}
+
+@keyframes indeterminateAnimation {
+  0% {
+    transform:  translateX(0) scaleX(0);
+  }
+  40% {
+    transform:  translateX(0) scaleX(0.4);
+  }
+  100% {
+    transform:  translateX(100%) scaleX(0.5);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
