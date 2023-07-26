@@ -161,6 +161,27 @@ def traeNombreISIS(legajo):
     finally:
         connections['ISISPayroll'].close()
 
+def actualiza(codigo):
+    legTarjeta = completar_ceros(codigo)
+    try:
+        with connections ['principal'].cursor() as cursor:
+            sql = "UPDATE T_Legajos SET legTarjeta = %s WHERE legCodigo = %s"
+            cursor.execute(sql, [legTarjeta,codigo])
+
+    except Exception as e:
+        print(e)
+    finally:
+        connections['principal'].close()
+
+def completar_ceros(numero_str):
+    longitud_deseada = 8
+    ceros_faltantes = longitud_deseada - len(numero_str)
+    if ceros_faltantes > 0:
+        numero_completo = "0" * ceros_faltantes + numero_str
+    else:
+        numero_completo = numero_str
+    return numero_completo
+
 def TrasladoLegajos():
     legajos_no_principal = buscaLegajosPRINCIPAL()
     for i in legajos_no_principal:
@@ -195,6 +216,10 @@ def TrasladoLegajos():
             insertaSonidosLegajos(legLegajo)
             insertaTarjetaPeriodo_A(legLegajo)
             insertaTarjetaPeriodo_B(legLegajo)
+            actualiza(legLegajo)
+
+
+
 
 
 ############################################################################################################################
