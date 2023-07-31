@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from S3A.conexionessql import *
 import json
-
+from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from django.db import connections
 from django.http import JsonResponse
 
@@ -14,8 +14,10 @@ def insert_fichada(request):
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
+            usuario = str(json.loads(body)['usuario'])
+            fechaHora = str(json.loads(body)['actual'])
+            registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            #print("¡¡¡¡¡¡¡ACA SE MUESTRAN LOS DATOS!!!!!!!")
             for item in datos:
                 legajo = item['Legajo'] ### LEGAJO
                 tarjeta = traeLegTarjeta(str(item['Codigo']), str(item['Tarjeta']))### TARJETA
@@ -34,9 +36,13 @@ def insert_fichada(request):
                     #cursor.close()
                 #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + codigo + " - " + estado + " - " + orden)
             nota = "Los registros se guardaron exitosamente."
+            est = "E"
+            insertaRegistro(usuario,fechaHora,registro,est)
             return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
             error = str(e)
+            est = "F"
+            insertaRegistro(usuario,fechaHora,registro,est)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['principal'].close()

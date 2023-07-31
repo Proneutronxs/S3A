@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from S3A.conexionessql import *
 import json
-
+from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from django.db import connections
 from django.http import JsonResponse
 
@@ -15,6 +15,9 @@ def login_app(request):
         body = request.body.decode('utf-8')
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
+        fechaHora = str(json.loads(body)['actual']) + ".000"
+        registro = str(json.loads(body)['registro'])
+        print(fechaHora,registro)
         try:
             with connections['default'].cursor() as cursor:
                 sql = "SELECT USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt AS H_EXTRAS, USR_PERMISOS_APP.MD_Presentismo AS ASISTENCIA, USR_PERMISOS_APP.MD_Anticipos AS ANTICIPOS " \
@@ -34,12 +37,16 @@ def login_app(request):
                     }
                     #print("INICIA SESION")
                     datos = {'Message': 'Success', 'Data': response_data}
+                    estado = "E"
+                    insertaRegistro(usuario,fechaHora,registro,estado)
                     return JsonResponse(datos)
                 else:
                     response_data = {
                         'Message': 'Not Found',
                         'Nota': 'Usuario o Contraseña inválidos.'
                     }
+                    estado = "F"
+                    insertaRegistro(usuario,fechaHora,registro,estado)
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)

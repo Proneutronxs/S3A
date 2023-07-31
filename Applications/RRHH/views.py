@@ -130,7 +130,6 @@ def enviarHorasCargadas(request):
         resultados = []
         for i in checkboxes_tildados:
             ID_HEP = str(i) 
-            print(ID_HEP)
             fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
             Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
             resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)

@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from S3A.conexionessql import *
 from datetime import datetime
 import json
-
+from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from django.db import connections
 from django.http import JsonResponse
 
@@ -50,6 +50,9 @@ def insert_HoraExtra(request):
         try:
             lista_tieneHE_asignada = []
             body = request.body.decode('utf-8')
+            usuario = str(json.loads(body)['usuario'])
+            fechaHora = str(json.loads(body)['actual'])
+            registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
             for item in datos:
                 Legajo = str(item['Legajo']) ### LEGAJO
@@ -77,6 +80,8 @@ def insert_HoraExtra(request):
                         cursor.close()
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
+                est = "E"
+                insertaRegistro(usuario,fechaHora,registro,est)
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
             else:
                 nombres = []
@@ -84,10 +89,14 @@ def insert_HoraExtra(request):
                     Apellido = traeApellidos(str(legajo))
                     nombres.append(Apellido)
                 nota = "Los siguientes Apellidos ya tienen asignadas horas extras en ese rango horario: \n" + ', \n'.join(nombres) + '.'
+                est = "E"
+                insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
             print(e)
             error = str(e)
+            est = "F"
+            insertaRegistro(usuario,fechaHora,registro,est) 
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['default'].close()
