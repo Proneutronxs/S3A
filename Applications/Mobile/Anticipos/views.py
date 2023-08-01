@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from S3A.conexionessql import *
 import json
-from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
+from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro, enviarCorreo
 from django.db import connections
 from django.http import JsonResponse
 
@@ -19,10 +19,8 @@ def insert_anticipos(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            listaExistentes = []
-            listaFechas = []
-            verifica= 0
-            #print(usuario,fechaHora,registro)
+            listado = []
+
             for item in datos:
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
                 Fecha = item['Fecha']### FECHA DEL ADELANTO
@@ -35,17 +33,62 @@ def insert_anticipos(request):
                     sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
-                    cursor.close()
+                    #cursor.close()
+
+                ### ADJUNTA LOS DATOS DE LA GENTE 
+                with connections['ISISPayroll'].cursor() as cursor:
+                    sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
+                            "FROM Empleados " \
+                            "WHERE Regis_Epl = %s "
+                    cursor.execute(sql, [Regis_Epl])
+                    consulta = cursor.fetchone()
+                    if consulta:
+                        data = str(consulta[0]) + ' - Monto: $' + str(Importe)
+                        listado.append(data)
+                    #cursor.close()
+
+            contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+            asunto = 'Carga de Anticipos.'
+            listadoCorreos = correosChacras()
+            for correo in listadoCorreos:
+                enviarCorreo(asunto,contenido,correo)
+
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})      
         except Exception as e:
             error = str(e)
-            estado = "E"
+            print(error)
+            estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+# def datosEmpleado(Regis_Epl):
+#     try:
+        
+
+
+def correosChacras():
+    listadoCorreos = []
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT Correo " \
+                    "FROM Correos " \
+                    "WHERE Sector = 'CHACRA' "
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for i in consulta:
+                    correo = str(i[0])
+                    listadoCorreos.append(correo)
+        return listadoCorreos
+    except Exception as e:
+        error = str(e)
+        return listadoCorreos
+    finally:
+        connections['default'].close()

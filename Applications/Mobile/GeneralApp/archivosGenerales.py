@@ -1,5 +1,7 @@
 from django.db import connections
-
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 
 
 
@@ -15,3 +17,45 @@ def insertaRegistro(legajo,fecha,tipo,estado):
         return error
     finally:
         connections['default'].close()
+
+def enviarCorreo(asunto, contenido, destinatario):
+
+    remitente = 'aplicativo@tresases.com.ar'
+    asunto = 'No Responder - ' + asunto
+    cuerpo = contenido
+
+    correo = MIMEMultipart()
+    correo['From'] = remitente
+    correo['To'] = destinatario
+    correo['Subject'] = asunto
+
+    correo.attach(MIMEText(cuerpo, 'plain'))
+    servidor_smtp = smtplib.SMTP('mail.tresases.com.ar', 587)
+    servidor_smtp.starttls()
+    servidor_smtp.login(remitente, '8vzU&Uz3iorn')
+    servidor_smtp.send_message(correo)
+    servidor_smtp.quit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

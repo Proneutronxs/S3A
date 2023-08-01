@@ -123,7 +123,6 @@ def personal_por_Ccostos_asistencia(request, codigo):
                         nombre = str(row[2])
                         datos = {'Legajo': legajo, 'legCodigo': legCodigo, 'Nombre': nombre}
                         lista_data.append(datos)
-                    #print("LLAMA PERSONAL DE ASISTENCIA")
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
