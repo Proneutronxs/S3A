@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_crontab',
     'Applications.TresAses',
     'Applications.RRHH',
+    'Applications.Reportes',
 ]
 
 MIDDLEWARE = [

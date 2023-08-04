@@ -37,6 +37,11 @@ urlpatterns = [
     path('', include('Applications.TresAses.urls')),
 
     ### URL APLICACIÓN RRHH
-    path('rrhh/', include('Applications.RRHH.urls'))
+    path('rrhh/', include('Applications.RRHH.urls')),
+
+    ### URL APLICACIÓN RRHH
+    path('reportes/', include('Applications.Reportes.urls')),
+
+
 
 ]

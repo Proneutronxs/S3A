@@ -36,12 +36,12 @@ def insert_anticipos(request):
                     #cursor.close()
 
                 ### ADJUNTA LOS DATOS DE LA GENTE 
-                with connections['ISISPayroll'].cursor() as cursor:
+                with connections['ISISPayroll'].cursor() as cursor2:
                     sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
                             "FROM Empleados " \
                             "WHERE Regis_Epl = %s "
-                    cursor.execute(sql, [Regis_Epl])
-                    consulta = cursor.fetchone()
+                    cursor2.execute(sql, [Regis_Epl])
+                    consulta = cursor2.fetchone()
                     if consulta:
                         data = str(consulta[0]) + ' - Monto: $' + str(Importe)
                         listado.append(data)
@@ -49,9 +49,9 @@ def insert_anticipos(request):
 
             contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
             asunto = 'Carga de Anticipos.'
-            listadoCorreos = correosChacras()
-            for correo in listadoCorreos:
-                enviarCorreo(asunto,contenido,correo)
+            # listadoCorreos = correosChacras()
+            # for correo in listadoCorreos:
+            #     enviarCorreo(asunto,contenido,correo)
 
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
