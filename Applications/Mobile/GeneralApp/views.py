@@ -25,9 +25,10 @@ def login_app(request):
         print(fechaHora,registro)
         try:
             with connections['default'].cursor() as cursor:
-                sql = "SELECT USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt AS H_EXTRAS, USR_PERMISOS_APP.MD_Presentismo AS ASISTENCIA, USR_PERMISOS_APP.MD_Anticipos AS ANTICIPOS " \
-                      "FROM USUARIOS CROSS JOIN USR_PERMISOS_APP " \
-                      "WHERE USUARIOS.Usuario = %s AND USUARIOS.Clave = %s"
+                sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \
+                      "FROM            USUARIOS INNER JOIN " \
+                            "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
+                      "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
                 cursor.execute(sql, [usuario, clave])
                 consulta = cursor.fetchone()
                 
