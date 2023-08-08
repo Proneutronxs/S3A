@@ -1,13 +1,18 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from S3A.conexionessql import *
 import json
+from django.http import FileResponse
+import os
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from django.db import connections
 from django.http import JsonResponse
 
 
+def subirApp(request):
+    return render (request, 'generalapp/subirApp.html')
+
 ### LOGIN DE LA APLICACIÓN
+
 
 @csrf_exempt
 def login_app(request):
@@ -215,3 +220,62 @@ def traeMontoMax():
         return error
     finally:
         connections['default'].close()
+
+
+
+
+
+
+#### SUBIR APLICACION
+
+
+@csrf_exempt
+def recibir_apk(request):
+    if request.method == 'POST' and request.FILES.get('archivo_apk'):
+        archivo_apk = request.FILES['archivo_apk']
+        nombre_archivo = archivo_apk.name
+        ruta_destino = os.path.join('Applications/Mobile/GeneralApp/archivosAPK/', nombre_archivo)
+        try:
+            with open(ruta_destino, 'wb+') as destino:
+                for chunk in archivo_apk.chunks():
+                    destino.write(chunk)
+            return JsonResponse({'Message': 'Success','Nota': 'Archivo .apk almacenado correctamente.'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error','Nota': 'Error al almacenar el archivo .apk: {}'.format(e)}, status=500)
+    else:
+        return JsonResponse({'mensaje': 'No se encontró el archivo .apk en la solicitud POST.'}, status=400)
+
+
+@csrf_exempt
+def descargar_apk(request, nombre_apk):
+    ruta_apk = os.path.join('Applications/Mobile/GeneralApp/archivosAPK/', nombre_apk)
+    if os.path.exists(ruta_apk):
+        try:
+            with open(ruta_apk, 'rb') as archivo:
+                contenido = archivo.read()
+                response = HttpResponse(contenido, content_type='application/vnd.android.package-archive')
+                response['Content-Disposition'] = f'attachment; filename="{os.path.basename(ruta_apk)}"'
+                return response
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': error})  
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición (El Archivo no Existe).'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir APK</title>
+</head>
+<body>
+    <h1>Subir archivo .apk</h1>
+    <form id="formSubirAPK" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <input type="file" name="archivo_apk">
+            <input type="button" id="subirAplicacion" value="Subir archivo">
+        </div>
+    </form>
+</body>
+    <script src="{%static 'TresAses/js/subirApk/subirapp.js' %}"></script>
+</html>

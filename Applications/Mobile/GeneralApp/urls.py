@@ -4,7 +4,9 @@ from Applications.Mobile.GeneralApp import views
 urlpatterns = [
 
 ### sólo renderizado
-
+path('subir-aplicacion/', views.subirApp, name="subirApp"),
+path('subir-aplicacion/recibir_apk/', views.recibir_apk, name='recibir_apk'),
+path('descargar-app/<str:nombre_apk>', views.descargar_apk, name='descargar_apk'),
 ### LOGIN DE LA APLICACION
 path('login_App', views.login_app, name="login_App"),
 

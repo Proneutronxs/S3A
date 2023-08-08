@@ -64,6 +64,8 @@ def insert_anticipos(request):
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
+            cursor.close()
+            cursor2.close()
             connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})

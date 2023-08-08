@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'o@gi7gzjk8)i3m_gqsqu94$diq2^joa!8gr%1pi*td3e9bqi5_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -83,52 +83,52 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 ###### ORIGINAL S3A
-DATABASES = {
-    'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'TRESASES_APLICATIVO',
-        'USER': 'sa',
-        'HOST': '192.168.1.3\sql2012',
-        'PASSWORD': '',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
-    'ISISPayroll': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'TresAses_ISISPayroll',
-        'USER': 'sa',
-        'HOST': '192.168.1.3\sql2012',
-        'PASSWORD': '',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
-    'principal': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'principal',
-        'USER': 'sa',
-        'HOST': '192.168.1.3\sql2012',
-        'PASSWORD': '',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
-    'S3A': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'S3A',
-        'USER': 'sa',
-        'HOST': '192.168.1.3\sql2012',
-        'PASSWORD': '',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'TRESASES_APLICATIVO',
+#         'USER': 'sa',
+#         'HOST': '192.168.1.3\sql2012',
+#         'PASSWORD': '',
+#         'PORT': '',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+#     'ISISPayroll': {
+#         'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'TresAses_ISISPayroll',
+#         'USER': 'sa',
+#         'HOST': '192.168.1.3\sql2012',
+#         'PASSWORD': '',
+#         'PORT': '',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+#     'principal': {
+#         'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'principal',
+#         'USER': 'sa',
+#         'HOST': '192.168.1.3\sql2012',
+#         'PASSWORD': '',
+#         'PORT': '',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+#     'S3A': {
+#         'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'S3A',
+#         'USER': 'sa',
+#         'HOST': '192.168.1.3\sql2012',
+#         'PASSWORD': '',
+#         'PORT': '',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     }
+# }
 
 ###### LOCAL S3A
 # DATABASES = {
@@ -218,6 +218,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50242880
 
 CRONJOBS = [
     #('0 */2 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA DOS HORAS
