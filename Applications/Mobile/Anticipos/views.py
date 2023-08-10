@@ -50,8 +50,8 @@ def insert_anticipos(request):
             contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
             asunto = 'Carga de Anticipos.'
             listadoCorreos = correosChacras()
-            for correo in listadoCorreos:
-                enviarCorreo(asunto,contenido,correo)
+            # for correo in listadoCorreos:
+            #     enviarCorreo(asunto,contenido,correo)
 
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
