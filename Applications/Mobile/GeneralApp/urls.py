@@ -7,6 +7,8 @@ urlpatterns = [
 path('subir-aplicacion/', views.subirApp, name="subirApp"),
 path('subir-aplicacion/recibir_apk/', views.recibir_apk, name='recibir_apk'),
 path('descargar-app/<str:nombre_apk>', views.descargar_apk, name='descargar_apk'),
+
+path('busca-parametro/<str:codigo>', views.buscaParametro, name='buscaParametro'),
 ### LOGIN DE LA APLICACION
 path('login_App', views.login_app, name="login_App"),
 

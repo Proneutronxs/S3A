@@ -263,7 +263,45 @@ def descargar_apk(request, nombre_apk):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición (El Archivo no Existe).'})
 
-
+# SELECT Texto --Numerico
+# FROM Parametros_Aplicativo
+# WHERE Codigo = 'APP-ACT'
+@csrf_exempt
+def buscaParametro(request, codigo):
+    if request.method == 'GET':
+        try:
+            with connections['default'].cursor() as cursor:
+                sql = "SELECT Texto " \
+                      "FROM Parametros_Aplicativo " \
+                      "WHERE Codigo = %s "
+                cursor.execute(sql, [codigo])
+                consulta = cursor.fetchone()
+                
+                if consulta:
+                    parametro = str(consulta[0])
+                    datos = {'Message': 'Success', 'Parametro': parametro}                    
+                    return JsonResponse(datos)
+                else:
+                    error = 'No se encontraron Parámetros.'
+                    response_data = {
+                        'Message': 'Error',
+                        'Nota': error
+                    }
+                return JsonResponse(response_data)
+        except Exception as e:
+            error = str(e)
+            response_data = {
+                'Message': 'Error',
+                'Nota': error
+            }
+            return JsonResponse(response_data)
+        finally:
+            connections['default'].close()
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
 
 
 
