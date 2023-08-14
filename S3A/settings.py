@@ -197,6 +197,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.tresases.com.ar'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'aplicativo@tresases.com.ar'
+EMAIL_HOST_PASSWORD = '8vzU&Uz3iorn'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

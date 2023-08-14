@@ -18,8 +18,10 @@ def insertaRegistro(legajo,fecha,tipo,estado):
     finally:
         connections['default'].close()
 
-def enviarCorreo(asunto, contenido, destinatario):
 
+#contrseña = 8vzU&Uz3iorn
+
+def enviarCorreo(asunto, contenido, destinatario):
     remitente = 'aplicativo@tresases.com.ar'
     asunto = 'No Responder - ' + asunto
     cuerpo = contenido
@@ -32,7 +34,7 @@ def enviarCorreo(asunto, contenido, destinatario):
     correo.attach(MIMEText(cuerpo, 'plain'))
     servidor_smtp = smtplib.SMTP('mail.tresases.com.ar', 587)
     servidor_smtp.starttls()
-    servidor_smtp.login(remitente, '8vzU&Uz3iorn')
+    servidor_smtp.login(remitente, '1234')
     servidor_smtp.send_message(correo)
     servidor_smtp.quit()
 

@@ -5,6 +5,7 @@ import json
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro, enviarCorreo
 from django.db import connections
 from django.http import JsonResponse
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -107,10 +108,21 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto):
         connections['default'].close()
 
 
+def enviar_correo_sendMail(asunto, mensaje, destinatario):
+    remitente = 'aplicativo@tresases.com.ar'
+    asunto = 'No Responder - ' + asunto
+
+    send_mail(
+        asunto,
+        mensaje,
+        remitente,
+        [destinatario],
+        fail_silently=False,
+    )
+
 def enviaCorreo(listado):
     contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
     asunto = 'Carga de Anticipos.'
     listadoCorreos = correosChacras()
     for correo in listadoCorreos:
-        #enviarCorreo(asunto,contenido,correo)
-        print(correo)
+        enviar_correo_sendMail(asunto,contenido,correo)
