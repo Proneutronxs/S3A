@@ -28,13 +28,13 @@ def insert_anticipos(request):
                 Motivo = 'CH - ' + str(item['MotivoAd']) ### MOTIVO ADELANTO
                 Estado = item['Regis_TEA'] ### ESTADO ADELANTO
                 Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO               
+                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
 
                 with connections['ISISPayroll'].cursor() as cursor:
                     sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
                 
-            #     auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
             #     LegajoNombre = obtieneNombres(Regis_Epl)
             #     datosLegajo = LegajoNombre + ' Monto: $' + Importe
             #     listado.append(datosLegajo)
