@@ -19,7 +19,7 @@ def insert_anticipos(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            #F_Anticipo = datos['Data'][0]['Regis_Epl']
+            F_Anticipo = []
             listado = []
             listadoRegis_Epl = []
 
@@ -36,18 +36,19 @@ def insert_anticipos(request):
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
                 listadoRegis_Epl.append(Regis_Epl)
+                F_Anticipo.append(Fecha)
             
-            ### ADJUNTA LOS DATOS DE LA GENTE 
-            # for i in listadoRegis_Epl:
-            #     with connections['ISISPayroll'].cursor() as cursor2:
-            #         sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
-            #                 "FROM Empleados " \
-            #                 "WHERE Regis_Epl = %s AND FechaAde = %s"
-            #         cursor2.execute(sql, [i, F_Anticipo])
-            #         consulta = cursor2.fetchone()
-            #         if consulta:
-            #             data = str(consulta[0]) + ' - Monto: $' + str(Importe)
-            #             listado.append(data)
+            ## ADJUNTA LOS DATOS DE LA GENTE 
+            for i in listadoRegis_Epl:
+                with connections['ISISPayroll'].cursor() as cursor2:
+                    sql2 = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
+                            "FROM Empleados " \
+                            "WHERE Regis_Epl = %s AND FechaAde = %s"
+                    cursor2.execute(sql2, [i, F_Anticipo[0]])
+                    consulta2 = cursor2.fetchone()
+                    if consulta2:
+                        data = str(consulta2[0]) + ' - Monto: $' + str(Importe)
+                        listado.append(data)
 
             # contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
             # asunto = 'Carga de Anticipos.'
