@@ -39,7 +39,7 @@ def insert_anticipos(request):
                 datosLegajo = LegajoNombre + ' Monto: $' + Importe
                 listado.append(datosLegajo)
             
-            #enviaCorreo(listado)
+            enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
@@ -108,8 +108,8 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto):
 
 
 def enviaCorreo(listado):
-    contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+    contenido = 'Se cargaron anticipos de las siguientes personas: '
     asunto = 'Carga de Anticipos.'
     listadoCorreos = correosChacras()
-    correo = 'aplicativo@tresases.com.ar'
-    enviarCorreo(asunto,contenido,correo)
+    for correo in listadoCorreos:
+        enviarCorreo(asunto,contenido,correo)
