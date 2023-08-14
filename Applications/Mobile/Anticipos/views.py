@@ -40,7 +40,7 @@ def insert_anticipos(request):
                 datosLegajo = LegajoNombre + ' Monto: $' + Importe
                 listado.append(datosLegajo)
             
-            enviaCorreo(listado)
+            #enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
@@ -97,10 +97,11 @@ def obtieneNombres(Regis_Epl):
 
 
 def auditaAnticipos(usuario, Fechahora, Destino, Monto):
+    estado = '1'
     try:
         with connections['default'].cursor() as cursor:
-            sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto) VALUES (%s, %s, %s, %s)"
-            values = (usuario,Fechahora,Destino,Monto)
+            sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto, EstadoCorreo) VALUES (%s, %s, %s, %s, %s)"
+            values = (usuario,Fechahora,Destino,Monto,estado)
             cursor.execute(sql, values)
     except Exception as e:
         print(e)
