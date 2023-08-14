@@ -39,26 +39,18 @@ def insert_anticipos(request):
                 datosLegajo = LegajoNombre + ' Monto: $' + Importe
                 listado.append(datosLegajo)
             
-
-            contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
-            asunto = 'Carga de Anticipos.'
-            listadoCorreos = correosChacras()
-            for correo in listadoCorreos:
-                enviarCorreo(asunto,contenido,correo)
-
+            enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})      
         except Exception as e:
             error = str(e)
-            #print(error)
             estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
-            #cursor2.close()
             connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
@@ -113,3 +105,11 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto):
         print(e)
     finally:
         connections['default'].close()
+
+
+def enviaCorreo(listado):
+    contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+    asunto = 'Carga de Anticipos.'
+    listadoCorreos = correosChacras()
+    for correo in listadoCorreos:
+        enviarCorreo(asunto,contenido,correo)
