@@ -20,6 +20,7 @@ def insert_anticipos(request):
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
             listado = []
+            listadoRegis_Epl = []
 
             for item in datos:
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
@@ -33,19 +34,18 @@ def insert_anticipos(request):
                     sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
-                    #cursor.close()
-
-                ### ADJUNTA LOS DATOS DE LA GENTE 
-            with connections['ISISPayroll'].cursor() as cursor2:
-                sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
-                        "FROM Empleados " \
-                        "WHERE Regis_Epl = %s "
-                cursor2.execute(sql, [Regis_Epl])
-                consulta = cursor2.fetchone()
-                if consulta:
-                    data = str(consulta[0]) + ' - Monto: $' + str(Importe)
-                    listado.append(data)
-                    #cursor.close()
+                listadoRegis_Epl.append(Regis_Epl)
+            ### ADJUNTA LOS DATOS DE LA GENTE 
+            for i in listadoRegis_Epl:
+                with connections['ISISPayroll'].cursor() as cursor2:
+                    sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
+                            "FROM Empleados " \
+                            "WHERE Regis_Epl = %s "
+                    cursor2.execute(sql, [i])
+                    consulta = cursor2.fetchone()
+                    if consulta:
+                        data = str(consulta[0]) + ' - Monto: $' + str(Importe)
+                        listado.append(data)
 
             contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
             asunto = 'Carga de Anticipos.'
