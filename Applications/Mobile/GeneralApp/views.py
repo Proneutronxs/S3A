@@ -20,9 +20,9 @@ def login_app(request):
         body = request.body.decode('utf-8')
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
-        fechaHora = str(json.loads(body)['actual']) + ".000"
+        fechaHora = str(json.loads(body)['actual'])
         registro = str(json.loads(body)['registro'])
-        print(fechaHora,registro)
+        #print(fechaHora,registro)
         try:
             with connections['default'].cursor() as cursor:
                 sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \

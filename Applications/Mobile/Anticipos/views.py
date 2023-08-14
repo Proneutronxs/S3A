@@ -25,8 +25,8 @@ def insert_anticipos(request):
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
                 Fecha = item['Fecha']### FECHA DEL ADELANTO
                 Importe = item['Importe'] ### IMPORTE ADELANTO
-                Motivo = item['MotivoAd'] ### MOTIVO ADELANTO
-                Estado = item['Regis_TEA'] ### EESTADO ADELANTO
+                Motivo = 'CH - ' + str(item['MotivoAd']) ### MOTIVO ADELANTO
+                Estado = item['Regis_TEA'] ### ESTADO ADELANTO
                 Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO               
 
                 with connections['ISISPayroll'].cursor() as cursor:
@@ -59,7 +59,7 @@ def insert_anticipos(request):
             return JsonResponse({'Message': 'Success', 'Nota': nota})      
         except Exception as e:
             error = str(e)
-            print(error)
+            #print(error)
             estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
