@@ -35,9 +35,9 @@ def insert_anticipos(request):
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
                 
-            #     LegajoNombre = obtieneNombres(Regis_Epl)
-            #     datosLegajo = LegajoNombre + ' Monto: $' + Importe
-            #     listado.append(datosLegajo)
+                LegajoNombre = obtieneNombres(Regis_Epl)
+                datosLegajo = LegajoNombre + ' Monto: $' + Importe
+                listado.append(datosLegajo)
             
             # enviaCorreo(listado)
             estado = "E"
