@@ -39,7 +39,7 @@ def insert_anticipos(request):
                 datosLegajo = LegajoNombre + ' Monto: $' + Importe
                 listado.append(datosLegajo)
             
-            enviaCorreo(listado)
+            #enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
