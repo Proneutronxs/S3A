@@ -19,7 +19,7 @@ def insert_anticipos(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            F_Anticipo = datos['Data'][0]['Regis_Epl']
+            #F_Anticipo = datos['Data'][0]['Regis_Epl']
             listado = []
             listadoRegis_Epl = []
 
