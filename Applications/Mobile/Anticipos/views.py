@@ -110,7 +110,7 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto):
 def enviaCorreo(listado):
     contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
     asunto = 'Carga de Anticipos.'
-    #listadoCorreos = correosChacras()
-    #for correo in listadoCorreos:
-    correo = 'aplicativo@tresases.com.ar'
-    enviarCorreo(asunto,contenido,correo)
+    listadoCorreos = correosChacras()
+    for correo in listadoCorreos:
+        #enviarCorreo(asunto,contenido,correo)
+        print(correo)
