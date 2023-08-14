@@ -19,9 +19,7 @@ def insert_anticipos(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            F_Anticipo = []
             listado = []
-            listadoRegis_Epl = []
 
             for item in datos:
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
@@ -35,26 +33,18 @@ def insert_anticipos(request):
                     sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
-                listadoRegis_Epl.append(Regis_Epl)
-                F_Anticipo.append(Fecha)
+                
+                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
+                LegajoNombre = obtieneNombres(Regis_Epl)
+                datosLegajo = LegajoNombre + ' Monto: $' + Importe
+                listado.append(datosLegajo)
             
-            ## ADJUNTA LOS DATOS DE LA GENTE 
-            for i in listadoRegis_Epl:
-                with connections['ISISPayroll'].cursor() as cursor2:
-                    sql2 = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
-                            "FROM Empleados " \
-                            "WHERE Regis_Epl = %s AND FechaAde = %s"
-                    cursor2.execute(sql2, [i, F_Anticipo[0]])
-                    consulta2 = cursor2.fetchone()
-                    if consulta2:
-                        data = str(consulta2[0]) + ' - Monto: $' + str(Importe)
-                        listado.append(data)
 
-            # contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
-            # asunto = 'Carga de Anticipos.'
-            # listadoCorreos = correosChacras()
-            # for correo in listadoCorreos:
-            #     enviarCorreo(asunto,contenido,correo)
+            contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+            asunto = 'Carga de Anticipos.'
+            listadoCorreos = correosChacras()
+            for correo in listadoCorreos:
+                enviarCorreo(asunto,contenido,correo)
 
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
@@ -73,10 +63,6 @@ def insert_anticipos(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-# def datosEmpleado(Regis_Epl):
-#     try:
-        
-
 
 def correosChacras():
     listadoCorreos = []
@@ -98,21 +84,32 @@ def correosChacras():
     finally:
         connections['default'].close()
 
-# def obtieneDatosParaCorreo(Regis_Epl):
-#     listado = []
-#     try:
-#         with connections['ISISPayroll'].cursor() as cursor2:
-#             sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
-#                     "FROM Empleados " \
-#                     "WHERE Regis_Epl = %s "
-#             cursor2.execute(sql, [i])
-#             consulta = cursor2.fetchone()
-#             if consulta:
-#                 data = str(consulta[0]) + ' - Monto: $' + str(Importe)
-#                 listado.append(data)
-#         return listado
-#     except Exception as e:
-#         error = str(e)
-#         return listado
-#     finally:
-#         connections['ISISPayroll'].close()
+def obtieneNombres(Regis_Epl):
+    nombre = ''
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
+                    "FROM Empleados " \
+                    "WHERE Regis_Epl = %s "
+            cursor.execute(sql, [Regis_Epl])
+            consulta = cursor.fetchone()
+            if consulta:
+                nombre = str(consulta[0])
+        return nombre
+    except Exception as e:
+        error = str(e)
+        return nombre
+    finally:
+        connections['ISISPayroll'].close()
+
+
+def auditaAnticipos(usuario, Fechahora, Destino, Monto):
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto) VALUES (%s, %s, %s, %s)"
+            values = (usuario,Fechahora,Destino,Monto)
+            cursor.execute(sql, values)
+    except Exception as e:
+        print(e)
+    finally:
+        connections['default'].close()
