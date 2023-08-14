@@ -36,22 +36,22 @@ def insert_anticipos(request):
                     cursor.execute(sql, values)
                 listadoRegis_Epl.append(Regis_Epl)
             ### ADJUNTA LOS DATOS DE LA GENTE 
-            for i in listadoRegis_Epl:
-                with connections['ISISPayroll'].cursor() as cursor2:
-                    sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
-                            "FROM Empleados " \
-                            "WHERE Regis_Epl = %s "
-                    cursor2.execute(sql, [i])
-                    consulta = cursor2.fetchone()
-                    if consulta:
-                        data = str(consulta[0]) + ' - Monto: $' + str(Importe)
-                        listado.append(data)
+            # for i in listadoRegis_Epl:
+            #     with connections['ISISPayroll'].cursor() as cursor2:
+            #         sql = "SELECT (CONVERT(VARCHAR(6), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + nombresEmple) " \
+            #                 "FROM Empleados " \
+            #                 "WHERE Regis_Epl = %s "
+            #         cursor2.execute(sql, [i])
+            #         consulta = cursor2.fetchone()
+            #         if consulta:
+            #             data = str(consulta[0]) + ' - Monto: $' + str(Importe)
+            #             listado.append(data)
 
             contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
             asunto = 'Carga de Anticipos.'
             listadoCorreos = correosChacras()
-            for correo in listadoCorreos:
-                enviarCorreo(asunto,contenido,correo)
+            # for correo in listadoCorreos:
+            #     enviarCorreo(asunto,contenido,correo)
 
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
@@ -65,7 +65,7 @@ def insert_anticipos(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
-            cursor2.close()
+            #cursor2.close()
             connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
