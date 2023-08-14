@@ -49,11 +49,11 @@ def insert_anticipos(request):
             #             data = str(consulta[0]) + ' - Monto: $' + str(Importe)
             #             listado.append(data)
 
-            contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
-            asunto = 'Carga de Anticipos.'
-            listadoCorreos = correosChacras()
-            for correo in listadoCorreos:
-                enviarCorreo(asunto,contenido,correo)
+            # contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+            # asunto = 'Carga de Anticipos.'
+            # listadoCorreos = correosChacras()
+            # for correo in listadoCorreos:
+            #     enviarCorreo(asunto,contenido,correo)
 
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
