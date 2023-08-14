@@ -34,12 +34,12 @@ def insert_anticipos(request):
                     values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
                     cursor.execute(sql, values)
                 
-                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
-                LegajoNombre = obtieneNombres(Regis_Epl)
-                datosLegajo = LegajoNombre + ' Monto: $' + Importe
-                listado.append(datosLegajo)
+            #     auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
+            #     LegajoNombre = obtieneNombres(Regis_Epl)
+            #     datosLegajo = LegajoNombre + ' Monto: $' + Importe
+            #     listado.append(datosLegajo)
             
-            enviaCorreo(listado)
+            # enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
