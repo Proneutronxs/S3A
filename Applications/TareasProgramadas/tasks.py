@@ -1211,7 +1211,7 @@ def procesoHorasExtras():
 def listadoAnticipos():
     try:
         with connections['default'].cursor() as cursor:
-            sql = "SELECT        'Legajo: ' + CONVERT(VARCHAR(8),TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) + ' ' + " \
+            sql = "SELECT        CONVERT(VARCHAR(8),TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) + ' ' + " \
                                 "' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2) + ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs.' AS COLUMNA "\
                     "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                             "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino " \
