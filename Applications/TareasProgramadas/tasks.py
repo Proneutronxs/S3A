@@ -1215,7 +1215,8 @@ def listadoAnticipos():
                                 "' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2) + ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs.' AS COLUMNA "\
                     "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                             "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino " \
-                    "WHERE        (Auditoria_Anticipos.EstadoCorreo = '1')"
+                    "WHERE        (Auditoria_Anticipos.EstadoCorreo = '1') " \
+                    "ORDER BY TresAses_ISISPayroll.dbo.Empleados.CodEmpleado"
             cursor.execute(sql)
             consulta = cursor.fetchall()
             lista_data = []
@@ -1266,16 +1267,17 @@ def enviar_correo_sendMail(asunto, mensaje, destinatario):
 
 def enviaCorreosAnticipos():
     listado = listadoAnticipos()
-    try:
-        contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
-        asunto = 'Carga de Anticipos.'
-        listadoCorreos = correosChacras()
-        for correo in listadoCorreos:
-            enviar_correo_sendMail(asunto,contenido,correo)
-        actualizaEstadoAnticipo()
-    except Exception as e:
-        error = str(e)
-        print(error)
+    if listado:
+        try:
+            contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+            asunto = 'Carga de Anticipos.'
+            listadoCorreos = correosChacras()
+            for correo in listadoCorreos:
+                enviar_correo_sendMail(asunto,contenido,correo)
+            actualizaEstadoAnticipo()
+        except Exception as e:
+            error = str(e)
+            print(error)
 
 def actualizaEstadoAnticipo():
     try:
