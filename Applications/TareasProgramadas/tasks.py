@@ -1272,11 +1272,21 @@ def enviaCorreosAnticipos():
         listadoCorreos = correosChacras()
         for correo in listadoCorreos:
             enviar_correo_sendMail(asunto,contenido,correo)
+        actualizaEstadoAnticipo()
     except Exception as e:
         error = str(e)
         print(error)
 
+def actualizaEstadoAnticipo():
+    try:
+        with connections ['default'].cursor() as cursor:
+            sql = "UPDATE Auditoria_Anticipos SET EstadoCorreo = '0' WHERE EstadoCorreo = '1'"
+            cursor.execute(sql)
 
+    except Exception as e:
+        print(e)
+    finally:
+        connections['default'].close()
 
 
 
