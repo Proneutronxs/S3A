@@ -1,5 +1,5 @@
 from django.db import connections
-# from datetime import datetime
+from django.core.mail import send_mail
 import datetime
 import locale
 
@@ -1206,9 +1206,75 @@ def procesoHorasExtras():
 
 
 
+##########################   INICIO DE ENVÍO DE CORREOS #############################################################
 
+def listadoAnticipos():
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT        'Legajo: ' + CONVERT(VARCHAR(8),TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) + ' ' + " \
+                                "' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2) + ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs.' AS COLUMNA "\
+                    "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                            "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino " \
+                    "WHERE        (Auditoria_Anticipos.EstadoCorreo = '1')"
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            lista_data = []
+            if consulta:
+                for row in consulta:
+                    datos = str(row[0])
+                    lista_data.append(datos)
+                return lista_data
+            else:
+                return lista_data
+    except Exception as e:
+        error = str(e)
+        return lista_data
+    finally:
+        connections['default'].close()
 
+def correosChacras():
+    listadoCorreos = []
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "SELECT Correo " \
+                    "FROM Correos " \
+                    "WHERE Sector = 'CHACRA' "
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for i in consulta:
+                    correo = str(i[0])
+                    listadoCorreos.append(correo)
+        return listadoCorreos
+    except Exception as e:
+        error = str(e)
+        return listadoCorreos
+    finally:
+        connections['default'].close()
 
+def enviar_correo_sendMail(asunto, mensaje, destinatario):
+    remitente = 'aplicativo@tresases.com.ar'
+    asunto = 'No Responder - ' + asunto
+
+    send_mail(
+        asunto,
+        mensaje,
+        remitente,
+        [destinatario],
+        fail_silently=False,
+    )
+
+def enviaCorreosAnticipos():
+    listado = listadoAnticipos()
+    try:
+        contenido = 'Se cargaron anticipos de las siguientes personas: \n \n' + ', \n'.join(listado) + '.'
+        asunto = 'Carga de Anticipos.'
+        listadoCorreos = correosChacras()
+        for correo in listadoCorreos:
+            enviar_correo_sendMail(asunto,contenido,correo)
+    except Exception as e:
+        error = str(e)
+        print(error)
 
 
 
