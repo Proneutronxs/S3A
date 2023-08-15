@@ -160,7 +160,7 @@ def verAnticipos(request):
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
-                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha:.'})
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha: '})
         except Exception as e:
             error = str(e)
         finally:
