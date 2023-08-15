@@ -40,7 +40,6 @@ def insert_anticipos(request):
                 datosLegajo = LegajoNombre + ' Monto: $' + Importe
                 listado.append(datosLegajo)
             
-            #enviaCorreo(listado)
             estado = "E"
             insertaRegistro(usuario, fechaHora, registro, estado)
             nota = "Los registros se guardaron exitosamente."
@@ -127,3 +126,57 @@ def enviaCorreo(listado):
     listadoCorreos = correosChacras()
     for correo in listadoCorreos:
         enviar_correo_sendMail(asunto,contenido,correo)
+
+@csrf_exempt
+def verAnticipos(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            ### VARIABLES
+            usuario = str(json.loads(body)['usuario'])
+            fecha = str(json.loads(body)['fecha'])
+            mes = str(json.loads(body)['mes'])
+            año = str(json.loads(body)['año'])
+            tipo = str(json.loads(body)['tipo'])
+            
+            with connections['default'].cursor() as cursor:
+                sql = "SELECT        CONVERT(VARCHAR(20), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) AS IMPORTE, " \
+                                                "'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
+                        "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
+                                                "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = Auditoria_Anticipos.Destino " \
+                        "WHERE        (Auditoria_Anticipos.Usuario = %s) AND (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (RIGHT('0' + CAST(MONTH(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) " \
+                                                "AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s) AND (TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde = %s) " \
+                        "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
+                cursor.execute(sql, [usuario,fecha,mes,año,tipo])
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        nombre = str(row[0])
+                        monto = str(row[1])
+                        tipoA = str(row[2])
+                        datos = {'Nombre': nombre, 'Monto': monto, 'TipoA': tipoA}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha:.'})
+        except Exception as e:
+            error = str(e)
+        finally:
+            cursor.close()
+            connections['default'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
+
+
+
+
+
