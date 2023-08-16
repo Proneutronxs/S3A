@@ -184,8 +184,8 @@ def cargaFechasDeAnticipos(request, mes):
                 if consulta:
                     lista_data = []
                     for row in consulta:
-                        idFecha = str(row[1])
-                        Fecha = str(row[0])
+                        idFecha = str(row[0])
+                        Fecha = str(row[1])
                         datos = {'idFecha': idFecha, 'Fecha': Fecha}
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
