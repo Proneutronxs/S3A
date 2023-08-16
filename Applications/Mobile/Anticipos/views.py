@@ -171,15 +171,16 @@ def verAnticipos(request):
 
 
 @csrf_exempt
-def cargaFechasDeAnticipos(request, mes):
+def cargaFechasDeAnticipos(request, mes, usuario):
     if request.method == 'GET':
         Mes = str(mes)
+        User = str(usuario)
         try:
             with connections['default'].cursor() as cursor:
                 sql = "SELECT DISTINCT CONVERT(VARCHAR(10), FechaHora, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), FechaHora, 103) AS FECHAS " \
                         "FROM Auditoria_Anticipos " \
-                        "WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s)"
-                cursor.execute(sql, [Mes])
+                        "WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s) AND (Usuario = %s) "
+                cursor.execute(sql, [Mes,User])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
