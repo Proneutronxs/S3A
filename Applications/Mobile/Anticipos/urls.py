@@ -6,4 +6,6 @@ urlpatterns = [
     path('inserta/anticipo', views.insert_anticipos, name="inserta_anticipos"),
     #### BODY DE BUSCAR ANTICPOS
     path('muestra/anticipo', views.verAnticipos, name="ver_anticipos"),
+    ### GET BUSCA FECHAS
+    path('muestra/fechas-anticipo/<str:mes>', views.cargaFechasDeAnticipos, name="cargaFechasDeAnticipos"),
 ]

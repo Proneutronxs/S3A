@@ -146,9 +146,9 @@ def verAnticipos(request):
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = Auditoria_Anticipos.Destino " \
                         "WHERE        (Auditoria_Anticipos.Usuario = %s) AND (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (RIGHT('0' + CAST(MONTH(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) " \
-                                                "AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s) AND (TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde = %s) " \
+                                                "AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s) " \
                         "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
-                cursor.execute(sql, [usuario,fecha,mes,año,tipo])
+                cursor.execute(sql, [usuario,fecha,mes,año])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
@@ -170,7 +170,34 @@ def verAnticipos(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
+@csrf_exempt
+def cargaFechasDeAnticipos(request, mes):
+    if request.method == 'GET':
+        Mes = str(mes)
+        try:
+            with connections['default'].cursor() as cursor:
+                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), FechaHora, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), FechaHora, 103) AS FECHAS " \
+                        "FROM Auditoria_Anticipos " \
+                        "WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s)"
+                cursor.execute(sql, [Mes])
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        idFecha = str(row[1])
+                        Fecha = str(row[0])
+                        datos = {'idFecha': idFecha, 'Fecha': Fecha}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['default'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
