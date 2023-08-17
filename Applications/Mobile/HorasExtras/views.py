@@ -70,14 +70,13 @@ def insert_HoraExtra(request):
                 fechaDesde, fechaHasta = retornaYYYYMMDD(Desde,Hasta)
                 #print(horaDesde,horaHasta,fechaDesde,fechaHasta)
 
-                if verificaHoraExtra(Legajo, horaDesde, horaHasta, fechaDesde, fechaHasta):
-                    lista_tieneHE_asignada.append(Legajo)
-                else:
-                    with connections['default'].cursor() as cursor:
-                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, Estado)
-                        cursor.execute(sql, values)            
-                        cursor.close()
+                # if verificaHoraExtra(Legajo, horaDesde, horaHasta, fechaDesde, fechaHasta):
+                #     lista_tieneHE_asignada.append(Legajo)
+                # else:
+                with connections['default'].cursor() as cursor:
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, Estado)
+                    cursor.execute(sql, values)
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
                 est = "E"
@@ -98,7 +97,8 @@ def insert_HoraExtra(request):
             est = "F"
             insertaRegistro(usuario,fechaHora,registro,est) 
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
+        finally:            
+            cursor.close()
             connections['default'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
