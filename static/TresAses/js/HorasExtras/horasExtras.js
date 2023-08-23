@@ -157,6 +157,7 @@ const verHorasExtras_transferencia_por_legajos = async () => {
             document.getElementById('tablaHorasProcesadas').innerHTML = datos_he;
             closeProgressBar();
         }else {
+            document.getElementById('tablaHorasProcesadas').innerHTML = '';
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
@@ -205,6 +206,7 @@ const verHorasExtras_transferencia = async () => {
             document.getElementById('tablaHorasProcesadas').innerHTML = datos_he;
             closeProgressBar();
         }else {
+            document.getElementById('tablaHorasProcesadas').innerHTML = '';
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
