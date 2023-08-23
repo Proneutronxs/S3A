@@ -44,6 +44,7 @@ def motrar_MotivosHE(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 def obtener_fecha_hora_actual_con_milisegundos():
+    import datetime 
     now = datetime.datetime.now()
     fecha_hora_actual = now.strftime("%Y-%m-%dT%H:%M:%S")
     hora = str(fecha_hora_actual) + ".000"
