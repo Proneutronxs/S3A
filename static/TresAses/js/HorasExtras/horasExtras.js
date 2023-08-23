@@ -11,6 +11,7 @@ const ocultarCombox = () =>{
 ComboxBuscarPor.addEventListener("change", (event) => {
     const selectedValue = event.target.value;
     if (selectedValue === '0') {
+        limpiarCampos();
         ocultarCombox();
     }else if (selectedValue === 'h') {
         ComboxHoras.style.display = 'block';
@@ -57,11 +58,17 @@ document.getElementById("enviaElFormHorasExtras").addEventListener("click", func
         }
     }
     if (!tieneFilas) {
-        alert("Debe buscar horas a enviar.");
+        var message = "Debe buscar horas a enviar.";
+        var color = "red";
+        mostrarInfo(message,color);
     } else if (heImporteValue === '') {
-        alert("El Importe está vacío. Por favor, ingrese un importe.");
+        var message = "El Importe está vacío. Por favor, ingrese un importe.";
+        var color = "red";
+        mostrarInfo(message,color);
     }else if (!alMenosUnTildado) {
-        alert("Debe seleccionar al menos un elemento antes de enviar los datos.");
+        var message = "Debe seleccionar al menos un elemento antes de enviar las Horas.";
+        var color = "red";
+        mostrarInfo(message,color);
     } else {
         enviarHorasExtras_transferencia();
     }
@@ -104,12 +111,15 @@ const listarLegajos = async () => {
         }else {
             closeProgressBar();
             var nota = data.Nota
-            alert(nota);
+            var color = "red";
+            mostrarInfo(nota,color) 
         }
     } catch (error) {
         closeProgressBar();
-        alert("Se produjo un error al procesar la solicitud.");
-        limpiarCampos();  
+        limpiarCampos(); 
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color)  
     }
 }
 
@@ -149,12 +159,15 @@ const verHorasExtras_transferencia_por_legajos = async () => {
         }else {
             closeProgressBar();
             var nota = data.Nota
-            alert(nota);
+            var color = "red";
+            mostrarInfo(nota,color);
         }
     } catch (error) {
         closeProgressBar();
-        alert("Se produjo un error al procesar la solicitud.");
-        limpiarCampos();  
+        limpiarCampos(); 
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color); 
     }
 };
 
@@ -194,11 +207,14 @@ const verHorasExtras_transferencia = async () => {
         }else {
             closeProgressBar();
             var nota = data.Nota
-            alert(nota);
+            var color = "red";
+            mostrarInfo(nota,color);
         }
     } catch (error) {
         closeProgressBar();
-        alert("Se produjo un error al procesar la solicitud.");
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);
         limpiarCampos();  
     }
 };
@@ -220,27 +236,123 @@ const enviarHorasExtras_transferencia = async () => {
         if(data.Message=="Success"){
             closeProgressBar();
             var nota = data.Nota
-            alert(nota);
-            limpiarCampos();       
+            limpiarCampos();
+            var color = "green";
+            mostrarInfo(nota,color);       
         }else {
             closeProgressBar();
             var nota = data.Nota
-            alert(nota);
+            var color = "red";
+            mostrarInfo(nota,color);
         }
     } catch (error) {
         closeProgressBar();
-        alert("Se produjo un error al procesar la solicitud.");
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);
+        limpiarCampos();  
+    }
+};
+
+const eliminaHorasExtras_transferencia = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formEnviaHorasExtras");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+        const response = await fetch("transferencia/elimina/listado-horas", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            closeProgressBar();
+            var nota = data.Nota
+            limpiarCampos();
+            var color = "green";
+            mostrarInfo(nota,color);       
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);
         limpiarCampos();  
     }
 };
 
 
+/// pop up de confirmación
+const encabezadoHorasExtras = document.getElementById("encabezado-tabla-hs-ex");
+const showPopupBtn = document.getElementById("showPopupBtn");
+const confirmationPopup = document.getElementById("confirmationPopup");
+const confirmBtn = document.getElementById("confirmBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+
+showPopupBtn.addEventListener("click", () => {
+    const tablaHorasProcesadas = document.getElementById("tablaHorasProcesadas");
+    const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    let alMenosUnTildado = false;
+    for (const checkbox of checkboxes) {
+        if (checkbox.checked) {
+            alMenosUnTildado = true;
+            break;
+        }
+    }
+    if (!tieneFilas) {
+        var message = "Debe buscar horas a enviar.";
+        var color = "red";
+        mostrarInfo(message,color);
+    }else if (!alMenosUnTildado) {
+        var message = "Debe seleccionar al menos un elemento antes de enviar las Horas.";
+        var color = "red";
+        mostrarInfo(message,color);
+    } else {
+        confirmationPopup.style.display = "flex";
+        encabezadoHorasExtras.style.position = "static";   
+    }
+  
+});
+
+confirmBtn.addEventListener("click", () => {
+    eliminaHorasExtras_transferencia();
+    confirmationPopup.style.display = "none";
+    encabezadoHorasExtras.style.position = "sticky"; 
+});
+
+cancelBtn.addEventListener("click", () => {
+  confirmationPopup.style.display = "none";
+  encabezadoHorasExtras.style.position = "sticky";
+});
+
+
+document.getElementById("closePopup").addEventListener("click", function() {
+    document.getElementById("popup").classList.remove("active");
+});
 
 
 
 
+function mostrarInfo(Message,Color) {
+    document.getElementById("popup").classList.add("active");
+    const colorBorderMsg = document.getElementById("popup");
+    const mensaje = document.getElementById("mensaje-pop-up");
+    colorBorderMsg.style.border = `2px solid ${Color}`;
+    mensaje.innerHTML = `<p style="color: black; font-size: 13px;"><b>${Message}</b></p>`;
 
-
+    setTimeout(() => {
+        document.getElementById("popup").classList.remove("active");
+    }, 5000);
+}
 
 
 

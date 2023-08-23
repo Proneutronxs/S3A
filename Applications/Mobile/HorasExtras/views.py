@@ -43,6 +43,12 @@ def motrar_MotivosHE(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def obtener_fecha_hora_actual_con_milisegundos():
+    now = datetime.datetime.now()
+    fecha_hora_actual = now.strftime("%Y-%m-%dT%H:%M:%S")
+    hora = str(fecha_hora_actual) + ".000"
+    return hora
+
 ###  METODO POST PARA PODER INSERTAR LAS HORAS EXTRAS PRE AUTORIZADAS EN EL SQL (BODY)
 @csrf_exempt
 def insert_HoraExtra(request):
@@ -55,6 +61,7 @@ def insert_HoraExtra(request):
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
             for item in datos:
+                fechaAlta = obtener_fecha_hora_actual_con_milisegundos()
                 Legajo = str(item['Legajo']) ### LEGAJO
                 Regis_Epl = str(item['Regis_Epl'])### ID LEGAJO
                 Desde = str(item['DateTimeDesde']) ### DATETIME DESDE
@@ -74,8 +81,8 @@ def insert_HoraExtra(request):
                 #     lista_tieneHE_asignada.append(Legajo)
                 # else:
                 with connections['default'].cursor() as cursor:
-                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, Estado)
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, fechaAlta, Estado)
                     cursor.execute(sql, values)
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
@@ -288,3 +295,18 @@ def enviarHorasExtras(request):
             'Message': 'No se pudo resolver la petición.'
         }
         return JsonResponse(response_data)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

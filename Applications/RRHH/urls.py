@@ -23,5 +23,7 @@ urlpatterns = [
 
     ### URL CARGA COMBOX POR LEGAJO
     path('horas-extras/transferencia/cargar-combox-legajos', views.cargaLegajos, name="cargaComboxLegajos"),
+    ### URL ELIMINAHORAS EXTRAS
+    path('horas-extras/transferencia/elimina/listado-horas', views.eliminaHorasCargadas, name="eliminaHorasCargadas"),
 
 ]

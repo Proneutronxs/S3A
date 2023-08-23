@@ -135,7 +135,7 @@ def enviarHorasCargadas(request):
             resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
             resultados.append(resultado)
 
-            print('100', 'IdHoraExtra', Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora, 'APLICATIVO' )       
+            #print('100', 'IdHoraExtra', Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora, 'APLICATIVO' )       
 
         if 0 in resultados:
             data = "Se produjo un Error en alguna de las inserciones."
@@ -237,6 +237,45 @@ def actualizarEstadoHEP(ID_HEP):
         print(error)
     finally:
         connections['default'].close()
+
+def eliminaHEP(ID_HEP):
+    try:
+        with connections['default'].cursor() as cursor:
+            sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '8' WHERE ID_HEP = %s"
+            cursor.execute(sql, [ID_HEP])
+            cursor.close()
+    except Exception as e:
+        error = str(e)
+        print(error)
+    finally:
+        connections['default'].close()
+
+@csrf_exempt
+def eliminaHorasCargadas(request):
+    if request.method == 'POST':
+        importe = request.POST.get('valor', None)
+        pagada = request.POST.get('HePagada', 'N')
+        checkboxes_tildados = request.POST.getlist('idCheck')
+        resultados = []
+        for i in checkboxes_tildados:
+            ID_HEP = str(i)  
+            resultado = eliminaHEP(ID_HEP)
+            resultados.append(resultado)
+
+        if 0 in resultados:
+            data = "Se produjo un Error en alguna de las horas a eliminar."
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+        else:
+            data = "Las horas se eliminaron correctamente."
+            return JsonResponse({'Message': 'Success', 'Nota': data})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+
+
+
+
 
 
 

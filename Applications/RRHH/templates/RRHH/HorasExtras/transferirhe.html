@@ -46,12 +46,17 @@
                 <div class="items-row">
                     <button id="enviaElFormHorasExtras" class="btn-submit botones" type="button"><b>Guardar</b></button>
                 </div>
+                <div style="margin-left: auto;">
+                  <div class="items-row">
+                    <button id="showPopupBtn" class="btn-submit botones" type="button"><b>Eliminar</b></button>
+                  </div>
+                </div>
               </div>
             </div>
           
             <div class="container-tabla-he">
                 <table class="pre-hs-ex">
-                    <thead>
+                    <thead id="encabezado-tabla-hs-ex">
                       <tr>
                         <th style="width: 40px;"><i class='bx bx-check icon'></i></th>
                         <th style="width: 60px;">Tipo</th>
@@ -80,6 +85,22 @@
     </div>
   </div>
 </div>
+
+<div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
+  <div class="popup-content">
+    <p>¿Estás seguro de que deseas eliminar los items seleccioados?</p> <br>
+    <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+    <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+  </div>
+</div>
+
+<div id="popup" class="popup">
+  <span class="close" id="closePopup">&times;</span>
+  <div id="mensaje-pop-up">
+
+  </div>
+</div>
+
   
 <script src="{%static 'TresAses/js/HorasExtras/horasExtras.js' %}"></script>
 {% endblock %}
