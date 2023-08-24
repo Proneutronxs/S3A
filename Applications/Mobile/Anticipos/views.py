@@ -148,7 +148,7 @@ def verAnticipos(request):
             año = obtenerAñoActual()
             with connections['default'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) " \
-                                                "AS IMPORTE, SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
+                                                "AS IMPORTE, 'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
                         "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = TresAses_ISISPayroll.dbo.Empleados.Regis_Epl " \
