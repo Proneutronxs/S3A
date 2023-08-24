@@ -297,6 +297,91 @@ def enviarHorasExtras(request):
         }
         return JsonResponse(response_data)
     
+def obtenerAñoActual():
+    import datetime 
+    now = datetime.datetime.now()
+    año_actual = now.strftime("%Y")
+    año = str(año_actual)
+    return año
+
+@csrf_exempt
+def verHorasExtras(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            ### VARIABLES
+            usuario = str(json.loads(body)['usuario'])
+            fecha = str(json.loads(body)['fecha'])
+            
+            with connections['default'].cursor() as cursor:
+                sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeDesde, " \
+                                                "103) + ' ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.DateTimeDesde, 108) + ' hs' AS DESDE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), " \
+                                                "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA " \
+                        "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                "HorasExtras_Sin_Procesar ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Sin_Procesar.Legajo INNER JOIN " \
+                                                "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
+                        "WHERE        (CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) = %s) AND (USUARIOS.Usuario = %s) " \
+                        "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
+                cursor.execute(sql, [fecha,usuario])
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        nombre = str(row[0])
+                        desde = str(row[1])
+                        hasta = str(row[2])
+                        datos = {'Nombre': nombre, 'Desde': desde, 'Hasta': hasta}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha: '})
+        except Exception as e:
+            error = str(e)
+        finally:
+            cursor.close()
+            connections['default'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+@csrf_exempt
+def verCargaFechasDeHorasExtras(request, mes, usuario):
+    if request.method == 'GET':
+        Mes = str(mes)
+        Año = obtenerAñoActual()
+        User = str(usuario)
+        try:
+            with connections['default'].cursor() as cursor:
+                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
+                        "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
+                                                "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
+                        "WHERE        (RIGHT('0' + CAST(MONTH(CONVERT(DATE, HorasExtras_Sin_Procesar.FechaAlta, 103)) AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, FechaAlta, 103)) = %s) AND (USUARIOS.Usuario = %s)"
+                cursor.execute(sql, [Mes,Año,User])
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        idFecha = str(row[0])
+                        Fecha = str(row[1])
+                        datos = {'idFecha': idFecha, 'Fecha': Fecha}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['default'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
 
 
 

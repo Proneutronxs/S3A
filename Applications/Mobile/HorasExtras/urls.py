@@ -9,11 +9,16 @@ urlpatterns = [
     ### INSERTA LAS HORAS EXTRAS ENVÍADAS HORAS EXTRAS A AUTORIZAR (POST BODY REQUEST)
     path('inserta/horas_extras', views.insert_HoraExtra, name="inserta_horasExtras"),
 
-    ### MUESTRA HORAS EXTRAS ACTIVAS - PETICIONES DE HORAS EXTRAS (GET BODY REQUEST)
+    ### MUESTRA HORAS EXTRAS ACTIVAS - PETICIONES DE HORAS EXTRAS (GET BODY REQUEST) ----------------------------------------NO SE USAN
     path('mostrar/horasextras/activas', views.mostrarHoraExtrasActivas, name="muestra_horasExtras_activas"),
 
-    ### GUARDA LAS HORAS EXTRAS EN S3A UBICACIÓN Y CONCATENACIÓN CON EL ID (ACTUALIZA EL ESTADO DE LA PETICIÓN)
+    ### GUARDA LAS HORAS EXTRAS EN S3A UBICACIÓN Y CONCATENACIÓN CON EL ID (ACTUALIZA EL ESTADO DE LA PETICIÓN)--------------NO SE USA
     path('inserta/horasextras/s3a', views.enviarHorasExtras, name="envia_horasExtras_s3a."),
 
+    ####MUESTRA LAS FECHAS QUE SE CARGARONHORAS EXTRAS
+    path('muestra/fechas-he/mes=<str:mes>&user=<str:usuario>', views.verCargaFechasDeHorasExtras, name="ver_Carga_fechas_horas_extras"),
+
+    ### MUESTAR POR LA FECHA ENVÍADA LAS HORAS EXTRAS CARGADAS
+    path('muestra/horas-extras-cargadas', views.verHorasExtras, name="ver_horas_extras"),
 
 ]
