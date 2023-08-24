@@ -144,6 +144,7 @@ def verAnticipos(request):
             usuario = str(json.loads(body)['usuario'])
             fecha = str(json.loads(body)['fecha'])
             mes = str(json.loads(body)['mes'])
+            tipo = 'CH - %'
             año = obtenerAñoActual()
             with connections['default'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) " \
@@ -151,9 +152,9 @@ def verAnticipos(request):
                         "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = TresAses_ISISPayroll.dbo.Empleados.Regis_Epl " \
-                        "WHERE        (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (Auditoria_Anticipos.Usuario = %s) AND (TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde LIKE 'CH - %') AND  " \
+                        "WHERE        (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (Auditoria_Anticipos.Usuario = %s) AND (TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde LIKE %s) AND  " \
                                                 "(RIGHT('0' + CAST(MONTH(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s)"
-                cursor.execute(sql, [fecha,usuario, mes,año])
+                cursor.execute(sql, [fecha,usuario,tipo,mes,año])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
