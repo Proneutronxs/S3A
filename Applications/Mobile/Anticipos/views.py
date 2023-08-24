@@ -127,6 +127,14 @@ def enviaCorreo(listado):
     for correo in listadoCorreos:
         enviar_correo_sendMail(asunto,contenido,correo)
 
+def obtenerAñoActual():
+    import datetime 
+    now = datetime.datetime.now()
+    año_actual = now.strftime("%Y")
+    año = str(año_actual)
+    return año
+
+
 @csrf_exempt
 def verAnticipos(request):
     if request.method == 'POST':
@@ -136,19 +144,16 @@ def verAnticipos(request):
             usuario = str(json.loads(body)['usuario'])
             fecha = str(json.loads(body)['fecha'])
             mes = str(json.loads(body)['mes'])
-            año = str(json.loads(body)['año'])
-            tipo = str(json.loads(body)['tipo'])
-            
+            año = obtenerAñoActual()
             with connections['default'].cursor() as cursor:
-                sql = "SELECT        CONVERT(VARCHAR(20), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) AS IMPORTE, " \
-                                                "'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
+                sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) " \
+                                                "AS IMPORTE, SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
                         "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
-                                                "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = Auditoria_Anticipos.Destino " \
-                        "WHERE        (Auditoria_Anticipos.Usuario = %s) AND (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (RIGHT('0' + CAST(MONTH(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) " \
-                                                "AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s) " \
-                        "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
-                cursor.execute(sql, [usuario,fecha,mes,año])
+                                                "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = TresAses_ISISPayroll.dbo.Empleados.Regis_Epl " \
+                        "WHERE        (CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) = %s) AND (Auditoria_Anticipos.Usuario = %s) AND (TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde LIKE 'CH - %') AND  " \
+                                                "(RIGHT('0' + CAST(MONTH(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, TresAses_ISISPayroll.dbo.EmpleadoAdelantos.FechaAde, 103)) = %s)"
+                cursor.execute(sql, [fecha,usuario, mes,año])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
