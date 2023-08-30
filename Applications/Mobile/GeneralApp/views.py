@@ -270,7 +270,7 @@ def descargar_apk(request, nombre_apk):
 def buscaParametro(request, codigo):
     if request.method == 'GET':
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT Texto " \
                       "FROM Parametros_Aplicativo " \
                       "WHERE Codigo = %s "
@@ -296,7 +296,7 @@ def buscaParametro(request, codigo):
             }
             return JsonResponse(response_data)
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
