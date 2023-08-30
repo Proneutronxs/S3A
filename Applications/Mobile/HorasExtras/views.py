@@ -334,7 +334,7 @@ def verHorasExtras(request):
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
-                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha: '})
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Horas Extras para la fecha. '})
         except Exception as e:
             error = str(e)
         finally:
@@ -350,13 +350,14 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
         Mes = str(mes)
         Año = obtenerAñoActual()
         User = str(usuario)
+        estado = '8'
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
                         "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
-                        "WHERE        (RIGHT('0' + CAST(MONTH(CONVERT(DATE, HorasExtras_Sin_Procesar.FechaAlta, 103)) AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, FechaAlta, 103)) = %s) AND (USUARIOS.Usuario = %s)"
-                cursor.execute(sql, [Mes,Año,User])
+                        "WHERE        (HorasExtras_Sin_Procesar.Estado <> %s) AND (RIGHT('0' + CAST(MONTH(CONVERT(DATE, HorasExtras_Sin_Procesar.FechaAlta, 103)) AS VARCHAR(2)), 2) = %s) AND (YEAR(CONVERT(DATE, FechaAlta, 103)) = %s) AND (USUARIOS.Usuario = %s)"
+                cursor.execute(sql, [estado,Mes,Año,User])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
