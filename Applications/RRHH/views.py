@@ -34,7 +34,7 @@ def mostrarHorasCargadas(request):
             data = "Llamo a las horas arregladas."
             return JsonResponse({'Message': 'Error', 'Nota': data})
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, " \
                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, " \
                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, " \
@@ -70,7 +70,7 @@ def mostrarHorasCargadas(request):
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -80,7 +80,7 @@ def mostrarHorasCargadasPorLegajo(request):
     if request.method == 'POST':
         legajo = request.POST.get('ComboxTipoLegajoTransf')
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, " \
                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, " \
                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, " \
@@ -116,7 +116,7 @@ def mostrarHorasCargadasPorLegajo(request):
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -151,7 +151,7 @@ def enviarHorasCargadas(request):
 def cargaLegajos(request):
     if request.method == 'GET':
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT DISTINCT " \
                                                 "HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), CONVERT(VARCHAR(5), HorasExtras_Procesadas.Legajo) + ' - ' + TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple) AS DATOS " \
                         "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
@@ -174,7 +174,7 @@ def cargaLegajos(request):
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -182,7 +182,7 @@ def cargaLegajos(request):
 
 def buscaDatosParaInsertarHE(idHEP):
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Legajo, CONVERT(VARCHAR(10), FechaHoraDesde, 126) AS FECHA_DESDE,CONVERT(VARCHAR(5), FechaHoraDesde, 108) AS HORA_DESDE, " \
                             "CONVERT(VARCHAR(10), FechaHoraHasta, 126) AS FECHA_HASTA, CONVERT(VARCHAR(5), FechaHoraHasta, 108) AS HORA_HASTA, CantidadHoras AS HORAS, " \
                             "IdMotivo AS MOTIVO, Autorizado AS AUTORIZADO, RTRIM(DescripcionMotivo) AS DESCRIPCION, TipoHoraExtra AS TIPO " \
@@ -206,7 +206,7 @@ def buscaDatosParaInsertarHE(idHEP):
         data = str(e)
         return data
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora):
@@ -228,27 +228,31 @@ def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, Id
 
 def actualizarEstadoHEP(ID_HEP):
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '0' WHERE ID_HEP = %s"
             cursor.execute(sql, [ID_HEP])
-            cursor.close()
     except Exception as e:
         error = str(e)
         print(error)
     finally:
-        connections['default'].close()
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 def eliminaHEP(ID_HEP):
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '8' WHERE ID_HEP = %s"
             cursor.execute(sql, [ID_HEP])
-            cursor.close()
+
+            slq2 = "UPDATE HorasExtras_Sin_Procesar SET Estado='8' WHERE ID_HESP = (SELECT ID_HESP FROM HorasExtras_Procesadas WHERE ID_HEP = %s)"
+            cursor.execute(slq2, [ID_HEP])
+
     except Exception as e:
         error = str(e)
         print(error)
     finally:
-        connections['default'].close()
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 @csrf_exempt
 def eliminaHorasCargadas(request):

@@ -24,7 +24,7 @@ def login_app(request):
         registro = str(json.loads(body)['registro'])
         #print(fechaHora,registro)
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \
                       "FROM            USUARIOS INNER JOIN " \
                             "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
@@ -62,7 +62,7 @@ def login_app(request):
             }
             return JsonResponse(response_data)
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
@@ -76,7 +76,7 @@ def id_Nombre_Ccostos(request, legajo):
     if request.method == 'GET':
         id = str(legajo)
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        USR_CCOSTOS.CodCtroCosto AS CODIGO, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS DESCRIPCION, TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo AS REGISCCo " \
                       "FROM            USR_CCOSTOS INNER JOIN " \
                       "TresAses_ISISPayroll.dbo.CentrosCostos ON USR_CCOSTOS.CodCtroCosto = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo " \
@@ -102,7 +102,7 @@ def id_Nombre_Ccostos(request, legajo):
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -205,7 +205,7 @@ def traeMotivos():
     
 def traeMontoMax():
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Monto AS MONTO " \
                     "FROM MAX_ADELANTO "
             cursor.execute(sql)
@@ -220,7 +220,7 @@ def traeMontoMax():
         error = str(e)
         return error
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 

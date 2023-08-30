@@ -523,12 +523,13 @@ def trae_lista_con_listado():
 
 #### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
 def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado):
-    values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado]
+    sector = buscaSector(legajo)
+    values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, sector, id_HESP, estado]
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             # Realizar la inserción en la tabla HorasExtras_Procesadas
-            sql_insert = "INSERT INTO HorasExtras_Procesadas (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, ID_HESP, EstadoEnvia) "\
-                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql_insert = "INSERT INTO HorasExtras_Procesadas (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, Sector, ID_HESP, EstadoEnvia) "\
+                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(sql_insert, values)
 
             # Realizar la actualización en la tabla HorasExtras_Sin_Procesar
@@ -541,12 +542,33 @@ def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado,
 
     finally:
         cursor.close()
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
+
+### BUSCA SECTOR A INSERTAR 
+def buscaSector(legajo):
+    sector = "N/S"
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT        SUBSTRING(LTRIM(CentrosCostos.DescrCtroCosto), 1, 1) AS SECTOR " \
+                    "FROM            Empleados INNER JOIN " \
+                                            "CentrosCostos ON Empleados.Regis_CCo = CentrosCostos.Regis_CCo " \
+                    "WHERE        (Empleados.CodEmpleado = %s)"
+            cursor.execute(sql, [legajo])
+            consulta = cursor.fetchone()
+            if consulta:
+                sector = str(consulta[0])
+            return sector
+    except Exception as e:
+        print("Error")
+        print(e)
+    finally:
+        cursor.close()
+        connections['ISISPayroll'].close()
 
 #### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
 def buscaDatos_paraInsertar(id):
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Legajo AS LEGAJO,IdMotivo AS IDMOTIVO, DescripcionMotivo AS DESCRIPCION, Autorizado AS AUTORIZADO, UsuarioEncargado AS ENCARGADO, ID_HESP AS ID " \
                 "FROM HorasExtras_Sin_Procesar " \
                 "WHERE ID_HESP = %s "
@@ -565,13 +587,13 @@ def buscaDatos_paraInsertar(id):
         print(e)
     finally:
         cursor.close()
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 #### LLAMA LAS HORAS EXTRAS NO PROCESADAS
 def llama_horas_extras_no_procesadas():
     listado_horas_extras_sin_proceso = []
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT ID_HESP AS ID, CONVERT(VARCHAR(16), DateTimeDesde, 120) AS DESDE, CONVERT(VARCHAR(16), DateTimeHasta, 120) AS HASTA " \
                 "FROM HorasExtras_Sin_Procesar " \
                 "WHERE Arreglo = '0' AND Estado = '1' "
@@ -587,7 +609,7 @@ def llama_horas_extras_no_procesadas():
         print(e)
     finally:
         cursor.close()
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
@@ -1210,7 +1232,7 @@ def procesoHorasExtras():
 
 def listadoAnticipos():
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT        CONVERT(VARCHAR(8),TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) + ' ' + " \
                                 "' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2) + ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs.' AS COLUMNA "\
                     "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
@@ -1231,12 +1253,12 @@ def listadoAnticipos():
         error = str(e)
         return lista_data
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 def correosChacras():
     listadoCorreos = []
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Correo " \
                     "FROM Correos " \
                     "WHERE Sector = 'CHACRA' "
@@ -1251,7 +1273,7 @@ def correosChacras():
         error = str(e)
         return listadoCorreos
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 def enviar_correo_sendMail(asunto, mensaje, destinatario):
     remitente = 'aplicativo@tresases.com.ar'
@@ -1281,14 +1303,14 @@ def enviaCorreosAnticipos():
 
 def actualizaEstadoAnticipo():
     try:
-        with connections ['default'].cursor() as cursor:
+        with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "UPDATE Auditoria_Anticipos SET EstadoCorreo = '0' WHERE EstadoCorreo = '1'"
             cursor.execute(sql)
 
     except Exception as e:
         print(e)
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 

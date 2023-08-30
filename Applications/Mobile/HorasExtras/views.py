@@ -81,7 +81,7 @@ def insert_HoraExtra(request):
                 # if verificaHoraExtra(Legajo, horaDesde, horaHasta, fechaDesde, fechaHasta):
                 #     lista_tieneHE_asignada.append(Legajo)
                 # else:
-                with connections['default'].cursor() as cursor:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, fechaAlta, Estado)
                     cursor.execute(sql, values)
@@ -107,7 +107,7 @@ def insert_HoraExtra(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:            
             cursor.close()
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -133,7 +133,7 @@ def retornaYYYYMMDD(f1,f2):
 
 def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT  CONVERT(VARCHAR(5), DateTimeDesde, 108) AS H_DESDE, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS H_HASTA "\
                     "FROM HorasExtras_Sin_Procesar " \
                     "WHERE Legajo = %s AND TRY_CONVERT(DATE, DateTimeDesde) >= %s AND TRY_CONVERT(DATE, DateTimeHasta) <= %s"
@@ -152,7 +152,7 @@ def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
         error = str(e)
         return error
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 ### TRAE EL APELLIDO DE LA HORA QUE EXISTE
 def traeApellidos(legajo):
@@ -207,7 +207,7 @@ def calcular_CantHoras(hora1, hora2):
 def mostrarHoraExtrasActivas(request):
     if request.method == 'GET':
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        PRE_CARGA_HE.CodEmpleado AS LEGAJO, PRE_CARGA_HE.ApellidoNombre AS NOMBRESyAPELLIDO, CONVERT(VARCHAR(10), PRE_CARGA_HE.Desde, 103) AS D_FECHA, CONVERT(VARCHAR(5), PRE_CARGA_HE.Desde, " \
                                                 "108) AS D_HORA, CONVERT(VARCHAR(10), PRE_CARGA_HE.Hasta, 103) AS FECHA, CONVERT(VARCHAR(5), PRE_CARGA_HE.Hasta, 108) AS H_HORA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
                                                 "PRE_CARGA_HE.idHExtra AS ID, CONVERT(VARCHAR(19), Desde, 127) AS DateTimeDesde, CONVERT(VARCHAR(19), Hasta, 127) AS DateTimeHasta " \
@@ -261,7 +261,7 @@ def mostrarHoraExtrasActivas(request):
 def enviarHorasExtras(request):
     if request.method == 'POST':
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = ""
                 cursor.execute(sql)
                 consulta = cursor.fetchone()
@@ -312,17 +312,17 @@ def verHorasExtras(request):
             ### VARIABLES
             usuario = str(json.loads(body)['usuario'])
             fecha = str(json.loads(body)['fecha'])
-            
-            with connections['default'].cursor() as cursor:
+            estado = '8'
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeDesde, " \
                                                 "103) + ' ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.DateTimeDesde, 108) + ' hs' AS DESDE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), " \
                                                 "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA " \
                         "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "HorasExtras_Sin_Procesar ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Sin_Procesar.Legajo INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
-                        "WHERE        (CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) = %s) AND (USUARIOS.Usuario = %s) " \
+                        "WHERE        HorasExtras_Sin_Procesar.Estado <> %s AND (CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) = %s) AND (USUARIOS.Usuario = %s) " \
                         "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
-                cursor.execute(sql, [fecha,usuario])
+                cursor.execute(sql, [estado,fecha,usuario])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
@@ -339,7 +339,7 @@ def verHorasExtras(request):
             error = str(e)
         finally:
             cursor.close()
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -351,7 +351,7 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
         Año = obtenerAñoActual()
         User = str(usuario)
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
                         "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
@@ -372,7 +372,7 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 

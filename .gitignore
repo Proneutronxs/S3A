@@ -1,6 +1,6 @@
 
 ### CACHÉ MAIN
-__pycache__/*
+__pycache__/
 
 ### CHACHÉ DE S3A 51051
 S3A/__pycache__/*
@@ -25,10 +25,10 @@ Applications/Mobile/Presentismo/__pycache__/views.cpython-38.pyc
 Applications/Mobile/Anticipos/__pycache__/views.cpython-38.pyc
 
 
+_pycache_/
 
-
-
-
+S3A/SQLite/db.sqlite3
+db.sqlite3
 
 
 

@@ -59,7 +59,7 @@ def insert_anticipos(request):
 def correosChacras():
     listadoCorreos = []
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Correo " \
                     "FROM Correos " \
                     "WHERE Sector = 'CHACRA' "
@@ -74,7 +74,7 @@ def correosChacras():
         error = str(e)
         return listadoCorreos
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 def obtieneNombres(Regis_Epl):
     nombre = ''
@@ -98,14 +98,14 @@ def obtieneNombres(Regis_Epl):
 def auditaAnticipos(usuario, Fechahora, Destino, Monto):
     estado = '1'
     try:
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto, EstadoCorreo) VALUES (%s, %s, %s, %s, %s)"
             values = (usuario,Fechahora,Destino,Monto,estado)
             cursor.execute(sql, values)
     except Exception as e:
         print(e)
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 def enviar_correo_sendMail(asunto, mensaje, destinatario):
@@ -146,7 +146,7 @@ def verAnticipos(request):
             mes = str(json.loads(body)['mes'])
             tipo = 'CH - %'
             año = obtenerAñoActual()
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) " \
                                                 "AS IMPORTE, 'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO " \
                         "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
@@ -171,7 +171,7 @@ def verAnticipos(request):
             error = str(e)
         finally:
             cursor.close()
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -182,7 +182,7 @@ def cargaFechasDeAnticipos(request, mes, usuario):
         Mes = str(mes)
         User = str(usuario)
         try:
-            with connections['default'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT DISTINCT CONVERT(VARCHAR(10), FechaHora, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), FechaHora, 103) AS FECHAS " \
                         "FROM Auditoria_Anticipos " \
                         "WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s) AND (Usuario = %s) "
@@ -202,10 +202,15 @@ def cargaFechasDeAnticipos(request, mes, usuario):
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
-            connections['default'].close()
+            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def pruebaMetodo(request):
+    if request.method == 'GET':
+        print("")
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'Applications.TresAses',
     'Applications.RRHH',
     'Applications.Reportes',
+    'Applications.Inicio',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +86,10 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 ###### ORIGINAL S3A
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'S3A/SQLite/db.SQLite',
+    },
+    'TRESASES_APLICATIVO': {
         'ENGINE': 'sql_server.pyodbc',
         'NAME': 'TRESASES_APLICATIVO',
         'USER': 'sa',
@@ -132,6 +137,10 @@ DATABASES = {
 
 ###### LOCAL S3A
 # DATABASES = {
+#     'SQLite': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'S3A/SQLite/db.SQLite',
+#     },
 #     'default': {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',

@@ -19,7 +19,7 @@ from django.urls import path, include
 urlpatterns = [
 
     ### ADMINISTRACION DE PANEL DJANGO
-    path('administracion/', admin.site.urls),
+    path('administracion/sistemas', admin.site.urls),
 
     ### API GENERAL APPLICATIONS
     path('api/general/', include('Applications.Mobile.GeneralApp.urls')),
@@ -42,6 +42,7 @@ urlpatterns = [
     ### URL APLICACIÓN RRHH
     path('reportes/', include('Applications.Reportes.urls')),
 
+    path('login/', include('Applications.Inicio.urls')),
 
 
 ]

@@ -7,7 +7,7 @@ import smtplib
 
 def insertaRegistro(legajo,fecha,tipo,estado):
     try:  
-        with connections['default'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "INSERT INTO Auditoria_Aplicacion_Android (Usuario, FechaHora, TipoRegistro, Estado) VALUES (%s, %s, %s, %s)"
             values = (legajo, fecha, tipo, estado)
             cursor.execute(sql, values)
@@ -16,7 +16,7 @@ def insertaRegistro(legajo,fecha,tipo,estado):
         error = str(e)
         return error
     finally:
-        connections['default'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 #contrseña = 8vzU&Uz3iorn
