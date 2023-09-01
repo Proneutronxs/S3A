@@ -19,7 +19,7 @@ from django.urls import path, include
 urlpatterns = [
 
     ### ADMINISTRACION DE PANEL DJANGO
-    path('administracion/sistemas', admin.site.urls),
+    path('administracion/sistemas/', admin.site.urls),
 
     ### API GENERAL APPLICATIONS
     path('api/general/', include('Applications.Mobile.GeneralApp.urls')),
