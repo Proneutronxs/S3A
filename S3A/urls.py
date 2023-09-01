@@ -39,6 +39,8 @@ urlpatterns = [
     ### URL APLICACIÓN RRHH
     path('rrhh/', include('Applications.RRHH.urls')),
 
+    path('empaque/', include('Applications.Empaque.urls')),
+
     ### URL APLICACIÓN RRHH
     path('reportes/', include('Applications.Reportes.urls')),
 

@@ -524,6 +524,8 @@ def trae_lista_con_listado():
 #### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
 def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado):
     sector = buscaSector(legajo)
+    if sector == 'E':
+        estado = '3'
     values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, sector, id_HESP, estado]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:

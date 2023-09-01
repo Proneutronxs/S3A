@@ -35,76 +35,13 @@
                     </li>
 
                     <li class="nav-link">
-                        <a href="#">
+                        <a href="{% url 'horas_extras_empaque' %}">
                             <i class='bx bx-space-bar icon' ></i>
-                            <span class="text nav-text">Báscula</span>
+                            <span class="text nav-text">Horas Extras</span>
                         </a>
                     </li>
 
-                    <li class="nav-link">
-                        <a href="{% url 'empaque' %}">
-                            <i class='bx bxs-factory icon' ></i>
-                            <span class="text nav-text">Empaque</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-bar-chart-alt-2 icon' ></i>
-                            <span class="text nav-text">ETE</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bxs-truck icon' ></i>
-                            <span class="text nav-text">Expedición</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-money icon' ></i>
-                            <span class="text nav-text">Liquidación</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-cog icon' ></i>
-                            <span class="text nav-text">Mantenimiento</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-trending-up icon' ></i>
-                            <span class="text nav-text">Producción</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-file icon' ></i>
-                            <span class="text nav-text">Reportes</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="{% url 'rrhh' %}">
-                            <i class='bx bx-group icon' ></i>
-                            <span class="text nav-text">RRHH</span>
-                        </a>
-                    </li>
-<!-- 
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-space-bar icon' ></i>
-                            <span class="text nav-text">Báscula</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
+                    <!-- <li class="nav-link">
                         <a href="#">
                             <i class='bx bxs-factory icon' ></i>
                             <span class="text nav-text">Empaque</span>
@@ -154,14 +91,14 @@
                     </li>
 
                     <li class="nav-link">
-                        <a href="{% url 'rrhh' %}">
+                        <a href="#">
                             <i class='bx bx-group icon' ></i>
                             <span class="text nav-text">RRHH</span>
                         </a>
-                    </li> -->
-
+                    </li>
+                    -->
                 </ul>
-            </div>
+            </div> 
 
             <div class="bottom-content">
                 <li class="">
@@ -177,12 +114,7 @@
         <div class="container">   
             {% block content %}         
                 <div class="encabezado" style="background-color: #a72626">
-                    <!-- <div class="text" style="font-size: 20px;">TRES ASES</div> -->
-                </div>
-                <div class="imageInicio">
-                    <div class="logoInicio">
-                        <img src="{%static 'TresAses/img/TA.png' %}" alt="">
-                    </div>
+                    <div class="text" style="font-size: 20px;">EMPAQUE</div>
                 </div>
             {% endblock %}
         </div>

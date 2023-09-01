@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'Applications.RRHH',
     'Applications.Reportes',
     'Applications.Inicio',
+    'Applications.Empaque',
 ]
 
 MIDDLEWARE = [
@@ -137,11 +138,11 @@ DATABASES = {
 
 ###### LOCAL S3A
 # DATABASES = {
-#     'SQLite': {
+#     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': 'S3A/SQLite/db.SQLite',
 #     },
-#     'default': {
+#     'TRESASES_APLICATIVO': {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',

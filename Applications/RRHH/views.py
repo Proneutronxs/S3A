@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-import json
 import datetime 
 
 from django.db import connections
@@ -31,7 +30,7 @@ def mostrarHorasCargadas(request):
     if request.method == 'POST':
         tipo = request.POST.get('ComboxTipoHoraTransf')
         if tipo == "A":
-            data = "Llamo a las horas arregladas."
+            data = "Horas Extras Arregladas no disponible."
             return JsonResponse({'Message': 'Error', 'Nota': data})
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:

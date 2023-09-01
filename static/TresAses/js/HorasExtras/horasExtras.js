@@ -58,15 +58,15 @@ document.getElementById("enviaElFormHorasExtras").addEventListener("click", func
         }
     }
     if (!tieneFilas) {
-        var message = "Debe buscar horas a enviar.";
+        var message = "No se encontraron horas.";
         var color = "red";
         mostrarInfo(message,color);
     } else if (heImporteValue === '') {
-        var message = "El Importe está vacío. Por favor, ingrese un importe.";
+        var message = "El Importe está vacío.";
         var color = "red";
         mostrarInfo(message,color);
     }else if (!alMenosUnTildado) {
-        var message = "Debe seleccionar al menos un elemento antes de enviar las Horas.";
+        var message = "Debe seleccionar al menos un item.";
         var color = "red";
         mostrarInfo(message,color);
     } else {
