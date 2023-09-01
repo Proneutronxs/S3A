@@ -598,7 +598,7 @@ def llama_horas_extras_no_procesadas():
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT ID_HESP AS ID, CONVERT(VARCHAR(16), DateTimeDesde, 120) AS DESDE, CONVERT(VARCHAR(16), DateTimeHasta, 120) AS HASTA " \
                 "FROM HorasExtras_Sin_Procesar " \
-                "WHERE Arreglo = '0' AND Estado = '1' "
+                "WHERE Arreglo = '0' AND Estado <> '0' AND Estado <> '8'"
             cursor.execute(sql)
             consulta = cursor.fetchall()
             if consulta:
