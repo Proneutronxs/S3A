@@ -29,6 +29,7 @@ def obtener_fecha_hora_actual_con_milisegundos():
 def mostrarHorasCargadas(request):
     if request.method == 'POST':
         tipo = request.POST.get('ComboxTipoHoraTransf')
+        sector =request.POST.get('ComboxSectorHEHoras')
         if tipo == "A":
             data = "Horas Extras Arregladas no disponible."
             return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -43,9 +44,9 @@ def mostrarHorasCargadas(request):
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON  " \
                                                 "S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado " \
-                        "WHERE        (HorasExtras_Procesadas.TipoHoraExtra = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                        "WHERE        (HorasExtras_Procesadas.Sector = %s) AND (HorasExtras_Procesadas.TipoHoraExtra = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
                         "ORDER BY HorasExtras_Procesadas.Legajo, HorasExtras_Procesadas.FechaHoraDesde"
-                cursor.execute(sql, [tipo])
+                cursor.execute(sql, [sector,tipo])
                 consulta = cursor.fetchall()
                 if consulta:
                     data = []
@@ -148,15 +149,17 @@ def enviarHorasCargadas(request):
 
 @csrf_exempt
 def cargaLegajos(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        sector = request.POST.get('ComboxSectorHELegajos')  
+        print(sector)      
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT DISTINCT " \
                                                 "HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), CONVERT(VARCHAR(5), HorasExtras_Procesadas.Legajo) + ' - ' + TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple) AS DATOS " \
                         "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo " \
-                        "WHERE (HorasExtras_Procesadas.EstadoEnvia = '1')"
-                cursor.execute(sql)
+                        "WHERE (HorasExtras_Procesadas.EstadoEnvia = '1') AND (HorasExtras_Procesadas.Sector = %s)"
+                cursor.execute(sql, [sector])
                 consulta = cursor.fetchall()
                 if consulta:
                     data = []

@@ -193,7 +193,7 @@ header .image-text .profession{
 .home .text{
     font-size: 14px;
     font-weight: 500;
-    padding: 12px 60px;
+    padding: 12px 20px;
 }
 
 .menu{
@@ -386,12 +386,12 @@ input[type="checkbox"].input-checkbox {
 .text.letras .row {
   display: flex;
   align-items: center; /* Alinea verticalmente los elementos */
-  gap: 5px; /* Espacio entre los elementos */
+  gap: 4px; /* Espacio entre los elementos */
 }
 
 .text.letras .row h4 {
   margin: 0; /* Elimina el margen por defecto del h4 */
-  margin-right: 50px; /* Agrega margen a la derecha del h4 */
+  margin-right: 20px; /* Agrega margen a la derecha del h4 */
 }
 
 .modal-overlay {

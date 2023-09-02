@@ -10,22 +10,39 @@
             <h4>TRANSFERENCIA DE HORAS EXTRAS</h4>
             <label class="letras" for="TipoHora">Buscar por:</label>
             <select class="selectores" type="checkbox" id="ComboxBuscarPor" name="ComboxBuscarPor">
-            <option value="0">Seleccione</option>
-            <option value="h">Horas</option>
-            <option value="l">Legajos</option>
+              <option value="0">Seleccione</option>
+              <option value="h">Horas</option>                                                 
+              <option value="l">Legajo</option>
+              <option value="f">Fecha</option>
             </select>
             <form style="display: none;" id="formMostrarHorasExtras" method="POST" action="">
-              <label class="letras" for="TipoHora">Horas: </label>
+              <label class="letras" for="TipoHora">‎ ‎ </label>
+              <select class="selectores" type="checkbox" id="ComboxSectorHEHoras" name="ComboxSectorHEHoras">
+                <option value="0">Departamento</option>
+                <option value="A">Administración</option>
+                <option value="C">Chacras</option>
+                <option value="E">Empaque</option>
+              </select>
+              <label class="letras" for="TipoHora">‎ ‎ </label>
               <select class="selectores" type="checkbox" id="ComboxTipoHoraTransf" name="ComboxTipoHoraTransf">
-              <option value="0">Seleccione</option>
-              <option value="50">Horas al 50 %</option>
-              <option value="100">Horas al 100 %</option>
-              <option value="N">Horas Nocturnas</option>
-              <option value="A">Horas Arregladas</option>
+                <option value="0">Seleccione</option>
+                <option value="50">Horas al 50 %</option>
+                <option value="100">Horas al 100 %</option>
+                <option value="N">Horas Nocturnas</option>
+                <option value="A">Horas Arregladas</option>
+              </select>
+            </form>
+            <form style="display: none;" id="formMostrarHorasExtrasSector" method="POST" action="">
+              <label class="letras" for="TipoHora">‎ ‎ </label>
+              <select class="selectores" type="checkbox" id="ComboxSectorHELegajos" name="ComboxSectorHELegajos">
+                <option value="0">Departamento</option>
+                <option value="A">Administración</option>
+                <option value="C">Chacras</option>
+                <option value="E">Empaque</option>
               </select>
             </form>
             <form style="display: none;" id="formMostrarHorasExtrasLegajo" method="POST" action="">
-              <label class="letras" for="TipoHora">Legajos: </label>
+              <label class="letras" for="TipoHora">‎ ‎ </label>
               <select class="selectores" type="checkbox" id="ComboxTipoLegajoTransf" name="ComboxTipoLegajoTransf">
               </select>
             </form>
@@ -58,7 +75,7 @@
                 <table class="pre-hs-ex">
                     <thead id="encabezado-tabla-hs-ex">
                       <tr>
-                        <th style="width: 40px;"><i class='bx bx-check icon'></i></th>
+                        <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox" id="selectAll"></th>
                         <th style="width: 60px;">Tipo</th>
                         <th style="width: 80px;">Legajo</th>
                         <th style="width: 280px;">Nombre y Apellido</th>

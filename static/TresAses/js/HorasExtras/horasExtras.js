@@ -1,45 +1,114 @@
 
 
 const ComboxHoras = document.getElementById("formMostrarHorasExtras");
+const ComboxSectores = document.getElementById("formMostrarHorasExtrasSector");
 const ComboxLegajos = document.getElementById("formMostrarHorasExtrasLegajo");
+const ComboxFechas = document.getElementById("formMostrarHorasExtrasLegajo");
 
 const ocultarCombox = () =>{
     ComboxHoras.style.display = 'none';
     ComboxLegajos.style.display = 'none';
+    ComboxSectores.style.display = 'none';
 }
 
 ComboxBuscarPor.addEventListener("change", (event) => {
+    document.getElementById("ComboxSectorHEHoras").selectedIndex = 0;
+    document.getElementById("ComboxSectorHELegajos").selectedIndex = 0;
+    document.getElementById("ComboxTipoHoraTransf").selectedIndex = 0;
     const selectedValue = event.target.value;
     if (selectedValue === '0') {
         limpiarCampos();
         ocultarCombox();
     }else if (selectedValue === 'h') {
+        ComboxSectores.style.display = 'none';
         ComboxHoras.style.display = 'block';
         ComboxLegajos.style.display = 'none';
         document.getElementById('tablaHorasProcesadas').innerHTML = '';
-        document.getElementById("HeImporte").value = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
     }else if (selectedValue === 'l') {
         ComboxHoras.style.display = 'none';
-        ComboxLegajos.style.display = 'block';
-        listarLegajos();
+        ComboxSectores.style.display = 'block';
+        //ComboxHoras.style.display = 'none';
+        //ComboxLegajos.style.display = 'block';
         document.getElementById('tablaHorasProcesadas').innerHTML = '';
-        document.getElementById("HeImporte").value = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
+    }else if (selectedValue == 'f'){
+        document.getElementById('tablaHorasProcesadas').innerHTML = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
+        var message = "No disponible.";
+        var color = "red";
+        mostrarInfo(message,color);
+        ocultarCombox();
+    }
+});
+
+ComboxSectorHEHoras.addEventListener("change", (event) => {
+    const miCheckbox = document.getElementById("selectAll");
+    miCheckbox.checked = false;
+    document.getElementById('tablaHorasProcesadas').innerHTML = '';
+    document.getElementById("ComboxTipoHoraTransf").selectedIndex = 0;
+    const selectedValue = event.target.value;
+    if (selectedValue === '0') {
+        limpiarCampos();
+    }else if (selectedValue === 'A') {
+        console.log('ADMIN');
+    }else if (selectedValue === 'C') {
+        console.log('CHACRA');
+    }else if (selectedValue === 'E') {
+        console.log('EMPAQUE');
+    }
+});
+
+ComboxSectorHELegajos.addEventListener("change", (event) => {
+    document.getElementById('tablaHorasProcesadas').innerHTML = '';
+    const miCheckbox = document.getElementById("selectAll");
+    miCheckbox.checked = false;
+    const selectedValue = event.target.value;
+    if (selectedValue === '0') {
+        limpiarCampos();
+    }else if (selectedValue === 'A') {
+        console.log('ADMIN');
+        ComboxLegajos.style.display = 'block';
+        listar_legajos_por_sector();
+    }else if (selectedValue === 'C') {
+        console.log('CHACRA');
+        ComboxLegajos.style.display = 'block';
+        listar_legajos_por_sector();
+    }else if (selectedValue === 'E') {
+        console.log('EMPAQUE');
+        ComboxLegajos.style.display = 'block';
+        listar_legajos_por_sector();
     }
 });
 
 ComboxTipoHoraTransf.addEventListener("change", (event) => {
-    const selectedValue = event.target.value;
-    if (selectedValue === '0') {
-        limpiarCampos();
-    } else {
-        verHorasExtras_transferencia();
+    const comboxSector = document.getElementById("ComboxSectorHEHoras");
+    const selectedIndex = comboxSector.selectedIndex;
+    const miCheckbox = document.getElementById("selectAll");
+    miCheckbox.checked = false;
+    if (selectedIndex == 0){
+        var message = "Debe seleccionar un Departamento.";
+        var color = "red";
+        mostrarInfo(message,color);
+        document.getElementById("ComboxTipoHoraTransf").selectedIndex = 0;
+    }else{
+        const selectedValue = event.target.value;
+        if (selectedValue === '0') {
+            document.getElementById('tablaHorasProcesadas').innerHTML = '';
+            document.getElementById("ComboxTipoHoraTransf").selectedIndex = 0;
+        } else {
+            verHorasExtras_transferencia();
+        }
     }
 });
 
 ComboxTipoLegajoTransf.addEventListener("change", (event) => {
     const selectedValue = event.target.value;
     if (selectedValue === '0') {
-        limpiarCampos();
+        document.getElementById('tablaHorasProcesadas').innerHTML = '';
     } else {
         verHorasExtras_transferencia_por_legajos();
     }
@@ -86,17 +155,58 @@ function closeProgressBar() {
 
 const limpiarCampos = () => {
     document.getElementById('tablaHorasProcesadas').innerHTML = '';
-    document.getElementById("HeImporte").value = '';
     document.getElementById("ComboxTipoHoraTransf").selectedIndex = 0;
-    document.getElementById("ComboxBuscarPor").selectedIndex = 0;
+    document.getElementById("HeImporte").value = '';
+    //document.getElementById("ComboxBuscarPor").selectedIndex = 0;
     ComboxHoras.style.display = 'none';
     ComboxLegajos.style.display = 'none';
 };
 
-const listarLegajos = async () => {
+//FUNCION GET
+// const listarLegajos = async () => {
+//     openProgressBar();
+//     try {
+//         const response = await fetch("transferencia/cargar-combox-legajos")
+//         const data = await response.json();
+//         if(data.Message=="Success"){
+//             let legajos_he = `<option value="0">Seleccione</option>`;
+//             data.Datos.forEach((datos) => {
+//                 legajos_he += `
+//                 <option value="${datos.legajo}">${datos.nombres}</option>
+//                 `;
+
+//             });
+//             document.getElementById('ComboxTipoLegajoTransf').innerHTML = legajos_he;
+//             closeProgressBar();
+//         }else {
+//             closeProgressBar();
+//             var nota = data.Nota
+//             var color = "red";
+//             mostrarInfo(nota,color) 
+//         }
+//     } catch (error) {
+//         closeProgressBar();
+//         limpiarCampos(); 
+//         var nota = "Se produjo un error al procesar la solicitud.";
+//         var color = "red";
+//         mostrarInfo(nota,color)  
+//     }
+// }
+
+const listar_legajos_por_sector = async () => {
     openProgressBar();
     try {
-        const response = await fetch("transferencia/cargar-combox-legajos")
+        const form = document.getElementById("formMostrarHorasExtrasSector");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("transferencia/cargar-combox-legajos", options);
         const data = await response.json();
         if(data.Message=="Success"){
             let legajos_he = `<option value="0">Seleccione</option>`;
@@ -104,11 +214,12 @@ const listarLegajos = async () => {
                 legajos_he += `
                 <option value="${datos.legajo}">${datos.nombres}</option>
                 `;
-
             });
             document.getElementById('ComboxTipoLegajoTransf').innerHTML = legajos_he;
             closeProgressBar();
         }else {
+            document.getElementById('ComboxTipoLegajoTransf').innerHTML = ``;
+            ComboxLegajos.style.display = 'none';
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
@@ -116,12 +227,12 @@ const listarLegajos = async () => {
         }
     } catch (error) {
         closeProgressBar();
-        limpiarCampos(); 
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
-        mostrarInfo(nota,color)  
+        mostrarInfo(nota,color);
+        limpiarCampos();  
     }
-}
+};
 
 const verHorasExtras_transferencia_por_legajos = async () => {
     openProgressBar();
@@ -143,7 +254,7 @@ const verHorasExtras_transferencia_por_legajos = async () => {
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
                 <td style="width: 40px;">
-                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox" ${datos.ID ? 'checked' : ''}>
+                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox">
                 </td>
                 <td style="width: 60px;">${datos.tipo}</td>
                 <td style="width: 80px;">${datos.legajo}</td>
@@ -192,7 +303,7 @@ const verHorasExtras_transferencia = async () => {
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
                 <td style="width: 40px;">
-                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox" ${datos.ID ? 'checked' : ''}>
+                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox">
                 </td>
                 <td style="width: 60px;">${datos.tipo}</td>
                 <td style="width: 80px;">${datos.legajo}</td>
@@ -290,6 +401,35 @@ const eliminaHorasExtras_transferencia = async () => {
         limpiarCampos();  
     }
 };
+
+// ComboxTipoLegajoAutorizaEmpaque.addEventListener("change", (event) => {
+//     const selectedValue = event.target.value;
+//     if (selectedValue === '0') {
+//         document.getElementById('tablaHorasProcesadas').innerHTML = '';
+
+//     } else {
+//         const miCheckbox = document.getElementById("selectAll");
+//         miCheckbox.checked = false;
+//         verHorasExtras_transferencia_por_legajos_empaque();
+//     }
+// });
+
+const selectAllCheckbox = document.getElementById("selectAll");
+
+selectAllCheckbox.addEventListener("change", function () {
+    if (selectAllCheckbox.checked) {
+        const checkboxes = document.querySelectorAll(".input-checkbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    } else {
+        const checkboxes = document.querySelectorAll(".input-checkbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+    }
+});
 
 
 /// pop up de confirmación
