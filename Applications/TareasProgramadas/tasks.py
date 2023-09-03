@@ -613,6 +613,37 @@ def llama_horas_extras_no_procesadas():
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
+def procesa_arreglos():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Legajo AS LEGAJO, CONVERT(VARCHAR(16), DateTimeDesde, 120) AS DESDE, CONVERT(VARCHAR(16), DateTimeHasta, 120) AS HASTA, " \
+                        "IdMotivo AS ID_MOTIVO, DescripcionMotivo AS DESCRIPCION, Autorizado AS AUTORIZADO, UsuarioEncargado AS USUARIO, ID_HESP AS ID " \
+                "FROM HorasExtras_Sin_Procesar " \
+                "WHERE Arreglo = '1' AND Estado <> '0' AND Estado <> '8'"
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for i in consulta:
+                    legajo = str(i[0])
+                    desde = str(i[1]) + ":00.000".replace(' ','T')
+                    hasta = str(i[2]) + ":00.000".replace(' ','T')
+                    motivo = str(i[3])
+                    descripcion = str(i[4])
+                    autorizado = str(i[5])
+                    user = str(i[6])
+                    tipoHora = "A"
+                    cantidadHoras = calcular_diferencia_horas(str(i[1]),str(i[2]))
+                    ID_HESP = str(i[7])
+                    estado = "1"
+                    insertaEnProcesados(legajo,desde,hasta,motivo,descripcion,autorizado,user,tipoHora,cantidadHoras,ID_HESP,estado)
+
+    except Exception as e:
+        print("Error")
+        print(e)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)

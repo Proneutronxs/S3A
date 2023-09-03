@@ -402,17 +402,6 @@ const eliminaHorasExtras_transferencia = async () => {
     }
 };
 
-// ComboxTipoLegajoAutorizaEmpaque.addEventListener("change", (event) => {
-//     const selectedValue = event.target.value;
-//     if (selectedValue === '0') {
-//         document.getElementById('tablaHorasProcesadas').innerHTML = '';
-
-//     } else {
-//         const miCheckbox = document.getElementById("selectAll");
-//         miCheckbox.checked = false;
-//         verHorasExtras_transferencia_por_legajos_empaque();
-//     }
-// });
 
 const selectAllCheckbox = document.getElementById("selectAll");
 
