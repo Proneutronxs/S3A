@@ -30,9 +30,6 @@ def mostrarHorasCargadas(request):
     if request.method == 'POST':
         tipo = request.POST.get('ComboxTipoHoraTransf')
         sector =request.POST.get('ComboxSectorHEHoras')
-        if tipo == "A":
-            data = "Horas Extras Arregladas no disponible."
-            return JsonResponse({'Message': 'Error', 'Nota': data})
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, " \
