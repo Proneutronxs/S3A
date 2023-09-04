@@ -261,7 +261,7 @@ const verHorasExtras_transferencia_por_legajos = async () => {
                 <td style="width: 280px;">${datos.nombres}</td>
                 <td style="width: 180px;">${datos.desde}</td>
                 <td style="width: 180px;">${datos.hasta}</td>
-                <td>${datos.motivo}</td>
+                <td style="overflow-x: auto; white-space: nowrap;">${datos.motivo} - ${datos.descripcion}</td>
                 <td style="width: 80px;">${datos.horas}</td>
               </tr>`
             });
@@ -310,7 +310,7 @@ const verHorasExtras_transferencia = async () => {
                 <td style="width: 280px;">${datos.nombres}</td>
                 <td style="width: 180px;">${datos.desde}</td>
                 <td style="width: 180px;">${datos.hasta}</td>
-                <td>${datos.motivo}</td>
+                <td style="overflow-x: auto; white-space: nowrap;">${datos.motivo} - ${datos.descripcion}</td>
                 <td style="width: 80px;">${datos.horas}</td>
               </tr>`
             });
