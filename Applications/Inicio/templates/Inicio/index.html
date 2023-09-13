@@ -11,8 +11,7 @@
 </head>
 <body>
     <section class="home">
-        <div class="container">   
-
+        <div class="container">  
             {% block content %}
             <div class="encabezado">
             </div>
@@ -20,22 +19,30 @@
                 <div class="logoInicio">
                 </div>
                 <div class="login-form">
-                <h2>Iniciar Sesión</h2>
-                <form>
-                    <div class="form-group">
-                        <input type="text" placeholder="Usuario" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" placeholder="Contraseña" id="password" name="password" required>
-                    </div>
-                    <button class="button" type="button">Ingresar</button>
-                </form>
+                    <h2>Iniciar Sesión</h2>
+                    <form>
+                        <div class="form-group">
+                            <input type="text" placeholder="Usuario" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" placeholder="Contraseña" id="password" name="password" required>
+                        </div>
+                        <button class="button" type="button" id="login-button">Ingresar</button>
+                    </form>
                 </div>
             </div>
             {% endblock %}
-
         </div>
     </section>
-    <!-- <script src="script.js"></script> -->
+    <div id="popup" class="popup">
+        <span class="close" id="closePopup">&times;</span>
+        <div id="mensaje-pop-up">
+      
+        </div>
+    </div>
+    <script src="{%static 'TresAses/js/inicio/inicio.js' %}"></script>
+
 </body>
+
+
 </html>
