@@ -85,6 +85,58 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 ###### ORIGINAL S3A
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'S3A/SQLite/db.SQLite',
+    },
+    'TRESASES_APLICATIVO': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'TRESASES_APLICATIVO',
+        'USER': 'sa',
+        'HOST': '192.168.1.3\sql2012',
+        'PASSWORD': '',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+    'ISISPayroll': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'TresAses_ISISPayroll',
+        'USER': 'sa',
+        'HOST': '192.168.1.3\sql2012',
+        'PASSWORD': '',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+    'principal': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'principal',
+        'USER': 'sa',
+        'HOST': '192.168.1.3\sql2012',
+        'PASSWORD': '',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
+    'S3A': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'S3A',
+        'USER': 'sa',
+        'HOST': '192.168.1.3\sql2012',
+        'PASSWORD': '',
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    }
+}
+
+###### LOCAL S3A
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -94,8 +146,8 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',
-#         'HOST': '192.168.1.3\sql2012',
-#         'PASSWORD': '',
+#         'HOST': '192.168.0.11',
+#         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
 #             'driver': 'ODBC Driver 17 for SQL Server',
@@ -105,8 +157,8 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TresAses_ISISPayroll',
 #         'USER': 'sa',
-#         'HOST': '192.168.1.3\sql2012',
-#         'PASSWORD': '',
+#         'HOST': '192.168.0.11',
+#         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
 #             'driver': 'ODBC Driver 17 for SQL Server',
@@ -116,8 +168,8 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'principal',
 #         'USER': 'sa',
-#         'HOST': '192.168.1.3\sql2012',
-#         'PASSWORD': '',
+#         'HOST': '192.168.0.11',
+#         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
 #             'driver': 'ODBC Driver 17 for SQL Server',
@@ -127,66 +179,14 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'S3A',
 #         'USER': 'sa',
-#         'HOST': '192.168.1.3\sql2012',
-#         'PASSWORD': '',
+#         'HOST': '192.168.0.11',
+#         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
 #             'driver': 'ODBC Driver 17 for SQL Server',
 #         },
 #     }
 # }
-
-###### LOCAL S3A
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'S3A/SQLite/db.SQLite',
-    },
-    # 'TRESASES_APLICATIVO': {
-    #     'ENGINE': 'sql_server.pyodbc',
-    #     'NAME': 'TRESASES_APLICATIVO',
-    #     'USER': 'sa',
-    #     'HOST': '192.168.0.11',
-    #     'PASSWORD': 'Sideswipe348',
-    #     'PORT': '',
-    #     'OPTIONS': {
-    #         'driver': 'ODBC Driver 17 for SQL Server',
-    #     },
-    # },
-    # 'ISISPayroll': {
-    #     'ENGINE': 'sql_server.pyodbc',
-    #     'NAME': 'TresAses_ISISPayroll',
-    #     'USER': 'sa',
-    #     'HOST': '192.168.0.11',
-    #     'PASSWORD': 'Sideswipe348',
-    #     'PORT': '',
-    #     'OPTIONS': {
-    #         'driver': 'ODBC Driver 17 for SQL Server',
-    #     },
-    # },
-    # 'principal': {
-    #     'ENGINE': 'sql_server.pyodbc',
-    #     'NAME': 'principal',
-    #     'USER': 'sa',
-    #     'HOST': '192.168.0.11',
-    #     'PASSWORD': 'Sideswipe348',
-    #     'PORT': '',
-    #     'OPTIONS': {
-    #         'driver': 'ODBC Driver 17 for SQL Server',
-    #     },
-    # },
-    # 'S3A': {
-    #     'ENGINE': 'sql_server.pyodbc',
-    #     'NAME': 'S3A',
-    #     'USER': 'sa',
-    #     'HOST': '192.168.0.11',
-    #     'PASSWORD': 'Sideswipe348',
-    #     'PORT': '',
-    #     'OPTIONS': {
-    #         'driver': 'ODBC Driver 17 for SQL Server',
-    #     },
-    # }
-}
 
 
 # Password validation
