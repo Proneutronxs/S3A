@@ -781,8 +781,10 @@ def InsertaInicioFinal(ID,Inicio,Final):
     error = "Solo Entra en la Funcion"
     Registro_Errores_SQL(funcion,error)
     diaSemana = obtener_dia_semana(Inicio)
-    sector = buscaSectorEnHorasExtrasSinProceso(ID)
-
+    sector = str(buscaSectorEnHorasExtrasSinProceso(ID))
+    funcion = "Inserta Inicio y Final"
+    error = "Entra y muestra el Sector: -> " + sector
+    Registro_Errores_SQL(funcion,error)
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
         if sector == 'C':
