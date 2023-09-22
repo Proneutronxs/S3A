@@ -109,6 +109,8 @@ def autorizaHorasCargadas(request):
     if request.method == 'POST':
         checkboxes_tildados = request.POST.getlist('idCheck')
         resultados = []
+        importe = "0"
+        pagada = "N"
         for i in checkboxes_tildados:
             ID_HEP = str(i) 
             fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
