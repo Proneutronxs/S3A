@@ -777,6 +777,9 @@ def procesa_arreglos():
 
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
+    funcion = "Inserta Inicio y Final"
+    error = "Solo Entra en la Funcion"
+    Registro_Errores_SQL(funcion,error)
     diaSemana = obtener_dia_semana(Inicio)
     sector = buscaSectorEnHorasExtrasSinProceso(ID)
 
@@ -927,6 +930,9 @@ def InsertaInicioFinal(ID,Inicio,Final):
                 hasta = hastaSin + ":00.000"
                 insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
         if sector == 'E':
+            funcion = "Inserta Inicio y Final"
+            error = "Entra en sector E"
+            Registro_Errores_SQL(funcion,error)
             ###PROCESAR LAS HORAS DE EMPAQUE
             soloFecha = obtener_solo_fecha(Inicio)
 
