@@ -622,7 +622,7 @@ def obtener_dia_semana(fecha):
     dia_semana = fechas.strftime("%A")
     return dia_semana.capitalize()
 
-### ME TRAE UNA LISTA QUE CONTIENE LISTAS CON LA CANTIDAD DE DÍAS QUE ENCUENTRA
+### ME TRAE UNA LISTA QUE CONTIENE LISTAS CON LA CANTIDAD DE DÍAS QUE ENCUENTRA1d95d463cee8958b17d1186a697a3ac1
 def trae_lista_con_listado():
     listado_HE_por_dia = []
     lista_HE_sin_proceso = llama_horas_extras_no_procesadas()
@@ -779,7 +779,7 @@ def procesa_arreglos():
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
-    sector = buscaSectorEnHorasExtras(ID)
+    sector = 'C'
 
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
