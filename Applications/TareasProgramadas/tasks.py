@@ -652,8 +652,9 @@ def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado,
             cursor.execute(sql_update, [id_HESP])
 
     except Exception as e:
-        print("Error al insertar o actualizar en la base de datos:")
-        print(e)
+        funcion = "Inserta en Procesados"
+        error = str(e)
+        Registro_Errores_SQL(funcion,error)
 
     finally:
         cursor.close()
@@ -928,6 +929,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
         if sector == 'E':
             ###PROCESAR LAS HORAS DE EMPAQUE
             soloFecha = obtener_solo_fecha(Inicio)
+
             Inicio_100_00_04_Empaque = LV_Hora100_00_a_04_Inicio_Empaque(Inicio)
             Final_100_00_04_Empaque = LV_Hora100_00_a_04_Final_Empaque(Final)
 
@@ -1682,6 +1684,18 @@ def actualizaEstadoAnticipo():
     except Exception as e:
         print(e)
     finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def Registro_Errores_SQL(funcion, error):
+    try:
+        with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO Log_Errores_SQL (Funcion, Error) VALUES (%s, %s)"
+            cursor.execute(sql,[funcion,error])
+
+    except Exception as e:
+        print(e)
+    finally:
+
         connections['TRESASES_APLICATIVO'].close()
 
 
