@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required
 import datetime 
 
 from django.db import connections
@@ -8,6 +10,8 @@ from django.http import JsonResponse
 # Create your views here.
 
 ### RENDERIZADO DE EMPAQUE
+#@login_required
+#@permission_required('Empaque.puede_ingresar', raise_exception=True)
 def Empaque(request):
     return render (request, 'Empaque/empaque.html')
 

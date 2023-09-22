@@ -1,4 +1,6 @@
-
+const loginButton = document.getElementById("login-button");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
 
 
 document.getElementById('login-button').addEventListener('click', function() {
@@ -15,8 +17,7 @@ document.getElementById('login-button').addEventListener('click', function() {
     .then(response => response.json())
     .then(data => {
         if (data.Message == 'success') {
-            console.log('inicio exitoso');
-            //window.location.href = 'rrhh/';
+            window.location.href = '/';
         } else {
             var Message = data.data;
             var Color = 'Red';
@@ -28,7 +29,12 @@ document.getElementById('login-button').addEventListener('click', function() {
     });
 });
 
-
+passwordInput.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+      // Si se presiona Enter, haz clic en el botón de inicio de sesión
+      loginButton.click();
+    }
+});
 
 
 

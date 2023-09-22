@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from Applications.Inicio import views
+from django.contrib.auth.views import logout_then_login
 
 urlpatterns = [
 
@@ -46,5 +48,9 @@ urlpatterns = [
 
     path('login/', include('Applications.Inicio.urls')),
 
+    path('accounts/login/', views.inicioSesion, name="inicio_sesion"),
 
+    path('accounts/login/login-3A/', views.custom_login, name='login-3A'),
+
+    path('logout/', logout_then_login, name='logout'),
 ]

@@ -4,6 +4,7 @@ from S3A.conexionessql import *
 from datetime import datetime
 import json
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
+from Applications.TareasProgramadas.tasks import buscaSector
 from django.db import connections
 from django.http import JsonResponse
 
@@ -70,6 +71,7 @@ def insert_HoraExtra(request):
                 idMotivo = str(item['Motivo']) ### MOTIVO
                 Descripcion = str(item['Descripcion']) ### DESCRIPCION DE LA TAREA
                 Arreglo = str(item['Arreglo']) ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
+                Sector = buscaSector(Legajo) ### TRAE EL SECTOR DE LEGAJO
                 Usuario = str(item['Usuario']) ### USUARIO DE LA APLICACIÓN
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
@@ -82,8 +84,8 @@ def insert_HoraExtra(request):
                 #     lista_tieneHE_asignada.append(Legajo)
                 # else:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Usuario, Autorizado, fechaAlta, Estado)
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Sector, Usuario, Autorizado, fechaAlta, Estado)
                     cursor.execute(sql, values)
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."

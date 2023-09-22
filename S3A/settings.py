@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -136,6 +137,13 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'S3A/SQLite/db.SQLite',
+#     },
+# }
+
 ###### LOCAL S3A
 # DATABASES = {
 #     'default': {
@@ -228,9 +236,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+CSRF_FAILURE_VIEW = 'Applications.TresAses.views.error_403'
+handler403 = 'Applications.TresAses.views.error_403'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+
+LOGOUT_REDIRECT_URL = reverse_lazy('tresases')
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)

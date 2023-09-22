@@ -43,10 +43,12 @@
 
                     <li class="nav-link">
                         <a href="{% url 'empaque' %}">
+                        <!-- <a onclick="verificar_Permisos('Empaque')"> -->
                             <i class='bx bxs-factory icon' ></i>
                             <span class="text nav-text">Empaque</span>
                         </a>
                     </li>
+                    
 
                     <li class="nav-link">
                         <a href="#">
@@ -165,9 +167,9 @@
 
             <div class="bottom-content">
                 <li class="">
-                    <a href="#">
+                    <a href="{% url 'logout' %}">
                         <i class='bx bx-log-out icon' ></i>
-                        <span class="text"><b>Usuario</b></span>
+                        <span class="text"><b>{{user.username}}</b></span>
                     </a>
                 </li>                
             </div>
@@ -186,8 +188,15 @@
                 </div>
             {% endblock %}
         </div>
+        <div id="user-has-permission" style="display: none;" data-value="{{ user_has_permission }}"></div>
     </section>
 
-    <!-- <script src="script.js"></script> -->
+    <div id="popup" class="popup">
+        <span class="close" id="closePopup">&times;</span>
+        <div id="mensaje-pop-up">
+        </div>
+    </div>
+      
+    <script src="{%static 'TresAses/js/General/permisos.js' %}"></script>
 </body>
 </html>

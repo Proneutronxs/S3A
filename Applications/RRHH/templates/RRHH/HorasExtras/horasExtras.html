@@ -52,9 +52,9 @@
 
             <div class="bottom-content">
                 <li class="">
-                    <a href="#">
+                    <a href="{% url 'logout' %}">
                         <i class='bx bx-log-out icon' ></i>
-                        <span class="text"><b>Usuario</b></span>
+                        <span class="text"><b>{{user.username | upper}}</b></span>
                     </a>
                 </li>                
             </div>
