@@ -685,7 +685,7 @@ def buscaSector(legajo):
 def buscaSectorEnHorasExtrasSinProceso(ID_HESP):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT Sector FROM HorasExtras_Sin_Procesar WHERE ID_HESP = %s "
+            sql = "SELECT RTRIM(Sector) FROM HorasExtras_Sin_Procesar WHERE ID_HESP = %s "
             cursor.execute(sql, [str(ID_HESP)])
             consulta = cursor.fetchone()
             if consulta:
