@@ -777,7 +777,7 @@ def procesa_arreglos():
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
-    sector =   'E' ###buscaSectorEnHorasExtrasSinProceso(ID)
+    sector = buscaSectorEnHorasExtrasSinProceso(ID)
 
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
@@ -972,18 +972,17 @@ def InsertaInicioFinal(ID,Inicio,Final):
                     hasta = hastaSin + ":00.000"
                     insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
             if Inicio_50_04_00_Empaque:
-                if Final_50_04_00_Empaque:
-                    horaInicio = Inicio
-                    horaFinal = obtener_dia_siguiente(Final)
-                    estado = "1"
-                    tipoHora = "50"
-                    cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
-                    legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
-                    desdeSin = horaInicio.replace(' ', 'T')
-                    hastaSin = horaFinal.replace(' ', 'T')
-                    desde = desdeSin + ":00.000"
-                    hasta = hastaSin + ":00.000"
-                    insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
+                horaInicio = Inicio
+                horaFinal = obtener_dia_siguiente(Final)
+                estado = "1"
+                tipoHora = "50"
+                cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
+                legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
+                desdeSin = horaInicio.replace(' ', 'T')
+                hastaSin = horaFinal.replace(' ', 'T')
+                desde = desdeSin + ":00.000"
+                hasta = hastaSin + ":00.000"
+                insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
 ################################## SÁBADO #########################################
     if diaSemana == "Sábado":
         if sector == 'C':
