@@ -272,10 +272,9 @@ const eliminaHorasExtras_autoriza = async () => {
         if(data.Message=="Success"){
             closeProgressBar();
             var nota = data.Nota
-            limpiarCampos();
             var color = "green";
             mostrarInfo(nota,color); 
-            listarLegajosEmpaque();       
+            verHorasExtras_transferencia_por_legajos_empaque();     
         }else {
             closeProgressBar();
             var nota = data.Nota
