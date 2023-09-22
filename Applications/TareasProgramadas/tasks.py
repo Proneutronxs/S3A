@@ -928,11 +928,11 @@ def InsertaInicioFinal(ID,Inicio,Final):
         if sector == 'E':
             ###PROCESAR LAS HORAS DE EMPAQUE
             soloFecha = obtener_solo_fecha(Inicio)
-            Inicio_100_00_04_Empaque = Inicio_100_00_04_Empaque(Inicio)
-            Final_100_00_04_Empaque = Final_100_00_04_Empaque(Final)
+            Inicio_100_00_04_Empaque = LV_Hora100_00_a_04_Inicio_Empaque(Inicio)
+            Final_100_00_04_Empaque = LV_Hora100_00_a_04_Final_Empaque(Final)
 
-            Inicio_50_04_00_Empaque = Inicio_50_04_00_Empaque(Inicio)
-            Final_50_04_00_Empaque = Final_50_04_00_Empaque(Final)
+            Inicio_50_04_00_Empaque = LV_Hora50_04_a_00_Inicio_Empaque(Inicio)
+            Final_50_04_00_Empaque = LV_Hora50_04_a_00_Final_Empaque(Final)
 
             if Inicio_100_00_04_Empaque:
                 if Final_100_00_04_Empaque:
@@ -1268,14 +1268,14 @@ def InsertaInicioFinal(ID,Inicio,Final):
             ### PROCESAR EMPAQUE SABADO
             soloFecha = obtener_solo_fecha(Inicio)
 
-            Inicio_100_00_04_Empaque = Inicio_100_00_04_Empaque(Inicio)
-            Final_100_00_04_Empaque = Final_100_00_04_Empaque(Final)
+            Inicio_100_00_04_Empaque = Sabado_Hora100_00_a_04_Inicio_Empaque(Inicio)
+            Final_100_00_04_Empaque = Sabado_Hora100_00_a_04_Final_Empaque(Final)
 
-            Inicio_50_04_13_Empaque = Inicio_50_04_13_Empaque(Inicio)
-            Final_50_04_13_Empaque = Final_50_04_13_Empaque(Final)
+            Inicio_50_04_13_Empaque = Sabado_Hora50_04_a_13_Inicio_Empaque(Inicio)
+            Final_50_04_13_Empaque = Sabado_Hora50_04_a_13_Final_Empaque(Final)
 
-            Inicio_100_13_00_Empaque = Inicio_100_13_00_Empaque(Inicio)
-            Final_100_13_00_Empaque = Final_100_13_00_Empaque(Final)
+            Inicio_100_13_00_Empaque = Sabado_Hora100_13_a_00_Inicio_Empaque(Inicio)
+            Final_100_13_00_Empaque = Sabado_Hora100_13_a_00_Final_Empaque(Final)
 
             if Inicio_100_00_04_Empaque:
                 if Final_100_00_04_Empaque:
