@@ -681,13 +681,11 @@ def buscaSector(legajo):
         connections['ISISPayroll'].close()
 
 ### CAMBIAR LA CONSULTA PARA OBTENER EL SECTOR DE LA HORA CON EL ID_HESP
-def buscaSectorEnHorasExtras(ID_HESP):
+def buscaSectorEnHorasExtrasSinProceso(ID_HESP):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT        Sector " \
-                    "FROM            HorasExtras_Sin_Procesar " \
-                    "WHERE        (ID_HESP = %s)"
-            cursor.execute(sql, [ID_HESP])
+            sql = "SELECT Sector FROM HorasExtras_Sin_Procesar WHERE ID_HESP = %s "
+            cursor.execute(sql, [str(ID_HESP)])
             consulta = cursor.fetchone()
             if consulta:
                 sector = str(consulta[0])
@@ -779,7 +777,7 @@ def procesa_arreglos():
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
-    sector = 'C'
+    sector = buscaSectorEnHorasExtrasSinProceso(ID)
 
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
