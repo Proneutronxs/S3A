@@ -777,7 +777,7 @@ def procesa_arreglos():
 ### FUNCION QUE INSERTA LOS DATOS CUANDO SE EJECUTA LA TAREA
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
-    sector =  'E'#buscaSectorEnHorasExtrasSinProceso(ID)
+    sector =  buscaSectorEnHorasExtrasSinProceso(ID)
 
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
