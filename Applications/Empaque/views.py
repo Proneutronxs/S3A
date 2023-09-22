@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos, insertaHorasExtras
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 import datetime 
@@ -110,7 +111,10 @@ def autorizaHorasCargadas(request):
         resultados = []
         for i in checkboxes_tildados:
             ID_HEP = str(i) 
-            autorizaHorasEstadoHEP(ID_HEP)
+            fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
+            Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
+            resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
+            resultados.append(resultado)
 
         if 0 in resultados:
             data = "Se produjo un Error en alguna de las inserciones."
