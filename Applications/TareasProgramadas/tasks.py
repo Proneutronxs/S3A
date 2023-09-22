@@ -929,7 +929,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
             ###PROCESAR LAS HORAS DE EMPAQUE
             soloFecha = obtener_solo_fecha(Inicio)
             Inicio_100_00_04_Empaque = Inicio_100_00_04_Empaque(Inicio)
-            Fina_100_00_04_Empaque = Fina_100_00_04_Empaque(Final)
+            Final_100_00_04_Empaque = Final_100_00_04_Empaque(Final)
 
             Inicio_50_04_00_Empaque = Inicio_50_04_00_Empaque(Inicio)
             Final_50_04_00_Empaque = Final_50_04_00_Empaque(Final)
