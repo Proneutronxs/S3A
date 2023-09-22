@@ -961,7 +961,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
                     horaInicio = Inicio
                     horaFinal = soloFecha + " 04:00"
                     estado = "1"
-                    tipoHora = "100"
+                    tipoHora = "50"
                     cantidadHoras = str(calcular_diferencia_horas(horaInicio,horaFinal))
                     legajo, idMotivo, descripcion, idAutorizado, encargado, idSinProceso = buscaDatos_paraInsertar(ID)
                     desdeSin = horaInicio.replace(' ', 'T')
