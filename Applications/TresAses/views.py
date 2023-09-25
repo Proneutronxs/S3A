@@ -11,10 +11,18 @@ from django.http import JsonResponse
 def TresAses(request):
     return render (request, 'TresAses/menu/index.html')
 
+
+
+
+
+
+
+
+
+
 @login_required
 def verificarPermisos(request, sector):
     user_has_permission = request.user.has_perm(sector + '.puede_ingresar')
-    print(user_has_permission)
     if user_has_permission:
         if sector == 'Empaque':
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
@@ -23,6 +31,17 @@ def verificarPermisos(request, sector):
 def error_403(request, exception):
     print("Renderizado de 403")
     return render(request, 'TresAses/errores/403.html', status=403)
+
+
+
+
+
+
+
+
+
+
+
 
 def funcion(request):
     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})

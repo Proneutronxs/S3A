@@ -307,24 +307,24 @@ def obtenerAñoActual():
     return año
 
 @csrf_exempt
-def verHorasExtras(request):
+def verHorasExtras(request):#HorasExtras_Sin_Procesar.Estado <> %s AND 
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
             ### VARIABLES
             usuario = str(json.loads(body)['usuario'])
             fecha = str(json.loads(body)['fecha'])
-            estado = '8'
+            #estado = '8'
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeDesde, " \
                                                 "103) + ' ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.DateTimeDesde, 108) + ' hs' AS DESDE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), " \
-                                                "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA " \
+                                                "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA, HorasExtras_Sin_Procesar.Estado AS Estado " \
                         "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "HorasExtras_Sin_Procesar ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Sin_Procesar.Legajo INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
-                        "WHERE        HorasExtras_Sin_Procesar.Estado <> %s AND (CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) = %s) AND (USUARIOS.Usuario = %s) " \
+                        "WHERE        (CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) = %s) AND (USUARIOS.Usuario = %s) " \
                         "ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple"
-                cursor.execute(sql, [estado,fecha,usuario])
+                cursor.execute(sql, [fecha,usuario])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
@@ -332,7 +332,8 @@ def verHorasExtras(request):
                         nombre = str(row[0])
                         desde = str(row[1])
                         hasta = str(row[2])
-                        datos = {'Nombre': nombre, 'Desde': desde, 'Hasta': hasta}
+                        estado = str(row[3])
+                        datos = {'Nombre': nombre, 'Desde': desde, 'Hasta': hasta, 'Estado': estado}
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
