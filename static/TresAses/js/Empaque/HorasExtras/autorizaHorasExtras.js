@@ -89,9 +89,8 @@ const listarLegajosEmpaque = async () => {
             let legajos_he = `<option value="0">Seleccione</option>`;
             data.Datos.forEach((datos) => {
                 legajos_he += `
-                <option value="${datos.legajo}">${datos.nombres}</option>
+                <option value="${datos.id}">${datos.cc}</option>
                 `;
-
             });
             ComboxLegajosEmpaque.style.display = 'block';
             document.getElementById('ComboxTipoLegajoAutorizaEmpaque').innerHTML = legajos_he;
