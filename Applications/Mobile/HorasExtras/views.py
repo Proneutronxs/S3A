@@ -354,7 +354,7 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
         User = str(usuario)
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
+                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS, HorasExtras_Sin_Procesar.FechaAlta " \
                         "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
                         "WHERE        (USUARIOS.Usuario = %s) AND FechaAlta >= DATEADD(DAY, -29, GETDATE()) " \
