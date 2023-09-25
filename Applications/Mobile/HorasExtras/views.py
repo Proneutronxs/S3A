@@ -352,14 +352,15 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
     if request.method == 'GET':
         Mes = str(mes)
         User = str(usuario)
+        estado = '8'
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS, HorasExtras_Sin_Procesar.FechaAlta " \
+                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
                         "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
-                        "WHERE        (USUARIOS.Usuario = %s) AND FechaAlta >= DATEADD(DAY, -29, GETDATE()) " \
-                        "ORDER BY HorasExtras_Sin_Procesar.FechaAlta"
-                cursor.execute(sql, [User])
+                        "WHERE        (HorasExtras_Sin_Procesar.Estado <> %s) AND (USUARIOS.Usuario = %s) AND FechaAlta >= DATEADD(DAY, -29, GETDATE()) " \
+                        "ORDER BY HorasExtras_Sin_Procesar.FechaAlta "
+                cursor.execute(sql, [estado,User])
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = []
