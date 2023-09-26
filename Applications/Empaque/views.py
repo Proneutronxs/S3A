@@ -28,33 +28,62 @@ def AutorizaHorasExtrasEmpaque(request):
 def cargaLegajosEmpaque(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':
         try:
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT     DISTINCT TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CentroCosto, TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo AS ID " \
-                        "FROM        TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
-                                        "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
-                                        "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
-                        "WHERE     (HorasExtras_Procesadas.EstadoEnvia = '3')"
-                cursor.execute(sql)
-                consulta = cursor.fetchall()
-                if consulta:
-                    data = []
-                    for i in consulta:
-                        cc = str(i[0])
-                        ids = str(i[1])
-                        datos = {'cc':cc, 'id':ids}
-                        data.append(datos)
-                    return JsonResponse({'Message': 'Success', 'Datos': data})
-                else:
-                    data = "No se encontraron horas extras procesadas."
-                    return JsonResponse({'Message': 'Error', 'Nota': data})
+            data = buscaCentroCostosEmpaqueIDDescrip()
+            if data:
+                return JsonResponse({'Message': 'Success', 'Datos': data})
+            else:
+                data = "No se encontraron Centros de Costos Asignados."
+                return JsonResponse({'Message': 'Error', 'Nota': data})                
         except Exception as e:
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+
+def buscaCentroCostosEmpaque():
+    data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Texto " \
+                "FROM Parametros_Aplicativo " \
+                "WHERE Codigo = 'APP-E-IDCC'"
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            if consulta:
+                data = str(consulta[0]).split('-')
+                return data
+            else:
+                return data
+    except Exception as e:
+        return data
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def buscaCentroCostosEmpaqueIDDescrip():
+    listado =  buscaCentroCostosEmpaque()
+    lista_json = []
+    for item in listado:
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "SELECT Regis_CCo, DescrCtroCosto " \
+                    "FROM CentrosCostos " \
+                    "WHERE Regis_CCo = %s"
+                cursor.execute(sql,[item])
+                consulta = cursor.fetchone()
+                if consulta:
+                    ids = str(consulta[0])
+                    cc = str(consulta[1])
+                    data = {'cc':cc, 'id':ids}
+                    lista_json.append(data)
+        except Exception as e:
+            return lista_json
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    return lista_json
 
 ###BUSCA POR EL LAGJO DEL SPINNER
 @csrf_exempt
