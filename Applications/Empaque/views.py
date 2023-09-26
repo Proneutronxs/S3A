@@ -67,7 +67,7 @@ def buscaCentroCostosEmpaqueIDDescrip():
     lista_json = []
     for item in listado:
         try:
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            with connections['ISISPayroll'].cursor() as cursor:
                 sql = "SELECT Regis_CCo, DescrCtroCosto " \
                     "FROM CentrosCostos " \
                     "WHERE Regis_CCo = %s"
@@ -82,7 +82,7 @@ def buscaCentroCostosEmpaqueIDDescrip():
             return lista_json
         finally:
             cursor.close()
-            connections['TRESASES_APLICATIVO'].close()
+            connections['ISISPayroll'].close()
     return lista_json
 
 ###BUSCA POR EL LAGJO DEL SPINNER
