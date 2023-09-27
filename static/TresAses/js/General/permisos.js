@@ -1,5 +1,8 @@
 
 
+
+
+
 const verificar_Permisos = async (sector) => {
     try {
         const response = await fetch("verificar/permisos&sector=" + sector)

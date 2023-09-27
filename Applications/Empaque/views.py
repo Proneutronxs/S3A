@@ -104,7 +104,7 @@ def mostrarHorasCargadasPorLegajoEmpaque(request):
                                     "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                     "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON " \
                                     "TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
-                    "WHERE     (TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '3') AND (HorasExtras_Procesadas.Sector = 'E') " \
+                    "WHERE     (TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '3') " \
                     "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
                 cursor.execute(sql, [cc])
                 consulta = cursor.fetchall()
@@ -120,7 +120,10 @@ def mostrarHorasCargadasPorLegajoEmpaque(request):
                         descripcion = str(i[8])
                         horas = str(i[9])
                         idHoras = str(i[11])
-                        datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas}
+                        centro = str(i[12])
+                        solicita = str(i[13])
+                        datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas , 'centro': centro, 'solicita': solicita}
+                        #print(datos)
                         data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Datos': data})
                 else:

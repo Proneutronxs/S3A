@@ -283,7 +283,7 @@ header .image-text .profession{
 }
 
 .items-row{
-  padding: 15px;
+  padding: 12px;
 }
 
 .items-row:last-child {
@@ -375,6 +375,7 @@ input[type="checkbox"].input-checkbox {
 
 .container-tabla-he{
   overflow-x: auto;
+  overflow-y: auto;
 }
 
 

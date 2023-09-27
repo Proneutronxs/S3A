@@ -130,16 +130,18 @@ const verHorasExtras_transferencia_por_legajos_empaque = async () => {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
-                <td style="width: 40px;">
+                <td >
                     <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
                 </td>
-                <td style="width: 60px;">${datos.tipo}</td>
-                <td style="width: 80px;">${datos.legajo}</td>
-                <td style="width: 280px;">${datos.nombres}</td>
-                <td style="width: 180px;">${datos.desde}</td>
-                <td style="width: 180px;">${datos.hasta}</td>
-                <td>${datos.motivo}</td>
-                <td style="width: 80px;">${datos.horas}</td>
+                <td >${datos.tipo}</td>
+                <td >${datos.legajo}</td>
+                <td >${datos.nombres}</td>
+                <td >${datos.centro}</td>
+                <td >${datos.desde}</td>
+                <td >${datos.hasta}</td>
+                <td >${datos.motivo}</td>
+                <td >${datos.horas}</td>
+                <td >${datos.solicita}</td>
               </tr>`
             });
             document.getElementById('tablaHorasProcesadasEmpaque').innerHTML = datos_he;
