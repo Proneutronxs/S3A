@@ -104,6 +104,10 @@ header .image-text .profession{
     display: block;
 }
 
+a:hover{
+  cursor: pointer;
+}
+
 .sidebar header .image{
     display: flex;
     align-items: center;

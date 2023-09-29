@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from S3A.funcionesGenerales import *
 from S3A.conexionessql import *
 from datetime import datetime
 import json
@@ -40,6 +41,7 @@ def motrar_MotivosHE(request):
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","motrar_MotivosHE","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
@@ -102,8 +104,8 @@ def insert_HoraExtra(request):
                 insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
-            print(e)
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","insert_horaExtra","usuario",error)
             est = "F"
             insertaRegistro(usuario,fechaHora,registro,est) 
             return JsonResponse({'Message': 'Error', 'Nota': error})
@@ -152,6 +154,7 @@ def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
                 return False
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("HorasExtras","verificaHoraExtra","usuario",error)
         return error
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -170,6 +173,7 @@ def traeApellidos(legajo):
             return apellido
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("HorasExtras","traeApellidos","usuario",error)
         return error
     finally:
         connections['ISISPayroll'].close()
@@ -247,6 +251,7 @@ def mostrarHoraExtrasActivas(request):
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","mostrarHorasExtrasActivas","usuario",error)
             response_data = {
                 'Message': 'Error',
                 'Nota': error
@@ -288,6 +293,7 @@ def enviarHorasExtras(request):
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","enviarHorasExtrasActivas","usuario",error)
             response_data = {
                 'Message': 'Error',
                 'Nota': error
@@ -340,12 +346,12 @@ def verHorasExtras(request):#HorasExtras_Sin_Procesar.Estado <> %s AND
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Horas Extras para la fecha. '})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","verHorasExtras","usuario",error)
         finally:
             cursor.close()
             connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 @csrf_exempt
 def verCargaFechasDeHorasExtras(request, mes, usuario):
@@ -373,6 +379,7 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("HorasExtras","verCargaFechasDeHorasExtras","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['TRESASES_APLICATIVO'].close()

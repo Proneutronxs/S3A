@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from S3A.conexionessql import *
+from S3A.funcionesGenerales import *
 import json
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro, enviarCorreo
 from django.db import connections
@@ -46,6 +47,7 @@ def insert_anticipos(request):
             return JsonResponse({'Message': 'Success', 'Nota': nota})      
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("Anticipos","insert_anticipos","usuario",error)
             estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
@@ -53,8 +55,7 @@ def insert_anticipos(request):
             cursor.close()
             connections['ISISPayroll'].close()
     else:
-        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
 
 def correosChacras():
     listadoCorreos = []
@@ -72,6 +73,7 @@ def correosChacras():
         return listadoCorreos
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("Anticipos","correosChacras","usuario",error)
         return listadoCorreos
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -90,10 +92,10 @@ def obtieneNombres(Regis_Epl):
         return nombre
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("Anticipos","obtiene_nobres","usuario",error)
         return nombre
     finally:
         connections['ISISPayroll'].close()
-
 
 def auditaAnticipos(usuario, Fechahora, Destino, Monto):
     estado = '1'
@@ -103,10 +105,10 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto):
             values = (usuario,Fechahora,Destino,Monto,estado)
             cursor.execute(sql, values)
     except Exception as e:
-        print(e)
+        error = str(e)
+        insertar_registro_error_sql("Anticipos","AuditaAnticipos","usuario",error)
     finally:
         connections['TRESASES_APLICATIVO'].close()
-
 
 def enviar_correo_sendMail(asunto, mensaje, destinatario):
     remitente = 'aplicativo@tresases.com.ar'
@@ -133,7 +135,6 @@ def obtenerAñoActual():
     año_actual = now.strftime("%Y")
     año = str(año_actual)
     return año
-
 
 @csrf_exempt
 def verAnticipos(request):
@@ -169,12 +170,12 @@ def verAnticipos(request):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Adelantos para la fecha: '})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
         finally:
             cursor.close()
             connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 @csrf_exempt
 def cargaFechasDeAnticipos(request, mes, usuario):
@@ -200,6 +201,7 @@ def cargaFechasDeAnticipos(request, mes, usuario):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("Anticipos","cargaFechasAnticipos","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['TRESASES_APLICATIVO'].close()

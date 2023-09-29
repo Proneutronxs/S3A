@@ -30,5 +30,5 @@ function mostrarInfo(Message,Color) {
 
     setTimeout(() => {
         document.getElementById("popup").classList.remove("active");
-    }, 5000);
+    }, 3000);
 }

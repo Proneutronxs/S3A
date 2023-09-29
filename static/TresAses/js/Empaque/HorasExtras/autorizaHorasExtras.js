@@ -52,7 +52,6 @@ const enviarHorasExtras_autorizado = async () => {
             mostrarInfo(nota,color);
             verHorasExtras_transferencia_por_legajos_empaque();       
         }else {
-            limpiarCampos();
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
@@ -147,7 +146,6 @@ const verHorasExtras_transferencia_por_legajos_empaque = async () => {
             document.getElementById('tablaHorasProcesadasEmpaque').innerHTML = datos_he;
             closeProgressBar();
         }else {
-            limpiarCampos();
             closeProgressBar();
             var nota = data.Nota
             var color = "red";

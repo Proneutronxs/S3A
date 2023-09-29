@@ -6,8 +6,5 @@ urlpatterns = [
     ### SOLO RENDERIZADO
     path('', views.inicioSesion, name="inicio_sesion"),
 
-    path('accounts/login/login-3A/', views.custom_login, name='login-3A'),
-
-
-
+    path('repassword/', views.repassword, name="repassword"),
 ]

@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from S3A.funcionesGenerales import *
 import json
 from django.http import FileResponse
 import os
@@ -56,6 +57,7 @@ def login_app(request):
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("GeneralApp","login_app",usuario,error)
             response_data = {
                 'Message': 'Error',
                 'Nota': error
@@ -100,6 +102,7 @@ def id_Nombre_Ccostos(request, legajo):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("GeneralApp","id_Nombre_Ccostos","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['TRESASES_APLICATIVO'].close()
@@ -134,6 +137,7 @@ def personal_por_Ccostos_asistencia(request, codigo):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("GeneralApp","personal_por_Ccostos_asistencia","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['ISISPayroll'].close()
@@ -175,6 +179,7 @@ def traePersonal(id):
                 return lista_data
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("GeneralApp","traePersonal","usuario",error)
         return error
     finally:
         connections['ISISPayroll'].close()
@@ -199,6 +204,7 @@ def traeMotivos():
                 return lista_data
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("GeneralApp","traeMotivos","usuario",error)
         return error
     finally:
         connections['S3A'].close()
@@ -218,6 +224,7 @@ def traeMontoMax():
                 return monto
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("GeneralApp","traerMontoMAx","usuario",error)
         return error
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -242,10 +249,11 @@ def recibir_apk(request):
                     destino.write(chunk)
             return JsonResponse({'Message': 'Success','Nota': 'Archivo .apk almacenado correctamente.'})
         except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("GeneralApp","recibir_apk","usuario",error)
             return JsonResponse({'Message': 'Error','Nota': 'Error al almacenar el archivo .apk: {}'.format(e)}, status=500)
     else:
         return JsonResponse({'mensaje': 'No se encontró el archivo .apk en la solicitud POST.'}, status=400)
-
 
 @csrf_exempt
 def descargar_apk(request, nombre_apk):
@@ -259,13 +267,11 @@ def descargar_apk(request, nombre_apk):
                 return response
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("GeneralApp","descargar_apk","usuario",error)
             return JsonResponse({'Message': error})  
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición (El Archivo no Existe).'})
 
-# SELECT Texto --Numerico
-# FROM Parametros_Aplicativo
-# WHERE Codigo = 'APP-ACT'
 @csrf_exempt
 def buscaParametro(request, codigo):
     if request.method == 'GET':
@@ -290,6 +296,7 @@ def buscaParametro(request, codigo):
                 return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("GeneralApp","buscaParametro","usuario",error)
             response_data = {
                 'Message': 'Error',
                 'Nota': error

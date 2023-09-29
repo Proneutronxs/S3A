@@ -7,18 +7,9 @@ from django.http import JsonResponse
 
 
 #### INICIO RENDERIZADO DE INICIO MENÚ
-#@login_required
+@login_required
 def TresAses(request):
     return render (request, 'TresAses/menu/index.html')
-
-
-
-
-
-
-
-
-
 
 @login_required
 def verificarPermisos(request, sector):
@@ -26,6 +17,8 @@ def verificarPermisos(request, sector):
     if user_has_permission:
         if sector == 'Empaque':
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
+        if sector == 'RRHH':
+            return JsonResponse ({'Message': 'Success', 'URL': 'rrhh/'})
     return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para acceder a este sector'})
 
 def error_403(request, exception):

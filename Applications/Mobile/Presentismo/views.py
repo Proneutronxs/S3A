@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from S3A.funcionesGenerales import *
 from S3A.conexionessql import *
 import json
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
@@ -41,6 +42,7 @@ def insert_fichada(request):
             return JsonResponse({'Message': 'Success', 'Nota': nota})
         except Exception as e:
             error = str(e)
+            insertar_registro_error_sql("Presentismo","insert_fichadas","usuario",error)
             est = "F"
             insertaRegistro(usuario,fechaHora,registro,est)
             return JsonResponse({'Message': 'Error', 'Nota': error})
@@ -64,10 +66,10 @@ def traeLegTarjeta(legCodigo, legTarjeta):
                 return legTarjeta
     except Exception as e:
         error = str(e)
+        insertar_registro_error_sql("Presentismo","traeLegTarjeta","usuario",error)
         return error
     finally:
         connections['principal'].close()
-
 
 @csrf_exempt
 def data(request):

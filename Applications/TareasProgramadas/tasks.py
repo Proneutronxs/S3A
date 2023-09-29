@@ -1,26 +1,8 @@
 from django.db import connections
+from S3A.funcionesGenerales import *
 from django.core.mail import send_mail
 import datetime
 import locale
-
-
-
-# def sumar_numeros():
-#     now = datetime.now()
-#     hora_actual = str(now.strftime("%H:%M:%S"))
-#     id = '34882177'
-#     legajo = '58015'
-#     user = "JCHAMBI " + hora_actual
-
-#     try:
-#         #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + legCodigo + " - " + estado + " - " + orden)
-#         with connections['default'].cursor() as cursor:
-#             sql = "INSERT INTO CopiaUsuarios (ID, legajo, usuario) VALUES (%s, %s, %s)"
-#             values = (id,legajo,user)
-#             cursor.execute(sql, values)
-
-#     except Exception as e:
-#         print(e)
 
 
 def traeLegajosISIS():
@@ -39,8 +21,7 @@ def traeLegajosISIS():
                     lista_Legajos_ISIS.append(str(row[0]))
             return lista_Legajos_ISIS
     except Exception as e:
-        #"WHERE cc.DescrCtroCosto  LIKE 'C%' " \
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","traeLegajosISIS","request.user",str(e))
     finally:
         connections['ISISPayroll'].close()
 
@@ -61,7 +42,7 @@ def buscaLegajosPRINCIPAL():
                     legajos_no_principal.append(i)
         return legajos_no_principal
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","traeLegajosPRINCIPAL","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -77,7 +58,7 @@ def traeLegLegajo(legajo):
             else:
                 return 0
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","traeLegLegajo","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -87,7 +68,7 @@ def insertaLegajosDatos(legLegajo):
             sql = "INSERT INTO T_Legajos_Datos (legCodigo, tacCodigo01, tacCodigo02) VALUES ( %s, '-1', '-1')"
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaLegajosDatos","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -97,7 +78,7 @@ def insertaLegajosTurnos_A(legLegajo):
             sql = " INSERT INTO T_Legajos_Turnos (tltComienzo, tltFin, turCodigo, legCodigo, tltPrioridad) VALUES ('1900-01-01T00:00:00.000', '9999-12-31T00:00:00.000', '3', %s, '0')"
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaLegajosTurnos_A","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -107,7 +88,7 @@ def insertaLegajosTurnos_B(legLegajo):
             sql = "INSERT INTO T_Legajos_Turnos (tltComienzo, tltFin, turCodigo, legCodigo, tltPrioridad) VALUES ('1900-01-01T00:00:00.000', '9999-12-31T00:00:00.000', '1', %s, '1')"
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaLegajosTurnos_B","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -117,7 +98,7 @@ def insertaSonidosLegajos(legLegajo):
             sql = "INSERT INTO T_SonidosLegajos (legCodigo, snlArchivo) VALUES (%s, '(Ninguno)')"
             cursor.execute(sql, [str(legLegajo)])
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaSonidosLegajos","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -129,7 +110,7 @@ def insertaTarjetaPeriodo_A(legLegajo):
             values = (str(legLegajo), legTarjeta)
             cursor.execute(sql, values)
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaTarjetaPeriodo_A","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -141,7 +122,7 @@ def insertaTarjetaPeriodo_B(legLegajo):
             values = (str(legLegajo), legTarjeta)
             cursor.execute(sql, values)
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","insertaTarjetaPeriodo_B","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -157,7 +138,7 @@ def traeNombreISIS(legajo):
                 nombre = str(consulta[0])
                 return nombre
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","traeNombreISIS","request.user",str(e))
     finally:
         connections['ISISPayroll'].close()
 
@@ -169,7 +150,7 @@ def actualiza(codigo):
             cursor.execute(sql, [legTarjeta,codigo])
 
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","actualiza","request.user",str(e))
     finally:
         connections['principal'].close()
 
@@ -203,7 +184,7 @@ def TrasladoLegajos():
                 values = (legajo, nombres, str(legajo.zfill(8)))
                 cursor.execute(sql, values)
         except Exception as e:
-            print(e)
+            insertar_registro_error_sql("TareasProgramadas","TrasladoLegajos","request.user",str(e))
         finally:
             connections['principal'].close()
 
@@ -652,10 +633,7 @@ def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado,
             cursor.execute(sql_update, [id_HESP])
 
     except Exception as e:
-        funcion = "Inserta en Procesados"
-        error = str(e)
-        Registro_Errores_SQL(funcion,error)
-
+        insertar_registro_error_sql("TareasProgramadas","insertaEnProcesados","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
@@ -675,8 +653,7 @@ def buscaSector(legajo):
                 sector = str(consulta[0])
             return sector
     except Exception as e:
-        print("Error")
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","buscaSector","request.user",str(e))
     finally:
         cursor.close()
         connections['ISISPayroll'].close()
@@ -692,8 +669,7 @@ def buscaSectorEnHorasExtrasSinProceso(ID_HESP):
                 sector = str(consulta[0])
             return sector
     except Exception as e:
-        print("Error")
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","buscaSectorEnHorasExtrasSinProceso","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
@@ -716,8 +692,7 @@ def buscaDatos_paraInsertar(id):
                 idSinProceso = str(consulta[5])
             return legajo, idMotivo, descripcion, autorizado, encargado, idSinProceso
     except Exception as e:
-        print("Error")
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","buscaDatos_paraInsertar","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
@@ -738,8 +713,7 @@ def llama_horas_extras_no_procesadas():
                     listado_horas_extras_sin_proceso.append(horas)
             return listado_horas_extras_sin_proceso
     except Exception as e:
-        print("Error")
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","llama_horas_extras_no_procesadas","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
@@ -769,8 +743,7 @@ def procesa_arreglos():
                     insertaEnProcesados(legajo,desde,hasta,motivo,descripcion,autorizado,user,tipoHora,cantidadHoras,ID_HESP,estado)
 
     except Exception as e:
-        print("Error")
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","procesa_arreglos","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
@@ -1623,7 +1596,7 @@ def listadoAnticipos():
             else:
                 return lista_data
     except Exception as e:
-        error = str(e)
+        insertar_registro_error_sql("TareasProgramadas","listadoAnticipos","request.user",str(e))
         return lista_data
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -1643,7 +1616,7 @@ def correosChacras():
                     listadoCorreos.append(correo)
         return listadoCorreos
     except Exception as e:
-        error = str(e)
+        insertar_registro_error_sql("TareasProgramadas","correosChacras","request.user",str(e))
         return listadoCorreos
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -1671,8 +1644,7 @@ def enviaCorreosAnticipos():
                 enviar_correo_sendMail(asunto,contenido,correo)
             actualizaEstadoAnticipo()
         except Exception as e:
-            error = str(e)
-            print(error)
+            insertar_registro_error_sql("TareasProgramadas","enviaCorreosAnticipos","request.user",str(e))
 
 def actualizaEstadoAnticipo():
     try:
@@ -1681,7 +1653,7 @@ def actualizaEstadoAnticipo():
             cursor.execute(sql)
 
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","actualizaEstadoAnticipo","request.user",str(e))
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
@@ -1692,9 +1664,8 @@ def Registro_Errores_SQL(funcion, error):
             cursor.execute(sql,[funcion,error])
 
     except Exception as e:
-        print(e)
+        insertar_registro_error_sql("TareasProgramadas","Registro_Errores_SQL","request.user",str(e))
     finally:
-
         connections['TRESASES_APLICATIVO'].close()
 
 

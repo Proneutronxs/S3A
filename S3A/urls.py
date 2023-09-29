@@ -21,7 +21,7 @@ from django.contrib.auth.views import logout_then_login
 urlpatterns = [
 
     ### ADMINISTRACION DE PANEL DJANGO
-    path('administracion/sistemas/', admin.site.urls),
+    path('administracion/sistemas/Django', admin.site.urls),
 
     ### API GENERAL APPLICATIONS
     path('api/general/', include('Applications.Mobile.GeneralApp.urls')),
@@ -52,5 +52,9 @@ urlpatterns = [
 
     path('accounts/login/login-3A/', views.custom_login, name='login-3A'),
 
+    path('accounts/login/change-password/', views.cambiar_password, name='change_password'),
+
     path('logout/', logout_then_login, name='logout'),
+
+    path('accounts/login/logout/', logout_then_login, name='log_out'),
 ]
