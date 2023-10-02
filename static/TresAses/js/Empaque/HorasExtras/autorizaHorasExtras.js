@@ -138,7 +138,7 @@ const verHorasExtras_transferencia_por_legajos_empaque = async () => {
                 <td >${datos.centro}</td>
                 <td >${datos.desde}</td>
                 <td >${datos.hasta}</td>
-                <td >${datos.motivo}</td>
+                <td >${datos.motivo} - ${datos.descripcion}</td>
                 <td >${datos.horas}</td>
                 <td >${datos.solicita}</td>
               </tr>`
@@ -146,6 +146,7 @@ const verHorasExtras_transferencia_por_legajos_empaque = async () => {
             document.getElementById('tablaHorasProcesadasEmpaque').innerHTML = datos_he;
             closeProgressBar();
         }else {
+            document.getElementById('tablaHorasProcesadasEmpaque').innerHTML = ``;
             closeProgressBar();
             var nota = data.Nota
             var color = "red";

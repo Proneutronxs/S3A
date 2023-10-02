@@ -19,6 +19,14 @@ ComboxBuscarPor.addEventListener("change", (event) => {
     if (selectedValue === '0') {
         limpiarCampos();
         ocultarCombox();
+    }else if (selectedValue === 't') {
+        ComboxSectores.style.display = 'block';
+        ComboxLegajos.style.display = 'none';
+        ComboxHoras.style.display = 'none';
+        ComboxLegajos.style.display = 'none';
+        document.getElementById('tablaHorasProcesadas').innerHTML = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
     }else if (selectedValue === 'h') {
         ComboxSectores.style.display = 'none';
         ComboxHoras.style.display = 'block';
@@ -70,17 +78,29 @@ ComboxSectorHELegajos.addEventListener("change", (event) => {
     if (selectedValue === '0') {
         limpiarCampos();
     }else if (selectedValue === 'A') {
-        console.log('ADMIN');
-        ComboxLegajos.style.display = 'block';
-        listar_legajos_por_sector();
+        document.getElementById('tablaHorasProcesadas').innerHTML = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
+        var message = "No disponible.";
+        var color = "red";
+        mostrarInfo(message,color);
     }else if (selectedValue === 'C') {
-        console.log('CHACRA');
-        ComboxLegajos.style.display = 'block';
-        listar_legajos_por_sector();
+        const selectElement = document.getElementById("ComboxBuscarPor");
+        const selectedValue = selectElement.value;
+        if (selectedValue === 't'){
+            console.log("ACA", selectedValue);
+            traeTodo();
+        }else {
+            ComboxLegajos.style.display = 'block';
+            listar_legajos_por_sector();
+        }
     }else if (selectedValue === 'E') {
-        console.log('EMPAQUE');
-        ComboxLegajos.style.display = 'block';
-        listar_legajos_por_sector();
+        document.getElementById('tablaHorasProcesadas').innerHTML = '';
+        const miCheckbox = document.getElementById("selectAll");
+        miCheckbox.checked = false;
+        var message = "No disponible.";
+        var color = "red";
+        mostrarInfo(message,color);
     }
 });
 
@@ -161,6 +181,46 @@ const limpiarCampos = () => {
     ComboxHoras.style.display = 'none';
     ComboxLegajos.style.display = 'none';
 };
+
+const traeTodo = async () => {
+    openProgressBar();
+    try {
+        const response = await fetch("transferencia/ver/listado-horas-todo")
+        const data = await response.json();
+        if(data.Message=="Success"){
+            let datos_he = ``;
+            data.Datos.forEach((datos) => {
+                datos_he += `<tr>
+                <td >
+                    <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
+                </td>
+                <td >${datos.tipo}</td>
+                <td >${datos.legajo}</td>
+                <td >${datos.nombres}</td>
+                <td style="align-items: center;">${datos.centro}</td>
+                <td >${datos.desde}</td>
+                <td >${datos.hasta}</td>
+                <td >${datos.motivo} - ${datos.descripcion}</td>
+                <td >${datos.horas}</td>
+                <td >${datos.solicita}</td>
+              </tr>`
+            });
+            document.getElementById('tablaHorasProcesadas').innerHTML = datos_he;
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        limpiarCampos(); 
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color)  
+    }
+}
 
 //FUNCION GET
 // const listarLegajos = async () => {
@@ -253,16 +313,18 @@ const verHorasExtras_transferencia_por_legajos = async () => {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
-                <td style="width: 40px;">
-                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox">
+                <td >
+                    <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
                 </td>
-                <td style="width: 60px;">${datos.tipo}</td>
-                <td style="width: 80px;">${datos.legajo}</td>
-                <td style="width: 280px;">${datos.nombres}</td>
-                <td style="width: 180px;">${datos.desde}</td>
-                <td style="width: 180px;">${datos.hasta}</td>
-                <td style="overflow-x: auto;">${datos.motivo} - ${datos.descripcion}</td>
-                <td style="width: 80px;">${datos.horas}</td>
+                <td >${datos.tipo}</td>
+                <td >${datos.legajo}</td>
+                <td >${datos.nombres}</td>
+                <td style="align-items: center;">${datos.centro}</td>
+                <td >${datos.desde}</td>
+                <td >${datos.hasta}</td>
+                <td >${datos.motivo} - ${datos.descripcion}</td>
+                <td >${datos.horas}</td>
+                <td >${datos.solicita}</td>
               </tr>`
             });
             document.getElementById('tablaHorasProcesadas').innerHTML = datos_he;
@@ -302,16 +364,18 @@ const verHorasExtras_transferencia = async () => {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
-                <td style="width: 40px;">
-                    <input id="idCheck" name="idCheck" value="${datos.ID}" class="input-checkbox" type="checkbox">
+                <td >
+                    <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
                 </td>
-                <td style="width: 60px;">${datos.tipo}</td>
-                <td style="width: 80px;">${datos.legajo}</td>
-                <td style="width: 280px;">${datos.nombres}</td>
-                <td style="width: 180px;">${datos.desde}</td>
-                <td style="width: 180px;">${datos.hasta}</td>
-                <td style="overflow-x: auto;">${datos.motivo} - ${datos.descripcion}</td>
-                <td style="width: 80px;">${datos.horas}</td>
+                <td >${datos.tipo}</td>
+                <td >${datos.legajo}</td>
+                <td >${datos.nombres}</td>
+                <td >${datos.centro}</td>
+                <td >${datos.desde}</td>
+                <td >${datos.hasta}</td>
+                <td >${datos.motivo} - ${datos.descripcion}</td>
+                <td >${datos.horas}</td>
+                <td >${datos.solicita}</td>
               </tr>`
             });
             document.getElementById('tablaHorasProcesadas').innerHTML = datos_he;

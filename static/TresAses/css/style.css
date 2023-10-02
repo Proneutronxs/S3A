@@ -497,6 +497,26 @@ input[type="checkbox"].input-checkbox {
 
 
 
+/* Barra de desplazamiento principal */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Barra de desplazamiento del riel */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Barra de desplazamiento */
+::-webkit-scrollbar-thumb {
+  background: #a72626dc;
+  border-radius: 6px;
+}
+
+/* Cambiar el color cuando se mueve el cursor sobre la barra de desplazamiento */
+::-webkit-scrollbar-thumb:hover {
+  background: #a72626;
+}
 
 
 

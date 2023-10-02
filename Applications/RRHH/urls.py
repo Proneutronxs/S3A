@@ -15,6 +15,9 @@ urlpatterns = [
     ### URL MOSTRAR HORAS EXTRAS
     path('horas-extras/transferencia/ver/listado-horas', views.mostrarHorasCargadas, name="verHorasExtrasTransferir"),
 
+    ###MUESTRA TODAS LAS HORAS PETICIÖN GET
+    path('horas-extras/transferencia/ver/listado-horas-todo', views.traeTodo, name="traeTodoHE"),
+
     ### URL MOSTRAR HORAS EXTRAS POR LEGAJOS
     path('horas-extras/transferencia/ver/listado-horas-legajos', views.mostrarHorasCargadasPorLegajo, name="verHorasExtrasTransferirLegajos"),
 

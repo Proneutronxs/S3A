@@ -45,19 +45,113 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
         if user_has_permission:
             tipo = request.POST.get('ComboxTipoHoraTransf')
             sector =request.POST.get('ComboxSectorHEHoras')
-            try:
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, " \
-                                        "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, " \
-                                        "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, " \
-                                                    "RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras " \
-                            "FROM            S3A.dbo.RH_HE_Autoriza INNER JOIN " \
+            if tipo == 'N50':
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE,  " \
+                                                    "CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5),  " \
+                                                    "HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5),  " \
+                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                            "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
                                                     "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
-                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON  " \
-                                                    "S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado " \
-                            "WHERE        (HorasExtras_Procesadas.Sector = %s) AND (HorasExtras_Procesadas.TipoHoraExtra = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
-                            "ORDER BY HorasExtras_Procesadas.Legajo, HorasExtras_Procesadas.FechaHoraDesde"
+                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON  " \
+                                                    "S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+                            "WHERE        (HorasExtras_Procesadas.Sector = 'C') AND (HorasExtras_Procesadas.TipoHoraExtra = 'N') AND (DATEPART(WEEKDAY, HorasExtras_Procesadas.FechaHoraDesde) >= 2 AND DATEPART(WEEKDAY, HorasExtras_Procesadas.FechaHoraDesde) <= 6) " \
+                            "AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                            "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
+                        cursor.execute(sql)
+                        consulta = cursor.fetchall()
+                        if consulta:
+                            data = []
+                            for i in consulta:
+                                tipo = str(i[0])
+                                legajo = str(i[1])
+                                nombres = str(i[2])
+                                centro = str(i[3])
+                                desde = str(i[4]) + " - " + str(i[5])
+                                hasta = str(i[6]) + " - " + str(i[7])
+                                motivo = str(i[8])
+                                descripcion = str(i[9])
+                                horas = str(i[10])
+                                idHoras = str(i[12])
+                                solicita = str(i[13])
+                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                                data.append(datos)
+                            return JsonResponse({'Message': 'Success', 'Datos': data})
+                        else:
+                            data = "No se encontrarón horas extras procesadas."
+                            return JsonResponse({'Message': 'Error', 'Nota': data})
+                except Exception as e:
+                    insertar_registro_error_sql("RRHH","mostrarHorasCargadas",request.user,str(e))
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+            if tipo == 'N100':
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE,  " \
+                                                    "CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5),  " \
+                                                    "HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5),  " \
+                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                            "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Motivo INNER JOIN " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON  " \
+                                                    "S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+                            "WHERE        (HorasExtras_Procesadas.Sector = 'C') AND (HorasExtras_Procesadas.TipoHoraExtra = 'N') AND (DATEPART(WEEKDAY, HorasExtras_Procesadas.FechaHoraDesde) IN (1, 7)) " \
+                            "AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                            "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
+                        cursor.execute(sql)
+                        consulta = cursor.fetchall()
+                        if consulta:
+                            data = []
+                            for i in consulta:
+                                tipo = str(i[0])
+                                legajo = str(i[1])
+                                nombres = str(i[2])
+                                centro = str(i[3])
+                                desde = str(i[4]) + " - " + str(i[5])
+                                hasta = str(i[6]) + " - " + str(i[7])
+                                motivo = str(i[8])
+                                descripcion = str(i[9])
+                                horas = str(i[10])
+                                idHoras = str(i[12])
+                                solicita = str(i[13])
+                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                                data.append(datos)
+                            return JsonResponse({'Message': 'Success', 'Datos': data})
+                        else:
+                            data = "No se encontrarón horas extras procesadas."
+                            return JsonResponse({'Message': 'Error', 'Nota': data})
+                except Exception as e:
+                    insertar_registro_error_sql("RRHH","mostrarHorasCargadas",request.user,str(e))
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, " \
+                                                    "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
+                                                    "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
+                                                    "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                            "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Motivo INNER JOIN " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON " \
+                                                    "S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+                            "WHERE        (HorasExtras_Procesadas.Sector = %s ) AND (HorasExtras_Procesadas.TipoHoraExtra = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                            "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
                     cursor.execute(sql, [sector,tipo])
                     consulta = cursor.fetchall()
                     if consulta:
@@ -66,13 +160,70 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                             tipo = str(i[0])
                             legajo = str(i[1])
                             nombres = str(i[2])
-                            desde = str(i[3]) + " - " + str(i[4])
-                            hasta = str(i[5]) + " - " + str(i[6])
-                            motivo = str(i[7])
-                            descripcion = str(i[8])
-                            horas = str(i[9])
-                            idHoras = str(i[11])
-                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas}
+                            centro = str(i[3])
+                            desde = str(i[4]) + " - " + str(i[5])
+                            hasta = str(i[6]) + " - " + str(i[7])
+                            motivo = str(i[8])
+                            descripcion = str(i[9])
+                            horas = str(i[10])
+                            idHoras = str(i[12])
+                            solicita = str(i[13])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No se encontrarón horas extras procesadas."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                insertar_registro_error_sql("RRHH","mostrarHorasCargadas",request.user,str(e))
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
+@csrf_exempt
+def traeTodo(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIPO DE HORA
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('RRHH.puede_ver')
+        if user_has_permission:
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, " \
+                                                    "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
+                                                    "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
+                                                    "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                            "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Motivo INNER JOIN " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON " \
+                                                    "S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+                            "WHERE        (HorasExtras_Procesadas.Sector = 'C' ) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                            "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
+                    cursor.execute(sql)
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        data = []
+                        for i in consulta:
+                            tipo = str(i[0])
+                            legajo = str(i[1])
+                            nombres = str(i[2])
+                            centro = str(i[3])
+                            desde = str(i[4]) + " - " + str(i[5])
+                            hasta = str(i[6]) + " - " + str(i[7])
+                            motivo = str(i[8])
+                            descripcion = str(i[9])
+                            horas = str(i[10])
+                            idHoras = str(i[12])
+                            solicita = str(i[13])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -98,17 +249,20 @@ def mostrarHorasCargadasPorLegajo(request): ### MUESTRA HORAS CARGADAS Y PROCESA
             legajo = request.POST.get('ComboxTipoLegajoTransf')
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, " \
-                                        "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, " \
-                                        "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, " \
-                                                    "RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras " \
-                            "FROM            S3A.dbo.RH_HE_Autoriza INNER JOIN " \
+                    sql = "SELECT        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), " \
+                                                    "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, " \
+                                                    "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
+                                                    "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
+                                                    "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                            "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
+                                                    "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
                                                     "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
-                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON  " \
-                                                    "S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado " \
-                            "WHERE        (HorasExtras_Procesadas.Legajo = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
-                            "ORDER BY HorasExtras_Procesadas.Legajo, HorasExtras_Procesadas.FechaHoraDesde"
+                                                    "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON " \
+                                                    "S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+                            "WHERE        (HorasExtras_Procesadas.Legajo = %s ) AND (HorasExtras_Procesadas.EstadoEnvia = '1') " \
+                            "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
                     cursor.execute(sql, [legajo])
                     consulta = cursor.fetchall()
                     if consulta:
@@ -117,13 +271,15 @@ def mostrarHorasCargadasPorLegajo(request): ### MUESTRA HORAS CARGADAS Y PROCESA
                             tipo = str(i[0])
                             legajo = str(i[1])
                             nombres = str(i[2])
-                            desde = str(i[3]) + " - " + str(i[4])
-                            hasta = str(i[5]) + " - " + str(i[6])
-                            motivo = str(i[7])
-                            descripcion = str(i[8])
-                            horas = str(i[9])
-                            idHoras = str(i[11])
-                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas}
+                            centro = str(i[3])
+                            desde = str(i[4]) + " - " + str(i[5])
+                            hasta = str(i[6]) + " - " + str(i[7])
+                            motivo = str(i[8])
+                            descripcion = str(i[9])
+                            horas = str(i[10])
+                            idHoras = str(i[12])
+                            solicita = str(i[13])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
