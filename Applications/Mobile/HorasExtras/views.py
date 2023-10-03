@@ -73,6 +73,10 @@ def insert_HoraExtra(request):
                 idMotivo = str(item['Motivo']) ### MOTIVO
                 Descripcion = str(item['Descripcion']) ### DESCRIPCION DE LA TAREA
                 Arreglo = str(item['Arreglo']) ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
+                try:
+                    Importe = str(item['ImporteArreglo'])
+                except KeyError:
+                    Importe = "0"
                 Sector = buscaSector(Legajo) ### TRAE EL SECTOR DE LEGAJO
                 Usuario = str(item['Usuario']) ### USUARIO DE LA APLICACIÓN
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
@@ -86,8 +90,8 @@ def insert_HoraExtra(request):
                 #     lista_tieneHE_asignada.append(Legajo)
                 # else:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
                     cursor.execute(sql, values)
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."

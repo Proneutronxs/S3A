@@ -722,7 +722,7 @@ def procesa_arreglos():
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Legajo AS LEGAJO, CONVERT(VARCHAR(16), DateTimeDesde, 120) AS DESDE, CONVERT(VARCHAR(16), DateTimeHasta, 120) AS HASTA, " \
-                        "IdMotivo AS ID_MOTIVO, DescripcionMotivo AS DESCRIPCION, Autorizado AS AUTORIZADO, UsuarioEncargado AS USUARIO, ID_HESP AS ID " \
+                        "IdMotivo AS ID_MOTIVO, DescripcionMotivo AS DESCRIPCION, Autorizado AS AUTORIZADO, UsuarioEncargado AS USUARIO, ID_HESP AS ID, ImpArreglo AS IMPORTE " \
                 "FROM HorasExtras_Sin_Procesar " \
                 "WHERE Arreglo = '1' AND Estado <> '0' AND Estado <> '8'"
             cursor.execute(sql)
@@ -739,11 +739,34 @@ def procesa_arreglos():
                     tipoHora = "A"
                     cantidadHoras = calcular_diferencia_horas(str(i[1]),str(i[2]))
                     ID_HESP = str(i[7])
+                    Importe = str(i[8])
                     estado = "1"
-                    insertaEnProcesados(legajo,desde,hasta,motivo,descripcion,autorizado,user,tipoHora,cantidadHoras,ID_HESP,estado)
+                    insertaArreglosEnProcesados(legajo,desde,hasta,motivo,descripcion,autorizado,user,tipoHora,cantidadHoras,ID_HESP,estado,Importe)
 
     except Exception as e:
         insertar_registro_error_sql("TareasProgramadas","procesa_arreglos","request.user",str(e))
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def insertaArreglosEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado, importe):
+    sector = buscaSector(legajo)
+    if sector == 'E':
+        estado = '3'
+    values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, sector, id_HESP, estado, importe]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            # Realizar la inserción en la tabla HorasExtras_Procesadas
+            sql_insert = "INSERT INTO HorasExtras_Procesadas (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, Sector, ID_HESP, EstadoEnvia, ImpArreglo) "\
+                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql_insert, values)
+
+            # Realizar la actualización en la tabla HorasExtras_Sin_Procesar
+            sql_update = "UPDATE HorasExtras_Sin_Procesar SET Estado = '0' WHERE ID_HESP = %s"
+            cursor.execute(sql_update, [id_HESP])
+
+    except Exception as e:
+        insertar_registro_error_sql("TareasProgramadas","insertaEnProcesados","request.user",str(e))
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
