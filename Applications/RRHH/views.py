@@ -52,7 +52,7 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                                                     "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE,  " \
                                                     "CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5),  " \
                                                     "HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5),  " \
-                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA, ISNULL(ImpArreglo, '0') AS ImpArreglo " \
                             "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
@@ -78,7 +78,8 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                                 horas = str(i[10])
                                 idHoras = str(i[12])
                                 solicita = str(i[13])
-                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                                importe = str(i[14])
+                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'importe': importe, 'solicita': solicita}
                                 data.append(datos)
                             return JsonResponse({'Message': 'Success', 'Datos': data})
                         else:
@@ -97,7 +98,7 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                                                     "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS CENTRO_COSTOS, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE,  " \
                                                     "CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5),  " \
                                                     "HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5),  " \
-                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                                                    "HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA, ISNULL(ImpArreglo, '0') AS ImpArreglo  " \
                             "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
@@ -123,7 +124,8 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                                 horas = str(i[10])
                                 idHoras = str(i[12])
                                 solicita = str(i[13])
-                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                                importe = str(i[14])
+                                datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'importe': importe, 'solicita': solicita}
                                 data.append(datos)
                             return JsonResponse({'Message': 'Success', 'Datos': data})
                         else:
@@ -143,7 +145,7 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
                                                     "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
                                                     "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
-                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA, ISNULL(ImpArreglo, '0') AS ImpArreglo  " \
                             "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
@@ -168,7 +170,8 @@ def mostrarHorasCargadas(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIP
                             horas = str(i[10])
                             idHoras = str(i[12])
                             solicita = str(i[13])
-                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                            importe = str(i[14])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'importe': importe, 'solicita': solicita}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -198,7 +201,7 @@ def traeTodo(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIPO DE HORA
                                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
                                                     "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
                                                     "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
-                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA, ISNULL(ImpArreglo, '0') AS ImpArreglo " \
                             "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
@@ -223,7 +226,8 @@ def traeTodo(request): ### MUESTRA HORAS PROCESADAS POR SECTOR Y TIPO DE HORA
                             horas = str(i[10])
                             idHoras = str(i[12])
                             solicita = str(i[13])
-                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                            importe = str(i[14])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'importe': importe, 'solicita': solicita}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -254,7 +258,7 @@ def mostrarHorasCargadasPorLegajo(request): ### MUESTRA HORAS CARGADAS Y PROCESA
                                                     "CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA_DESDE, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) AS HORA_DESDE, CONVERT(VARCHAR(10), " \
                                                     "HorasExtras_Procesadas.FechaHoraHasta, 103) AS FECHA_HASTA, CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) AS HORA_HASTA, RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) AS MOTIVO, " \
                                                     "RTRIM(HorasExtras_Procesadas.DescripcionMotivo) AS DESCRIPCION, CONVERT(VARCHAR(5), HorasExtras_Procesadas.CantidadHoras) AS HORAS, RTRIM(S3A.dbo.RH_HE_Autoriza.Apellidos) AS AUTORIZADO, " \
-                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA " \
+                                                    "HorasExtras_Procesadas.ID_HEP AS idHoras, (SELECT CONVERT(VARCHAR(21),ApellidoEmple + ' ' + NombresEmple) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = HorasExtras_Procesadas.UsuarioEncargado) AS SOLICITA, ISNULL(ImpArreglo, '0') AS ImpArreglo " \
                             "FROM            TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Autoriza INNER JOIN " \
                                                     "S3A.dbo.RH_HE_Motivo INNER JOIN " \
@@ -279,7 +283,8 @@ def mostrarHorasCargadasPorLegajo(request): ### MUESTRA HORAS CARGADAS Y PROCESA
                             horas = str(i[10])
                             idHoras = str(i[12])
                             solicita = str(i[13])
-                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'solicita': solicita}
+                            importe = str(i[14])
+                            datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'centro': centro, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas, 'importe': importe, 'solicita': solicita}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:

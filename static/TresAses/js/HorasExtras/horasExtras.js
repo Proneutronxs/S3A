@@ -197,11 +197,12 @@ const traeTodo = async () => {
                 <td >${datos.tipo}</td>
                 <td >${datos.legajo}</td>
                 <td >${datos.nombres}</td>
-                <td style="align-items: center;">${datos.centro}</td>
+                <td >${datos.centro}</td>
                 <td >${datos.desde}</td>
                 <td >${datos.hasta}</td>
                 <td >${datos.motivo} - ${datos.descripcion}</td>
                 <td >${datos.horas}</td>
+                <td >${datos.importe}</td>
                 <td >${datos.solicita}</td>
               </tr>`
             });
@@ -319,11 +320,12 @@ const verHorasExtras_transferencia_por_legajos = async () => {
                 <td >${datos.tipo}</td>
                 <td >${datos.legajo}</td>
                 <td >${datos.nombres}</td>
-                <td style="align-items: center;">${datos.centro}</td>
+                <td >${datos.centro}</td>
                 <td >${datos.desde}</td>
                 <td >${datos.hasta}</td>
                 <td >${datos.motivo} - ${datos.descripcion}</td>
                 <td >${datos.horas}</td>
+                <td >${datos.importe}</td>
                 <td >${datos.solicita}</td>
               </tr>`
             });
@@ -375,6 +377,7 @@ const verHorasExtras_transferencia = async () => {
                 <td >${datos.hasta}</td>
                 <td >${datos.motivo} - ${datos.descripcion}</td>
                 <td >${datos.horas}</td>
+                <td >${datos.importe}</td>
                 <td >${datos.solicita}</td>
               </tr>`
             });
@@ -508,7 +511,7 @@ showPopupBtn.addEventListener("click", () => {
         var color = "red";
         mostrarInfo(message,color);
     }else if (!alMenosUnTildado) {
-        var message = "Debe seleccionar al menos un elemento antes de enviar las Horas.";
+        var message = "Debe seleccionar al menos un item.";
         var color = "red";
         mostrarInfo(message,color);
     } else {
