@@ -155,7 +155,7 @@ def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
 @csrf_exempt
 def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
-        user_has_permission = request.user.has_perm('Empaque.insertar') 
+        user_has_permission = request.user.has_perm('Empaque.puede_insertar') 
         if user_has_permission: 
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
