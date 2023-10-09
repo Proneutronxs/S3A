@@ -74,7 +74,7 @@ def insert_HoraExtra(request):
                 Descripcion = str(item['Descripcion']) ### DESCRIPCION DE LA TAREA
                 Arreglo = str(item['Arreglo']) ### SI SE HIZO UN ARREGLO CON RESPECTO A LA HORA
                 try:
-                    Importe = str(item['ImporteArreglo'])
+                    Importe = str(item['importeArreglo'])
                 except KeyError:
                     Importe = "0"
                 Sector = buscaSector(Legajo) ### TRAE EL SECTOR DE LEGAJO
