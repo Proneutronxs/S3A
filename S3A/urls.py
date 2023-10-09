@@ -38,12 +38,12 @@ urlpatterns = [
     ### URL APLICACIÓN TRES ASES GENERAL
     path('', include('Applications.TresAses.urls')),
 
-    ### URL APLICACIÓN RRHH
     path('rrhh/', include('Applications.RRHH.urls')),
 
     path('empaque/', include('Applications.Empaque.urls')),
 
-    ### URL APLICACIÓN RRHH
+    path('frigorifico/', include('Applications.Frio.urls')),
+
     path('reportes/', include('Applications.Reportes.urls')),
 
     path('login/', include('Applications.Inicio.urls')),

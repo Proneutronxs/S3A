@@ -1,0 +1,85 @@
+{% extends "Frio/HorasExtras/horasExtrasFrio.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row">
+            <h4>AUTORIZACIÓN DE HORAS EXTRAS</h4>
+            <form style="display: none;" id="formMostrarCentrosCostosFrio" method="POST" action="">
+              <label class="letras" for="TipoHora"> </label>
+              <select class="selectores" type="checkbox" id="ComboxTipoCCAutorizaFrio" name="ComboxTipoCCAutorizaFrio">
+              </select>
+            </form>
+        </div>
+    </div>
+    <div class="transferir">
+        <form id="formEnviaHorasExtrasFrio" method="POST" action="#">
+            <div class="formularios">
+              <div class="row_items">
+                <div style="display: flex;">
+                  <div class="items-row">
+                      <button id="autorizaFormHorasExtras" class="btn-submit botones" type="button"><b>Autorizar</b></button>
+                  </div>
+                  <div class="items-row">
+                    <button id="elminaHEAutoriza" class="btn-submit botones" type="button"><b>Eliminar</b></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="container-tabla-he">
+                <table class="pre-hs-ex">
+                    <thead id="encabezado-tabla-hs-ex">
+                      <tr>
+                        <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox" id="selectAll"></th>
+                        <th style="width: 60px; min-width: 60px;">Tipo</th>
+                        <th style="width: 80px; min-width: 80px;">Legajo</th>
+                        <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
+                        <th style="width: 280px; min-width: 280px;">Centro de Costo</th>
+                        <th style="width: 180px; min-width: 180px;">Desde - Fecha y Hora</th>
+                        <th style="width: 180px; min-width: 180px;">Hasta - Fecha y Hora</th>
+                        <th style="width: 400px; min-width: 400px;">Motivo</th>
+                        <th style="width: 80px; min-width: 80px;">Horas</th>
+                        <th style="width: 260px; min-width: 260px;">Solicita</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaHorasProcesadasFrio">
+                    </tbody>
+                  </table>                          
+            </div>                    
+        </form>
+    </div>                  
+</div>
+
+<div class="modal-overlay">
+  <div class="modal-container">
+    <div class="demo-container">
+      <div class="progress-bar">
+        <div class="progress-bar-value"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
+  <div class="popup-content">
+    <p>¿Estás seguro de que deseas eliminar los items seleccionados?</p> <br>
+    <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+    <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+  </div>
+</div>
+
+<div id="popup" class="popup">
+  <span class="close" id="closePopup">&times;</span>
+  <div id="mensaje-pop-up">
+
+  </div>
+</div>
+
+  
+<script src="{%static 'TresAses/js/Frio/HorasExtras/autorizaHorasExtras.js' %}"></script>
+
+{% endblock %}

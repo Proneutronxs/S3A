@@ -618,7 +618,7 @@ def trae_lista_con_listado():
 #### LLAMA A LOS DATOS CON EL ID DE LA HORA SIN PROCESAR PAA INSRTAR EN LA HORA PROCESADA
 def insertaEnProcesados(legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, id_HESP, estado):
     sector = buscaSector(legajo)
-    if sector == 'E':
+    if sector == 'E' or sector == 'F':
         estado = '3'
     values = [legajo, desde, hasta, idMotivo, descripcion, autorizado, user, tipoHora, CantidadHoras, sector, id_HESP, estado]
     try:
@@ -921,7 +921,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
                 desde = desdeSin + ":00.000"
                 hasta = hastaSin + ":00.000"
                 insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
-        if sector == 'E':
+        if sector == 'E' or sector == 'F':
             ###PROCESAR LAS HORAS DE EMPAQUE
             soloFecha = obtener_solo_fecha(Inicio)
 
@@ -1260,7 +1260,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
                 desde = desdeSin + ":00.000"
                 hasta = hastaSin + ":00.000"
                 insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
-        if sector == 'E':
+        if sector == 'E' or sector == 'F':
             ### PROCESAR EMPAQUE SABADO
             soloFecha = obtener_solo_fecha(Inicio)
 
@@ -1538,7 +1538,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
                 desde = desdeSin + ":00.000"
                 hasta = hastaSin + ":00.000"
                 insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
-        if sector == 'E':
+        if sector == 'E' or sector == 'F':
             ### PROCESA DOMINGOS EMPAQUE
             horaInicio = Inicio
             horaFinal = obtener_dia_siguiente(Final)

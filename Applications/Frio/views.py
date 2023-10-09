@@ -8,28 +8,28 @@ from django.http import JsonResponse
 import datetime
 from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos, insertaHorasExtras
 
-
 # Create your views here.
 
-### RENDERIZADO DE EMPAQUE
+
 @login_required
-@permission_required('Empaque.puede_ingresar', raise_exception=True)
-def Empaque(request):
-    return render (request, 'Empaque/empaque.html')
+@permission_required('Frio.puede_ingresar', raise_exception=True)
+def Frio(request):
+    return render (request, 'Frio/frio.html')
 
-def HorasExtrasEmpaque(request):
-    return render (request, 'Empaque/HorasExtras/horasExtrasEmpaque.html')
 
-def AutorizaHorasExtrasEmpaque(request):
-    return render (request, 'Empaque/HorasExtras/autorizaHorasExtras.html')
+def HorasExtrasFrio(request):
+    return render (request, 'Frio/HorasExtras/horasExtrasFrio.html')
 
-##LLAMA A LAS HORAS EXTRAS
+def AutorizaHorasExtrasFrio(request):
+    return render (request, 'Frio/HorasExtras/autorizaHorasExtras.html')
+
+
 @login_required
 @csrf_exempt
-def cargaLegajosEmpaque(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
+def cargaCentrosCostosFrio(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':
         try:
-            data = buscaCentroCostosEmpaqueIDDescrip()
+            data = buscaCentroCostosFrioIDDescripHE()
             if data:
                 return JsonResponse({'Message': 'Success', 'Datos': data})
             else:
@@ -37,37 +37,14 @@ def cargaLegajosEmpaque(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTR
                 return JsonResponse({'Message': 'Error', 'Nota': data})                
         except Exception as e:
             data = str(e)
-            insertar_registro_error_sql("Empaque","cargaLegajosEmpaque",request.user,data)
+            insertar_registro_error_sql("Frio","cargaCCFrio",request.user,data)
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
-
-def buscaCentroCostosEmpaque():
-    data = []
-    try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT Texto " \
-                "FROM Parametros_Aplicativo " \
-                "WHERE Codigo = 'APP-E-IDCC'"
-            cursor.execute(sql)
-            consulta = cursor.fetchone()
-            if consulta:
-                data = str(consulta[0]).split('-')
-                return data
-            else:
-                return data
-    except Exception as e:
-        error = str(e)
-        insertar_registro_error_sql("Empaque","buscaCentroCostosEmpaque","usuario",error)
-        return data
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
-
-def buscaCentroCostosEmpaqueIDDescrip():
-    listado =  buscaCentroCostosEmpaque()
+def buscaCentroCostosFrioIDDescripHE():
+    listado =  buscaCentroCostosFrioHE()
     lista_json = []
     for item in listado:
         try:
@@ -84,21 +61,42 @@ def buscaCentroCostosEmpaqueIDDescrip():
                     lista_json.append(data)
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("Empaque","buscaCentroCostosEmpaqueIDDescrip","usuario",error)
+            insertar_registro_error_sql("Frio","buscaCentroCostosFrioIDDescrip","usuario",error)
             return lista_json
         finally:
             cursor.close()
             connections['ISISPayroll'].close()
     return lista_json
 
-###BUSCA POR EL LAGJO DEL SPINNER
+def buscaCentroCostosFrioHE():
+    data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Texto " \
+                "FROM Parametros_Aplicativo " \
+                "WHERE Codigo = 'APP-F-IDCC'"
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            if consulta:
+                data = str(consulta[0]).split('-')
+                return data
+            else:
+                return data
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("Frio","buscaCentroCostosFrio","usuario",error)
+        return data
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
 @login_required
 @csrf_exempt
-def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
+def mostrarHorasCargadasPorCCFrio(request): ### MUESTRA LA TABLA DE HORAS
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('Empaque.puede_ver')
+        user_has_permission = request.user.has_perm('Frio.puede_ver')
         if user_has_permission:
-            cc = request.POST.get('ComboxTipoLegajoAutorizaEmpaque')
+            cc = request.POST.get('ComboxTipoCCAutorizaFrio')
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = "SELECT     RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRES, CONVERT(VARCHAR(10), " \
@@ -140,7 +138,7 @@ def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
                         return JsonResponse({'Message': 'Error', 'Nota': data})
             except Exception as e:
                 error = str(e)
-                insertar_registro_error_sql("Empaque","mostrarHorasCargadasPorLegajoEmpaque",request.user,error)
+                insertar_registro_error_sql("Frio","mostrarHorasCargadasPorCCFrio",request.user,error)
                 data = str(e)
                 return JsonResponse({'Message': 'Error', 'Nota': data})
             finally:
@@ -150,12 +148,52 @@ def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+
+def eliminaHorasEstadoHEP(ID_HEP):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '8' WHERE ID_HEP = %s"
+            cursor.execute(sql, [ID_HEP])
+            
+            slq2 = "UPDATE HorasExtras_Sin_Procesar SET Estado='8' WHERE ID_HESP = (SELECT ID_HESP FROM HorasExtras_Procesadas WHERE ID_HEP = %s)"
+            cursor.execute(slq2, [ID_HEP])
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("Frio","eliminaHorasEstadoHEP","usuario",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+@login_required
+@csrf_exempt
+def eliminaHorasSeleccionadasFrio(request): ### ELIMINA LAS HORAS SELECCIONADAS
+    if request.method == 'POST':   ### METODO POST PUT DELETE GET
+        user_has_permission = request.user.has_perm('Frio.puede_borrar')
+        if user_has_permission:
+            checkboxes_tildados = request.POST.getlist('idCheck')
+            resultados = []
+            for i in checkboxes_tildados:
+                ID_HEP = str(i) 
+                resultado = eliminaHorasEstadoHEP(ID_HEP)
+                resultados.append(resultado)
+            if 0 in resultados:
+                data = "Se produjo un Error en alguna de las eliminaciones."
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            else:
+                data = "Las horas se eliminaron correctamente."
+                return JsonResponse({'Message': 'Success', 'Nota': data})
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'}) 
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
 
 @login_required
 @csrf_exempt
 def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
-        user_has_permission = request.user.has_perm('Empaque.puede_insertar') 
+        user_has_permission = request.user.has_perm('Frio.puede_insertar') 
         if user_has_permission: 
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
@@ -193,64 +231,9 @@ def autorizaHorasEstadoHEP(ID_HEP):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-def eliminaHorasEstadoHEP(ID_HEP):
-    try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '8' WHERE ID_HEP = %s"
-            cursor.execute(sql, [ID_HEP])
-            
-            slq2 = "UPDATE HorasExtras_Sin_Procesar SET Estado='8' WHERE ID_HESP = (SELECT ID_HESP FROM HorasExtras_Procesadas WHERE ID_HEP = %s)"
-            cursor.execute(slq2, [ID_HEP])
-            return True
-    except Exception as e:
-        error = str(e)
-        insertar_registro_error_sql("Empaque","eliminaHorasEstadoHEP","usuario",error)
-        return False
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
-
-@login_required
-@csrf_exempt
-def eliminaHorasSeleccionadas(request): ### ELIMINA LAS HORAS SELECCIONADAS
-    if request.method == 'POST':   ### METODO POST PUT DELETE GET
-        user_has_permission = request.user.has_perm('Empaque.puede_borrar')  ### 'Empaque.puede_ver' REEMPLAZAR POR EL SECTOR Y PERMISO
-        if user_has_permission: ### VERIFICAR PERMISO SI ESTA CONCEDIDO
-            checkboxes_tildados = request.POST.getlist('idCheck')
-            resultados = []
-            for i in checkboxes_tildados:
-                ID_HEP = str(i) 
-                resultado = eliminaHorasEstadoHEP(ID_HEP)
-                resultados.append(resultado)
-            if 0 in resultados:
-                data = "Se produjo un Error en alguna de las eliminaciones."
-                return JsonResponse({'Message': 'Error', 'Nota': data})
-            else:
-                data = "Las horas se eliminaron correctamente."
-                return JsonResponse({'Message': 'Success', 'Nota': data})
-        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'}) ### SI NO TIENE PERMISOS DEVUELVE MENSAJE "SIN PERMISOS" 
-    else:
-        data = "No se pudo resolver la Petición"
-        return JsonResponse({'Message': 'Error', 'Nota': data})
-   
 
 
 
-
-########## FUNCION PARA PEDIR Y SOLICITAR PERMISOS ################
-
-
-
-
-def funcionGeneralPermisos(request):
-    if request.method == 'POST':
-        user_has_permission = request.user.has_perm('Empaque.puede_ver')
-        if user_has_permission:
-            pass
-        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
-    else:
-        data = "No se pudo resolver la Petición"
-        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 

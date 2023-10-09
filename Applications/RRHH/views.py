@@ -371,7 +371,7 @@ def buscaDatosParaInsertarHE(idHEP): ### SOLO FUNCIÓN, BUSCA DATOS PARA INSERTA
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Legajo, CONVERT(VARCHAR(10), FechaHoraDesde, 126) AS FECHA_DESDE,CONVERT(VARCHAR(5), FechaHoraDesde, 108) AS HORA_DESDE, " \
                             "CONVERT(VARCHAR(10), FechaHoraHasta, 126) AS FECHA_HASTA, CONVERT(VARCHAR(5), FechaHoraHasta, 108) AS HORA_HASTA, CantidadHoras AS HORAS, " \
-                            "IdMotivo AS MOTIVO, Autorizado AS AUTORIZADO, RTRIM(DescripcionMotivo) AS DESCRIPCION, TipoHoraExtra AS TIPO " \
+                            "IdMotivo AS MOTIVO, Autorizado AS AUTORIZADO, CONVERT(VARCHAR(99), RTRIM(DescripcionMotivo)) AS DESCRIPCION, TipoHoraExtra AS TIPO " \
                     "FROM HorasExtras_Procesadas " \
                     "WHERE ID_HEP = %s" 
             cursor.execute(sql, [idHEP])

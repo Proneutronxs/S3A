@@ -19,7 +19,9 @@ def verificarPermisos(request, sector):
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
         if sector == 'RRHH':
             return JsonResponse ({'Message': 'Success', 'URL': 'rrhh/'})
-    return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para acceder a este sector'})
+        if sector == 'Frigorifico':
+            return JsonResponse ({'Message': 'Success', 'URL': 'frigorifico/'})
+    return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para acceder a este sector.'})
 
 def error_403(request, exception):
     print("Renderizado de 403")

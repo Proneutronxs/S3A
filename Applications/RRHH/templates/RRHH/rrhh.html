@@ -6,7 +6,7 @@
     <link href="{%static 'TresAses/img/TA.ico' %}" rel="icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{%static 'TresAses/css/style.css' %}">
-    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <title>Tres Ases</title> 
 </head>
 <body>
@@ -29,81 +29,25 @@
                 <ul class="menu-links">
                     <li class="nav-link">
                         <a href="{% url 'tresases' %}">
-                            <i class='bx bx-home-alt icon' ></i>
+                            <i class='bx material-symbols-outlined icon'>home</i>
                             <span class="text nav-text">Inicio</span>
                         </a>
                     </li>
 
                     <li class="nav-link">
                         <a href="{% url 'horasExtras' %}">
-                            <i class='bx bx-space-bar icon' ></i>
+                            <i class='bx material-symbols-outlined icon' >schedule</i>
                             <span class="text nav-text">Horas Extras</span>
                         </a>
                     </li>
 
-                    <!-- <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bxs-factory icon' ></i>
-                            <span class="text nav-text">Empaque</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-bar-chart-alt-2 icon' ></i>
-                            <span class="text nav-text">ETE</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bxs-truck icon' ></i>
-                            <span class="text nav-text">Expedición</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-money icon' ></i>
-                            <span class="text nav-text">Liquidación</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-cog icon' ></i>
-                            <span class="text nav-text">Mantenimiento</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-trending-up icon' ></i>
-                            <span class="text nav-text">Producción</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-file icon' ></i>
-                            <span class="text nav-text">Reportes</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class='bx bx-group icon' ></i>
-                            <span class="text nav-text">RRHH</span>
-                        </a>
-                    </li>
-                    -->
                 </ul>
             </div> 
 
             <div class="bottom-content">
                 <li class="">
                     <a href="{% url 'logout' %}">
-                        <i class='bx bx-log-out icon' ></i>
+                        <i class='bx material-symbols-outlined icon' >logout</i>
                         <span class="text"><b>{{user.username}}</b></span>
                     </a>
                 </li>                

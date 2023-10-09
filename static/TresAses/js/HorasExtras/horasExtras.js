@@ -453,7 +453,7 @@ const eliminaHorasExtras_transferencia = async () => {
             var nota = data.Nota
             limpiarCampos();
             var color = "green";
-            mostrarInfo(nota,color);       
+            mostrarInfo(nota,color);      
         }else {
             closeProgressBar();
             var nota = data.Nota
