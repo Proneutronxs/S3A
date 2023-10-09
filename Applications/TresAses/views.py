@@ -19,7 +19,7 @@ def verificarPermisos(request, sector):
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
         if sector == 'RRHH':
             return JsonResponse ({'Message': 'Success', 'URL': 'rrhh/'})
-        if sector == 'Frigorifico':
+        if sector == 'Frio':
             return JsonResponse ({'Message': 'Success', 'URL': 'frigorifico/'})
     return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para acceder a este sector.'})
 
