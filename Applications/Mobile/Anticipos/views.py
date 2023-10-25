@@ -163,7 +163,7 @@ def verAnticipos(request):
                         nombre = str(row[0])
                         monto = str(row[1])
                         tipoA = str(row[2])
-                        datos = {'Nombre': nombre, 'Monto': monto, 'TipoA': tipoA}
+                        datos = {'Nombre': nombre, 'Monto': monto, 'TipoA': tipoA, 'Estado': '00'}
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
