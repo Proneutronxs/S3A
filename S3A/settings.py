@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Applications.Mobile.GeneralApp',
     'Applications.Mobile.Anticipos',
     'Applications.Mobile.HorasExtras',
+    'Applications.Mobile.FletesRemitos',
     'Applications.Mobile.Presentismo',
     'Applications.TareasProgramadas',
     'django_crontab',

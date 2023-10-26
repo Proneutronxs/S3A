@@ -1599,13 +1599,14 @@ def procesoHorasExtras():
 def listadoAnticipos():
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT   CONVERT(VARCHAR(8), TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20),  " \
-                                            "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) + ' - ' + TresAses_ISISPayroll.dbo.CentrosCostos.AbrevCtroCosto + ' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2)  " \
-                                            "+ ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs.' AS COLUMNA " \
-                    "FROM         TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN " \
-                                            "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
-                                            "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON  " \
-                                            "TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
+            sql = "SELECT   CONVERT(VARCHAR(8), TresAses_ISISPayroll.dbo.Empleados.CodEmpleado) + ' - ' + CONVERT(VARCHAR(20), " \
+                            "TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) + ' - ' + TresAses_ISISPayroll.dbo.CentrosCostos.AbrevCtroCosto + ' - $ ' + CONVERT(VARCHAR(20), Auditoria_Anticipos.Monto, 2)   " \
+                            "+ ' - ' + Auditoria_Anticipos.Tipo + ' - Fecha Solicitud: ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.FechaHora, 103) + ' ' + CONVERT(VARCHAR(5), Auditoria_Anticipos.FechaHora, 108) + ' Hs. - Solicita: ' +  " \
+                            "Auditoria_Anticipos.Usuario AS COLUMNA  " \
+                    "FROM         TresAses_ISISPayroll.dbo.CentrosCostos INNER JOIN  " \
+                                "TresAses_ISISPayroll.dbo.Empleados INNER JOIN  " \
+                                "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON  " \
+                                "TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo  " \
                     "WHERE     (Auditoria_Anticipos.EstadoCorreo = '1') " \
                     "ORDER BY TresAses_ISISPayroll.dbo.Empleados.CodEmpleado"
             cursor.execute(sql)

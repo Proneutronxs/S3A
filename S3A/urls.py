@@ -35,6 +35,9 @@ urlpatterns = [
     #### MOBILE HORAS EXTRAS
     path('api/hextras/', include('Applications.Mobile.HorasExtras.urls')),
 
+    #### MOBILE REMITOS - FLETES - PRE CARGA INGRESO BASCULA
+    path('api/fletes-remitos/', include('Applications.Mobile.FletesRemitos.urls')),
+
     ### URL APLICACIÓN TRES ASES GENERAL
     path('', include('Applications.TresAses.urls')),
 

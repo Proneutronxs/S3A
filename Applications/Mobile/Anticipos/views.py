@@ -28,9 +28,10 @@ def insert_anticipos(request):
                 Fecha = item['Fecha']### FECHA DEL ADELANTO
                 Importe = item['Importe'] ### IMPORTE ADELANTO
                 Motivo = 'CH - ' + str(item['MotivoAd']) ### MOTIVO ADELANTO
+                motivoAuditoria = str(item['MotivoAd'])
                 Estado = item['Regis_TEA'] ### ESTADO ADELANTO
                 Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO               
-                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe)
+                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
 
                 with connections['ISISPayroll'].cursor() as cursor:
                     sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -97,12 +98,12 @@ def obtieneNombres(Regis_Epl):
     finally:
         connections['ISISPayroll'].close()
 
-def auditaAnticipos(usuario, Fechahora, Destino, Monto):
+def auditaAnticipos(usuario, Fechahora, Destino, Monto,motivoAuditoria):
     estado = '1'
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto, EstadoCorreo) VALUES (%s, %s, %s, %s, %s)"
-            values = (usuario,Fechahora,Destino,Monto,estado)
+            sql = "INSERT INTO Auditoria_Anticipos (Usuario, FechaHora, Destino, Monto, Tipo, EstadoCorreo) VALUES (%s, %s, %s, %s, %s, %s)"
+            values = (usuario,Fechahora,Destino,Monto,motivoAuditoria,estado)
             cursor.execute(sql, values)
     except Exception as e:
         error = str(e)
