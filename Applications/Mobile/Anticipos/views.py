@@ -21,8 +21,12 @@ def insert_anticipos(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            listado = []
-
+            listadoRepetidos = []
+            listadoAdelantosMes = []
+            listadoJson = []
+            Hora = obtenerHoraActual()
+            Mes = obtenerMesActual()
+            Año = obtenerAñoActual()
             for item in datos:
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
                 Fecha = item['Fecha']### FECHA DEL ADELANTO
@@ -30,31 +34,69 @@ def insert_anticipos(request):
                 Motivo = 'CH - ' + str(item['MotivoAd']) ### MOTIVO ADELANTO
                 motivoAuditoria = str(item['MotivoAd'])
                 Estado = item['Regis_TEA'] ### ESTADO ADELANTO
-                Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO               
-                auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
+                Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO     
 
-                with connections['ISISPayroll'].cursor() as cursor:
-                    sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
-                    cursor.execute(sql, values)
+                if motivoAuditoria == 'ADELANTO SUELDO':
+                    if verificaAnticipoMesAño(Regis_Epl,Mes,Año):
+                        listadoAdelantosMes.append(Regis_Epl)
+                        listadoRepetidos.append(Regis_Epl)
+                    else:
+                        auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
+                        try:
+                            with connections['ISISPayroll'].cursor() as cursor:
+                                sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
+                                cursor.execute(sql, values)
+                                listadoRepetidos.append(Regis_Epl)
+                        except Exception as e:
+                            error = str(e)
+                            insertar_registro_error_sql("Anticipos","insert_anticipos","Aplicacion",error)
+                            estado = "F"
+                            insertaRegistro(usuario, fechaHora, registro, estado)
+                            return JsonResponse({'Message': 'Error', 'Nota': error})
+                        finally:
+                            connections['ISISPayroll'].close()
+                else:
+                    if verificaAdelantoIngresoHora(Regis_Epl, Hora, Año) is False:
+                        auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
+                        try:
+                            with connections['ISISPayroll'].cursor() as cursor:
+                                sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
+                                cursor.execute(sql, values)
+                                listadoRepetidos.append(Regis_Epl)
+                        except Exception as e:
+                            error = str(e)
+                            insertar_registro_error_sql("Anticipos","insert_anticipos","Aplicacion",error)
+                            estado = "F"
+                            insertaRegistro(usuario, fechaHora, registro, estado)
+                            return JsonResponse({'Message': 'Error', 'Nota': error})
+                        finally:
+                            connections['ISISPayroll'].close()
                 
-                LegajoNombre = obtieneNombres(Regis_Epl)
-                datosLegajo = LegajoNombre + ' Monto: $' + Importe
-                listado.append(datosLegajo)
-            
-            estado = "E"
-            insertaRegistro(usuario, fechaHora, registro, estado)
-            nota = "Los registros se guardaron exitosamente."
-            return JsonResponse({'Message': 'Success', 'Nota': nota})      
+            if listadoAdelantosMes:
+                for item in listadoAdelantosMes:
+                    LegajoNombre = obtieneNombres(item)
+                    datosLegajo = LegajoNombre 
+                    listadoJson.append(datosLegajo)
+                nota = 'Se cargaron anticipos. Las siguientes personas ya tiene un Adelanto de Sueldo este Mes: \n \n' + ', \n'.join(listadoJson) + '.'
+                estado = "E"
+                insertaRegistro(usuario, fechaHora, registro, estado)
+                return JsonResponse({'Message': 'Success', 'Nota': nota})  
+            else:
+                estado = "E"
+                insertaRegistro(usuario, fechaHora, registro, estado)
+                nota = "Los registros se guardaron exitosamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("Anticipos","insert_anticipos","usuario",error)
+            insertar_registro_error_sql("Anticipos","insert_anticipos","Aplicacion",error)
             estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
-            cursor.close()
             connections['ISISPayroll'].close()
+        
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
 
@@ -136,6 +178,66 @@ def obtenerAñoActual():
     año_actual = now.strftime("%Y")
     año = str(año_actual)
     return año
+
+def obtenerHoraActual():
+    import datetime 
+    now = datetime.datetime.now()
+    hora_actual = now.strftime("%H")
+    hora = str(hora_actual)
+    return hora
+
+def obtenerMesActual():
+    import datetime 
+    now = datetime.datetime.now()
+    mes_actual = now.strftime("%m")
+    mes = str(mes_actual)
+    return mes
+
+def verificaAnticipoMesAño(Regis_Epl, Mes, Año):
+    values = (Regis_Epl, Mes, Año)
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT Regis_Epl, FechaAde, ImporteAde " \
+                    "FROM EmpleadoAdelantos " \
+                    "WHERE  Regis_Epl = %s " \
+                            "AND MotivoAde = 'CH - ADELANTO SUELDO' " \
+                            "AND MONTH(FechaAde) =  %s " \
+                            "AND YEAR(FechaAde) = %s "
+            cursor.execute(sql, values)
+            consulta = cursor.fetchone()
+            if consulta:
+                return True
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("Anticipos","verificaAnticipoMesAño","usuario",error)
+        print(error)
+        return True
+    finally:
+        connections['ISISPayroll'].close()
+
+def verificaAdelantoIngresoHora(Regis_Epl, Hora, Año):
+    values = (Regis_Epl, Hora, Año)
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Destino, DATEPART(HOUR, FechaHora) AS HORA " \
+                    "FROM Auditoria_Anticipos " \
+                    "WHERE  Destino = %s " \
+                            "AND Tipo = 'ADELANTO INGRESO' " \
+                            "AND DATEPART(HOUR, FechaHora) =  %s " \
+                            "AND YEAR(FechaHora) = %s "
+            cursor.execute(sql, values)
+            consulta = cursor.fetchone()
+            if consulta:
+                return True
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("Anticipos","verificaAdelantoIngresoHora","Aplicacion",error)
+        print(error)
+        return True
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 @csrf_exempt
 def verAnticipos(request):
