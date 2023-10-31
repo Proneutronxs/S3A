@@ -13,8 +13,6 @@ def subirApp(request):
     return render (request, 'generalapp/subirApp.html')
 
 ### LOGIN DE LA APLICACIÓN
-
-
 @csrf_exempt
 def login_app(request):
     if request.method == 'POST':
@@ -26,21 +24,29 @@ def login_app(request):
         #print(fechaHora,registro)
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \
-                      "FROM            USUARIOS INNER JOIN " \
-                            "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
+                sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, ISNULL(CONVERT(VARCHAR(22), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)), '-') AS Nombres,  " \
+                                        "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  " \
+                                        "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_Chofer " \
+                        "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
+                                                "USUARIOS INNER JOIN " \
+                                                "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USUARIOS.CodEmpleado " \
                       "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
                 cursor.execute(sql, [usuario, clave])
                 consulta = cursor.fetchone()
                 
                 if consulta:
-                    legajo, hExtras, asistencia, anticipos = map(str, consulta)
+                    legajo, nombre, hExtras, asistencia, anticipos,pedidoFlete, crearRemito, chofer = map(str, consulta)
                     response_data = {                        
                         'Legajo': legajo,
+                        'Nombre': nombre,
                         'Usuario': usuario,
                         'HExtras': hExtras,
                         'Asistencia': asistencia,
-                        'Anticipos': anticipos
+                        'Anticipos': anticipos,
+                        'PedidoFlete': pedidoFlete,
+                        'CrearRemito': crearRemito,
+                        'Chofer': chofer
+
                     }
                     #print("INICIA SESION")
                     datos = {'Message': 'Success', 'Data': response_data}
@@ -70,6 +76,62 @@ def login_app(request):
             'Message': 'No se pudo resolver la petición.'
         }
         return JsonResponse(response_data)
+
+# @csrf_exempt
+# def login_app(request):
+#     if request.method == 'POST':
+#         body = request.body.decode('utf-8')
+#         usuario = str(json.loads(body)['usuario'])
+#         clave = str(json.loads(body)['contraseña'])
+#         fechaHora = str(json.loads(body)['actual'])
+#         registro = str(json.loads(body)['registro'])
+#         #print(fechaHora,registro)
+#         try:
+#             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+#                 sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \
+#                       "FROM            USUARIOS INNER JOIN " \
+#                             "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
+#                       "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
+#                 cursor.execute(sql, [usuario, clave])
+#                 consulta = cursor.fetchone()
+                
+#                 if consulta:
+#                     legajo, hExtras, asistencia, anticipos = map(str, consulta)
+#                     response_data = {                        
+#                         'Legajo': legajo,
+#                         'Usuario': usuario,
+#                         'HExtras': hExtras,
+#                         'Asistencia': asistencia,
+#                         'Anticipos': anticipos
+#                     }
+#                     #print("INICIA SESION")
+#                     datos = {'Message': 'Success', 'Data': response_data}
+#                     estado = "E"
+#                     insertaRegistro(usuario,fechaHora,registro,estado)
+#                     return JsonResponse(datos)
+#                 else:
+#                     response_data = {
+#                         'Message': 'Not Found',
+#                         'Nota': 'Usuario o Contraseña inválidos.'
+#                     }
+#                     estado = "F"
+#                     insertaRegistro(usuario,fechaHora,registro,estado)
+#                     return JsonResponse(response_data)
+#         except Exception as e:
+#             error = str(e)
+#             insertar_registro_error_sql("GeneralApp","login_app",usuario,error)
+#             response_data = {
+#                 'Message': 'Error',
+#                 'Nota': error
+#             }
+#             return JsonResponse(response_data)
+#         finally:
+#             connections['TRESASES_APLICATIVO'].close()
+#     else:
+#         response_data = {
+#             'Message': 'No se pudo resolver la petición.'
+#         }
+#         return JsonResponse(response_data)
 
 ###  METODO GET PARA TRAER CHACRAS Y ID
 
