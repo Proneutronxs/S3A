@@ -53,4 +53,18 @@ def insertar_registros_realizados(aplicacion,funcion,usuario,accion,realiza):
         return True
     except Exception as e:
         return False
+    
+
+def inyectaData(Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector):
+    values = [Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO Data_Funciones (Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+            cursor.execute(sql,values)
+            cursor.commit()
+    except Exception as e:
+        insertar_registro_error_sql("TareasHE","inyectaData","errores",str(e))
+        
+    finally:
+        connections['TRESASES_APLICATIVO'].close()    
 
