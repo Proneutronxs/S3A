@@ -1553,36 +1553,55 @@ def InsertaInicioFinal(ID,Inicio,Final):
             insertaEnProcesados(legajo,desde,hasta,idMotivo,descripcion,idAutorizado,encargado,tipoHora,cantidadHoras,idSinProceso,estado)
 #### FUNCION PAR APROCESAR CADA 30 MINUTOS
 def procesoHorasExtras():
-    listado_de_listado_de_HE = trae_lista_con_listado()
-    for diasLista in listado_de_listado_de_HE:
-        cantidad = len(diasLista)
+    if ProcesaActivo() == 1:
+        listado_de_listado_de_HE = trae_lista_con_listado()
+        for diasLista in listado_de_listado_de_HE:
+            cantidad = len(diasLista)
 
-        if cantidad == 2:
-            DT1 = str(diasLista[0])
-            DT2 = str(diasLista[1])
-            ListaDiaUno = DT1.split('*')
-            ListaDiaDos = DT2.split('*')
-            ID_HoraExtra_MD = str(ListaDiaUno[0])
-            Inicio = str(ListaDiaUno[1])
-            Final = str(ListaDiaDos[1])
-            InsertaInicioFinal(ID_HoraExtra_MD,Inicio,Final)
+            if cantidad == 2:
+                DT1 = str(diasLista[0])
+                DT2 = str(diasLista[1])
+                ListaDiaUno = DT1.split('*')
+                ListaDiaDos = DT2.split('*')
+                ID_HoraExtra_MD = str(ListaDiaUno[0])
+                Inicio = str(ListaDiaUno[1])
+                Final = str(ListaDiaDos[1])
+                InsertaInicioFinal(ID_HoraExtra_MD,Inicio,Final)
 
-        if cantidad == 4:
-            DT1A = str(diasLista[0])
-            DT1B = str(diasLista[1])
-            DT2A = str(diasLista[2])
-            DT2B = str(diasLista[3])
-            ListaDiaUnoA = DT1A.split('*')
-            ListaDiaUnoB = DT1B.split('*')
-            ListaDiaDosA = DT2A.split('*')
-            ListaDiaDosB = DT2B.split('*')
-            ID_HoraExtra_DD = str(ListaDiaUnoA[0])
-            Inicio_Uno_A = str(ListaDiaUnoA[1])
-            Final_Uno_B = str(ListaDiaUnoB[1])
-            Inicio_Dos_A = str(ListaDiaDosA[1])
-            Final_Dos_B = str(ListaDiaDosB[1])
-            InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Uno_A,Final_Uno_B)
-            InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Dos_A,Final_Dos_B)
+            if cantidad == 4:
+                DT1A = str(diasLista[0])
+                DT1B = str(diasLista[1])
+                DT2A = str(diasLista[2])
+                DT2B = str(diasLista[3])
+                ListaDiaUnoA = DT1A.split('*')
+                ListaDiaUnoB = DT1B.split('*')
+                ListaDiaDosA = DT2A.split('*')
+                ListaDiaDosB = DT2B.split('*')
+                ID_HoraExtra_DD = str(ListaDiaUnoA[0])
+                Inicio_Uno_A = str(ListaDiaUnoA[1])
+                Final_Uno_B = str(ListaDiaUnoB[1])
+                Inicio_Dos_A = str(ListaDiaDosA[1])
+                Final_Dos_B = str(ListaDiaDosB[1])
+                InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Uno_A,Final_Uno_B)
+                InsertaInicioFinal(ID_HoraExtra_DD,Inicio_Dos_A,Final_Dos_B)
+
+def ProcesaActivo():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Numerico " \
+                    "FROM Parametros_Aplicativo " \
+                    "WHERE Codigo = 'PROCESA-HE' "
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            if consulta:
+                data = int(consulta[0])
+                return data
+        return 0
+    except Exception as e:
+        insertar_registro_error_sql("TareasProgramadas","correosChacras","request.user",str(e))
+        return 0
+    finally:
+        connections['TRESASES_APLICATIVO'].close()    
 
 
 
