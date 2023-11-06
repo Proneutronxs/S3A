@@ -932,6 +932,9 @@ def InsertaInicioFinal(ID,Inicio,Final):
             Inicio_50_04_00_Empaque = LV_Hora50_04_a_00_Inicio_Empaque(Inicio)
             Final_50_04_00_Empaque = LV_Hora50_04_a_00_Final_Empaque(Final)
 
+            data = str(ID) + " - " + str(Inicio_100_00_04_Empaque) + "-" + str(Final_100_00_04_Empaque)+ "-" + str(Inicio_50_04_13_Empaque) + "-" + str(Final_50_04_13_Empaque) + "-" + str(Inicio_100_13_00_Empaque) + "-" + str(Final_100_13_00_Empaque)
+            inyectaData("InsertaInicioFinal-Semana",data,str(Inicio), str(soloFecha),str(Final),diaSemana, sector)
+
             if Inicio_100_00_04_Empaque:
                 if Final_100_00_04_Empaque:
                     horaInicio = Inicio
@@ -1275,7 +1278,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
             Final_100_13_00_Empaque = Sabado_Hora100_13_a_00_Final_Empaque(Final)
 
             data = str(ID) + " - " + str(Inicio_100_00_04_Empaque) + "-" + str(Final_100_00_04_Empaque)+ "-" + str(Inicio_50_04_13_Empaque) + "-" + str(Final_50_04_13_Empaque) + "-" + str(Inicio_100_13_00_Empaque) + "-" + str(Final_100_13_00_Empaque)
-            inyectaData("InsertaInicioFinal",data,str(Inicio), str(soloFecha),str(Final),diaSemana, sector)
+            inyectaData("InsertaInicioFinal-Sabado",data,str(Inicio), str(soloFecha),str(Final),diaSemana, sector)
 
             if Inicio_100_00_04_Empaque:
                 if Final_100_00_04_Empaque:
