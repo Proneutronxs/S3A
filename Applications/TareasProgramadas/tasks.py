@@ -775,7 +775,6 @@ def insertaArreglosEnProcesados(legajo, desde, hasta, idMotivo, descripcion, aut
 def InsertaInicioFinal(ID,Inicio,Final):
     diaSemana = obtener_dia_semana(Inicio)
     sector = str(buscaSectorEnHorasExtrasSinProceso(ID))
-    inyectaData("InsertaInicioFinal",str(ID),str(Inicio), str(Inicio),str(Final),diaSemana, sector)
 
 ################################# LUNES A VIERNES ##################################
     if diaSemana in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]:
