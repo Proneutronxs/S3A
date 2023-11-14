@@ -67,40 +67,25 @@ def datos_Iniciales_Flete(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 
-def idProductor_Chacra_Zona(request,idProductor):
+def idProductor_Chacra(request,idProductor):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
 
                 listado_Chacra = []
-                listado_Zona = []
 
                 ## CHACRA
                 sql = "SELECT IdChacra, RTRIM(Nombre) FROM Chacra WHERE IdProductor = %s ORDER BY Nombre"
                 cursor.execute(sql, [idProductor])
                 consulta = cursor.fetchall()
                 if consulta:
-                    listado_planta_destino = []
                     for row in consulta:
                         idChacra = str(row[0])
                         nombreChacra = str(row[1])
                         datos = {'idChacra': idChacra, 'NombreChacra': nombreChacra}
                         listado_Chacra.append(datos)
 
-                ## ZONA
-                sql2 = "SELECT Z.IdZona, RTRIM(Z.Nombre) FROM Chacra AS C Left Join Zona AS Z ON (C.Zona = Z.IdZona) WHERE C.IdProductor = %s GROUP BY Z.IdZona, Z.Nombre"
-                cursor.execute(sql2, [idProductor])
-                consulta2 = cursor.fetchall()
-                if consulta2:
-                    listado_productor = []
-                    for row2 in consulta2:
-                        idZona = str(row2[0])
-                        nombreZona = str(row2[1])
-                        datos2 = {'IdZona': idZona, 'NombreZona': nombreZona}
-                        listado_Zona.append(datos2)
-                        
-                if listado_Chacra and listado_Zona:
-                    return JsonResponse({'Message': 'Success', 'DataChacra': listado_Chacra, 'DataZona': listado_Zona})
+                    return JsonResponse({'Message': 'Success', 'DataChacra': listado_Chacra})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
         except Exception as e:
@@ -113,6 +98,38 @@ def idProductor_Chacra_Zona(request,idProductor):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
+def idProductor_Zona(request,idProductor,idChacra):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+
+                
+                listado_Zona = []
+
+                ## ZONA
+                sql2 = "SELECT Z.IdZona, RTRIM(Z.Nombre) FROM Zona as Z Left Join Chacra as C on (Z.IdZona = C.Zona) WHERE C.IdProductor = %s AND C.IdChacra = %s "
+                cursor.execute(sql2, [idProductor, idChacra])
+                consulta2 = cursor.fetchall()
+                if consulta2:
+                    for row2 in consulta2:
+                        idZona = str(row2[0])
+                        nombreZona = str(row2[1])
+                        datos2 = {'IdZona': idZona, 'NombreZona': nombreZona}
+                        listado_Zona.append(datos2)
+                        
+                
+                    return JsonResponse({'Message': 'Success', 'DataZona': listado_Zona})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 def idEspecie_Varierad(request,idEspecie):
