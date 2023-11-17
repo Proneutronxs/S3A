@@ -215,7 +215,7 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                                                 "Acoplado AS A ON PF.IdAcoplado = A.IdAcoplado " \
                         "WHERE        (PF.IdPedidoFlete = %s)"
                 cursor.execute(sql, [idAsignacion])
-                consulta = cursor.fetchone()
+                consulta = cursor.fetchall()
                 if consulta:
                     listadoData_Asignaciones = []
                     for row in consulta:
@@ -230,8 +230,7 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                         datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte, 'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa}
                         listadoData_Asignaciones.append(datos)
                 listadoData_UP = traeUPS(renspa)
-                if listadoData_Asignaciones:
-                    listadoData_UP = traeUPS(renspa)
+                if listadoData_Asignaciones and listadoData_UP:
                     return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Datos para la Asignacion seleccionada.'})
