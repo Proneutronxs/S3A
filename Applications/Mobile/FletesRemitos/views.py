@@ -201,8 +201,8 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT        P.RazonSocial AS Productor, C.Nombre AS Chacra, Z.Nombre AS Zona, CONVERT(VARCHAR(30), T.RazonSocial) AS Transporte, " \
-                                        "PF.Chofer, CA.Nombre AS Camion, CA.Patente, RTRIM(C.RENSPA) AS Renspa " \
+                sql = "SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, CONVERT(VARCHAR(30), T.RazonSocial) AS Transporte, " \
+                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa " \
                         "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
                                                 "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
                                                 "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
