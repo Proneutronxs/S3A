@@ -229,8 +229,9 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                         renspa = str(row[7])
                         datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte, 'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa}
                         listadoData_Asignaciones.append(datos)
+                listadoData_UP = traeUPS(renspa)
+                if listadoData_Asignaciones:
                     listadoData_UP = traeUPS(renspa)
-                if listadoData_Asignaciones and listadoData_UP:
                     return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Datos para la Asignacion seleccionada.'})
