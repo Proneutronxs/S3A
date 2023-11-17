@@ -15,6 +15,12 @@ urlpatterns = [
    ### DATA SEGUN ID DE ESPECIE
    path('data-especie/idEspecie=<str:idEspecie>', views.idEspecie_Varierad, name="idEspecie_Variedad"),
 
+   ### DATA MUESTRA ASIGNACIONES PENDIENTES
+   path('data-asignaciones/usuario=<str:usuario>', views.llamaAsignacionesPendientes, name="llama_asignaciones_pendientes"),
+
+   
+
+
 
 
 ]

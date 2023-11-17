@@ -101,11 +101,8 @@ def idProductor_Chacra(request,idProductor):
 def idProductor_Zona(request,idProductor,idChacra):
     if request.method == 'GET':
         try:
-            with connections['S3A'].cursor() as cursor:
-
-                
+            with connections['S3A'].cursor() as cursor:                
                 listado_Zona = []
-
                 ## ZONA
                 sql2 = "SELECT Z.IdZona, RTRIM(Z.Nombre) FROM Zona as Z Left Join Chacra as C on (Z.IdZona = C.Zona) WHERE C.IdProductor = %s AND C.IdChacra = %s "
                 cursor.execute(sql2, [idProductor, idChacra])
@@ -136,7 +133,6 @@ def idEspecie_Varierad(request,idEspecie):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-
                 ## CHACRA
                 sql = "SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie FROM Variedad WHERE IdEspecie = %s and IdVariedad < 1000 ORDER BY Nombre"
                 cursor.execute(sql, [idEspecie])
@@ -161,3 +157,114 @@ def idEspecie_Varierad(request,idEspecie):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+
+
+#### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES
+
+def llamaAsignacionesPendientes(request, usuario):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = "SELECT         IdPedidoFlete, CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) + ' - ' +  Productor.RazonSocial AS Asignacion " \
+                        "FROM            PedidoFlete INNER JOIN " \
+                                                "Productor ON PedidoFlete.IdProductor = Productor.IdProductor " \
+                        "WHERE        (PedidoFlete.UserID = %s) AND (PedidoFlete.Estado = 'A') " \
+                        "ORDER BY IdPedidoFlete"
+                cursor.execute(sql, [usuario])
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_Asignaciones = []
+                    for row in consulta:
+                        idFlete = str(row[0])
+                        descripcionFlete = str(row[1])
+                        datos = {'idFlete': idFlete, 'DescripcionFlete': descripcionFlete}
+                        listado_Asignaciones.append(datos)
+
+                    return JsonResponse({'Message': 'Success', 'Asignaciones': listado_Asignaciones})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Asignaciones pendientes.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","llamaAsisgnacionesPendientes","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+### LLAMA A LOS DATOS DE LA ASIGNACION SELECCIONADA CON EL ID
+def llamaDataAsignacionPendiente(request, idAsignacion):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = "SELECT        P.RazonSocial AS Productor, C.Nombre AS Chacra, Z.Nombre AS Zona, CONVERT(VARCHAR(30), T.RazonSocial) AS Transporte, " \
+                                        "PF.Chofer, CA.Nombre AS Camion, CA.Patente, RTRIM(C.RENSPA) AS Renspa " \
+                        "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
+                                                "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
+                                                "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
+                                                "Zona AS Z ON PF.IdZona = Z.IdZona LEFT OUTER JOIN " \
+                                                "Ubicacion AS U ON PF.IdPlantaDestino = U.IdUbicacion LEFT OUTER JOIN " \
+                                                "Especie AS E ON PF.IdEspecie = E.IdEspecie LEFT OUTER JOIN " \
+                                                "Variedad AS V ON PF.IdVariedad = V.IdVariedad LEFT OUTER JOIN " \
+                                                "Transportista AS T ON PF.IdTransportista = T.IdTransportista LEFT OUTER JOIN " \
+                                                "Camion AS CA ON PF.IdCamion = CA.IdCamion LEFT OUTER JOIN " \
+                                                "Acoplado AS A ON PF.IdAcoplado = A.IdAcoplado " \
+                        "WHERE        (PF.IdPedidoFlete = %s)"
+                cursor.execute(sql, [idAsignacion])
+                consulta = cursor.fetchone()
+                if consulta:
+                    listadoData_Asignaciones = []
+                    for row in consulta:
+                        productor = str(row[0])
+                        chacra = str(row[1])
+                        zona = str(row[2])
+                        transporte = str(row[3])
+                        chofer = str(row[4])
+                        camion = str(row[5])
+                        patente = str(row[6])
+                        renspa = str(row[7])
+                        datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte, 'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa}
+                        listadoData_Asignaciones.append(datos)
+                    listadoData_UP = traeUPS(renspa)
+                if listadoData_Asignaciones and listadoData_UP:
+                    return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Datos para la Asignacion seleccionada.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","llamaDataAsignacionPendiente","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+### LLAMA A LAS UP DE LA RENSPA  DE LA ASIGNACION SELECCIONADA
+def traeUPS(idAsignacion):
+    listadoUP_Renspa = []
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT DISTINCT UP FROM ReporteDanio WHERE RENSPA = %s AND (YEAR(Fecha) = YEAR(GETDATE()))"
+            cursor.execute(sql, [idAsignacion])
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    up = str(row[0])
+                    datos = {'up': up}
+                    listadoUP_Renspa.append(datos)
+                    return listadoUP_Renspa
+            else:
+                listadoUP_Renspa
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("traeFletesRemitos","traeUPS","Aplicacion",error)
+        return listadoUP_Renspa
+    finally:
+        cursor.close()
+        connections['S3A'].close()
