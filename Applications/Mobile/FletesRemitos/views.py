@@ -246,12 +246,12 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
 
 
 ### LLAMA A LAS UP DE LA RENSPA  DE LA ASIGNACION SELECCIONADA
-def traeUPS(idAsignacion):
+def traeUPS(renspa):
     listadoUP_Renspa = []
     try:
         with connections['S3A'].cursor() as cursor:
             sql = "SELECT DISTINCT UP FROM ReporteDanio WHERE RENSPA = %s AND (YEAR(Fecha) = YEAR(GETDATE()))"
-            cursor.execute(sql, [idAsignacion])
+            cursor.execute(sql, [renspa])
             consulta = cursor.fetchall()
             if consulta:
                 for row in consulta:

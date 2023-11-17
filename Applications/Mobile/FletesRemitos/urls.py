@@ -18,7 +18,10 @@ urlpatterns = [
    ### DATA MUESTRA ASIGNACIONES PENDIENTES
    path('data-asignaciones/usuario=<str:usuario>', views.llamaAsignacionesPendientes, name="llama_asignaciones_pendientes"),
 
-   
+   ## DATA MUESTRA DATOS DE LA ASIGNACION SELECCIONADA POR EL ID DE LA ASIGNACION
+   path('data-asignacion/idAsignacion=<str:idAsignacion>', views.llamaDataAsignacionPendiente, name="llama_data_asignacion_pendiente"),
+
+
 
 
 
