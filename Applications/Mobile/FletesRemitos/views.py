@@ -250,7 +250,7 @@ def traeUPS(renspa):
     listadoUP_Renspa = []
     try:
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT DISTINCT UP FROM ReporteDanio WHERE RENSPA = %s AND (YEAR(Fecha) = YEAR(GETDATE()))"
+            sql = "SELECT DISTINCT RTRIM(UP) FROM ReporteDanio WHERE RENSPA = %s AND (YEAR(Fecha) = YEAR(GETDATE()))"
             cursor.execute(sql, [renspa])
             consulta = cursor.fetchall()
             if consulta:
