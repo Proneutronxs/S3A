@@ -43,7 +43,7 @@ def datos_Iniciales_Flete(request):
                 ## ESPECIE
                 listado = traeIdEspecies()
                 cantValues = ','.join(['?'] * len(listado))
-                sql3 = (f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY IdEspecie IN ({cantValues})")
+                sql3 = (f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValues}) ORDER BY IdEspecie")
                 cursor.execute(sql3, listado)
                 consulta3 = cursor.fetchall()
                 if consulta3:
@@ -59,7 +59,7 @@ def datos_Iniciales_Flete(request):
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
         except Exception as e:
-            error = str(e) +  ' ' + str(listado) + cantValues 
+            error = str(e)
             insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
