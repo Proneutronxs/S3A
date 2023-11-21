@@ -42,7 +42,7 @@ def datos_Iniciales_Flete(request):
 
                 ## ESPECIE
                 listado = traeIdEspecies()
-                cantValues = ','.join(['?'] * len(listado))
+                cantValues = ','.join(['%s'] * len(listado))
                 sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValues}) ORDER BY IdEspecie"
                 cursor.execute(sql3, listado)
                 consulta3 = cursor.fetchall()
