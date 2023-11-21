@@ -41,10 +41,10 @@ def datos_Iniciales_Flete(request):
                         listado_productor.append(datos2)
 
                 ## ESPECIE
-                listado_especies = traeIdEspecies()
-                cantValues = ','.join(['?'] * len(listado_especie))
+                listado = traeIdEspecies()
+                cantValues = ','.join(['?'] * len(listado))
                 sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY IdEspecie IN ({cantValues})"
-                cursor.execute(sql3, listado_especie)
+                cursor.execute(sql3, listado)
                 consulta3 = cursor.fetchall()
                 if consulta3:
                     listado_especie = []
