@@ -43,7 +43,7 @@ def datos_Iniciales_Flete(request):
                 ## ESPECIE
                 listado = traeIdEspecies()
                 cantValues = ','.join(['?'] * len(listado))
-                sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY IdEspecie IN ({cantValues})"
+                sql3 = (f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY IdEspecie IN ({cantValues})")
                 cursor.execute(sql3, listado)
                 consulta3 = cursor.fetchall()
                 if consulta3:
@@ -163,7 +163,7 @@ def traeIdEspecies():
             cursor.execute(sql)
             consulta = cursor.fetchone()
             if consulta:
-                datos = str(consulta[0])
+                datos = consulta[0]
                 listado_id = datos.split(',')
                 return listado_id
     except Exception as e:
