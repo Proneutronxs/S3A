@@ -59,7 +59,7 @@ def datos_Iniciales_Flete(request):
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
         except Exception as e:
-            error = str(e)
+            error = str(e) +  ' ' + str(listado) + cantValues 
             insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
