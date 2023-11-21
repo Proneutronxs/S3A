@@ -2,6 +2,7 @@
 from django.utils import timezone
 from django.db import connections
 from Applications.TresAses.models import *
+from datetime import datetime
 
 
 
@@ -66,5 +67,15 @@ def inyectaData(Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector):
         insertar_registro_error_sql("TareasHE","inyectaData","errores",str(e))
         
     finally:
-        connections['TRESASES_APLICATIVO'].close()    
+        connections['TRESASES_APLICATIVO'].close()   
+
+
+def obtenerFechaActual():
+    fecha_actual = datetime.now()
+    fecha = fecha_actual.strftime('%d/%m/%Y')
+    return fecha
+
+def obtenerHoraActual():
+    hora_actual = datetime.now()
+    hora = hora_actual.strftime('%H:%M')
 

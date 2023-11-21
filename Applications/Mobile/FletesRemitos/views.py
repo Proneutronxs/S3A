@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from django.http import JsonResponse
 from S3A.funcionesGenerales import *
+import json
 
 # Create your views here.
 
@@ -172,6 +173,66 @@ def traeIdEspecies():
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
+
+### INSERTA POST DE UNA ASIGNACIÓN
+@csrf_exempt
+def insertaPedidoFlete(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            solicita = str(json.loads(body)['solicita'])
+            idPlanta = '100'
+            usuario = str(json.loads(body)['usuario'])
+            fechaPedido = obtenerFechaActual()
+            horaPedido = obtenerHoraActual()
+            tipoDestino  = 'P'
+            tipoCarga = str(json.loads(body)['tipoCarga'])
+            idProductor = str(json.loads(body)['idProductor'])
+            idChacra = str(json.loads(body)['idChacra'])
+            idZona = str(json.loads(body)['idZona'])
+            idPlantaDestino = None
+            idEspecie = str(json.loads(body)['idEspecie'])
+            idVariedad = str(json.loads(body)['idVariedad'])
+            binsTotal = str(json.loads(body)['binsTotal'])
+            traeVacios = str(json.loads(body)['traeVacios'])
+            traeCuellos = str(json.loads(body)['traeCuellos'])
+            horaRequerida = str(json.loads(body)['horaRequerida'])
+            observaciones = str(json.loads(body)['observaciones'])
+            estado = 'P'
+            fechaRequerida = str(json.loads(body)['fechaRequerida'])
+            binsBlancos = str(json.loads(body)['binsBlancos'])
+            binsRojos = str(json.loads(body)['binsRojos'])
+
+            values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, idPlantaDestino, 
+                      idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
+                      usuario, binsBlancos, binsRojos]
+            valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
+            #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
+            # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
+            # ''12:17:25'',''P'',''RAU'',5405,1000732,12,NULL,1,34,40,''S'',''S'',''11:53'',''PRUEBA - OBSERVACIÓN'',''P'',''14/11/2023'',getdate(),''JCHAMBI'')
+
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                # sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
+                #     "IdProductor,IdChacra,IdZona,IdPlantaDestino,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
+                #     "Estado,FechaRequerida,FechaAlta,UserID) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,getdate(),%s,) "
+                # cursor.execute(sql, values)      
+                
+                sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (?,?,?)"
+                cursor.execute(sql, valores)                         
+
+                return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
+
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","insertaPedidoFlete","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
+
+
 
 
 #### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES
