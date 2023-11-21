@@ -206,6 +206,7 @@ def insertaPedidoFlete(request):
             values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, idPlantaDestino, 
                       idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
                       usuario, binsBlancos, binsRojos]
+            
             valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
             #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
             # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
@@ -217,7 +218,7 @@ def insertaPedidoFlete(request):
                 #     "Estado,FechaRequerida,FechaAlta,UserID) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,getdate(),%s,) "
                 # cursor.execute(sql, values)      
                 
-                sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (?,?,?)"
+                sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
                 cursor.execute(sql, valores)                         
 
                 return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
