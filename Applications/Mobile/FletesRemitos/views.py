@@ -41,8 +41,10 @@ def datos_Iniciales_Flete(request):
                         listado_productor.append(datos2)
 
                 ## ESPECIE
-                sql3 = "SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY nombre"
-                cursor.execute(sql3)
+                listado_especies = traeIdEspecies()
+                cantValues = ','.join(['?'] * len(listado_especie))
+                sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie ORDER BY IdEspecie IN ({cantValues})"
+                cursor.execute(sql3, listado_especie)
                 consulta3 = cursor.fetchall()
                 if consulta3:
                     listado_especie = []
@@ -112,9 +114,7 @@ def idProductor_Zona(request,idProductor,idChacra):
                         idZona = str(row2[0])
                         nombreZona = str(row2[1])
                         datos2 = {'IdZona': idZona, 'NombreZona': nombreZona}
-                        listado_Zona.append(datos2)
-                        
-                
+                        listado_Zona.append(datos2)                
                     return JsonResponse({'Message': 'Success', 'DataZona': listado_Zona})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
@@ -133,7 +133,7 @@ def idEspecie_Varierad(request,idEspecie):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                ## CHACRA
+                ## VARIEDAD
                 sql = "SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie FROM Variedad WHERE IdEspecie = %s and IdVariedad < 1000 ORDER BY Nombre"
                 cursor.execute(sql, [idEspecie])
                 consulta = cursor.fetchall()
@@ -158,7 +158,22 @@ def idEspecie_Varierad(request,idEspecie):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
+def traeIdEspecies():
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-ESP-FLETES'"
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            if consulta:
+                datos = str(consulta[0])
+                listado_id = datos.split(',')
+                return listado_id
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeIdEspecies","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
 
 
 #### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES
