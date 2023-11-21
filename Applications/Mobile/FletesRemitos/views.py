@@ -163,7 +163,7 @@ def traeIdEspecies():
             cursor.execute(sql)
             consulta = cursor.fetchone()
             if consulta:
-                datos = consulta[0]
+                datos = str(consulta[0])
                 listado_id = datos.split(',')
                 return listado_id
     except Exception as e:
