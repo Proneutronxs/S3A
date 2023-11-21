@@ -73,9 +73,7 @@ def idProductor_Chacra(request,idProductor):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-
                 listado_Chacra = []
-
                 ## CHACRA
                 sql = "SELECT IdChacra, RTRIM(Nombre) FROM Chacra WHERE IdProductor = %s ORDER BY Nombre"
                 cursor.execute(sql, [idProductor])
@@ -160,7 +158,7 @@ def idEspecie_Varierad(request,idEspecie):
     
 def traeIdEspecies():
     try:
-        with connections['S3A'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-ESP-FLETES'"
             cursor.execute(sql)
             consulta = cursor.fetchone()
@@ -173,7 +171,7 @@ def traeIdEspecies():
         insertar_registro_error_sql("FletesRemitos","traeIdEspecies","Aplicacion",error)
     finally:
         cursor.close()
-        connections['S3A'].close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 #### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES
