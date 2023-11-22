@@ -333,9 +333,9 @@ def traeUPS(renspa):
                     up = str(row[0])
                     datos = {'up': up}
                     listadoUP_Renspa.append(datos)
-                    return listadoUP_Renspa
+                return listadoUP_Renspa
             else:
-                listadoUP_Renspa
+                return listadoUP_Renspa
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("traeFletesRemitos","traeUPS","Aplicacion",error)
