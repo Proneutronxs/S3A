@@ -343,3 +343,84 @@ def traeUPS(renspa):
     finally:
         cursor.close()
         connections['S3A'].close()
+
+
+def obtieneMarcaBins(request):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                listado = traeIdMarcas()
+                cantValues = ','.join(['%s'] * len(listado))
+                sql = f"SELECT IdMarca, Nombre FROM Marca WHERE IdMarca IN ({cantValues})"
+                cursor.execute(sql,listado)
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_marca = []
+                    for row in consulta:
+                        idMarca = str(row[0])
+                        nombreMarca = str(row[1])
+                        datos = {'idMarca': idMarca, 'NombreMarca': nombreMarca}
+                        listado_marca.append(datos)
+                        
+                    return JsonResponse({'Message': 'Success', 'DataMarca': listado_marca})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","ObtieneMarcaBins","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def traeIdMarcas():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-BINS-REMITO'"
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            if consulta:
+                datos = str(consulta[0])
+                listado_id = datos.split(',')
+                return listado_id
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeIdMarca","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
