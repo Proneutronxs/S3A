@@ -236,7 +236,7 @@ def insertaPedidoFlete(request):
 
 
 
-#### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES
+#### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES Y BINS 
 
 def llamaAsignacionesPendientes(request, usuario):
     if request.method == 'GET':
@@ -304,9 +304,26 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                         renspa = str(row[7])
                         datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte, 'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa}
                         listadoData_Asignaciones.append(datos)
+                
                 listadoData_UP = traeUPS(renspa)
-                if listadoData_Asignaciones and listadoData_UP:
-                    return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP})
+                listadoData_Marca = traeMarcaBins()
+
+                listado_idMarcas = traeIdMarcas()
+
+                listados = {item: [] for item in listado_idMarcas}
+
+                for item in listados.items():
+                    dato = traeTipoBins(item[0])
+                    listados[item[0]] = dato
+
+                listadoData_TipoBins = []
+
+                for item, dato in listados.items():
+                    listadoData_TipoBins.append({item: dato})
+                    
+
+                if listadoData_Asignaciones and listadoData_UP and listadoData_Marca and listadoData_TipoBins:
+                    return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP, 'DataMarcas': listadoData_Marca, 'DataTipo': listadoData_TipoBins})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Datos para la Asignacion seleccionada.'})
         except Exception as e:
@@ -345,35 +362,55 @@ def traeUPS(renspa):
         connections['S3A'].close()
 
 
-def obtieneMarcaBins(request):
-    if request.method == 'GET':
-        try:
-            with connections['S3A'].cursor() as cursor:
-                listado = traeIdMarcas()
-                cantValues = ','.join(['%s'] * len(listado))
-                sql = f"SELECT IdMarca, Nombre FROM Marca WHERE IdMarca IN ({cantValues})"
-                cursor.execute(sql,listado)
-                consulta = cursor.fetchall()
-                if consulta:
-                    listado_marca = []
-                    for row in consulta:
-                        idMarca = str(row[0])
-                        nombreMarca = str(row[1])
-                        datos = {'idMarca': idMarca, 'NombreMarca': nombreMarca}
-                        listado_marca.append(datos)
-                        
-                    return JsonResponse({'Message': 'Success', 'DataMarca': listado_marca})
-                else:
-                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
-        except Exception as e:
-            error = str(e)
-            insertar_registro_error_sql("FletesRemitos","ObtieneMarcaBins","Aplicacion",error)
-            return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            cursor.close()
-            connections['S3A'].close()
-    else:
-        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+def traeMarcaBins():
+    try:
+        with connections['S3A'].cursor() as cursor:
+            listado = traeIdMarcas()
+            cantValues = ','.join(['%s'] * len(listado))
+            listado_marca = []
+            sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN ({cantValues})"
+            cursor.execute(sql,listado)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    idMarca = str(row[0])
+                    nombreMarca = str(row[1])
+                    datos = {'idMarca': idMarca, 'NombreMarca': nombreMarca}
+                    listado_marca.append(datos)
+                    
+                return listado_marca
+            else: 
+                return listado_marca
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","TraeMarcaBins","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+
+def traeTipoBins(idMarca):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            listado_tipo = []
+            sql = "SELECT IdBins, RTRIM(Nombre) FROM Bins WHERE IdMarca = %s"
+            cursor.execute(sql,[idMarca])
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    idBins = str(row[0])
+                    nombreBins = str(row[1])
+                    datos = {'idBins': idBins, 'NombreBins': nombreBins}
+                    listado_tipo.append(datos)
+                    
+                return listado_tipo
+            else: 
+                return listado_tipo
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeTipoBins","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
     
 def traeIdMarcas():
     try:

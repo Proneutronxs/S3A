@@ -25,7 +25,7 @@ urlpatterns = [
    path('data-asignacion/idAsignacion=<str:idAsignacion>', views.llamaDataAsignacionPendiente, name="llama_data_asignacion_pendiente"),
 
    ### DATA BINS MARCA Y TIPO PARA REMITOS
-   path('data-remitos/bins', views.obtieneMarcaBins, name="trae_idMarcas"),
+   #path('data-remitos/bins', views.obtieneMarcaBins, name="trae_idMarcas"),
 
 
 
