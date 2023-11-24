@@ -430,6 +430,95 @@ def traeIdMarcas():
         connections['TRESASES_APLICATIVO'].close()
 
 
+@csrf_exempt
+def insertCreaciónRemitos(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            Usuario = str(json.loads(body)['usuario'])
+            Nombre = str(json.loads(body)['nombre'])
+            IdAsignación = str(json.loads(body)['idAsignacion'])
+            Renspa = str(json.loads(body)['renspa'])
+            UP = str(json.loads(body)['up'])
+            IdEspecie = str(json.loads(body)['idEspecie'])
+            IdVariedad = str(json.loads(body)['idVariedad'])
+            TotalBins = str(json.loads(body)['totalBins'])
+            listadoBins = json.loads(body)['DataBins']
+
+            for item in listadoBins:
+                IdMarca = item['idMarca']
+                IdTamaño = item['idTamaño']
+                Cantidad = item['cantidad']   
+
+                
+               
+            
+             
+            nota = "El Remito se creó correctamente."
+            return JsonResponse({'Message': 'Success', 'Nota': nota})                  
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})      
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -24,8 +24,8 @@ urlpatterns = [
    ## DATA MUESTRA DATOS DE LA ASIGNACION SELECCIONADA POR EL ID DE LA ASIGNACION
    path('data-asignacion/idAsignacion=<str:idAsignacion>', views.llamaDataAsignacionPendiente, name="llama_data_asignacion_pendiente"),
 
-   ### DATA BINS MARCA Y TIPO PARA REMITOS
-   #path('data-remitos/bins', views.obtieneMarcaBins, name="trae_idMarcas"),
+   ### METODO POST DE CRACIÓN DE REMITOS
+   path('data-inserta-crea/remitos', views.insertCreaciónRemitos, name="inserta_Crea_Remitos"),
 
 
 
