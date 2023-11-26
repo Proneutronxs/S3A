@@ -486,8 +486,8 @@ def insertCreaciónRemitos(request):
                 
             #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
             #barcode_filename = code128.save('barcode')
-            barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
-            pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
+            # barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+            # pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
 
             #fecha = str(fechaActual).replace('/', '')
 
