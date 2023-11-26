@@ -78,4 +78,5 @@ def obtenerFechaActual():
 def obtenerHoraActual():
     hora_actual = datetime.now()
     hora = hora_actual.strftime('%H:%M')
+    return hora
 

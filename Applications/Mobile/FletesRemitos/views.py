@@ -464,7 +464,7 @@ def insertCreaciónRemitos(request):
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
             pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
-                                    numero_remito, productor, señor, domicilio, 
+                                    numero_remito, productor, productor, domicilio, 
                                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
                                     total_bins, capataz, Usuario,)
             pdf.alias_nb_pages()
@@ -472,26 +472,26 @@ def insertCreaciónRemitos(request):
 
             index = 0
             for item in listadoBins:
-                # if index > 9:
-                #     pdf.add_page()
+                if index > 9:
+                    pdf.add_page()
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
                 marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
-                # pdf.set_font('Arial', '', 8)
-                # pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                # pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
-                # pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                pdf.set_font('Arial', '', 8)
+                pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                 index = index + 1
                 
             #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
             #barcode_filename = code128.save('barcode')
-            # barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
-            # pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
+            barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+            pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
 
-            #fecha = str(fechaActual).replace('/', '')
+            fecha = str(fechaActual).replace('/', '')
 
-            name = 'R_' + str(numero_remito) + '.pdf'
+            name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
 
             actualizaNombrePDF(name,numero_remito)
