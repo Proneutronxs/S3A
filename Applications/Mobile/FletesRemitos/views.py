@@ -502,7 +502,7 @@ def insertCreaciónRemitos(request):
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
-            error = str(e) + str(numero_remito) + ' ' + str(especie) + ' ' + str(variedad) + ' ' + str(listadoBins) + ' ' + str(lista) + ' ' + productor + ' ' + chacra + ' ' + zona + ' ' + transporte + ' ' + chofer + ' ' + camion + ' ' + patente + ' ' + domicilio
+            error = str(e)
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
