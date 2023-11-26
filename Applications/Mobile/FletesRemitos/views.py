@@ -444,13 +444,13 @@ def insertCreaciónRemitos(request):
             horaActual = obtenerHoraActual()
             numero_chacra= "00017"
             Usuario = str(json.loads(body)['usuario'])
-            Nombre = str(json.loads(body)['nombre'])
+            capataz = str(json.loads(body)['nombre'])
             IdAsignación = str(json.loads(body)['idAsignacion'])
             Renspa = str(json.loads(body)['renspa'])
             UP = str(json.loads(body)['up'])
             IdEspecie = str(json.loads(body)['idEspecie'])
             IdVariedad = str(json.loads(body)['idVariedad'])
-            TotalBins = str(json.loads(body)['totalBins'])
+            total_bins = str(json.loads(body)['totalBins'])
             listadoBins = json.loads(body)['DataBins']
 
             #### primero inserta el remito para generar el número
@@ -459,14 +459,14 @@ def insertCreaciónRemitos(request):
 
             ### busca datos de la Asignacion
 
-            productor, chacra, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
+            productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
             señor = 'Tres Ases'
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
             pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                                     numero_remito, productor, señor, domicilio, 
-                                    chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
-                                    TotalBins, Nombre, Usuario,)
+                                    lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
+                                    total_bins, capataz, Usuario,)
             pdf.alias_nb_pages()
             pdf.add_page()
 
