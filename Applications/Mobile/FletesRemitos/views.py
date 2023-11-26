@@ -493,7 +493,7 @@ def insertCreaciónRemitos(request):
 
             fecha = str(fechaActual).replace('/', '')
 
-            name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+            name = 'R_' + str(numero_remito) + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
 
             actualizaNombrePDF(name,numero_remito)
