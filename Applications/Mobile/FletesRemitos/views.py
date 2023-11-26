@@ -1,9 +1,14 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
+from django.http import HttpResponse, Http404
+from django.views.static import serve
 from django.http import JsonResponse
 from S3A.funcionesGenerales import *
+from Applications.ModelosPDF.remitoChacra import Remito_Movimiento_Chacras
+import barcode
 import json
+import os
 
 # Create your views here.
 
@@ -435,6 +440,9 @@ def insertCreaciónRemitos(request):
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
+            fechaActual = obtenerFechaActual()
+            horaActual = obtenerHoraActual()
+            numero_chacra= "00017"
             Usuario = str(json.loads(body)['usuario'])
             Nombre = str(json.loads(body)['nombre'])
             IdAsignación = str(json.loads(body)['idAsignacion'])
@@ -445,15 +453,47 @@ def insertCreaciónRemitos(request):
             TotalBins = str(json.loads(body)['totalBins'])
             listadoBins = json.loads(body)['DataBins']
 
+            #### primero inserta el remito para generar el número
+
+            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario)
+
+            ### busca datos de la Asignacion
+
+            productor, chacra, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
+
+            especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
+
+            pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+                                    numero_remito, productor, productor, domicilio, 
+                                    chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
+                                    TotalBins, Nombre, Usuario)
+            pdf.alias_nb_pages()
+            pdf.add_page()
+
+            index = 0
             for item in listadoBins:
+                if index > 9:
+                    pdf.add_page()
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
-
+                marca, bins = traeMarcaBins(IdMarca, IdTamaño)
+                pdf.set_font('Arial', '', 8)
+                pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                index = index + 1
                 
-               
-            
-             
+            #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
+            #barcode_filename = code128.save('barcode')
+            barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+            pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
+            fecha = fechaActual.replace('/', '')
+            name = "R_" + str(numero_remito) + "_" + str(fecha)  + '.pdf'
+            nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+            actualizaNombrePDF(name,numero_remito)
+            pdf.output(nameDireccion, 'F')
+
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
@@ -462,12 +502,127 @@ def insertCreaciónRemitos(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+    
+
+def datosRemito(idAsignacion):
+    try:    
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, CONVERT(VARCHAR(30), T.RazonSocial) AS Transporte, " \
+                                    "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, P.Direccion " \
+                    "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
+                                            "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
+                                            "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
+                                            "Zona AS Z ON PF.IdZona = Z.IdZona LEFT OUTER JOIN " \
+                                            "Ubicacion AS U ON PF.IdPlantaDestino = U.IdUbicacion LEFT OUTER JOIN " \
+                                            "Especie AS E ON PF.IdEspecie = E.IdEspecie LEFT OUTER JOIN " \
+                                            "Variedad AS V ON PF.IdVariedad = V.IdVariedad LEFT OUTER JOIN " \
+                                            "Transportista AS T ON PF.IdTransportista = T.IdTransportista LEFT OUTER JOIN " \
+                                            "Camion AS CA ON PF.IdCamion = CA.IdCamion LEFT OUTER JOIN " \
+                                            "Acoplado AS A ON PF.IdAcoplado = A.IdAcoplado " \
+                    "WHERE        (PF.IdPedidoFlete = %s)"
+            cursor.execute(sql, [idAsignacion])
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    productor = str(row[0])
+                    chacra = str(row[1])
+                    zona = str(row[2])
+                    transporte = str(row[3])
+                    chofer = str(row[4])
+                    camion = str(row[5])
+                    patente = str(row[6])
+                    domicilio = str(row[8])
+            return productor, chacra, zona, transporte, chofer, camion, patente, domicilio
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","DatosRemito","Consulta",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+
+def traeEspecieVariedad(IdEspecie,IdVariedad):
+    try:    
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT Nombre AS Especie, (SELECT Nombre FROM Variedad WHERE IdVariedad = %s) AS VAriedad " \
+                    "FROM Especie " \
+                    "WHERE IdEspecie = %s"
+            cursor.execute(sql, [IdVariedad, IdEspecie])
+            consulta = cursor.fetchone()
+            if consulta:
+                especie = str(consulta[0])
+                variedad = str(consulta[1])
+            return especie, variedad
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeEspecieVariedad","Consulta",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+
+def traeMarcaBins(IdMarca,IdBins):
+    try:    
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT Nombre AS Marca, (SELECT Nombre FROM Bins WHERE IdBins = %s) AS Bins " \
+                    "FROM Marca " \
+                    "WHERE IdMarca = %s"
+            cursor.execute(sql, [IdBins, IdMarca])
+            consulta = cursor.fetchone()
+            if consulta:
+                marca = str(consulta[0])
+                bins = str(consulta[1])
+            return marca, bins
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeEspecieVariedad","Consulta",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+
+def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario):
+    values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO Datos_Remito (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, FechaAlta, Usuario) " \
+			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito), %s, %s, %s, %s, %s, getdate(), %s)"
+            cursor.execute(sql, values)
+            
+            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito WHERE IdAsignacion = %s"
+            cursor.execute(sql2, [IdAsignación])
+            consulta = cursor.fetchone()
+            if consulta:
+                numero_remito = str(consulta[0])
+            return numero_remito
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
+def actualizaNombrePDF(nombrePdf, numero_remito):
+    values = [nombrePdf, numero_remito]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "UPDATE Datos_Remito SET NombrePdf = %s WHERE FORMAT(NumeroRemito, '00000000') = %s"
+            cursor.execute(sql, values)
+            
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","actualizaNombrePDF","Consulta",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
-
-
-
+def descarga_pdf_remito_chacra(request, filename):
+    nombre = filename
+    filename = 'Applications/ReportesPDF/RemitosChacra/' + filename
+    if os.path.exists(filename):
+        response = serve(request, os.path.basename(filename), os.path.dirname(filename))
+        response['Content-Disposition'] = f'attachment; filename="{nombre}"'
+        return response
+    else:
+        raise Http404
 
 
 

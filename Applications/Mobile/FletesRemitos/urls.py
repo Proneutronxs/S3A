@@ -27,6 +27,8 @@ urlpatterns = [
    ### METODO POST DE CRACIÓN DE REMITOS
    path('data-inserta-crea/remitos', views.insertCreaciónRemitos, name="inserta_Crea_Remitos"),
 
+   ### METODO VER PDF
+   path('data-ver-remito/<str:filename>', views.descarga_pdf_remito_chacra, name="descarga_pdf_remito_chacra"),
 
 
 
