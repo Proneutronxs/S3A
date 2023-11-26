@@ -472,7 +472,7 @@ def insertCreaciónRemitos(request):
 
             index = 0
             for item in listadoBins:
-                if index > 9:
+                if index == 9:
                     pdf.alias_nb_pages()
                     pdf.add_page()
                     IdMarca = item['idMarca']
