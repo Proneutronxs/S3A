@@ -443,7 +443,7 @@ def insertCreaciónRemitos(request):
             fechaActual = obtenerFechaActual()
             horaActual = obtenerHoraActual()
             numero_chacra= "00017"
-            Usuario = str(json.loads(body)['usuario'])
+            Usuario = str(json.loads(body)['usuario']) + fechaActual
             Nombre = str(json.loads(body)['nombre'])
             IdAsignación = str(json.loads(body)['idAsignacion'])
             Renspa = str(json.loads(body)['renspa'])
