@@ -27,6 +27,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.total_bins = total_bins
         self.capataz = capataz
         self.usuario = usuario
+        
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)

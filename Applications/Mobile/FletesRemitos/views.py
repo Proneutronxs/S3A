@@ -489,10 +489,11 @@ def insertCreaciónRemitos(request):
             barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
             pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
 
-            #fecha = str(fechaActual).replace('/', '')
+            fecha = str(fechaActual).replace('/', '')
 
-            name = 'R_' + str(numero_remito) + '.pdf'
+            name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+
             actualizaNombrePDF(name,numero_remito)
 
             pdf.output(nameDireccion, 'F')
@@ -500,7 +501,7 @@ def insertCreaciónRemitos(request):
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
-            error = str(e)
+            error = str(e) + str(numero_remito) + ' ' + str(especie) + ' ' + str(variedad) + ' ' + str(listadoBins)
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
