@@ -547,7 +547,7 @@ def datosRemito(idAsignacion):
 def traeEspecieVariedad(IdEspecie,IdVariedad):
     try:    
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT RTRIM(Nombre) AS Especie, (SELECT Nombre FROM Variedad WHERE IdVariedad = %s) AS VAriedad " \
+            sql = "SELECT RTRIM(Nombre) AS Especie, (SELECT RTRIM(Nombre) FROM Variedad WHERE IdVariedad = %s) AS VAriedad " \
                     "FROM Especie " \
                     "WHERE IdEspecie = %s"
             cursor.execute(sql, [IdVariedad, IdEspecie])
@@ -566,7 +566,7 @@ def traeEspecieVariedad(IdEspecie,IdVariedad):
 def traeMarcaBinsConID(IdMarca,IdBins):
     try:    
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT RTRIM(Nombre) AS Marca, (SELECT Nombre FROM Bins WHERE IdBins = %s) AS Bins " \
+            sql = "SELECT RTRIM(Nombre) AS Marca, (SELECT RTRIM(Nombre) FROM Bins WHERE IdBins = %s) AS Bins " \
                     "FROM Marca " \
                     "WHERE IdMarca = %s"
             cursor.execute(sql, [IdBins, IdMarca])
