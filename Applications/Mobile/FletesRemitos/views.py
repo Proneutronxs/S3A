@@ -477,12 +477,13 @@ def insertCreaciónRemitos(request):
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
-                marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
-                lista.append(str(marca) + ' ' + str(bins))
+                # marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                # listado = str(marca) + ' ' + str(bins)
+                # lista.append(listado)
                 pdf.set_font('Arial', '', 8)
                 pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
-                pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                pdf.cell(w=86, h=5, txt= 'str(bins)', border='BR', align='C', fill=0)
+                pdf.multi_cell(w=0, h=5, txt= 'str(marca)', border='BR', align='C', fill=0)
                 index = index + 1
                 
             #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
@@ -575,7 +576,7 @@ def traeMarcaBinsConID(IdMarca,IdBins):
             if consulta:
                 marca = str(consulta[0])
                 bins = str(consulta[1])
-            return "marca, bins"
+            return marca, bins
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","traeEspecieVariedad","Consulta",error)
