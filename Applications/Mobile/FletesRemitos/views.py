@@ -489,11 +489,12 @@ def insertCreaciónRemitos(request):
             barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
             pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
 
-            fecha = str(obtenerFechaActual()).replace('/', '')
+            #fecha = str(fechaActual).replace('/', '')
 
-            name = "R_" + str(numero_remito) + "_" + str(fecha)  + '.pdf'
+            name = 'R_' + str(numero_remito) + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
             actualizaNombrePDF(name,numero_remito)
+
             pdf.output(nameDireccion, 'F')
 
             nota = "El Remito se creó correctamente."
