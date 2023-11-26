@@ -469,7 +469,7 @@ def insertCreaciónRemitos(request):
                                     TotalBins, Nombre, Usuario)
             pdf.alias_nb_pages()
             pdf.add_page()
-            
+
             index = 0
             for item in listadoBins:
                 if index > 9:
@@ -501,7 +501,7 @@ def insertCreaciónRemitos(request):
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
-            error = str(e)
+            error = f"ERROR: {type(e).__name__} - {str(e)}"
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
