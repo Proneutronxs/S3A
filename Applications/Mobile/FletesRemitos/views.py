@@ -460,11 +460,11 @@ def insertCreaciónRemitos(request):
             ### busca datos de la Asignacion
 
             productor, chacra, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
-
+            señor = 'Tres Ases'
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
             pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
-                                    numero_remito, productor, productor, domicilio, 
+                                    numero_remito, productor, señor, domicilio, 
                                     chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
                                     TotalBins, Nombre, Usuario,)
             pdf.alias_nb_pages()
