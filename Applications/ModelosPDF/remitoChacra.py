@@ -30,7 +30,7 @@ class Remito_Movimiento_Chacras(FPDF):
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
-        self.image('TA.png', x=8, y=10, w=30, h=20)
+        self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
         self.set_font('Arial', 'I', 8)
         self.text(x=50, y=12, txt= 'De TRES ASES S.A.')
         self.set_font('Arial', 'B', 8)
