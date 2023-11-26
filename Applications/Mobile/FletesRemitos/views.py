@@ -475,14 +475,6 @@ def insertCreaciónRemitos(request):
                 if index == 9:
                     pdf.alias_nb_pages()
                     pdf.add_page()
-                    IdMarca = item['idMarca']
-                    IdTamaño = item['idTamaño']
-                    Cantidad = item['cantidad']   
-                    marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
-                    pdf.set_font('Arial', '', 8)
-                    pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                    pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
-                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                     index = 0
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
