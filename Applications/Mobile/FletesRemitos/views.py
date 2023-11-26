@@ -474,6 +474,15 @@ def insertCreaciónRemitos(request):
             for item in listadoBins:
                 if index > 9:
                     pdf.add_page()
+                    IdMarca = item['idMarca']
+                    IdTamaño = item['idTamaño']
+                    Cantidad = item['cantidad']   
+                    marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                    pdf.set_font('Arial', '', 8)
+                    pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                    pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                    index = 0
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
@@ -484,8 +493,7 @@ def insertCreaciónRemitos(request):
                 pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                 index = index + 1
                 
-            #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
-            #barcode_filename = code128.save('barcode')
+            
             barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
             pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
 
@@ -590,7 +598,7 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario
 			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito), %s, %s, %s, %s, %s, getdate(), %s)"
             cursor.execute(sql, values)
             
-            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito WHERE IdAsignacion = %s"
+            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito WHERE IdAsignacion = %s AND NombrePdf IS NULL"
             cursor.execute(sql2, [IdAsignación])
             consulta = cursor.fetchone()
             if consulta:

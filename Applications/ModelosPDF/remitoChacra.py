@@ -78,7 +78,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.set_font('Arial', '', 8)
         self.text(x=10, y=52, txt= 'De Lote: ')
         self.text(x=10, y=57, txt= 'N° RENSPA:')
-        self.text(x=80, y=57, txt= 'UP / NQ: ')
+        self.text(x=80, y=57, txt= 'UP: ')
         self.text(x=140, y=52, txt= 'ESPECIE: ')
         self.text(x=140, y=57, txt= 'VARIEDAD: ')
         self.set_font('Arial', 'B', 9)
