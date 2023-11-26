@@ -480,11 +480,11 @@ def insertCreaciónRemitos(request):
                 # marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
                 # listado = str(marca) + ' ' + str(bins)
                 # lista.append(listado)
-                pdf.set_font('Arial', '', 8)
-                pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                pdf.cell(w=86, h=5, txt= 'str(bins)', border='BR', align='C', fill=0)
-                pdf.multi_cell(w=0, h=5, txt= 'str(marca)', border='BR', align='C', fill=0)
-                index = index + 1
+                # pdf.set_font('Arial', '', 8)
+                # pdf.cell(w=24, h=5, txt= 'str(Cantidad)', border='LBR', align='C', fill=0)
+                # pdf.cell(w=86, h=5, txt= 'str(bins)', border='BR', align='C', fill=0)
+                # pdf.multi_cell(w=0, h=5, txt= 'str(marca)', border='BR', align='C', fill=0)
+                # index = index + 1
                 
             #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
             #barcode_filename = code128.save('barcode')
