@@ -477,7 +477,7 @@ def insertCreaciónRemitos(request):
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
-                marca, bins = traeMarcaBins(IdMarca, IdTamaño)
+                marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
                 pdf.set_font('Arial', '', 8)
                 pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
                 pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
@@ -559,7 +559,7 @@ def traeEspecieVariedad(IdEspecie,IdVariedad):
         cursor.close()
         connections['S3A'].close()
 
-def traeMarcaBins(IdMarca,IdBins):
+def traeMarcaBinsConID(IdMarca,IdBins):
     try:    
         with connections['S3A'].cursor() as cursor:
             sql = "SELECT Nombre AS Marca, (SELECT Nombre FROM Bins WHERE IdBins = %s) AS Bins " \
