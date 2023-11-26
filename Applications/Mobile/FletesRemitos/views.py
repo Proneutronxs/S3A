@@ -575,7 +575,7 @@ def traeMarcaBinsConID(IdMarca,IdBins):
             if consulta:
                 marca = str(consulta[0])
                 bins = str(consulta[1])
-            return marca, bins
+            return "marca, bins"
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","traeEspecieVariedad","Consulta",error)
