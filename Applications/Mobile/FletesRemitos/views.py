@@ -443,7 +443,7 @@ def insertCreaciónRemitos(request):
             fechaActual = obtenerFechaActual()
             horaActual = obtenerHoraActual()
             numero_chacra= "00017"
-            Usuario = str(json.loads(body)['usuario']) + fechaActual
+            Usuario = str(json.loads(body)['usuario'])
             Nombre = str(json.loads(body)['nombre'])
             IdAsignación = str(json.loads(body)['idAsignacion'])
             Renspa = str(json.loads(body)['renspa'])
@@ -488,7 +488,9 @@ def insertCreaciónRemitos(request):
             #barcode_filename = code128.save('barcode')
             barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
             pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
-            fecha = str(fechaActual).replace('/', '')
+
+            fecha = str(obtenerFechaActual()).replace('/', '')
+
             name = "R_" + str(numero_remito) + "_" + str(fecha)  + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
             actualizaNombrePDF(name,numero_remito)
