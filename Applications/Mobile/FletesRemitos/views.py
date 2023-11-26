@@ -463,12 +463,12 @@ def insertCreaciónRemitos(request):
 
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
-            # pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
-            #                         numero_remito, productor, productor, domicilio, 
-            #                         chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
-            #                         TotalBins, Nombre, Usuario,)
-            # pdf.alias_nb_pages()
-            # pdf.add_page()
+            pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+                                    numero_remito, productor, productor, domicilio, 
+                                    chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
+                                    TotalBins, Nombre, Usuario,)
+            pdf.alias_nb_pages()
+            pdf.add_page()
 
             index = 0
             for item in listadoBins:
@@ -496,7 +496,7 @@ def insertCreaciónRemitos(request):
 
             actualizaNombrePDF(name,numero_remito)
 
-            # pdf.output(nameDireccion, 'F')
+            pdf.output(nameDireccion, 'F')
 
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  

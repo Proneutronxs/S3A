@@ -6,7 +6,7 @@ import barcode # pip install python-barcode
 class Remito_Movimiento_Chacras(FPDF):
     def __init__(self, fecha_remito, hora_remito, 
                  numero_chacra, numero_remito, productor, 
-                 señor, domicilio, lote, especie, variedad, renspa, up_nq, chofer, 
+                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
                  camion, patente, total_bins, capataz, usuario):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
@@ -20,7 +20,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.especie = especie
         self.variedad = variedad
         self.renspa = renspa
-        self.up_nq = up_nq
+        self.UP = UP
         self.chofer = chofer
         self.camion = camion
         self.patente = patente
@@ -85,7 +85,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.text(x=22, y=52, txt= self.lote)
         self.text(x=154, y=52, txt= self.especie)
         self.text(x=28, y=57, txt= self.renspa)
-        self.text(x=92, y=57, txt= self.up_nq)
+        self.text(x=92, y=57, txt= self.UP)
         self.text(x=156, y=57, txt= self.variedad)
         ##################################################
         self.rect(x=10,y=60,w=190,h=5)
