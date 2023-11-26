@@ -469,7 +469,7 @@ def insertCreaciónRemitos(request):
                                     TotalBins, Nombre, Usuario)
             pdf.alias_nb_pages()
             pdf.add_page()
-
+            lista = []
             index = 0
             for item in listadoBins:
                 if index > 9:
@@ -478,6 +478,7 @@ def insertCreaciónRemitos(request):
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
                 marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                lista.append(str(marca) + ' ' + str(bins))
                 pdf.set_font('Arial', '', 8)
                 pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
                 pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
@@ -501,7 +502,7 @@ def insertCreaciónRemitos(request):
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
-            error = str(e) + str(numero_remito) + ' ' + str(especie) + ' ' + str(variedad) + ' ' + str(listadoBins)
+            error = str(e) + str(numero_remito) + ' ' + str(especie) + ' ' + str(variedad) + ' ' + str(listadoBins) + ' ' + str(lista) + ' ' + productor + ' ' + chacra + ' ' + zona + ' ' + transporte + ' ' + chofer + ' ' + camion + ' ' + patente + ' ' + domicilio
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
@@ -547,7 +548,7 @@ def datosRemito(idAsignacion):
 def traeEspecieVariedad(IdEspecie,IdVariedad):
     try:    
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT Nombre AS Especie, (SELECT Nombre FROM Variedad WHERE IdVariedad = %s) AS VAriedad " \
+            sql = "SELECT RTRIM(Nombre) AS Especie, (SELECT Nombre FROM Variedad WHERE IdVariedad = %s) AS VAriedad " \
                     "FROM Especie " \
                     "WHERE IdEspecie = %s"
             cursor.execute(sql, [IdVariedad, IdEspecie])
@@ -566,7 +567,7 @@ def traeEspecieVariedad(IdEspecie,IdVariedad):
 def traeMarcaBinsConID(IdMarca,IdBins):
     try:    
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT Nombre AS Marca, (SELECT Nombre FROM Bins WHERE IdBins = %s) AS Bins " \
+            sql = "SELECT RTRIM(Nombre) AS Marca, (SELECT Nombre FROM Bins WHERE IdBins = %s) AS Bins " \
                     "FROM Marca " \
                     "WHERE IdMarca = %s"
             cursor.execute(sql, [IdBins, IdMarca])
