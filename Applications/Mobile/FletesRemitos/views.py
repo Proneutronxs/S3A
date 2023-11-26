@@ -488,7 +488,7 @@ def insertCreaciónRemitos(request):
             #barcode_filename = code128.save('barcode')
             barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
             pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
-            fecha = fechaActual.replace('/', '')
+            fecha = str(fechaActual).replace('/', '')
             name = "R_" + str(numero_remito) + "_" + str(fecha)  + '.pdf'
             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
             actualizaNombrePDF(name,numero_remito)
