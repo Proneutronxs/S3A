@@ -463,25 +463,25 @@ def insertCreaciónRemitos(request):
 
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
-            pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
-                                    numero_remito, productor, productor, domicilio, 
-                                    chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
-                                    TotalBins, Nombre, Usuario)
-            pdf.alias_nb_pages()
-            pdf.add_page()
+            # pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+            #                         numero_remito, productor, productor, domicilio, 
+            #                         chacra, especie, variedad, Renspa, UP, chofer, camion, patente, 
+            #                         TotalBins, Nombre, Usuario,)
+            # pdf.alias_nb_pages()
+            # pdf.add_page()
 
             index = 0
             for item in listadoBins:
-                if index > 9:
-                    pdf.add_page()
+                # if index > 9:
+                #     pdf.add_page()
                 IdMarca = item['idMarca']
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
                 marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
-                pdf.set_font('Arial', '', 8)
-                pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
-                pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                # pdf.set_font('Arial', '', 8)
+                # pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                # pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                # pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                 index = index + 1
                 
             #code128 = barcode.get('code128', codigo_barra, writer=barcode.writer.ImageWriter())
@@ -496,7 +496,7 @@ def insertCreaciónRemitos(request):
 
             actualizaNombrePDF(name,numero_remito)
 
-            pdf.output(nameDireccion, 'F')
+            # pdf.output(nameDireccion, 'F')
 
             nota = "El Remito se creó correctamente."
             return JsonResponse({'Message': 'Success', 'Nota': nota})                  
