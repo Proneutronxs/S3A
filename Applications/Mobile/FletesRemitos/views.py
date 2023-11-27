@@ -626,6 +626,19 @@ def descarga_pdf_remito_chacra(request, filename):
         raise Http404
 
 
+
+def ver_pdf_remito_chacra(request, filename):
+    nombre = filename
+    filename = 'Applications/ReportesPDF/RemitosChacra/' + filename
+    if os.path.exists(filename):
+        with open(filename, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="{nombre}"'
+            return response
+    else:
+        raise Http404
+
+
 def mostrarListadoRemitos(request, chofer):
     if request.method == 'GET':
         try:

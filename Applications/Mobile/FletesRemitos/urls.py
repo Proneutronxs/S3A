@@ -30,8 +30,11 @@ urlpatterns = [
    ### DATA MUESTRA LISTADO DE REMITOS
    path('data-listado-remitos/chofer=<str:chofer>', views.mostrarListadoRemitos, name="motrar_listado_remitos"),
 
+   ### METODO DESCARGAR PDF
+   path('data-descargar-remito/<str:filename>', views.descarga_pdf_remito_chacra, name="descarga_pdf_remito_chacra"),
+
    ### METODO VER PDF
-   path('data-ver-remito/<str:filename>', views.descarga_pdf_remito_chacra, name="descarga_pdf_remito_chacra"),
+   path('data-ver-remito/<str:filename>', views.ver_pdf_remito_chacra, name="ver_pdf_remito_chacra"),
 
 
 
