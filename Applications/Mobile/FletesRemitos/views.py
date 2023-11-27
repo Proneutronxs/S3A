@@ -455,7 +455,7 @@ def insertCreaciónRemitos(request):
 
             #### primero inserta el remito para generar el número
 
-            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario)
+            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario)
 
             ### busca datos de la Asignacion
 
@@ -579,12 +579,12 @@ def traeMarcaBinsConID(IdMarca,IdBins):
         cursor.close()
         connections['S3A'].close()
 
-def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario):
-    values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, Usuario]
+def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario):
+    values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario]
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Datos_Remito (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, FechaAlta, Usuario) " \
-			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito), %s, %s, %s, %s, %s, getdate(), %s)"
+            sql = "INSERT INTO Datos_Remito (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario) " \
+			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito), %s, %s, %s, %s, %s, %s, getdate(), %s)"
             cursor.execute(sql, values)
             
             sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito WHERE IdAsignacion = %s AND NombrePdf IS NULL"
@@ -624,8 +624,6 @@ def descarga_pdf_remito_chacra(request, filename):
         return response
     else:
         raise Http404
-
-
 
 def ver_pdf_remito_chacra(request, filename):
     nombre = filename
