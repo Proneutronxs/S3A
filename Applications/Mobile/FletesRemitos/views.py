@@ -486,10 +486,6 @@ def insertCreaciónRemitos(request):
                 pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                 index = index + 1
                 
-            
-            barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
-            pdf.image(barcode_filename, x=22, y=129, w=65, h=12)
-
             fecha = str(fechaActual).replace('/', '')
 
             name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
@@ -630,7 +626,47 @@ def descarga_pdf_remito_chacra(request, filename):
         raise Http404
 
 
+def mostrarListadoRemitos(request, chofer):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = "SELECT        RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Especie.Nombre) AS ESPECIE, RTRIM(Variedad.Nombre) AS VARIEDAD, TRESASES_APLICATIVO.dbo.Datos_Remito.Cantidad AS CANTIDAD, " \
+                                                "TRESASES_APLICATIVO.dbo.Datos_Remito.NombrePdf AS PDF " \
+                        "FROM            TRESASES_APLICATIVO.dbo.Datos_Remito INNER JOIN " \
+                                                "PedidoFlete INNER JOIN " \
+                                                "Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN " \
+                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdAsignacion = PedidoFlete.IdPedidoFlete INNER JOIN " \
+                                                "Especie ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdEspecie = Especie.IdEspecie INNER JOIN " \
+                                                "Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdVariedad = Variedad.IdVariedad " \
+                        "WHERE RTRIM(PedidoFlete.Chofer) = %s " \
+                                "AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) " \
+                                "AND PedidoFlete.Estado = 'A'"
+                cursor.execute(sql, [chofer])
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_Remitos = []
+                    for row in consulta:
+                        productor = str(row[0])
+                        chacra = str(row[1])
+                        especie = str(row[2])
+                        variedad = str(row[3])
+                        cantidad = str(row[4])
+                        pdf = str(row[5])
+                        datos = {'Productor': productor, 'Chacra': chacra, 'Especie': especie, 'Variedad': variedad, 'Cantidad': cantidad, 'PDF': pdf}
+                        listado_Remitos.append(datos)
 
+                    return JsonResponse({'Message': 'Success', 'Remitos': listado_Remitos})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Remitos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","mostrarListadoRemitos","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

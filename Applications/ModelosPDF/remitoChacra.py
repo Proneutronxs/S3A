@@ -122,6 +122,9 @@ class Remito_Movimiento_Chacras(FPDF):
         self.set_y(-20)
         self.cell(0, 11, 'Página ' + str(self.page_no()) + '/{nb}', 15, 0, 'R')
         self.rect(x=10,y=128,w=190,h=12)
+        ###IMAGEN
+        barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+        self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
         self.text(x=110, y=133, txt= 'C.A.I.: 47503100328571')
