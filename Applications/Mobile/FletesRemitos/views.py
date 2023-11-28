@@ -742,7 +742,7 @@ def viajesAceptaRechaza(request, idAsignacion, acepta):
 def soloAceptaSiNoExiste(idAsignacion):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE Estado = 'S' "
+            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE IdAsignacion = %s AND Estado = 'S' "
             cursor.execute(sql, [idAsignacion])
             consulta = cursor.fetchone()
             if consulta:
