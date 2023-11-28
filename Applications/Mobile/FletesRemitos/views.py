@@ -678,9 +678,92 @@ def mostrarListadoRemitos(request, chofer):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+def listadoViajesAsignados(request, chofer):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = "SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(PedidoFlete.Solicitante) AS SOLICITA, CONVERT(VARCHAR(10), PedidoFlete.FechaPedido, 103) AS FECHA, " \
+                                        "RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Zona.Nombre) AS ZONA, CASE PedidoFlete.Vacios WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS VACIOS, " \
+                                        "CASE PedidoFlete.Cuellos WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS CUELLOS  " \
+                        "FROM            PedidoFlete INNER JOIN " \
+                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN " \
+                                                "Zona ON PedidoFlete.IdZona = Zona.IdZona " \
+                        "WHERE        (PedidoFlete.Chofer = %s) AND (PedidoFlete.Estado = 'A')"
+                cursor.execute(sql, [chofer])
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_Viajes = []
+                    for row in consulta:
+                        idAsignacion = str(row[0])
+                        solicita = str(row[1])
+                        fecha = str(row[2])
+                        chacra = str(row[3])
+                        zona = str(row[4])
+                        vacios = str(row[5])
+                        cuellos = str(row[6])
+                        datos = {'IdAsignacion': idAsignacion, 'Solicita': solicita, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'Vacios': vacios, 'Cuellos': cuellos}
+                        listado_Viajes.append(datos)
+
+                    return JsonResponse({'Message': 'Success', 'Viajes': listado_Viajes})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Viajes Asignados.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","listadoViajesAsignados","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+def viajesAceptaRechaza(request, idAsignacion, acepta):
+    if request.method == 'GET':
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "INSERT INTO Logistica_Camiones_Seguimiento (IdAsignacion, FechaHora, Acepta, Estado) VALUES (%s, GETDATE(), %s, 'A') "
+                cursor.execute(sql, [idAsignacion, acepta])
+                
 
+                return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","listadoViajesAsignados","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def actualizaEstadoPosicion(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            IdAsignacion = str(json.loads(body)['idAsignacion'])
+            Columna = str(json.loads(body)['columna'])
+            Valor = str(json.loads(body)['valor'])
+
+            values = [Columna, Valor,IdAsignacion]
+
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "UPDATE Logistica_Camiones_Seguimiento SET %s = %s WHERE IdAsignacion = %s AND Estado = 'A' "
+                cursor.execute(sql, values)                
+
+                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","actualizaEstadoPosicion","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
