@@ -721,14 +721,14 @@ def listadoViajesAsignados(request, chofer):
 
 
 def viajesAceptaRechaza(request, idAsignacion, acepta):
-    if request.method == 'GET':
+    if request.method == 'GET':            
         try:
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "INSERT INTO Logistica_Camiones_Seguimiento (IdAsignacion, FechaHora, Acepta, Estado) VALUES (%s, GETDATE(), %s, 'A') "
-                cursor.execute(sql, [idAsignacion, acepta])
-                
+            if soloAceptaSiNoExiste(idAsignacion):
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "INSERT INTO Logistica_Camiones_Seguimiento (IdAsignacion, FechaHora, Acepta, Estado) VALUES (%s, GETDATE(), %s, %s) "
+                    cursor.execute(sql, [idAsignacion, acepta, acepta])                   
 
-                return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
+            return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","listadoViajesAsignados","Aplicacion",error)
@@ -738,6 +738,24 @@ def viajesAceptaRechaza(request, idAsignacion, acepta):
             connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def soloAceptaSiNoExiste(idAsignacion):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE Estado = 'S' "
+            cursor.execute(sql, [idAsignacion])
+            consulta = cursor.fetchone()
+            if consulta:
+                return False
+            else:
+                return True
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","soloAceptaSiNoExiste","consulta",error)
+        return False
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
     
 @csrf_exempt
 def actualizaEstadoPosicion(request):
@@ -751,7 +769,7 @@ def actualizaEstadoPosicion(request):
             values = [Columna, Valor,IdAsignacion]
 
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "UPDATE Logistica_Camiones_Seguimiento SET %s = %s WHERE IdAsignacion = %s AND Estado = 'A' "
+                sql = "UPDATE Logistica_Camiones_Seguimiento SET %s = %s WHERE IdAsignacion = %s AND Estado = 'S' "
                 cursor.execute(sql, values)                
 
                 return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
@@ -765,7 +783,44 @@ def actualizaEstadoPosicion(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
+def datosViajesAceptados(request, chofer):
+    if request.method == 'GET':
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "SELECT        Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO, " \
+                                        "CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, " \
+                                        "CASE Logistica_Camiones_Seguimiento.UbicacionBins WHEN NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS " \
+                        "FROM            S3A.dbo.Zona INNER JOIN " \
+                                                "S3A.dbo.Chacra INNER JOIN " \
+                                                "S3A.dbo.PedidoFlete INNER JOIN " \
+                                                "Logistica_Camiones_Seguimiento ON S3A.dbo.PedidoFlete.IdPedidoFlete = Logistica_Camiones_Seguimiento.IdAsignacion ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON  " \
+                                                "S3A.dbo.Zona.IdZona = S3A.dbo.PedidoFlete.IdZona " \
+                        "WHERE        (RTRIM(S3A.dbo.PedidoFlete.Chofer) = %s) AND (Logistica_Camiones_Seguimiento.Estado = 'S')"
+                cursor.execute(sql, [chofer]) 
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_Viajes_Aceptados = []
+                    for row in consulta:
+                        idAsignacion = str(row[0])
+                        aceptado = str(row[1])
+                        fecha = str(row[2])
+                        chacra = str(row[3])
+                        zona = str(row[4])
+                        ubicacionBins = str(row[5])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins}
+                        listado_Viajes_Aceptados.append(datos)                    
+                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados})
+                else:
+                    return JsonResponse({'Message': 'No'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","datos viajes aceptados","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
