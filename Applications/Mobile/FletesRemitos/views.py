@@ -789,7 +789,7 @@ def datosViajesAceptados(request, chofer):
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO, " \
                                         "CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, " \
-                                        "CASE Logistica_Camiones_Seguimiento.UbicacionBins WHEN NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS " \
+                                        "CASE WHEN Logistica_Camiones_Seguimiento.UbicacionBins IS NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS " \
                         "FROM            S3A.dbo.Zona INNER JOIN " \
                                                 "S3A.dbo.Chacra INNER JOIN " \
                                                 "S3A.dbo.PedidoFlete INNER JOIN " \
