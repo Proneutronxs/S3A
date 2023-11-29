@@ -720,15 +720,25 @@ def listadoViajesAsignados(request, chofer):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-def viajesAceptaRechaza(request, idAsignacion, acepta):
+def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
     if request.method == 'GET':            
         try:
-            if soloAceptaSiNoExiste(idAsignacion):
+            if soloAceptaSiNoExiste(idAsignacion,chofer):
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "INSERT INTO Logistica_Camiones_Seguimiento (IdAsignacion, FechaHora, Acepta, Estado) VALUES (%s, GETDATE(), %s, %s) "
-                    cursor.execute(sql, [idAsignacion, acepta, acepta])                   
+                    sql = "INSERT INTO Logistica_Camiones_Seguimiento (Orden, IdAsignacion, Chofer, FechaHora, Acepta, Estado) VALUES ( CASE " \
+                            "WHEN EXISTS ( " \
+                                "SELECT Orden " \
+                                "FROM Logistica_Camiones_Seguimiento " \
+                                "WHERE TRY_CONVERT(DATE, FechaHora) = TRY_CONVERT(DATE, GETDATE()) AND Chofer = %s " \
+                            ") " \
+                            "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE TRY_CONVERT(DATE, FechaHora) = TRY_CONVERT(DATE, GETDATE()) AND Chofer = %s) " \
+                            "ELSE 1 " \
+                        "END , %s, %s, GETDATE(), %s, %s) "
+                    cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, acepta])                   
 
-            return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
+                return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
+            else:
+                return JsonResponse({'Message': 'Success'})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","listadoViajesAsignados","Aplicacion",error)
@@ -739,11 +749,11 @@ def viajesAceptaRechaza(request, idAsignacion, acepta):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-def soloAceptaSiNoExiste(idAsignacion):
+def soloAceptaSiNoExiste(idAsignacion, chofer):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE IdAsignacion = %s AND Estado = 'S' "
-            cursor.execute(sql, [idAsignacion])
+            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE IdAsignacion = %s AND Chofer = %s AND Estado = 'S' "
+            cursor.execute(sql, [idAsignacion,chofer])
             consulta = cursor.fetchone()
             if consulta:
                 return False

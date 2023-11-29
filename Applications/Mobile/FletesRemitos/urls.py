@@ -40,7 +40,7 @@ urlpatterns = [
    path('data-ver-viajes/chofer=<str:chofer>', views.listadoViajesAsignados, name="listado_viajes_asignados"),
 
    ### METODO ACEPTA RECHAZA VIAJE
-   path('data-acepta-rechaza/isAsignacion=<str:idAsignacion>&acepta=<str:acepta>', views.viajesAceptaRechaza, name="viajes_acepta_rechaza"),
+   path('data-acepta-rechaza/isAsignacion=<str:idAsignacion>&chofer=<str:chofer>&acepta=<str:acepta>', views.viajesAceptaRechaza, name="viajes_acepta_rechaza"),
 
    ### METODO POST ACTUALIZA ESTADO POSICION
    path('data-actualiza-posicion', views.actualizaEstadoPosicion, name="actualiza_estado_posicion"),
