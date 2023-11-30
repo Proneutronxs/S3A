@@ -797,9 +797,9 @@ def datosViajesAceptados(request, chofer):
     if request.method == 'GET':
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, Logistica_Camiones_Seguimiento.Acepta AS ACEPTADO, " \
-                                                "CASE WHEN Logistica_Camiones_Seguimiento.UbicacionBins IS NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS, S3A.dbo.PedidoFlete.Solicitante, S3A.dbo.Chacra.Nombre,  " \
-                                                "S3A.dbo.Zona.Nombre AS Expr1, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido , 103) AS FECHA " \
+                sql = "SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' AS ACEPTADO, " \
+                                                "CASE WHEN Logistica_Camiones_Seguimiento.UbicacionBins IS NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS, RTRIM(S3A.dbo.PedidoFlete.Solicitante), RTRIM(S3A.dbo.Chacra.Nombre),  " \
+                                                "RTRIM(S3A.dbo.Zona.Nombre) AS Expr1, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido , 103) AS FECHA " \
                         "FROM            Logistica_Camiones_Seguimiento INNER JOIN " \
                                                 "S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN " \
                                                 "S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN " \
