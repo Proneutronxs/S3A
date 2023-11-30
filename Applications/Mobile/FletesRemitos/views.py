@@ -797,27 +797,31 @@ def datosViajesAceptados(request, chofer):
     if request.method == 'GET':
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT        Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO, " \
-                                        "CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, " \
-                                        "CASE WHEN Logistica_Camiones_Seguimiento.UbicacionBins IS NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS " \
-                        "FROM            S3A.dbo.Zona INNER JOIN " \
-                                                "S3A.dbo.Chacra INNER JOIN " \
-                                                "S3A.dbo.PedidoFlete INNER JOIN " \
-                                                "Logistica_Camiones_Seguimiento ON S3A.dbo.PedidoFlete.IdPedidoFlete = Logistica_Camiones_Seguimiento.IdAsignacion ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON  " \
-                                                "S3A.dbo.Zona.IdZona = S3A.dbo.PedidoFlete.IdZona " \
-                        "WHERE        (RTRIM(S3A.dbo.PedidoFlete.Chofer) = %s) AND (Logistica_Camiones_Seguimiento.Estado = 'S')"
-                cursor.execute(sql, [chofer]) 
+                sql = "SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, Logistica_Camiones_Seguimiento.Acepta AS ACEPTADO, " \
+                                                "CASE WHEN Logistica_Camiones_Seguimiento.UbicacionBins IS NULL THEN '-' ELSE Logistica_Camiones_Seguimiento.UbicacionBins END AS UBICACION_BINS, S3A.dbo.PedidoFlete.Solicitante, S3A.dbo.Chacra.Nombre,  " \
+                                                "S3A.dbo.Zona.Nombre AS Expr1, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido , 103) AS FECHA " \
+                        "FROM            Logistica_Camiones_Seguimiento INNER JOIN " \
+                                                "S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN " \
+                                                "S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN " \
+                                                "S3A.dbo.Zona ON S3A.dbo.PedidoFlete.IdZona = S3A.dbo.Zona.IdZona " \
+                        "WHERE        (Logistica_Camiones_Seguimiento.Chofer = %s) AND (Logistica_Camiones_Seguimiento.Estado = 'S') AND (Logistica_Camiones_Seguimiento.Orden = " \
+                                                    "(SELECT        MIN(Orden) AS Expr1 " \
+                                                    "FROM            Logistica_Camiones_Seguimiento AS Logistica_Camiones_Seguimiento_1 " \
+                                                    "WHERE        (Chofer = %s) AND (Estado = 'S')))"
+                cursor.execute(sql, [chofer, chofer]) 
                 consulta = cursor.fetchall()
                 if consulta:
                     listado_Viajes_Aceptados = []
                     for row in consulta:
-                        idAsignacion = str(row[0])
-                        aceptado = str(row[1])
-                        fecha = str(row[2])
-                        chacra = str(row[3])
-                        zona = str(row[4])
-                        ubicacionBins = str(row[5])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins}
+                        orden = str(row[0])
+                        idAsignacion = str(row[1])
+                        aceptado = str(row[2])
+                        ubicacionBins = str(row[3])
+                        solicita = str(row[4])
+                        chacra = str(row[5])
+                        zona = str(row[6])
+                        fecha = str(row[7])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden}
                         listado_Viajes_Aceptados.append(datos)                    
                     return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados})
                 else:
