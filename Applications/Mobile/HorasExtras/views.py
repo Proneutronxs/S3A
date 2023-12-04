@@ -82,16 +82,16 @@ def insert_HoraExtra(request):
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
-                fecha1, hora1 = convertir_formato_fecha_hora(Desde)
-                fecha2, hora2 = convertir_formato_fecha_hora(Hasta)
+                # fecha1, hora1 = convertir_formato_fecha_hora(Desde)
+                # fecha2, hora2 = convertir_formato_fecha_hora(Hasta)
                 
-                if verificaHoraExtra(fecha1,fecha2,hora1,hora2, Legajo):
-                    lista_tieneHE_asignada.append(Legajo)
-                else:
-                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
-                        cursor.execute(sql, values)
+                # if verificaHoraExtra(fecha1,fecha2,hora1,hora2, Legajo):
+                #     lista_tieneHE_asignada.append(Legajo)
+                # else:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                    cursor.execute(sql, values)
 
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
