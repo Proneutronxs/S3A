@@ -81,18 +81,18 @@ def insert_HoraExtra(request):
                 Usuario = str(item['Usuario']) ### USUARIO DE LA APLICACIÓN
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
-                
-                horaDesde, horaHasta = retornaHHMM(Desde,Hasta)
-                fechaDesde, fechaHasta = retornaYYYYMMDD(Desde,Hasta)
-                #print(horaDesde,horaHasta,fechaDesde,fechaHasta)
 
-                # if verificaHoraExtra(Legajo, horaDesde, horaHasta, fechaDesde, fechaHasta):
-                #     lista_tieneHE_asignada.append(Legajo)
-                # else:
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
-                    cursor.execute(sql, values)
+                fecha1, hora1 = convertir_formato_fecha_hora(Desde)
+                fecha2, hora2 = convertir_formato_fecha_hora(Hasta)
+                
+                if verificaHoraExtra(fecha1,fecha2,hora1,hora2, Legajo):
+                    lista_tieneHE_asignada.append(Legajo)
+                else:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                        cursor.execute(sql, values)
+
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
                 est = "E"
@@ -139,21 +139,34 @@ def retornaYYYYMMDD(f1,f2):
     fechaHasta = fechaDos.strftime(formato_salida)
     return fechaDesde, fechaHasta
 
-def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
+def verificaHoraExtra(fecha1,fecha2, hora1, hora2, legajo):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT  CONVERT(VARCHAR(5), DateTimeDesde, 108) AS H_DESDE, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS H_HASTA "\
-                    "FROM HorasExtras_Sin_Procesar " \
-                    "WHERE Legajo = %s AND TRY_CONVERT(DATE, DateTimeDesde) >= %s AND TRY_CONVERT(DATE, DateTimeHasta) <= %s"
-            cursor.execute(sql, [legajo, fechaDesde, fechaHasta])
-            consulta = cursor.fetchone()
+            sql = "SELECT CONVERT(VARCHAR(10), DateTimeDesde, 103) AS FECHA_INICIO, CONVERT(VARCHAR(5), DateTimeDesde, 108) AS HORA_INICIO, " \
+                        "CONVERT(VARCHAR(10), DateTimeHasta, 103) AS FECHA_FINAL, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS HORA_FINAL, Legajo " \
+                "FROM HorasExtras_Sin_Procesar " \
+                "WHERE Legajo = %s AND (TRY_CONVERT(DATE, DateTimeDesde) = %s) AND (TRY_CONVERT(DATE, DateTimeHasta) <= %s) AND Estado <> '8'"
+            cursor.execute(sql, [legajo, fecha1, fecha2])
+            consulta = cursor.fetchall()
             if consulta:
-                horaD = str(consulta[0])
-                horaH =str(consulta[1])
-                if verificar_solapamiento(horaDesde,horaHasta,horaD,horaH):
-                    return True
-                else:
-                    return False
+                for row in consulta:
+                    f1 = datetime.strptime(str(row[0]), "%d/%m/%Y")
+                    h1 = str(row[1])
+                    f2 = datetime.strptime(str(row[2]), "%d/%m/%Y")
+                    h2 = str(row[3])
+                    
+                    if f1 == f2:                 
+                        if hora_dentro_del_rango(hora1,h1,h2) or hora_dentro_del_rango(hora2,h1,h2):
+                            return True
+                        else:
+                            return False
+                    if f1 != f2:
+                        hora23 = "23:59"
+                        hora00 = "00:00"
+                        if hora_dentro_del_rango(hora1,h1,hora23) or hora_dentro_del_rango(h2,hora00,hora2):
+                            return True
+                        else:
+                            return False
             else:
                 return False
     except Exception as e:
@@ -161,7 +174,22 @@ def verificaHoraExtra(legajo,horaDesde,horaHasta,fechaDesde,fechaHasta):
         insertar_registro_error_sql("HorasExtras","verificaHoraExtra","usuario",error)
         return error
     finally:
+        cursor.close()
         connections['TRESASES_APLICATIVO'].close()
+
+def convertir_formato_fecha_hora(fecha_hora_str):
+    fecha_hora_obj = datetime.strptime(fecha_hora_str, "%Y-%m-%dT%H:%M:%S.%f")
+    fecha_formateada = fecha_hora_obj.strftime("%d/%m/%Y")
+    hora_formateada = fecha_hora_obj.strftime("%H:%M")
+
+    return fecha_formateada, hora_formateada
+
+def hora_dentro_del_rango(hora, inicio, fin):
+    hora = datetime.strptime(hora, "%H:%M")
+    inicio = datetime.strptime(inicio, "%H:%M")
+    fin = datetime.strptime(fin, "%H:%M")
+
+    return inicio <= hora <= fin
 
 ### TRAE EL APELLIDO DE LA HORA QUE EXISTE
 def traeApellidos(legajo):
