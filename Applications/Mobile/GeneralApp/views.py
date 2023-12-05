@@ -24,17 +24,40 @@ def login_app(request):
         #print(fechaHora,registro) " \
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT        USR_PERMISOS_APP.CodEmpleado,CASE WHEN(SELECT TresAses_ISISPayroll.dbo.Empleados.CodEmpleado " \
-                                                                                "FROM TresAses_ISISPayroll.dbo.Empleados " \
-                                                                                "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) IS NOT NULL " \
-                                                                        "THEN (SELECT CONVERT(VARCHAR(22), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) " \
-                                                                                "FROM TresAses_ISISPayroll.dbo.Empleados " \
-                                                                                "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE '-' END AS Nombres, " \
-                                    "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  " \
-                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer " \
-                    "FROM            USUARIOS INNER JOIN " \
-                                    "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
-                    "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
+                sql = "DECLARE @ParametroUser VARCHAR(255) " \
+                        "DECLARE @ParametroPass VARCHAR(6) " \
+                        "SET @ParametroUser = %s " \
+                        "SET @ParametroPass = %s " \
+                        "DECLARE @MD_Chofer INT; " \
+                        "SELECT @MD_Chofer = USR_PERMISOS_APP.MD_Chofer " \
+                        "FROM USUARIOS " \
+                        "INNER JOIN USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
+                        "WHERE (USUARIOS.Usuario = @ParametroUser) AND (USUARIOS.Clave = @ParametroPass); " \
+                        "IF @MD_Chofer = 1 " \
+                            "BEGIN " \
+                                "SELECT        USUARIOS.CodEmpleado, (RTRIM(S3A.dbo.Chofer.Apellidos) + ' ' + RTRIM(S3A.dbo.Chofer.Nombres)) AS Nombre, " \
+                                                    "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  " \
+                                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer " \
+                                "FROM            S3A.dbo.Chofer INNER JOIN " \
+                                                        "USUARIOS INNER JOIN " \
+                                                        "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado ON S3A.dbo.Chofer.IdChofer = USUARIOS.CodEmpleado " \
+                                "WHERE        (USUARIOS.Usuario = @ParametroUser) AND (USUARIOS.Clave = @ParametroPass) " \
+                            "END " \
+                        "ELSE " \
+                            "BEGIN " \
+                                "SELECT        USR_PERMISOS_APP.CodEmpleado,CASE WHEN(SELECT TresAses_ISISPayroll.dbo.Empleados.CodEmpleado  " \
+                                    "FROM TresAses_ISISPayroll.dbo.Empleados  " \
+                                    "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) IS NOT NULL  " \
+                                    "THEN (SELECT CONVERT(VARCHAR(22), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple))  " \
+                                    "FROM TresAses_ISISPayroll.dbo.Empleados  " \
+                                    "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE '-' END AS Nombres,  " \
+                                    "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,   " \
+                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer  " \
+                                "FROM            USUARIOS INNER JOIN  " \
+                                                "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado  " \
+                                "WHERE        (USUARIOS.Usuario = @ParametroUser) AND (USUARIOS.Clave = @ParametroPass) " \
+                            "END"
+
                 cursor.execute(sql, [usuario, clave])
                 consulta = cursor.fetchone()
                 
@@ -90,24 +113,37 @@ def login_app(request):
 #         clave = str(json.loads(body)['contraseña'])
 #         fechaHora = str(json.loads(body)['actual'])
 #         registro = str(json.loads(body)['registro'])
-#         #print(fechaHora,registro)
+#         #print(fechaHora,registro) " \
 #         try:
 #             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-#                 sql = "SELECT        USUARIOS.CodEmpleado AS LEGAJO, USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos " \
-#                       "FROM            USUARIOS INNER JOIN " \
-#                             "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
-#                       "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
+#                 sql = "SELECT        USR_PERMISOS_APP.CodEmpleado,CASE WHEN(SELECT TresAses_ISISPayroll.dbo.Empleados.CodEmpleado " \
+#                                                                                 "FROM TresAses_ISISPayroll.dbo.Empleados " \
+#                                                                                 "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) IS NOT NULL " \
+#                                                                         "THEN (SELECT CONVERT(VARCHAR(22), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple)) " \
+#                                                                                 "FROM TresAses_ISISPayroll.dbo.Empleados " \
+#                                                                                 "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE '-' END AS Nombres, " \
+#                                     "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  " \
+#                                     "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer " \
+#                     "FROM            USUARIOS INNER JOIN " \
+#                                     "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado " \
+#                     "WHERE        (USUARIOS.Usuario = %s) AND (USUARIOS.Clave = %s)"
 #                 cursor.execute(sql, [usuario, clave])
 #                 consulta = cursor.fetchone()
                 
 #                 if consulta:
-#                     legajo, hExtras, asistencia, anticipos = map(str, consulta)
+#                     legajo, nombre, hExtras, asistencia, anticipos, pedidoFlete, crearRemito, reporteBins, chofer = map(str, consulta)
 #                     response_data = {                        
 #                         'Legajo': legajo,
+#                         'Nombre': nombre,
 #                         'Usuario': usuario,
 #                         'HExtras': hExtras,
 #                         'Asistencia': asistencia,
-#                         'Anticipos': anticipos
+#                         'Anticipos': anticipos,
+#                         'PedidoFlete': pedidoFlete,
+#                         'CrearRemito': crearRemito,
+#                         'ReporteBins': reporteBins,
+#                         'Chofer': chofer
+
 #                     }
 #                     #print("INICIA SESION")
 #                     datos = {'Message': 'Success', 'Data': response_data}
