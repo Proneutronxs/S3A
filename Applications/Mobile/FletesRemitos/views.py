@@ -460,7 +460,7 @@ def insertCreaciónRemitos(request):
             ### busca datos de la Asignacion
 
             productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
-            señor = 'Tres Ases'
+            
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
             pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
@@ -583,11 +583,11 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_b
     values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario]
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Datos_Remito (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario) " \
-			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito), %s, %s, %s, %s, %s, %s, getdate(), %s)"
+            sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario) " \
+			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins), %s, %s, %s, %s, %s, %s, getdate(), %s)"
             cursor.execute(sql, values)
             
-            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito WHERE IdAsignacion = %s AND NombrePdf IS NULL"
+            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
             cursor.execute(sql2, [IdAsignación])
             consulta = cursor.fetchone()
             if consulta:
@@ -605,7 +605,7 @@ def actualizaNombrePDF(nombrePdf, numero_remito):
     values = [nombrePdf, numero_remito]
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "UPDATE Datos_Remito SET NombrePdf = %s WHERE FORMAT(NumeroRemito, '00000000') = %s"
+            sql = "UPDATE Datos_Remito_MovBins SET NombrePdf = %s WHERE FORMAT(NumeroRemito, '00000000') = %s"
             cursor.execute(sql, values)
             
     except Exception as e:
@@ -641,16 +641,16 @@ def mostrarListadoRemitos(request, chofer):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT        RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Especie.Nombre) AS ESPECIE, RTRIM(Variedad.Nombre) AS VARIEDAD, TRESASES_APLICATIVO.dbo.Datos_Remito.Cantidad AS CANTIDAD, " \
-                                                "TRESASES_APLICATIVO.dbo.Datos_Remito.NombrePdf AS PDF " \
-                        "FROM            TRESASES_APLICATIVO.dbo.Datos_Remito INNER JOIN " \
+                sql = "SELECT        RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Especie.Nombre) AS ESPECIE, RTRIM(Variedad.Nombre) AS VARIEDAD, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.Cantidad AS CANTIDAD, " \
+                                                "TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.NombrePdf AS PDF " \
+                        "FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins INNER JOIN " \
                                                 "PedidoFlete INNER JOIN " \
                                                 "Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN " \
-                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdAsignacion = PedidoFlete.IdPedidoFlete INNER JOIN " \
-                                                "Especie ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdEspecie = Especie.IdEspecie INNER JOIN " \
-                                                "Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito.IdVariedad = Variedad.IdVariedad " \
+                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdAsignacion = PedidoFlete.IdPedidoFlete INNER JOIN " \
+                                                "Especie ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdEspecie = Especie.IdEspecie INNER JOIN " \
+                                                "Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdVariedad = Variedad.IdVariedad " \
                         "WHERE RTRIM(PedidoFlete.Chofer) = %s " \
-                                "AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) " \
+                                "AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) " \
                                 "AND PedidoFlete.Estado = 'A'"
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
