@@ -874,12 +874,14 @@ def traeEstadoChofer(chofer):
             if consulta:
                 disponible = str(consulta[0])
                 libre = str(consulta[1])
-                transporte = str(consulta[2])
-                datos = {'Disponible': disponible, 'Libre': libre, 'Transporte': transporte}
+                transporte = str(consulta[3])
+                textoDisponible = str(consulta[4])
+                textoLibre = str(consulta[5])
+                datos = {'Disponible': disponible, 'Libre': libre, 'Transporte': transporte, 'TextoDisponible': textoDisponible, 'TextoLibre': textoLibre}
                 listado_estado.append(datos)
                 return listado_estado
             else:
-                listado_estado = [{'Disponible': 'S', 'Libre': 'S', 'Transporte': 'Transporte'}]
+                listado_estado = [{'Disponible': 'S', 'Libre': 'S', 'Transporte': 'Transporte', 'TextoDisponible': 'textoDisponible', 'TextoLibre': 'textoLibre'}]
                 return listado_estado
     except Exception as e:
         error = str(e)
