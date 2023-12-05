@@ -73,10 +73,10 @@ def login_app(request):
                         'PedidoFlete': pedidoFlete,
                         'CrearRemito': crearRemito,
                         'ReporteBins': reporteBins,
-                        'Chofer': chofer
+                        'Chofer': chofer,
+                        'Delete': borraBaseDatosApp()
 
                     }
-                    #print("INICIA SESION")
                     datos = {'Message': 'Success', 'Data': response_data}
                     estado = "E"
                     insertaRegistro(usuario,fechaHora,registro,estado)
@@ -175,6 +175,26 @@ def login_app(request):
 #         return JsonResponse(response_data)
 
 ###  METODO GET PARA TRAER CHACRAS Y ID
+
+def borraBaseDatosApp():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Numerico FROM Parametros_Aplicativo WHERE Codigo = 'APP-DEL-TABLE' " 
+            cursor.execute(sql)
+            consulta = cursor.fetchone()
+            dato = "0"
+            if consulta:
+                dato = str(consulta[0])
+                return dato
+            else:
+                return dato
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","borraBaseDatosApp","usuario",error)
+        return dato
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 @csrf_exempt
 def id_Nombre_Ccostos(request, legajo):
