@@ -480,6 +480,8 @@ def insertCreaciónRemitos(request):
                 IdTamaño = item['idTamaño']
                 Cantidad = item['cantidad']   
                 marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                ##INSERTA DATA BINS
+                insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño)
                 pdf.set_font('Arial', '', 8)
                 pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
                 pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
@@ -596,6 +598,20 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_b
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins):
+    values = [numeroRemito, cantidad, idMarca, idBins]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO Contenido_Remito_MovBins (NumeroRemito, Cantidad, IdMarca, IdBins) " \
+			        "VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","InsertaBinsRemito","Consulta",error)
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
