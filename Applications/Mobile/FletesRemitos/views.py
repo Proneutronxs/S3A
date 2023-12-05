@@ -839,9 +839,9 @@ def datosViajesAceptados(request, chofer):
                         fecha = str(row[7])
                         datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden}
                         listado_Viajes_Aceptados.append(datos)                    
-                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados})
+                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer)})
                 else:
-                    return JsonResponse({'Message': 'No'})
+                    return JsonResponse({'Message': 'No', 'DataEstadoChofer' : traeEstadoChofer(chofer)})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","datos viajes aceptados","Aplicacion",error)
@@ -852,7 +852,42 @@ def datosViajesAceptados(request, chofer):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
+def traeEstadoChofer(chofer):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "DECLARE @P_Chofer VARCHAR(255) " \
+                    "SET @P_Chofer = %s " \
+                    "SELECT        Logistica_Estado_Camiones.Disponible, Logistica_Estado_Camiones.Libre, Logistica_Estado_Camiones.NombreChofer, " \
+                                "(SELECT RTRIM(RazonSocial) FROM S3A.dbo.Transportista WHERE (IdTransportista = S3A.dbo.Chofer.IdTransportista)) AS TRANSPORTE,  " \
+                                "CASE Disponible  " \
+                                        "WHEN 'S' THEN 'DISPONIBLE' WHEN 'N' THEN 'NO DISPONIBLE'  " \
+                                "END AS DISPONIBLE,  " \
+                                "CASE Libre  " \
+                                        "WHEN 'S' THEN 'LIBRE' WHEN 'N' THEN 'OCUPADO'  " \
+                                "END AS LIBRE " \
+                    "FROM            S3A.dbo.Chofer INNER JOIN " \
+                                            "Logistica_Estado_Camiones ON S3A.dbo.Chofer.IdChofer = Logistica_Estado_Camiones.IdChofer " \
+                    "WHERE        (Logistica_Estado_Camiones.NombreChofer = @P_Chofer)"
+            cursor.execute(sql, [chofer])
+            consulta = cursor.fetchone()
+            listado_estado = []
+            if consulta:
+                disponible = str(consulta[0])
+                libre = str(consulta[1])
+                transporte = str(consulta[2])
+                datos = {'Disponible': disponible, 'Libre': libre, 'Transporte': transporte}
+                listado_estado.append(datos)
+                return listado_estado
+            else:
+                listado_estado = [{'Disponible': 'S', 'Libre': 'S', 'Transporte': 'Transporte'}]
+                return listado_estado
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeEstadoChofer","consulta",error)
+        return listado_estado
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 
