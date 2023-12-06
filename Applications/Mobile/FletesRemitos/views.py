@@ -824,7 +824,7 @@ def datosViajesAceptados(request, chofer):
                         "FROM            Logistica_Camiones_Seguimiento INNER JOIN " \
                                                 "S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN " \
                                                 "S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN " \
-                                                "S3A.dbo.Zona ON S3A.dbo.PedidoFlete.IdZona = S3A.dbo.Zona.IdZona INNER JOIN " \
+                                                "S3A.dbo.Zona ON S3A.dbo.PedidoFlete.IdZona = S3A.dbo.Zona.IdZona LEFT JOIN " \
                                                 "Logistica_Ubicacion_Chacras_Bins ON Logistica_Camiones_Seguimiento.UbicacionBins = Logistica_Ubicacion_Chacras_Bins.IdUbicacion LEFT JOIN " \
                                                 "Logistica_Ubicacion_Chacras_Bins AS Logistica_Ubicacion_Chacras_Bins_1 ON S3A.dbo.Chacra.IdChacra = Logistica_Ubicacion_Chacras_Bins_1.IdUbicacion " \
                         "WHERE        (Logistica_Camiones_Seguimiento.Chofer = %s ) AND (Logistica_Camiones_Seguimiento.Estado = 'S') AND (Logistica_Camiones_Seguimiento.Orden = " \
