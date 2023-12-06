@@ -750,8 +750,11 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                             "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE TRY_CONVERT(DATE, FechaHora) = TRY_CONVERT(DATE, GETDATE()) AND Chofer = %s) " \
                             "ELSE 1 " \
                         "END , %s, %s, GETDATE(), %s, %s) "
-                    cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, acepta])                   
+                    cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, acepta]) 
 
+                    sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'N' WHERE NombreChofer %s "                  
+                    cursor.execute(sqlUpdate, [chofer])
+                    
                 return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
             else:
                 return JsonResponse({'Message': 'Success'})
