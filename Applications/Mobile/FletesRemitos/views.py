@@ -752,9 +752,9 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                         "END , %s, %s, GETDATE(), %s, %s) "
                     cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, acepta]) 
 
-                    sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'N' WHERE NombreChofer %s "                  
+                    sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'N' WHERE NombreChofer = %s "                  
                     cursor.execute(sqlUpdate, [chofer])
-                    
+
                 return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
             else:
                 return JsonResponse({'Message': 'Success'})
