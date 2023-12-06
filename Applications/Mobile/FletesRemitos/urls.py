@@ -48,6 +48,9 @@ urlpatterns = [
    ### METODO DATA MUESTRA DATOS DE ACPTADOS
    path('data-viajes-aceptado/chofer=<str:chofer>', views.datosViajesAceptados, name="datos_viajes_aceptados"),
 
+   ### METODO POST ACTUALIZA ESTADO DEL CHOFER
+   path('data-actualiza-estado/chofer', views.actualizaEstadoChofer, name="actualiza_estado_chofer"),
+
 
 
 ]
