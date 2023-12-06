@@ -825,7 +825,7 @@ def actualizaEstadoChofer(request):
             values = [Columna, Valor,IdAsignacion]
 
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s AND Estado = 'S' "
+                sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
                 cursor.execute(sql, values)                
 
                 return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
