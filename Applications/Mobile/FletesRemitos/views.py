@@ -821,14 +821,24 @@ def actualizaEstadoChofer(request):
             chofer = str(json.loads(body)['chofer'])
             Columna = str(json.loads(body)['columna'])
             Valor = str(json.loads(body)['valor'])
-            insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",str([Columna,Valor,chofer]))
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
-                cursor.execute(sql, [Columna,Valor,chofer])                
-            if cursor.rowcount > 0:
-                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+            
+            if Columna == 'Disponible' and Valor == 'N':
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "UPDATE Logistica_Estado_Camiones SET Disponible = 'N', Libre = 'N', Actualizado = GETDATE() WHERE NombreChofer = %s "
+                    cursor.execute(sql, [chofer]) 
+                if cursor.rowcount > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'}) 
             else:
-                return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f"UPDATE Logistica_Estado_Camiones SET {Columna} = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
+                    cursor.execute(sql, [Valor,chofer])   
+
+                if cursor.rowcount > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
             
         except Exception as e:
             error = str(e)
