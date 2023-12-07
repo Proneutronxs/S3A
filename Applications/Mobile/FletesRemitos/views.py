@@ -821,7 +821,7 @@ def actualizaEstadoChofer(request):
             chofer = str(json.loads(body)['chofer'])
             Columna = str(json.loads(body)['columna'])
             Valor = str(json.loads(body)['valor'])
-
+            insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",str([Columna,Valor,chofer]))
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
                 cursor.execute(sql, [Columna,Valor,chofer])                
@@ -829,6 +829,7 @@ def actualizaEstadoChofer(request):
                 return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
+            
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",error)
