@@ -826,16 +826,23 @@ def actualizaEstadoChofer(request):
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = "UPDATE Logistica_Estado_Camiones SET Disponible = 'N', Libre = 'N', Actualizado = GETDATE() WHERE NombreChofer = %s "
                     cursor.execute(sql, [chofer]) 
-                if cursor.rowcount > 0:
+
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'}) 
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
             else:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Estado_Camiones SET {Columna} = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
                     cursor.execute(sql, [Valor,chofer])   
 
-                if cursor.rowcount > 0:
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
