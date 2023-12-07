@@ -828,7 +828,7 @@ def actualizaEstadoChofer(request):
                 sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
                 cursor.execute(sql, values)                
 
-                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+            return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","actualizaEstadoPosicion","Aplicacion",error)
