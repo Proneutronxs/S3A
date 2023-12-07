@@ -818,20 +818,20 @@ def actualizaEstadoChofer(request):
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
-            IdAsignacion = str(json.loads(body)['chofer'])
+            chofer = str(json.loads(body)['chofer'])
             Columna = str(json.loads(body)['columna'])
             Valor = str(json.loads(body)['valor'])
 
-            values = [Columna, Valor,IdAsignacion]
-
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "UPDATE Logistica_Estado_Camiones SET %s = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
-                cursor.execute(sql, values)                
-
-            return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                cursor.execute(sql, [Columna,Valor,chofer])                
+            if cursor.rowcount > 0:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("FletesRemitos","actualizaEstadoPosicion","Aplicacion",error)
+            insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
