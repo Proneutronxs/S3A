@@ -706,7 +706,12 @@ def listadoViajesAsignados(request, chofer):
                         "FROM            PedidoFlete INNER JOIN " \
                                                 "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN " \
                                                 "Zona ON PedidoFlete.IdZona = Zona.IdZona " \
-                        "WHERE        (PedidoFlete.Chofer = %s) AND (PedidoFlete.Estado = 'A')"
+                        "WHERE        (PedidoFlete.Chofer = %s) " \
+                        "AND (PedidoFlete.Estado = 'A') " \
+                        "AND NOT EXISTS ( " \
+                        "SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento " \
+                        "WHERE IdAsignacion = PedidoFlete.IdPedidoFlete " \
+                            "AND Estado = 'S')"
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
                 if consulta:
