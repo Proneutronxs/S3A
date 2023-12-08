@@ -801,13 +801,18 @@ def actualizaEstadoPosicion(request):
             Columna = str(json.loads(body)['columna'])
             Valor = str(json.loads(body)['valor'])
 
-            values = [Columna, Valor,IdAsignacion]
-
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "UPDATE Logistica_Camiones_Seguimiento SET %s = %s WHERE IdAsignacion = %s AND Estado = 'S' "
-                cursor.execute(sql, values)                
+                sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                cursor.execute(sql, [Valor, IdAsignacion])                
 
-                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
+            if affected_rows > 0:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
+            
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","actualizaEstadoPosicion","Aplicacion",error)
