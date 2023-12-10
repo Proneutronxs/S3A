@@ -210,7 +210,7 @@ def insertaPedidoFlete(request):
 
             values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, idPlantaDestino, 
                       idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
-                      usuario, binsBlancos, binsRojos]
+                      usuario]
             
             #valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
             #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
