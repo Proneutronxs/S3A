@@ -878,7 +878,9 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
             else:
-                if traeNumColumna(IdAsignacion) != 3:
+                if traeNumColumna(IdAsignacion) == 3:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
+                else:
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
                     Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
 
@@ -894,8 +896,6 @@ def actualizaEstadoPosicion(request):
                         return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                     else:
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
-                else:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
             
         except Exception as e:
             error = str(e)
