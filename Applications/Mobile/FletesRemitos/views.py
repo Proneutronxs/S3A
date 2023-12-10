@@ -434,7 +434,6 @@ def traeIdMarcas():
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-
 @csrf_exempt
 def insertCreaciónRemitos(request):
     if request.method == 'POST':
@@ -504,8 +503,7 @@ def insertCreaciónRemitos(request):
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})      
     else:
-        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
-    
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})  
 
 def datosRemito(idAsignacion):
     try:    
@@ -879,6 +877,7 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
                 
             if Columna == 'Columna':
+                insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"VER")
                 if traeNumColumna(IdAsignacion) == 3:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
                 else:
