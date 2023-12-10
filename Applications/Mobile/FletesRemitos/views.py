@@ -878,21 +878,24 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
             else:
-                Row = ["LlegaChacra", "SaleChacra", "Bascula"]
-                Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
+                if traeNumColumna(IdAsignacion) < 3:
+                    Row = ["LlegaChacra", "SaleChacra", "Bascula"]
+                    Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
 
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Row[traeNumColumna(IdAsignacion)]} = %s, {Hora[traeNumColumna(IdAsignacion)]} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
-                    cursor.execute(sql, [Valor, IdAsignacion])                
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Row[traeNumColumna(IdAsignacion)]} = %s, {Hora[traeNumColumna(IdAsignacion)]} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                        cursor.execute(sql, [Valor, IdAsignacion])                
 
-                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                    affected_rows = cursor.fetchone()[0]
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
 
-                if affected_rows > 0:
-                    actualizaNumColumna(IdAsignacion)
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+                    if affected_rows > 0:
+                        actualizaNumColumna(IdAsignacion)
+                        return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
             
         except Exception as e:
             error = str(e)
