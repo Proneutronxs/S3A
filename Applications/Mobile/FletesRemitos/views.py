@@ -865,7 +865,10 @@ def actualizaEstadoPosicion(request):
             elif Columna == 'Cancelar':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET Estado = 'C', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
-                    cursor.execute(sql, [IdAsignacion])                
+                    cursor.execute(sql, [IdAsignacion])     
+
+                    sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
+                    cursor.execute(sqlDelete, [IdAsignacion])           
 
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                     affected_rows = cursor.fetchone()[0]
