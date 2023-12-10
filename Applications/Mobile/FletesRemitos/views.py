@@ -878,7 +878,7 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
             else:
-                if traeNumColumna(IdAsignacion) >= 3:
+                if traeNumColumna(IdAsignacion) != 3:
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
                     Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
 
