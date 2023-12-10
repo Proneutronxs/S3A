@@ -212,21 +212,27 @@ def insertaPedidoFlete(request):
                       idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
                       usuario, binsBlancos, binsRojos]
             
-            valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
+            #valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
             #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
             # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
             # ''12:17:25'',''P'',''RAU'',5405,1000732,12,NULL,1,34,40,''S'',''S'',''11:53'',''PRUEBA - OBSERVACIÓN'',''P'',''14/11/2023'',getdate(),''JCHAMBI'')
 
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                # sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
-                #     "IdProductor,IdChacra,IdZona,IdPlantaDestino,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
-                #     "Estado,FechaRequerida,FechaAlta,UserID) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,getdate(),%s,) "
-                # cursor.execute(sql, values)      
+                sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
+                    "IdProductor,IdChacra,IdZona,IdPlantaDestino,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
+                    "Estado,FechaRequerida,FechaAlta,UserID) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,getdate(),%s,) "
+                cursor.execute(sql, values)      
                 
-                sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
-                cursor.execute(sql, valores)                         
+                # sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
+                # cursor.execute(sql, valores) 
 
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
+            if affected_rows > 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
+            else:
+                return JsonResponse({'Message': 'Success', 'Nota': 'El pedido no se pudo realizar.'})                       
 
         except Exception as e:
             error = str(e)
@@ -273,8 +279,7 @@ def llamaAsignacionesPendientes(request, usuario):
             cursor.close()
             connections['S3A'].close()
     else:
-        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
 
 ### LLAMA A LOS DATOS DE LA ASIGNACION SELECCIONADA CON EL ID
 def llamaDataAsignacionPendiente(request, idAsignacion):
@@ -341,7 +346,6 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 ### LLAMA A LAS UP DE LA RENSPA  DE LA ASIGNACION SELECCIONADA
 def traeUPS(renspa):
     listadoUP_Renspa = []
@@ -365,7 +369,6 @@ def traeUPS(renspa):
     finally:
         cursor.close()
         connections['S3A'].close()
-
 
 def traeMarcaBins():
     try:
@@ -614,7 +617,6 @@ def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-
 def actualizaNombrePDF(nombrePdf, numero_remito):
     values = [nombrePdf, numero_remito]
     try:    
@@ -649,7 +651,6 @@ def ver_pdf_remito_chacra(request, filename):
             return response
     else:
         raise Http404
-
 
 def mostrarListadoRemitos(request, chofer):
     if request.method == 'GET':
@@ -693,7 +694,6 @@ def mostrarListadoRemitos(request, chofer):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
 def listadoViajesAsignados(request, chofer):
     if request.method == 'GET':
         try:
@@ -737,7 +737,6 @@ def listadoViajesAsignados(request, chofer):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
     if request.method == 'GET':            
