@@ -884,7 +884,7 @@ def actualizaEstadoPosicion(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    actualizaNumColumna(IdAsignacion)
+                    #actualizaNumColumna(IdAsignacion)
                     return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
