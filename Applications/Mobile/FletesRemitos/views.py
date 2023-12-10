@@ -877,8 +877,9 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
                 
             if Columna == 'Columna':
-                insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"VER")
+                insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"ANTES")
                 if traeNumColumna(IdAsignacion) == 3:
+                    insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
                     return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
                 else:
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
