@@ -897,7 +897,7 @@ def actualizaEstadoPosicion(request):
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
                 
                 insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
-                return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
+                return JsonResponse({'Message': 'Error', 'Nota': str(traeNumColumna(IdAsignacion))})
             
         except Exception as e:
             error = str(e)
