@@ -906,7 +906,7 @@ def traeNumColumna(idAsignacion):
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Punto FROM Logistica_Campos_Temporales WHERE IdAsignacion = %s "
             cursor.execute(sql, [idAsignacion])
-            consulta = cursor.fetchall()
+            consulta = cursor.fetchone()
             if consulta:
                 punto = int(consulta[0])
                 return punto
@@ -916,9 +916,6 @@ def traeNumColumna(idAsignacion):
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","traeNumColumna","consulta",error)
         return 0
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def actualizaNumColumna(idAsignacion):
     try:
@@ -928,9 +925,6 @@ def actualizaNumColumna(idAsignacion):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","actualizaNumColumna","consulta",error)
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
     
 @csrf_exempt
 def actualizaEstadoChofer(request):
