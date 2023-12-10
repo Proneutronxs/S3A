@@ -799,19 +799,45 @@ def actualizaEstadoPosicion(request):
             body = request.body.decode('utf-8')
             IdAsignacion = str(json.loads(body)['idAsignacion'])
             Columna = str(json.loads(body)['columna'])
+            ColumnaHora = str(json.loads(body)['columnaHora'], 'sinColumna')
             Valor = str(json.loads(body)['valor'])
+            
+            if Columna == 'RetiraBins':
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraRetiraBins = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    cursor.execute(sql, [Valor, IdAsignacion])                
 
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
-                cursor.execute(sql, [Valor, IdAsignacion])                
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
 
-                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Retiro de Bins'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Confirmar el retiro.'})
+            elif Columna == 'Final':
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    cursor.execute(sql, [Valor, IdAsignacion])                
 
-            if affected_rows > 0:
-                return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'F'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
             else:
-                return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, {ColumnaHora} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    cursor.execute(sql, [Valor, IdAsignacion])                
+
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
             
         except Exception as e:
             error = str(e)
