@@ -833,7 +833,7 @@ def actualizaEstadoPosicion(request):
             
             if Columna == 'RetiraBins':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraRetiraBins = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraRetiraBins = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' AND HoraRetiraBins IS NULL "
                     cursor.execute(sql, [Valor, IdAsignacion])                
 
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
@@ -842,7 +842,7 @@ def actualizaEstadoPosicion(request):
                 if affected_rows > 0:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Retiro de Bins'})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Confirmar el retiro.'})
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.'})
                 
             if Columna == 'Final':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -877,7 +877,6 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
                 
             if Columna == 'Columna':
-                insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"ANTES")
                 if traeNumColumna(IdAsignacion) < 3:
 
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
@@ -899,7 +898,7 @@ def actualizaEstadoPosicion(request):
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                         affected_rows = cursor.fetchone()[0]
-                    insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
+                        
                     return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
             
         except Exception as e:
