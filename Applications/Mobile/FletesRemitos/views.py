@@ -828,13 +828,13 @@ def actualizaEstadoPosicion(request):
             body = request.body.decode('utf-8')
             IdAsignacion = str(json.loads(body)['idAsignacion'])
             Columna = str(json.loads(body)['columna'])
-            ColumnaHora = str(json.loads(body)['columnaHora'])
+            Chofer = str(json.loads(body)['chofer'])
             Valor = str(json.loads(body)['valor'])
             
             if Columna == 'RetiraBins':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraRetiraBins = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' AND HoraRetiraBins IS NULL "
-                    cursor.execute(sql, [Valor, IdAsignacion])                
+                    cursor.execute(sql, [Valor, IdAsignacion])               
 
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                     affected_rows = cursor.fetchone()[0]
@@ -847,7 +847,10 @@ def actualizaEstadoPosicion(request):
             if Columna == 'Final':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
-                    cursor.execute(sql, [Valor, IdAsignacion])                
+                    cursor.execute(sql, [Valor, IdAsignacion])           
+
+                    sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'S', Actualizado = GETDATE() WHERE NombreChofer = %s " 
+                    cursor.execute(sqlUpdate, [Chofer])     
 
                     sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
                     cursor.execute(sqlDelete, [IdAsignacion])
