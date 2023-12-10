@@ -846,7 +846,7 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Confirmar el retiro.'})
                 
-            elif Columna == 'Final':
+            if Columna == 'Final':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [Valor, IdAsignacion])                
@@ -862,7 +862,7 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
                 
-            elif Columna == 'Cancelar':
+            if Columna == 'Cancelar':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET Estado = 'C', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [IdAsignacion])     
@@ -877,7 +877,7 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Success', 'Nota': 'Cancelado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
-            else:
+            if Columna == 'Columna':
                 if traeNumColumna(IdAsignacion) == 3:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
                 else:
