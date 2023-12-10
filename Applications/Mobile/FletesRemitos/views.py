@@ -840,7 +840,7 @@ def actualizaEstadoPosicion(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Retiro de Bins'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Retiró Bins'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.'})
                 
