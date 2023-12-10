@@ -799,7 +799,7 @@ def actualizaEstadoPosicion(request):
             body = request.body.decode('utf-8')
             IdAsignacion = str(json.loads(body)['idAsignacion'])
             Columna = str(json.loads(body)['columna'])
-            ColumnaHora = str(json.loads(body)['columnaHora'], 'sinColumna')
+            ColumnaHora = str(json.loads(body)['columnaHora'])
             Valor = str(json.loads(body)['valor'])
             
             if Columna == 'RetiraBins':
