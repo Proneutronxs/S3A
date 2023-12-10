@@ -211,7 +211,7 @@ def insertaPedidoFlete(request):
             values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, idPlantaDestino, 
                       idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
                       usuario]
-            
+            insertar_registro_error_sql("FletesRemitos","ANTES","Aplicacion",str(values))
             #valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
             #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
             # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
