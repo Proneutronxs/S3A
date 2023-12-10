@@ -845,6 +845,7 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Success', 'Nota': 'Retiro de Bins'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Confirmar el retiro.'})
+                
             elif Columna == 'Final':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
@@ -860,6 +861,7 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Success', 'Nota': 'F'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
+                
             elif Columna == 'Cancelar':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET Estado = 'C', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
@@ -884,7 +886,7 @@ def actualizaEstadoPosicion(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    #actualizaNumColumna(IdAsignacion)
+                    actualizaNumColumna(IdAsignacion)
                     return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
@@ -904,7 +906,7 @@ def traeNumColumna(idAsignacion):
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT Punto FROM Logistica_Campos_Temporales WHERE IdAsignacion = %s "
             cursor.execute(sql, [idAsignacion])
-            consulta = cursor.fetchone()
+            consulta = cursor.fetchall()
             if consulta:
                 punto = int(consulta[0])
                 return punto
