@@ -879,7 +879,7 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
                 
             if Columna == 'Columna':
-                if traeNumColumna(IdAsignacion) == '3':
+                if traeNumColumna(IdAsignacion) == 3:
                     return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
                 else:
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
