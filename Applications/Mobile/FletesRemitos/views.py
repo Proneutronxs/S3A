@@ -878,11 +878,7 @@ def actualizaEstadoPosicion(request):
                 
             if Columna == 'Columna':
                 insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"ANTES")
-                if traeNumColumna(IdAsignacion) == 3:
-                    print("Puntos Máximos")
-                    insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
-                    return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
-                else:
+                if traeNumColumna(IdAsignacion) < 3:
                     Row = ["LlegaChacra", "SaleChacra", "Bascula"]
                     Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
 
@@ -898,6 +894,9 @@ def actualizaEstadoPosicion(request):
                         return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                     else:
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
+                else:
+                    insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
             else:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Se Actualizaron todos los Puntos'})
 
