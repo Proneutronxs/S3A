@@ -219,7 +219,7 @@ def insertaPedidoFlete(request):
 
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
-                    "IdProductor,IdChacra,IdZona,IdPlantaDestino,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
+                    "IdProductor,IdChacra,IdZona,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
                     "Estado,FechaRequerida,FechaAlta,UserID) VALUES ((SELECT MAX(IdPedidoFlete + 1) FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,getdate(),%s,) "
                 cursor.execute(sql, values)      
                 
