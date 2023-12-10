@@ -791,7 +791,7 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se Rechazar'})
                 
             else:
-                return JsonResponse({'Message': 'Success', 'Nota': 'Ya fue Aceptado'})
+                return JsonResponse({'Message': 'Success', 'Nota': 'Ya fue Aceptado o Rechazado'})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","viajesAceptaRechaza","Aplicacion",error)
@@ -805,7 +805,7 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
 def soloAceptaSiNoExiste(idAsignacion, chofer):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE IdAsignacion = %s AND Chofer = %s AND Estado = 'S' OR Estado = 'R'"
+            sql = "SELECT IdAsignacion FROM Logistica_Camiones_Seguimiento WHERE IdAsignacion = %s AND Chofer = %s AND Estado = 'S'"
             cursor.execute(sql, [idAsignacion,chofer])
             consulta = cursor.fetchone()
             if consulta:
