@@ -877,7 +877,7 @@ def actualizaEstadoPosicion(request):
                 Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
 
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Row[traeNumColumna()]} = %s, {Hora[traeNumColumna()]} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Row[traeNumColumna(IdAsignacion)]} = %s, {Hora[traeNumColumna(IdAsignacion)]} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [Valor, IdAsignacion])                
 
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
@@ -925,7 +925,7 @@ def actualizaNumColumna(idAsignacion):
             cursor.execute(sql, [idAsignacion])
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("FletesRemitos","traeNumColumna","consulta",error)
+        insertar_registro_error_sql("FletesRemitos","actualizaNumColumna","consulta",error)
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
