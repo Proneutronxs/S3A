@@ -761,6 +761,9 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                         sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'N', Actualizado= GETDATE() WHERE NombreChofer = %s "                  
                         cursor.execute(sqlUpdate, [chofer])
 
+                        sqlInsert = "INSERT INTO Logistica_Campos_Temporales (IdAsignacion, Punto) VALUES (%s, '0')"                  
+                        cursor.execute(sqlInsert, [idAsignacion])
+
                         cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                         affected_rows = cursor.fetchone()[0]
 
@@ -847,6 +850,9 @@ def actualizaEstadoPosicion(request):
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [Valor, IdAsignacion])                
 
+                    sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
+                    cursor.execute(sqlDelete, [IdAsignacion])
+
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                     affected_rows = cursor.fetchone()[0]
 
@@ -867,15 +873,18 @@ def actualizaEstadoPosicion(request):
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
             else:
-                
+                Row = ["LlegaChacra", "SaleChacra", "Bascula"]
+                Hora = ["HoraLlegaChacra", "HoraSaleChacra", "HoraBascula"]
+
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, {ColumnaHora} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Row[traeNumColumna()]} = %s, {Hora[traeNumColumna()]} = GETDATE(), Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [Valor, IdAsignacion])                
 
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
+                    actualizaNumColumna(IdAsignacion)
                     return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
@@ -889,6 +898,37 @@ def actualizaEstadoPosicion(request):
             connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def traeNumColumna(idAsignacion):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Punto FROM Logistica_Campos_Temporales WHERE IdAsignacion = %s "
+            cursor.execute(sql, [idAsignacion])
+            consulta = cursor.fetchone()
+            if consulta:
+                punto = int(consulta[0])
+                return punto
+            else:
+                return 0
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeNumColumna","consulta",error)
+        return 0
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def actualizaNumColumna(idAsignacion):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "UPDATE Logistica_Campos_Temporales SET Punto = (Punto + 1) WHERE IdAsignacion = %s "
+            cursor.execute(sql, [idAsignacion])
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","traeNumColumna","consulta",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
     
 @csrf_exempt
 def actualizaEstadoChofer(request):
