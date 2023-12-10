@@ -895,9 +895,12 @@ def actualizaEstadoPosicion(request):
                         return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
                     else:
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
-                
-                insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
-                return JsonResponse({'Message': 'Error', 'Nota': str(traeNumColumna(IdAsignacion))})
+                else:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
+                    insertar_registro_error_sql(Columna,str(traeNumColumna(IdAsignacion)),str(type(traeNumColumna(IdAsignacion))),"DESPUES")
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
             
         except Exception as e:
             error = str(e)
