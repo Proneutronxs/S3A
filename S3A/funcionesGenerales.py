@@ -75,6 +75,11 @@ def obtenerFechaActual():
     fecha = fecha_actual.strftime('%d/%m/%Y')
     return fecha
 
+def obtenerFechaActualUSA():
+    fecha_actual = datetime.now()
+    fecha = fecha_actual.strftime('%Y-%m-%d')
+    return fecha
+
 def obtenerHoraActual():
     hora_actual = datetime.now()
     hora = hora_actual.strftime('%H:%M')
