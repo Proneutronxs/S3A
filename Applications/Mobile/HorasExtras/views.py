@@ -82,9 +82,9 @@ def insert_HoraExtra(request):
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
-                f1, f2 = retornaYYYYMMDD(Desde,Hasta)
+                fechaHasta = retornaYYYYMMDD(Desde,Hasta)
                 
-                if buscaHoras(f2,Legajo,Desde,Hasta):
+                if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
                     lista_tieneHE_asignada.append(Legajo)
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -129,14 +129,14 @@ def retornaHHMM(hora1,hora2):
     return horaDesde, horaHasta
 
 ### RETORNA YYYY-MM-DD DE UN DATE TIME
-def retornaYYYYMMDD(f1,f2):
+def retornaYYYYMMDD(f2):
     formato_entrada = "%Y-%m-%dT%H:%M:%S.%f"
     formato_salida = "%Y-%m-%d"
-    fechaUno = datetime.strptime(f1, formato_entrada)
+    #fechaUno = datetime.strptime(f1, formato_entrada)
     fechaDos = datetime.strptime(f2, formato_entrada)
-    fechaDesde = fechaUno.strftime(formato_salida)
+    #fechaDesde = fechaUno.strftime(formato_salida)
     fechaHasta = fechaDos.strftime(formato_salida)
-    return fechaDesde, fechaHasta
+    return fechaHasta
 
 def verificar_rango(fecha_inicio_str, fecha_fin_str, fecha_a_verificar_str):
     fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d %H:%M:%S.%f")
@@ -163,7 +163,7 @@ def buscaHoras(fecha,legajo,dateTime1,dateTime2):
                 return False
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("HorasExtras","verificaHoraExtra","usuario",error)
+        insertar_registro_error_sql("HorasExtras","buscaHoras","usuario",error)
         return error
     finally:
         cursor.close()
