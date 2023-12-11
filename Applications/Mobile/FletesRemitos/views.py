@@ -196,8 +196,8 @@ def insertaPedidoFlete(request):
             idChacra = str(json.loads(body)['idChacra'])
             idZona = str(json.loads(body)['idZona'])
             idPlantaDestino = None
-            idEspecie = str(json.loads(body)['idEspecie'])
-            idVariedad = str(json.loads(body)['idVariedad'])
+            idEspecie = json.loads(body)['idEspecie']
+            idVariedad = json.loads(body)['idVariedad']
             binsTotal = str(json.loads(body)['binsTotal'])
             traeVacios = str(json.loads(body)['traeVacios'])
             traeCuellos = str(json.loads(body)['traeCuellos'])
