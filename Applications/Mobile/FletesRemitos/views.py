@@ -186,11 +186,11 @@ def insertaPedidoFlete(request):
         try:
             body = request.body.decode('utf-8')
             solicita = str(json.loads(body)['solicita'])
-            idPlanta = '100'
+            idPlanta = "100"
             usuario = str(json.loads(body)['usuario'])
             fechaPedido = obtenerFechaActual()
             horaPedido = obtenerHoraActual()
-            tipoDestino  = 'P'
+            tipoDestino  = "P"
             tipoCarga = str(json.loads(body)['tipoCarga'])
             idProductor = str(json.loads(body)['idProductor'])
             idChacra = str(json.loads(body)['idChacra'])
@@ -203,7 +203,7 @@ def insertaPedidoFlete(request):
             traeCuellos = str(json.loads(body)['traeCuellos'])
             horaRequerida = str(json.loads(body)['horaRequerida'])
             observaciones = str(json.loads(body)['observaciones'])
-            estado = 'P'
+            estado = "P"
             fechaRequerida = str(json.loads(body)['fechaRequerida'])
             binsBlancos = str(json.loads(body)['binsBlancos'])
             binsRojos = str(json.loads(body)['binsRojos'])
