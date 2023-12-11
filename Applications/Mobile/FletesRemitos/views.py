@@ -218,10 +218,17 @@ def insertaPedidoFlete(request):
             # ''12:17:25'',''P'',''RAU'',5405,1000732,12,NULL,1,34,40,''S'',''S'',''11:53'',''PRUEBA - OBSERVACIÓN'',''P'',''14/11/2023'',getdate(),''JCHAMBI'')
 
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
-                        "IdProductor,IdChacra,IdZona,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
-                            "Estado,FechaRequerida,UserID,FechaAlta) VALUES  " \
-                    "((SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())  "
+                sql = """
+                        INSERT INTO PedidoFlete (
+                            IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
+                            IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
+                            HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
+                        )
+                        VALUES (
+                            (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
+                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                        )
+                        """
                 cursor.execute(sql, values)      
                 
                 # sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
