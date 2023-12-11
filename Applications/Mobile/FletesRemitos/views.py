@@ -188,7 +188,7 @@ def insertaPedidoFlete(request):
             solicita = str(json.loads(body)['solicita'])
             idPlanta = '100'
             usuario = str(json.loads(body)['usuario'])
-            fechaPedido = obtenerFechaActualUSA()
+            fechaPedido = obtenerFechaActual()
             horaPedido = obtenerHoraActual()
             tipoDestino  = 'P'
             tipoCarga = str(json.loads(body)['tipoCarga'])
@@ -220,8 +220,8 @@ def insertaPedidoFlete(request):
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
                         "IdProductor,IdChacra,IdZona,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
-                            "Estado,FechaRequerida,FechaAlta,UserID) VALUES  " \
-                    "((SELECT MAX(IdPedidoFlete + 1) FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,GETDATE(), %s)  "
+                            "Estado,FechaRequerida,UserID,FechaAlta) VALUES  " \
+                    "((SELECT MAX(IdPedidoFlete + 1) FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())  "
                 cursor.execute(sql, values)      
                 
                 # sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
