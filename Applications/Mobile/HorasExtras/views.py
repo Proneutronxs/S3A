@@ -82,7 +82,7 @@ def insert_HoraExtra(request):
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
-                fechaHasta = retornaYYYYMMDD(Desde,Hasta)
+                fechaHasta = retornaYYYYMMDD(Hasta)
                 
                 if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
                     lista_tieneHE_asignada.append(Legajo)
