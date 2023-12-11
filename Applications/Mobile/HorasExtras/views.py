@@ -161,6 +161,7 @@ def buscaHoras(fecha,legajo,dateTime1,dateTime2):
                         return True
             else:
                 return False
+        return False
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("HorasExtras","buscaHoras","usuario",error)
