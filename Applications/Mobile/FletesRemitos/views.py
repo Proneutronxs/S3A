@@ -217,7 +217,7 @@ def insertaPedidoFlete(request):
             # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
             # ''12:17:25'',''P'',''RAU'',5405,1000732,12,NULL,1,34,40,''S'',''S'',''11:53'',''PRUEBA - OBSERVACIÓN'',''P'',''14/11/2023'',getdate(),''JCHAMBI'')
 
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            with connections['S3A'].cursor() as cursor:
                 sql = """
                         INSERT INTO PedidoFlete (
                             IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
@@ -248,7 +248,7 @@ def insertaPedidoFlete(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
-            connections['TRESASES_APLICATIVO'].close()
+            connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
 
