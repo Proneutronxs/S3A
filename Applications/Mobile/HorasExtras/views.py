@@ -82,15 +82,15 @@ def insert_HoraExtra(request):
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
-                fechaHasta = retornaYYYYMMDD(Hasta)
+                # fechaHasta = retornaYYYYMMDD(Hasta)
                 
-                if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
-                    lista_tieneHE_asignada.append(Legajo)
-                else:
-                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
-                        cursor.execute(sql, values)
+                # if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
+                #     lista_tieneHE_asignada.append(Legajo)
+               # else:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                    cursor.execute(sql, values)
 
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
