@@ -201,8 +201,8 @@ def insertaPedidoFlete(request):
                 idEspecie = json.loads(body)['idEspecie']
                 idVariedad = json.loads(body)['idVariedad']
             except (json.decoder.JSONDecodeError, TypeError):
-                idEspecie = None
-                idVariedad = None
+                idEspecie = ''
+                idVariedad = ''
 
             binsTotal = str(json.loads(body)['binsTotal'])
             traeVacios = str(json.loads(body)['traeVacios'])
@@ -214,40 +214,57 @@ def insertaPedidoFlete(request):
             binsBlancos = str(json.loads(body)['binsBlancos'])
             binsRojos = str(json.loads(body)['binsRojos'])
 
-            values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
-                      idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
-                      usuario]
-            #insertar_registro_error_sql("FletesRemitos","ANTES","Aplicacion",str(values))
-            #valores = ["INSERTA FLETES", obtenerFechaActual(), str(values)]
-            #Insert PedidoFlete(IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga,IdProductor,IdChacra,IdZona,IdPlantaDestino,
-            # IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs,Estado,FechaRequerida,FechaAlta,UserID)values(1004651,100,''PRUEBA - SISTEMAS'',''14/11/2023'',
-            # ''12:17:25'',''P'',''RAU'',5405,1000732,12,NULL,1,34,40,''S'',''S'',''11:53'',''PRUEBA - OBSERVACIÓN'',''P'',''14/11/2023'',getdate(),''JCHAMBI'')
+            if tipoCarga == 'RAU':
+                values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
+                        idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
+                        usuario]
+                with connections['S3A'].cursor() as cursor:
+                    sql = """
+                            INSERT INTO PedidoFlete (
+                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
+                                IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
+                                HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
+                            )
+                            VALUES (
+                                (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
+                                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                            )
+                            """
+                    cursor.execute(sql, values)
 
-            with connections['S3A'].cursor() as cursor:
-                sql = """
-                        INSERT INTO PedidoFlete (
-                            IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
-                            IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
-                            HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
-                        )
-                        VALUES (
-                            (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
-                        )
-                        """
-                cursor.execute(sql, values)      
-                
-                # sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
-                # cursor.execute(sql, valores) 
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
 
-                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                affected_rows = cursor.fetchone()[0]
-
-            if affected_rows > 0:
-                return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El pedido no se pudo realizar.'})                       
             else:
-                return JsonResponse({'Message': 'Success', 'Nota': 'El pedido no se pudo realizar.'})                       
+                values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
+                         binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
+                        usuario]
+                with connections['S3A'].cursor() as cursor:
+                    sql = """
+                            INSERT INTO PedidoFlete (
+                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
+                                IdProductor, IdChacra, IdZona, Bins, Vacios, Cuellos,
+                                HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
+                            )
+                            VALUES (
+                                (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
+                                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                            )
+                            """
+                    cursor.execute(sql, values)
 
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El pedido se realizó correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El pedido no se pudo realizar.'})
+            
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","insertaPedidoFlete","Aplicacion",error)
