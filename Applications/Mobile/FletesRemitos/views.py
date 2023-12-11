@@ -196,8 +196,14 @@ def insertaPedidoFlete(request):
             idChacra = str(json.loads(body)['idChacra'])
             idZona = str(json.loads(body)['idZona'])
             idPlantaDestino = None
-            idEspecie = json.loads(body)['idEspecie']
-            idVariedad = json.loads(body)['idVariedad']
+
+            try:
+                idEspecie = json.loads(body)['idEspecie']
+                idVariedad = json.loads(body)['idVariedad']
+            except (json.decoder.JSONDecodeError, TypeError):
+                idEspecie = None
+                idVariedad = None
+
             binsTotal = str(json.loads(body)['binsTotal'])
             traeVacios = str(json.loads(body)['traeVacios'])
             traeCuellos = str(json.loads(body)['traeCuellos'])
