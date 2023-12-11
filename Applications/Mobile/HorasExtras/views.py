@@ -84,7 +84,7 @@ def insert_HoraExtra(request):
 
                 f1, f2 = retornaYYYYMMDD(Desde,Hasta)
                 
-                if buscaHoras(f2,legajo,Desde,Hasta):
+                if buscaHoras(f2,Legajo,Desde,Hasta):
                     lista_tieneHE_asignada.append(Legajo)
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
