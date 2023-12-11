@@ -149,7 +149,7 @@ def buscaHoras(fecha,legajo,dateTime1,dateTime2):
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = "SELECT CONVERT(VARCHAR(23), DateTimeDesde, 25), CONVERT(VARCHAR(23), DateTimeHasta, 25) " \
                 "FROM HorasExtras_Sin_Procesar " \
-                "WHERE Legajo = %s AND (TRY_CONVERT(DATE, DateTimeHasta) >= %s "
+                "WHERE Legajo = %s AND (TRY_CONVERT(DATE, DateTimeHasta) >= %s AND Estado <> 8"
             cursor.execute(sql, [legajo, fecha])
             cursor.execute(sql)
             consulta = cursor.fetchall()
