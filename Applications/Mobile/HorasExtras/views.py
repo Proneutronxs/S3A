@@ -82,16 +82,15 @@ def insert_HoraExtra(request):
                 Autorizado = str(item['Autorizado']) ### RELACIONAR EL LEGAJO O BIEN CARGAR EL ID DEL AUTORIZADO
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
-                # fecha1, hora1 = convertir_formato_fecha_hora(Desde)
-                # fecha2, hora2 = convertir_formato_fecha_hora(Hasta)
+                f1, f2 = retornaYYYYMMDD(Desde,Hasta)
                 
-                # if verificaHoraExtra(fecha1,fecha2,hora1,hora2, Legajo):
-                #     lista_tieneHE_asignada.append(Legajo)
-                # else:
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                    values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
-                    cursor.execute(sql, values)
+                if buscaHoras(f2,legajo,Desde,Hasta):
+                    lista_tieneHE_asignada.append(Legajo)
+                else:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                        cursor.execute(sql, values)
 
             if len(lista_tieneHE_asignada) == 0:
                 nota = "Los Horas Extras se envíaron correctamente."
@@ -139,34 +138,27 @@ def retornaYYYYMMDD(f1,f2):
     fechaHasta = fechaDos.strftime(formato_salida)
     return fechaDesde, fechaHasta
 
-def verificaHoraExtra(fecha1,fecha2, hora1, hora2, legajo):
+def verificar_rango(fecha_inicio_str, fecha_fin_str, fecha_a_verificar_str):
+    fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d %H:%M:%S.%f")
+    fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d %H:%M:%S.%f")
+    fecha_a_verificar = datetime.strptime(fecha_a_verificar_str, "%Y-%m-%d %H:%M:%S.%f")
+    return fecha_inicio <= fecha_a_verificar <= fecha_fin
+
+def buscaHoras(fecha,legajo,dateTime1,dateTime2):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT CONVERT(VARCHAR(10), DateTimeDesde, 103) AS FECHA_INICIO, CONVERT(VARCHAR(5), DateTimeDesde, 108) AS HORA_INICIO, " \
-                        "CONVERT(VARCHAR(10), DateTimeHasta, 103) AS FECHA_FINAL, CONVERT(VARCHAR(5), DateTimeHasta, 108) AS HORA_FINAL, Legajo " \
+            sql = "SELECT CONVERT(VARCHAR(23), DateTimeDesde, 25), CONVERT(VARCHAR(23), DateTimeHasta, 25) " \
                 "FROM HorasExtras_Sin_Procesar " \
-                "WHERE Legajo = %s AND (TRY_CONVERT(DATE, DateTimeDesde) = %s) AND (TRY_CONVERT(DATE, DateTimeHasta) <= %s) AND Estado <> '8'"
-            cursor.execute(sql, [legajo, fecha1, fecha2])
+                "WHERE Legajo = %s AND (TRY_CONVERT(DATE, DateTimeHasta) >= %s"
+            cursor.execute(sql, [legajo, fecha])
+            cursor.execute(sql)
             consulta = cursor.fetchall()
             if consulta:
                 for row in consulta:
-                    f1 = datetime.strptime(str(row[0]), "%d/%m/%Y")
-                    h1 = str(row[1])
-                    f2 = datetime.strptime(str(row[2]), "%d/%m/%Y")
-                    h2 = str(row[3])
-                    
-                    if f1 == f2:                 
-                        if hora_dentro_del_rango(hora1,h1,h2) or hora_dentro_del_rango(hora2,h1,h2):
-                            return True
-                        else:
-                            return False
-                    if f1 != f2:
-                        hora23 = "23:59"
-                        hora00 = "00:00"
-                        if hora_dentro_del_rango(hora1,h1,hora23) or hora_dentro_del_rango(h2,hora00,hora2):
-                            return True
-                        else:
-                            return False
+                    df1 = str(row[0])
+                    df2 = str(row[1])
+                    if verificar_rango(df1,df2,dateTime1) or verificar_rango(df1,df2,dateTime2):
+                        return True
             else:
                 return False
     except Exception as e:
