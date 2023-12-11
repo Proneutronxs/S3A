@@ -221,7 +221,7 @@ def insertaPedidoFlete(request):
                 sql = "INSERT PedidoFlete (IdPedidoFlete,IdPlanta,Solicitante,FechaPedido,HoraPedido,TipoDestino,TipoCarga, " \
                         "IdProductor,IdChacra,IdZona,IdEspecie,IdVariedad,Bins,Vacios,Cuellos,HoraRequerida,Obs, " \
                             "Estado,FechaRequerida,UserID,FechaAlta) VALUES  " \
-                    "((SELECT MAX(IdPedidoFlete + 1) FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())  "
+                    "((SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%'), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())  "
                 cursor.execute(sql, values)      
                 
                 # sql = "INSERT Data_Funciones (Funcion, Fecha, Textos) VALUES (%s, %s, %s)"
