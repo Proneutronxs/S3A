@@ -188,7 +188,7 @@ def insertaPedidoFlete(request):
             solicita = str(json.loads(body)['solicita'])
             idPlanta = "100"
             usuario = str(json.loads(body)['usuario'])
-            fechaPedido = obtenerFechaActual()
+            fechaPedido = obtenerFechaActualUSA()
             horaPedido = obtenerHoraActual()
             tipoDestino  = "P"
             tipoCarga = str(json.loads(body)['tipoCarga'])

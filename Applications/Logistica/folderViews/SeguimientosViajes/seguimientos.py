@@ -95,8 +95,8 @@ def listadoViajes(request):
                                                 ELSE '#008f39e7' 
                                             END AS HEXA_SALE_CHACRA,
                                             CASE 
-                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Bascula IS NULL THEN 'Salida Báscula - -' 
-                                                ELSE 'Salida Báscula - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraBascula, 108) + ' Hs.' 
+                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Bascula IS NULL THEN 'Llegada Báscula - -' 
+                                                ELSE 'Llegada Báscula - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraBascula, 108) + ' Hs.' 
                                             END AS LLEGA_BASCULA,
                                             CASE 
                                                 WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Bascula IS NULL THEN '#d5393ce8' 
