@@ -209,19 +209,19 @@ def insertaPedidoFlete(request):
             binsRojos = str(json.loads(body)['binsRojos'])
 
             if tipoCarga == 'RAU':
-                values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
+                values = [idPlanta, solicita, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
                         idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
                         usuario]
                 with connections['S3A'].cursor() as cursor:
                     sql = """
                             INSERT INTO PedidoFlete (
-                                IdPedidoFlete, IdPlanta, Solicitante, HoraPedido, TipoDestino, TipoCarga,
+                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
                                 IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
                                 HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, CONVERT(DATE,GETDATE()), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
@@ -240,13 +240,13 @@ def insertaPedidoFlete(request):
                 with connections['S3A'].cursor() as cursor:
                     sql = """
                             INSERT INTO PedidoFlete (
-                                IdPedidoFlete, IdPlanta, Solicitante, HoraPedido, TipoDestino, TipoCarga,
+                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
                                 IdProductor, IdChacra, IdZona, Bins, Vacios, Cuellos,
                                 HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, CONVERT(DATE, GETDATE()), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
