@@ -215,13 +215,13 @@ def insertaPedidoFlete(request):
                 with connections['S3A'].cursor() as cursor:
                     sql = """
                             INSERT INTO PedidoFlete (
-                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
+                                IdPedidoFlete, IdPlanta, Solicitante, HoraPedido, TipoDestino, TipoCarga,
                                 IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
                                 HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                                %s, %s, (TRY_CONVERT(DATE, GETDATE())), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
@@ -240,13 +240,13 @@ def insertaPedidoFlete(request):
                 with connections['S3A'].cursor() as cursor:
                     sql = """
                             INSERT INTO PedidoFlete (
-                                IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
+                                IdPedidoFlete, IdPlanta, Solicitante, HoraPedido, TipoDestino, TipoCarga,
                                 IdProductor, IdChacra, IdZona, Bins, Vacios, Cuellos,
                                 HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                                %s, %s, (TRY_CONVERT(DATE, GETDATE())), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
