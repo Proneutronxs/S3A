@@ -234,7 +234,7 @@ def insertaPedidoFlete(request):
                 else:
                     return JsonResponse({'Message': 'Success', 'Nota': 'El pedido no se pudo realizar.'})                       
             else:
-                values = [idPlanta, solicita, fechaPedido, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
+                values = [idPlanta, solicita, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
                          binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, fechaRequerida, 
                         usuario]
                 with connections['S3A'].cursor() as cursor:
