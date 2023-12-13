@@ -11,17 +11,17 @@ window.addEventListener("load", async () =>{
     }, 15000);
 
 
-    // setInterval(async () => {
-    //     await listarViajes();
-    // }, 20000);
+    setInterval(async () => {
+        await listarViajes();
+    }, 20000);
 
-    // setInterval(async () => {
-    //     await listarRechazados();
-    // }, 20000);
+    setInterval(async () => {
+        await listarRechazados();
+    }, 20000);
 
-    // setInterval(async () => {
-    //     await listarAsignados();
-    // }, 20000);
+    setInterval(async () => {
+        await listarAsignados();
+    }, 20000);
 
 });
 
