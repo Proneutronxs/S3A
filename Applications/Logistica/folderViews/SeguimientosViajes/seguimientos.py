@@ -71,7 +71,7 @@ def listadoViajes(request):
                                                 WHEN 'S' THEN 'ACEPTADO - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.FechaHora, 108) + ' Hs.' 
                                             END AS ACEPTA,
                                             CASE 
-                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.RetiraBins IS NULL THEN 'Retiró Bins - -' 
+                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraRetiraBins IS NULL THEN 'Retiró Bins - -' 
                                                 ELSE 'Retiró Bins - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraLlegaChacra, 108) + ' Hs.' 
                                             END AS RETIRA_BINS,
                                             CASE 
