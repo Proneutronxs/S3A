@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="{%static 'TresAses/img/TA.ico' %}" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{%static 'TresAses/css/SeguimientoLogistica/style.css' %}">
+    <title>Logística-Viajes</title>
+
+    <!-- <nav>
+        <form action="" class="form-nav">
+            <button class="btn-nav">Actualiza Disponibles</button>
+        </form>
+        <form action="" class="form-nav">
+            <button class="btn-nav">Actualiza Asignados</button>
+        </form>
+        <form action="" class="form-nav">
+            <button class="btn-nav">Actualiza Rechazados</button>
+        </form>
+        <form action="" class="form-nav">
+            <button class="btn-nav">Actualiza Viajes</button>
+        </form>
+        <form action="" class="form-nav">
+            <input type="date" id="asignadosDate" name="desde" class="btn-nav" required="">
+            <button class="btn-nav">Buscar</button>
+        </form>
+    </nav> -->
+
+</head>
+<body>
+    <section class="home">
+        <div class="div1">
+            <div class="blue-div">
+                <h4>DISPONIBLES</h4>
+                <div class="cards" id="listado-choferes">
+                    <div class="loading-indicator" id="loading-disponible"></div>
+                </div>
+            </div> 
+        </div>
+        <div class="div-center">
+            <div class="div-center-top">
+                <div class="blue-div">
+                    <h4>ASIGNADOS</h4>
+                    <div class="cards" id="listado-asignados">
+                        <div class="loading-indicator" id="loading-asignados"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="div-center-bottom">
+                <div class="blue-div">
+                    <h4>RECHAZADOS</h4>
+                    <div class="cards" id="listar-rechazados">
+                        <div class="loading-indicator" id="loading-rechazados"></div>
+                        <div class="cardHorizontal">
+                            <div class="ladoA">
+                                <div class="data">PEDIDO FLETE: 1004743</div>
+                                <div class="data">VALLEDOR MIGUEL ANGEL</div>
+                                <div class="data">LE MARCHE</div>
+                                <div class="data">CINCO SALTOS</div>
+                            </div>
+                            <div class="ladoB">
+                                <div class="data">‎ </div>
+                                <div class="data">‎ </div>
+                                <div class="data">‎ </div>
+                                <div class="data">
+                                    <button class="btn-asignar">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="div2">
+            <div class="blue-div">
+                <h4>EN CURSO</h4>
+                <div class="cards" id="listado-viajes">
+                    <div class="loading-indicator" id="loading-viajes"></div>
+                </div>
+            </div> 
+        </div>
+    </section>
+
+    <!-- Popup Container -->
+    <div id="popupContainer" class="popup-container">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <h2>Ubicación Vacíos</h4>
+            <form action="" method="POST">
+                <p><span id="idPedidoFlete"></span></p>
+                <label for="integerInput">Cantidad Vacíos:</label>
+                <input class="selector-pop" maxlength="2" type="number" id="integerInput" name="integerInput" required>
+                <label for="selectBox">Ubicación:</label>
+                <select class="selector-pop" id="selectBox" name="selectBox">
+                    <option value="1">PLANTA CIPOLLETTI</option>
+                    <option value="2">PLANTA VIDAL</option>
+                    <option value="3">PLANTA ALLEN</option>
+                    <option value="4">ASERRADERO</option>
+                    <option value="5">FRIO GASPARRI</option>
+                    <option value="6">FRIO TOSCHI</option>
+                </select>
+            </form>
+            
+            <div class="div-button-pop">
+                <button class="btn-pop" onclick="closePopup()">Cancelar</button>
+                <button class="btn-pop" onclick="submitPopup()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{%static 'TresAses/js/SeguimientoLogistica/seguimientoViajes.js' %}"></script>
+</body>
+</html>

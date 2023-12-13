@@ -47,6 +47,8 @@ urlpatterns = [
 
     path('frigorifico/', include('Applications.Frio.urls')),
 
+    path('logistica/', include('Applications.Logistica.urls')),
+
     path('reportes/', include('Applications.Reportes.urls')),
 
     path('login/', include('Applications.Inicio.urls')),
