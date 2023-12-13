@@ -91,7 +91,7 @@ def listadoViajes(request):
                                                 ELSE 'Salida Chacra - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraSaleChacra, 108) + ' Hs.' 
                                             END AS SALE_CHACRA,
                                             CASE 
-                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.LlegaChacra IS NULL THEN '#d5393ce8' 
+                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.SaleChacra IS NULL THEN '#d5393ce8' 
                                                 ELSE '#008f39e7' 
                                             END AS HEXA_SALE_CHACRA,
                                             CASE 
@@ -107,7 +107,7 @@ def listadoViajes(request):
                                                 ELSE 'FINALIZADO - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraFinal, 108) + ' Hs.' 
                                             END AS FINALIZA,
                                             CASE 
-                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Bascula IS NULL THEN '#d5393ce8' 
+                                                WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Final IS NULL THEN '#d5393ce8' 
                                                 ELSE '#008f39e7' 
                                             END AS HEXA_FINALIZA,
                                             PedidoFlete.IdPedidoFlete
