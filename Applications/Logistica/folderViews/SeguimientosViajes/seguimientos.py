@@ -124,7 +124,7 @@ def listadoViajes(request):
                     if consulta:
                         data = []
                         for row in consulta:
-                            pedido = str(row[0]) + " - FECHA: " + str(row[16])
+                            pedido = str(row[0]) + " - F: " + str(row[16])
                             transporte = str(row[1])
                             nombre = str(row[2])
                             chacra = str(row[3])
