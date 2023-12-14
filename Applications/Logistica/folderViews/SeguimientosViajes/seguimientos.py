@@ -110,7 +110,7 @@ def listadoViajes(request):
                                                 WHEN TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.HoraFinal IS NULL THEN '#d5393ce8' 
                                                 ELSE '#008f39e7' 
                                             END AS HEXA_FINALIZA,
-                                            PedidoFlete.IdPedidoFlete, CONVERT(VARCHAR(10), PedidoFlete.FechaAlta, 108) AS FECHA
+                                            PedidoFlete.IdPedidoFlete, CONVERT(VARCHAR(10), PedidoFlete.FechaAlta, 103) AS FECHA
                             FROM            PedidoFlete INNER JOIN
                                                     Transportista ON PedidoFlete.IdTransportista = Transportista.IdTransportista INNER JOIN
                                                     Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
@@ -124,7 +124,7 @@ def listadoViajes(request):
                     if consulta:
                         data = []
                         for row in consulta:
-                            pedido = str(row[0]) + " - " + str(row[16])
+                            pedido = str(row[0]) + " - FECHA: " + str(row[16])
                             transporte = str(row[1])
                             nombre = str(row[2])
                             chacra = str(row[3])
