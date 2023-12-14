@@ -170,29 +170,28 @@ def listadoAsignados(request):
         if user_has_permission:  
             try:
                 with connections['S3A'].cursor() as cursor:
-                    sql = """ SELECT        'PEDIDO FLETE: ' + CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) AS ID_PEDIDO, CONVERT(VARCHAR(26), RTRIM(Transportista.RazonSocial)) AS TRANSPORTE, RTRIM(Chofer.Apellidos) + ' ' + RTRIM(Chofer.Nombres) 
-                                                    AS NOMBRE, RTRIM(Camion.Nombre) AS CAMION, RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Zona.Nombre) AS ZONA,PedidoFlete.IdPedidoFlete AS ID,PedidoFlete.FechaAlta
-                            FROM            PedidoFlete INNER JOIN
-                                                    Transportista ON PedidoFlete.IdTransportista = Transportista.IdTransportista INNER JOIN
-                                                    Chofer ON PedidoFlete.IdTransportista = Chofer.IdTransportista INNER JOIN
-                                                    Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
-                                                    Camion ON PedidoFlete.IdCamion = Camion.IdCamion INNER JOIN
+                    sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(Transportista.RazonSocial) AS TRANSPORTE, RTRIM(PedidoFlete.Chofer) AS CHOFER, RTRIM(Camion.Nombre) AS CAMION, RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, 
+                                                    RTRIM(Zona.Nombre) AS ZONA
+                            FROM            Transportista INNER JOIN
+                                                    PedidoFlete ON Transportista.IdTransportista = PedidoFlete.IdTransportista INNER JOIN
+                                                    Camion ON Transportista.IdTransportista = Camion.IdTransportista AND PedidoFlete.IdCamion = Camion.IdCamion INNER JOIN
                                                     Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN
+                                                    Chacra ON Productor.IdProductor = Chacra.IdProductor AND PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
                                                     Zona ON PedidoFlete.IdZona = Zona.IdZona
-                            WHERE        (PedidoFlete.Estado = 'A') 
-                                            AND (TRY_CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, -8, GETDATE()))
-                                            AND (PedidoFlete.Estado = 'A')
-                                            AND NOT EXISTS ( 
+                            WHERE        (CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE()))) 
+                                        AND (PedidoFlete.Estado = 'A')
+                                        AND NOT EXISTS ( 
                                                     SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
                                                     WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
-                                                    AND Estado IN ('S','F','C')) """
+                                                    AND Estado IN ('S','F','C'))
+                            ORDER BY PedidoFlete.FechaAlta """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
                     if consulta:
                         data = []
                         for row in consulta:
                             flete = str(row[0])
-                            transporte = str(row[1])
+                            transporte = "PEDIDO: " + str(row[1])
                             nombre = str(row[2])
                             camion = str(row[3])
                             productor = str(row[4])

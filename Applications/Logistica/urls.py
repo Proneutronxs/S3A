@@ -6,6 +6,7 @@ urlpatterns = [
 
     # ### SOLO RENDERIZADO
     path('', views.Logistica, name="logistica"),
+    
     path('seguimiento-viajes/', views.seguimientoViajes, name="seguimiento_viajes"),
 
     ### INICIO JAVA SCRIPT SEGUIMIENTOS ###
