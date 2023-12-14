@@ -115,8 +115,7 @@ def listadoViajes(request):
                                                     Transportista ON PedidoFlete.IdTransportista = Transportista.IdTransportista INNER JOIN
                                                     Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
                                                     TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento ON PedidoFlete.IdPedidoFlete = TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.IdAsignacion
-                            WHERE        (PedidoFlete.Estado = 'A') 
-                                        --AND (TRY_CONVERT(DATE, PedidoFlete.FechaAlta) = '10/12/2023')--
+                            WHERE        (PedidoFlete.Estado = 'A')
                                         AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado = 'S' """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
@@ -197,7 +196,7 @@ def listadoAsignados(request):
                             chacra = str(row[5])
                             zona = str(row[6])
                             datos = {'Flete':flete, 'Transporte':transporte, 'Nombre':nombre, 'Camion':camion, 
-                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':flete}
+                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':str(row[0])}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Data': data})
                     else:
