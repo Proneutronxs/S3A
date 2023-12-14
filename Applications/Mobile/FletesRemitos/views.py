@@ -208,6 +208,9 @@ def insertaPedidoFlete(request):
             binsBlancos = str(json.loads(body)['binsBlancos'])
             binsRojos = str(json.loads(body)['binsRojos'])
 
+
+            insertar_registro_error_sql("FletesRemitos","HORA REQUERIA","Aplicacion",horaRequerida)
+
             if tipoCarga == 'RAU':
                 values = [idPlanta, solicita, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
                         idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, 
@@ -221,7 +224,7 @@ def insertaPedidoFlete(request):
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(), %s, GETDATE()
+                                %s, %s, (TRY_CONVERT(DATE, GETDATE())), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(), %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
