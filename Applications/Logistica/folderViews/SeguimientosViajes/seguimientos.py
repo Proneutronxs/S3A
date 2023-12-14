@@ -116,7 +116,9 @@ def listadoViajes(request):
                                                     Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
                                                     TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento ON PedidoFlete.IdPedidoFlete = TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.IdAsignacion
                             WHERE        (PedidoFlete.Estado = 'A')
-                                        AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado = 'S' """
+                                        AND (CONVERT(DATE, TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.FechaHora) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE())))
+                                        AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado IN ('S','F) 
+                            ORDER BY TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Actuallizacion DESC"""
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
                     if consulta:
