@@ -118,7 +118,7 @@ def listadoViajes(request):
                             WHERE        (PedidoFlete.Estado = 'A')
                                         AND (CONVERT(DATE, TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.FechaHora) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE())))
                                         AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado IN ('S','F') 
-                            ORDER BY TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Actuallizacion DESC """
+                            ORDER BY TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Actualizacion DESC """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
                     if consulta:
