@@ -87,6 +87,9 @@ const listarViajes = async () => {
                         <div class="elemento" style="background-color: ${datos.HexaSale}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Sale}</div>
                         <div class="elemento" style="background-color: ${datos.HexaBascula}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Bascula}</div>
                         <div class="elemento" style="background-color: ${datos.HexaFinaliza}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Finaliza}</div>
+                        <div class="data">
+                            <button class="btn-actualizar" onclick="openPopup(${datos.ID})">Ubicacion Vacios</button>
+                        </div>
                     </div>
                 </div>
                 `;
