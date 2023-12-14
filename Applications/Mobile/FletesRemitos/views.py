@@ -249,7 +249,7 @@ def insertaPedidoFlete(request):
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
+                                %s, %s, (TRY_CONVERT(DATE,GETDATE())), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE()
                             )
                             """
                     cursor.execute(sql, values)
