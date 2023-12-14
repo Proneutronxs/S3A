@@ -190,16 +190,15 @@ def listadoAsignados(request):
                     if consulta:
                         data = []
                         for row in consulta:
-                            flete = str(row[0])
-                            transporte = "PEDIDO: " + str(row[1])
+                            flete = "PEDIDO: " + str(row[0])
+                            transporte = str(row[1])
                             nombre = str(row[2])
                             camion = str(row[3])
                             productor = str(row[4])
                             chacra = str(row[5])
                             zona = str(row[6])
-                            id_pedido_flete = str(row[7])
                             datos = {'Flete':flete, 'Transporte':transporte, 'Nombre':nombre, 'Camion':camion, 
-                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':id_pedido_flete}
+                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':flete}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Data': data})
                     else:
