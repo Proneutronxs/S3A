@@ -66,7 +66,7 @@ def listadoViajes(request):
             try:
                 with connections['S3A'].cursor() as cursor:
                     sql = """ SELECT        'PEDIDO FLETE: ' + CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) AS ID_PEDIDO, CONVERT(VARCHAR(26), RTRIM(Transportista.RazonSocial)) AS TRANSPORTE, 
-                                            RTRIM(Chofer.Apellidos) + ' ' + RTRIM(Chofer.Nombres) AS NOMBRE, RTRIM(Chacra.Nombre) AS CHACRA,
+                                            RTRIM(PedidoFlete.Chofer) AS NOMBRE, RTRIM(Chacra.Nombre) AS CHACRA,
                                             CASE TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Acepta 
                                                 WHEN 'S' THEN 'ACEPTADO - ' + CONVERT(VARCHAR(5), TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.FechaHora, 108) + ' Hs.' 
                                             END AS ACEPTA,
@@ -113,7 +113,6 @@ def listadoViajes(request):
                                             PedidoFlete.IdPedidoFlete
                             FROM            PedidoFlete INNER JOIN
                                                     Transportista ON PedidoFlete.IdTransportista = Transportista.IdTransportista INNER JOIN
-                                                    Chofer ON PedidoFlete.IdTransportista = Chofer.IdTransportista INNER JOIN
                                                     Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
                                                     TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento ON PedidoFlete.IdPedidoFlete = TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.IdAsignacion
                             WHERE        (PedidoFlete.Estado = 'A') 
