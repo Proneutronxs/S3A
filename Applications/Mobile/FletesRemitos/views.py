@@ -205,7 +205,6 @@ def insertaPedidoFlete(request):
             observaciones = str(json.loads(body)['observaciones'])
             estado = "P"
             fechaRequerida = str(json.loads(body)['fechaRequerida'])
-            binsBlancos = str(json.loads(body)['binsBlancos'])
             binsRojos = str(json.loads(body)['binsRojos'])
 
 
@@ -214,17 +213,17 @@ def insertaPedidoFlete(request):
             if tipoCarga == 'RAU':
                 values = [idPlanta, solicita, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
                         idEspecie, idVariedad, binsTotal, traeVacios, traeCuellos, horaRequerida, observaciones, estado, 
-                        usuario]
+                        usuario, binsRojos]
                 with connections['S3A'].cursor() as cursor:
                     sql = """
                             INSERT INTO PedidoFlete (
                                 IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, TipoCarga,
                                 IdProductor, IdChacra, IdZona, IdEspecie, IdVariedad, Bins, Vacios, Cuellos,
-                                HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta
+                                HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta, CantBinsRojos
                             )
                             VALUES (
                                 (SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'),
-                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(), %s, GETDATE()
+                                %s, %s, GETDATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(), %s, GETDATE(), %s
                             )
                             """
                     cursor.execute(sql, values)
