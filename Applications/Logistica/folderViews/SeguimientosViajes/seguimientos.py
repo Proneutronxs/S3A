@@ -118,7 +118,7 @@ def listadoViajes(request):
                                                     TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento ON PedidoFlete.IdPedidoFlete = TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.IdAsignacion
                             WHERE        (PedidoFlete.Estado = 'A')
                                         AND (CONVERT(DATE, TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.FechaHora) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE())))
-                                        AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado IN ('S','F') 
+                                        AND TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Estado IN ('S') 
                             ORDER BY TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento.Actualizacion DESC """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
@@ -302,6 +302,9 @@ def eliminaRechazado(request, idAsignacion):
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ UPDATE Logistica_Camiones_Seguimiento SET Estado='E' WHERE IdAsignacion = %s """
                 cursor.execute(sql, [idAsignacion]) 
+
+                sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
+                cursor.execute(sqlDelete, [idAsignacion])   
 
                 cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                 affected_rows = cursor.fetchone()[0]
