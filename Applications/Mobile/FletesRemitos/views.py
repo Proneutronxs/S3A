@@ -739,7 +739,7 @@ def listadoViajesAsignados(request, chofer):
                                                     AND NOT EXISTS ( 
                                                     SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
                                                     WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
-                                                        AND Estado = 'S') """
+                                                        AND Estado IN ('S','F','R')) """
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
                 if consulta:
