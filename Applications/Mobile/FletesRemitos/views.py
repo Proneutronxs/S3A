@@ -279,11 +279,14 @@ def llamaAsignacionesPendientes(request, usuario):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT         IdPedidoFlete, CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) + ' - ' +  Productor.RazonSocial AS Asignacion " \
-                        "FROM            PedidoFlete INNER JOIN " \
-                                                "Productor ON PedidoFlete.IdProductor = Productor.IdProductor " \
-                        "WHERE        (PedidoFlete.UserID = %s) AND (PedidoFlete.Estado = 'A') " \
-                        "ORDER BY IdPedidoFlete"
+                sql = """ SELECT         IdPedidoFlete AS ID, CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) + ' - ' +  RTRIM(Productor.RazonSocial) AS ASIGNACION 
+                            FROM            PedidoFlete INNER JOIN 
+                                            Productor ON PedidoFlete.IdProductor = Productor.IdProductor
+                            WHERE        (PedidoFlete.UserID = %s) 
+                                            AND (PedidoFlete.Estado = 'A')
+                                            AND ((SELECT LlegaChacra FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = IdPedidoFlete ) IS NOT NULL)
+                                            AND ((SELECT DISTINCT AsigCerrada FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins WHERE IdAsignacion = IdPedidoFlete) IS NULL)
+                            ORDER BY IdPedidoFlete """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
                 if consulta:
@@ -724,18 +727,19 @@ def listadoViajesAsignados(request, chofer):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(PedidoFlete.Solicitante) AS SOLICITA, CONVERT(VARCHAR(10), PedidoFlete.FechaPedido, 103) AS FECHA, " \
-                                        "RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Zona.Nombre) AS ZONA, CASE PedidoFlete.Vacios WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS VACIOS, " \
-                                        "CASE PedidoFlete.Cuellos WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS CUELLOS  " \
-                        "FROM            PedidoFlete INNER JOIN " \
-                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN " \
-                                                "Zona ON PedidoFlete.IdZona = Zona.IdZona " \
-                        "WHERE        (PedidoFlete.Chofer = %s) " \
-                        "AND (PedidoFlete.Estado = 'A') " \
-                        "AND NOT EXISTS ( " \
-                        "SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento " \
-                        "WHERE IdAsignacion = PedidoFlete.IdPedidoFlete " \
-                            "AND Estado = 'S')"
+                sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(PedidoFlete.Solicitante) AS SOLICITA, CONVERT(VARCHAR(10), PedidoFlete.FechaPedido, 103) AS FECHA, 
+                                        RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Zona.Nombre) AS ZONA, CASE PedidoFlete.Vacios WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS VACIOS, 
+                                        CASE PedidoFlete.Cuellos WHEN 'S' THEN 'SI' WHEN 'N' THEN 'NO' ELSE '-' END AS CUELLOS  
+                            FROM            PedidoFlete INNER JOIN 
+                                            Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN 
+                                            Zona ON PedidoFlete.IdZona = Zona.IdZona 
+                            WHERE        (PedidoFlete.Chofer = %s) 
+                                                    AND (PedidoFlete.Estado = 'A')
+                                                    AND (PedidoFlete.UbicacionVacios IS NOT NULL)
+                                                    AND NOT EXISTS ( 
+                                                    SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
+                                                    WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
+                                                        AND Estado = 'S') """
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
                 if consulta:
@@ -1095,9 +1099,73 @@ def traeEstadoChofer(chofer):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
+@csrf_exempt
+def asignaViajeActualizaVacios(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            chofer = str(json.loads(body)['chofer'])
+            Columna = str(json.loads(body)['columna'])
+            Valor = str(json.loads(body)['valor'])
+            
+            if Columna == 'Disponible' and Valor == 'N':
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = "UPDATE Logistica_Estado_Camiones SET Disponible = 'N', Libre = 'N', Actualizado = GETDATE() WHERE NombreChofer = %s "
+                    cursor.execute(sql, [chofer]) 
 
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
 
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
+            else:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f"UPDATE Logistica_Estado_Camiones SET {Columna} = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
+                    cursor.execute(sql, [Valor,chofer])   
 
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
+            
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+def finalizaRemito(request, idAsignacion):
+    if request.method == 'GET':
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ UPDATE Datos_Remito_MovBins SET AsigCerrada = 'C' WHERE IdAsignacion = %s """
+                cursor.execute(sql, [idAsignacion]) 
+
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Finalizado'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Finalizar'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","finalizaRemito","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

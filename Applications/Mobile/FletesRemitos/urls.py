@@ -51,6 +51,9 @@ urlpatterns = [
    ### METODO POST ACTUALIZA ESTADO DEL CHOFER
    path('data-actualiza-estado/chofer', views.actualizaEstadoChofer, name="actualiza_estado_chofer"),
 
+   ### METODO DATA FINALIZA REMITO 
+   path('data-finaliza-remito/idAsignacion=<str:idAsignacion>', views.finalizaRemito, name="finaliza_remito"),
+
 
 
 ]
