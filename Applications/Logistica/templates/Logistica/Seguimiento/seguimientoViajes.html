@@ -51,7 +51,7 @@
             <div class="div-center-bottom">
                 <div class="blue-div">
                     <h4>RECHAZADOS</h4>
-                    <div class="cards" id="listar-rechazados">
+                    <div class="cards" id="listado-rechazados">
                         <div class="loading-indicator" id="loading-rechazados"></div>
                     </div>
                 </div>                
@@ -72,12 +72,14 @@
         <div class="popup-content">
             <span class="close-btn" onclick="closePopup()">&times;</span>
             <h2>Ubicación Vacíos</h4>
-            <form action="" method="POST">
+            <form action="" method="POST" id="formGuardaVacios">
                 <p><span id="idPedidoFlete"></span></p>
+                <input type="hidden" id="idasignacion" name="idasignacion">
                 <label for="integerInput">Cantidad Vacíos:</label>
                 <input class="selector-pop" maxlength="2" type="number" id="integerInput" name="integerInput" required>
                 <label for="selectBox">Ubicación:</label>
                 <select class="selector-pop" id="selectBox" name="selectBox">
+                    <option value="0">NO CARGA VACIOS</option>
                     <option value="1">PLANTA CIPOLLETTI</option>
                     <option value="2">PLANTA VIDAL</option>
                     <option value="3">PLANTA ALLEN</option>
@@ -91,6 +93,13 @@
                 <button class="btn-pop" onclick="closePopup()">Cancelar</button>
                 <button class="btn-pop" onclick="submitPopup()">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="popup" class="popup">
+        <span class="close" id="closePopup">&times;</span>
+        <div id="mensaje-pop-up">
+      
         </div>
     </div>
 

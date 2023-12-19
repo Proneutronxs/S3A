@@ -472,8 +472,7 @@ input[type="checkbox"].input-checkbox {
 .popup {
   position: fixed;
   bottom: 2rem;
-  right: -250px; /* Posición inicial fuera de la pantalla 
-  border: 2px solid #a72626;*/
+  right: -250px;
   width: 250px;
   height: auto;
   background-color: #f0f0f0;

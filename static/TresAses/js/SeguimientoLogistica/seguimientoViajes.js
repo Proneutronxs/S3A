@@ -52,12 +52,9 @@ const listarChoferes = async () => {
             closeProgressBarDisponible();
         }else {
             closeProgressBarDisponible();
-            var nota = data.Nota
-            var color = "red";
-            //mostrarInfo(nota,color) 
+            document.getElementById('listado-choferes').innerHTML = ``;
         }
     } catch (error) {
-        console.log(error)
         closeProgressBarDisponible();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -70,7 +67,6 @@ const listarViajes = async () => {
     try {
         const response = await fetch("listado-viajes/")
         const data = await response.json();
-        console.log(data);
         if(data.Message=="Success"){
             let listado = ``;
             data.Data.forEach((datos) => {
@@ -87,9 +83,6 @@ const listarViajes = async () => {
                         <div class="elemento" style="background-color: ${datos.HexaSale}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Sale}</div>
                         <div class="elemento" style="background-color: ${datos.HexaBascula}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Bascula}</div>
                         <div class="elemento" style="background-color: ${datos.HexaFinaliza}; color: #f1f1f1; border-radius: 2px; width: 100%;">${datos.Finaliza}</div>
-                        <div class="data">
-                            <button class="btn-actualizar" onclick="openPopup(${datos.ID})">Ubicacion Vacios</button>
-                        </div>
                     </div>
                 </div>
                 `;
@@ -98,12 +91,9 @@ const listarViajes = async () => {
             closeProgressBarViajes();
         }else {
             closeProgressBarViajes();
-            var nota = data.Nota
-            var color = "red";
-            //mostrarInfo(nota,color) 
+            document.getElementById('listado-viajes').innerHTML = ``;
         }
     } catch (error) {
-        console.log(error)
         closeProgressBarViajes();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -116,7 +106,6 @@ const listarAsignados = async () => {
     try {
         const response = await fetch("listado-asignados/")
         const data = await response.json();
-        console.log(data);
         if(data.Message=="Success"){
             let listado = ``;
             data.Data.forEach((datos) => {
@@ -133,7 +122,7 @@ const listarAsignados = async () => {
                         <div class="data">${datos.Chacra}</div>
                         <div class="data">${datos.Zona}</div>
                         <div class="data">
-                            <button class="btn-asignar">Aceptar</button>
+                            <button class="btn-asignar" onclick="aceptaViaje('${datos.ID}','${datos.Nombre}')">Aceptar</button>
                             <button class="btn-asignar" onclick="openPopup(${datos.ID})">Ubicacion Vacios</button>
                         </div>
                     </div>
@@ -144,12 +133,9 @@ const listarAsignados = async () => {
             closeProgressBarAsignados();
         }else {
             closeProgressBarAsignados();
-            var nota = data.Nota
-            var color = "red";
-            //mostrarInfo(nota,color) 
+            document.getElementById('listado-asignados').innerHTML = ``;
         }
     } catch (error) {
-        console.log(error)
         closeProgressBarAsignados();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -179,22 +165,20 @@ const listarRechazados = async () => {
                         <div class="data">‎ </div>
                         <div class="data">‎ </div>
                         <div class="data">
-                            <button class="btn-asignar">Eliminar</button>
+                            <button class="btn-asignar"onclick="eliminaRechazado(${datos.ID})">Eliminar</button>
                         </div>
                     </div>
                 </div>
-                `;
+                `; // onclick="openPopup(${datos.ID})"
             });
             document.getElementById('listado-rechazados').innerHTML = listado;
             closeProgressBarRechazados();
         }else {
             closeProgressBarRechazados();
-            var nota = data.Nota
-            var color = "red";
-            //mostrarInfo(nota,color) 
+            document.getElementById('listado-rechazados').innerHTML = ``;
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
         closeProgressBarRechazados();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -203,11 +187,91 @@ const listarRechazados = async () => {
 }
 
 
+const guardaVacios = async () => {
+    try {
+        const form = document.getElementById("formGuardaVacios");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("guarda-vacios/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            mostrarInfo(data.Nota);
+            closePopup();
+        }else {
+            mostrarInfo(data.Nota);
+        }
+    } catch (error) {
+        mostrarInfo(error);
+    }
+};
+
+async function aceptaViaje(idAsignacion, chofer) {
+    
+    try {
+        const url = `http://192.168.1.110/api/fletes-remitos/data-acepta-rechaza/isAsignacion=${idAsignacion}&chofer=${chofer}&acepta=S`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            mostrarInfo(response.statusText);
+            throw new Error(`Error al hacer la solicitud: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if(data.Message=="Success"){
+            mostrarInfo(data.Nota);
+            await listarAsignados();
+            await listarViajes();
+        }else {
+            mostrarInfo(data.Nota);
+        }
+
+    } catch (error) {
+        mostrarInfo(error);
+        console.error('Error:', error);
+    }
+}
+
+async function eliminaRechazado(idAsignacion) {
+    
+    try {
+        const url = `elimina-rechazado/idAsignacion=${idAsignacion}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            mostrarInfo(response.statusText);
+            throw new Error(`Error al hacer la solicitud: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if(data.Message=="Success"){
+            mostrarInfo(data.Nota);
+            await listarAsignados();
+            await listarRechazados();
+        }else {
+            mostrarInfo(data.Nota);
+        }
+
+    } catch (error) {
+        mostrarInfo(error);
+        console.error('Error:', error);
+    }
+}
+
 
 
 function openPopup(idPedidoFlete) {
     document.getElementById('popupContainer').style.display = 'flex';
     document.getElementById('idPedidoFlete').textContent = idPedidoFlete;
+    document.getElementById('idasignacion').value = idPedidoFlete;
 }
 
 function closePopup() {
@@ -215,7 +279,7 @@ function closePopup() {
 }
 
 function submitPopup() {
-    closePopup(); 
+    guardaVacios();
 }
 
 const progressBarDisponible = document.getElementById('loading-disponible');
@@ -246,4 +310,18 @@ function openProgressBarRechazados() {
 }
 function closeProgressBarRechazados() {
     progressBarRechazados.style.display = 'none';
+}
+
+document.getElementById("closePopup").addEventListener("click", function() {
+    document.getElementById("popup").classList.remove("active");
+});
+
+function mostrarInfo(Message) {
+    document.getElementById("popup").classList.add("active");
+    const mensaje = document.getElementById("mensaje-pop-up");
+    mensaje.innerHTML = `<p style="color: black; font-size: 13px;"><b>${Message}</b></p>`;
+
+    setTimeout(() => {
+        document.getElementById("popup").classList.remove("active");
+    }, 4000);
 }

@@ -4,6 +4,7 @@ from S3A.funcionesGenerales import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import datetime 
+import json
 
 from django.db import connections
 from django.http import JsonResponse
@@ -183,7 +184,7 @@ def listadoAsignados(request):
                                         AND NOT EXISTS ( 
                                                     SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
                                                     WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
-                                                    AND Estado IN ('S','F','C'))
+                                                    AND Estado IN ('S','F','C','R'))
                             ORDER BY PedidoFlete.FechaAlta """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
@@ -231,13 +232,14 @@ def listadoRechazados(request):
                                                         S3A.dbo.Productor ON S3A.dbo.PedidoFlete.IdProductor = S3A.dbo.Productor.IdProductor INNER JOIN
                                                         S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra
                                 WHERE        (Logistica_Camiones_Seguimiento.Estado IN ('C', 'R'))
-                                                AND Logistica_Camiones_Seguimiento.FechaHora >= DATEADD(DAY, -8, GETDATE()) """
+                                                AND Logistica_Camiones_Seguimiento.FechaHora >= DATEADD(DAY, -2, GETDATE()) 
+                                ORDER BY Logistica_Camiones_Seguimiento.FechaHora """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
                     if consulta:
                         data = []
                         for row in consulta:
-                            flete = str("Pedido Flete: " + row[0])
+                            flete = str("Pedido Flete: " + str(row[0]))
                             nombre = str(row[1])
                             productor = str(row[2])
                             chacra = str(row[3])
@@ -259,6 +261,84 @@ def listadoRechazados(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+
+
+@csrf_exempt
+def asignaViajeActualizaVacios(request):
+    if request.method == 'POST':
+        try:
+            
+            cantidad = request.POST.get('integerInput') or '0'
+            ubicacion = request.POST.get('selectBox')
+            idPedidoFlete = request.POST.get('idasignacion')
+
+            values = [cantidad, ubicacion, idPedidoFlete]
+            with connections['S3A'].cursor() as cursor:
+                sql = "UPDATE PedidoFlete SET CantVacios = %s, UbicacionVacios = %s WHERE IdPedidoFlete = %s "
+                cursor.execute(sql, values) 
+
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
+            if affected_rows > 0:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
+        except Exception as e:
+            error = str(e)
+            print(error)
+            insertar_registro_error_sql("FletesRemitos","asignaViajesVacios","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+def eliminaRechazado(request, idAsignacion):
+    if request.method == 'GET':            
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ UPDATE Logistica_Camiones_Seguimiento SET Estado='E' WHERE IdAsignacion = %s """
+                cursor.execute(sql, [idAsignacion]) 
+
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
+            if affected_rows > 0:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Eliminado'})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Eliminar'})
+                
+        except Exception as e:
+            error = str(e)
+            print(e)
+            insertar_registro_error_sql("FletesRemitos","EliminaRechazados","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -19,6 +19,10 @@ urlpatterns = [
 
     path('seguimiento-viajes/listado-rechazados/', seguimientos.listadoRechazados, name="listado_rechazados"),
 
+    path('seguimiento-viajes/guarda-vacios/', seguimientos.asignaViajeActualizaVacios, name="asigna_viajes_vacios"),
+
+    path('seguimiento-viajes/elimina-rechazado/idAsignacion=<str:idAsignacion>', seguimientos.eliminaRechazado, name="elimina_rechazado"),
+
     ### FINAL JAVA SCRIPT SEGUIMIENTOS ###
 
 

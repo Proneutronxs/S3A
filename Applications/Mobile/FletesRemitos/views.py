@@ -797,7 +797,7 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                     if affected_rows > 0:
                         return JsonResponse({'Message': 'Success', 'Nota': 'Aceptado'})
                     else:
-                        return JsonResponse({'Message': 'Error', 'Nota': 'No se Rechazar'})
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Rechazar'})
 
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -818,7 +818,7 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                     if affected_rows > 0:
                         return JsonResponse({'Message': 'Success', 'Nota': 'Rechazado'})
                     else:
-                        return JsonResponse({'Message': 'Error', 'Nota': 'No se Rechazar'})
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Rechazar'})
                 
             else:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Ya fue Aceptado o Rechazado'})
@@ -1099,49 +1099,7 @@ def traeEstadoChofer(chofer):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-@csrf_exempt
-def asignaViajeActualizaVacios(request):
-    if request.method == 'POST':
-        try:
-            body = request.body.decode('utf-8')
-            chofer = str(json.loads(body)['chofer'])
-            Columna = str(json.loads(body)['columna'])
-            Valor = str(json.loads(body)['valor'])
-            
-            if Columna == 'Disponible' and Valor == 'N':
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = "UPDATE Logistica_Estado_Camiones SET Disponible = 'N', Libre = 'N', Actualizado = GETDATE() WHERE NombreChofer = %s "
-                    cursor.execute(sql, [chofer]) 
 
-                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                    affected_rows = cursor.fetchone()[0]
-
-                if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
-                else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
-            else:
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Estado_Camiones SET {Columna} = %s, Actualizado = GETDATE() WHERE NombreChofer = %s "
-                    cursor.execute(sql, [Valor,chofer])   
-
-                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                    affected_rows = cursor.fetchone()[0]
-
-                if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
-                else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
-            
-        except Exception as e:
-            error = str(e)
-            insertar_registro_error_sql("FletesRemitos","actualizaEstadoChofer","Aplicacion",error)
-            return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            cursor.close()
-            connections['TRESASES_APLICATIVO'].close()
-    else:
-        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 def finalizaRemito(request, idAsignacion):
     if request.method == 'GET':
