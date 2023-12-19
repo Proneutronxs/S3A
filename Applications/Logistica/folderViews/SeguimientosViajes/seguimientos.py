@@ -303,11 +303,12 @@ def eliminaRechazado(request, idAsignacion):
                 sql = """ UPDATE Logistica_Camiones_Seguimiento SET Estado='E' WHERE IdAsignacion = %s """
                 cursor.execute(sql, [idAsignacion]) 
 
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+
                 sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
                 cursor.execute(sqlDelete, [idAsignacion])   
 
-                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                affected_rows = cursor.fetchone()[0]
 
             if affected_rows > 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Eliminado'})
