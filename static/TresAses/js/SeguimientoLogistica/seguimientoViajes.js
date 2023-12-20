@@ -122,7 +122,6 @@ const listarAsignados = async () => {
                         <div class="data">${datos.Chacra}</div>
                         <div class="data">${datos.Zona}</div>
                         <div class="data">
-                            <button class="btn-asignar" onclick="aceptaViaje('${datos.ID}','${datos.Nombre}')">Aceptar</button>
                             <button class="btn-asignar" onclick="openPopup(${datos.ID})">Ubicacion Vacios</button>
                         </div>
                     </div>
@@ -140,6 +139,7 @@ const listarAsignados = async () => {
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         //mostrarInfo(nota,color)  
+        //<button class="btn-asignar" onclick="aceptaViaje('${datos.ID}','${datos.Nombre}')">Aceptar</button>
     }
 }
 

@@ -685,17 +685,18 @@ def mostrarListadoRemitos(request, chofer):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT        RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Especie.Nombre) AS ESPECIE, RTRIM(Variedad.Nombre) AS VARIEDAD, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.Cantidad AS CANTIDAD, " \
-                                                "TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.NombrePdf AS PDF " \
-                        "FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins INNER JOIN " \
-                                                "PedidoFlete INNER JOIN " \
-                                                "Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN " \
-                                                "Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdAsignacion = PedidoFlete.IdPedidoFlete INNER JOIN " \
-                                                "Especie ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdEspecie = Especie.IdEspecie INNER JOIN " \
-                                                "Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdVariedad = Variedad.IdVariedad " \
-                        "WHERE RTRIM(PedidoFlete.Chofer) = %s " \
-                                "AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) " \
-                                "AND PedidoFlete.Estado = 'A'"
+                sql = """ SELECT        RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, RTRIM(Especie.Nombre) AS ESPECIE, RTRIM(Variedad.Nombre) AS VARIEDAD, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.Cantidad AS CANTIDAD, 
+                                        TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.NombrePdf AS PDF 
+                            FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins INNER JOIN 
+                                            PedidoFlete INNER JOIN 
+                                            Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN 
+                                            Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdAsignacion = PedidoFlete.IdPedidoFlete INNER JOIN 
+                                            Especie ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdEspecie = Especie.IdEspecie INNER JOIN
+                                            Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdVariedad = Variedad.IdVariedad 
+                            WHERE RTRIM(PedidoFlete.Chofer) = %s
+                                AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) 
+                                AND PedidoFlete.Estado = 'A'
+                                AND (SELECT Final FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = PedidoFlete.IdPedidoFlete) IS NULL """
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
                 if consulta:
@@ -710,7 +711,7 @@ def mostrarListadoRemitos(request, chofer):
                         datos = {'Productor': productor, 'Chacra': chacra, 'Especie': especie, 'Variedad': variedad, 'Cantidad': cantidad, 'PDF': pdf}
                         listado_Remitos.append(datos)
 
-                    return JsonResponse({'Message': 'Success', 'Remitos': listado_Remitos})
+                    return JsonResponse({'Message': 'Success', 'Nota': '', 'Remitos': listado_Remitos})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Remitos.'})
         except Exception as e:
