@@ -257,7 +257,7 @@ const traeTodo = async () => {
 const listar_legajos_por_sector = async () => {
     openProgressBar();
     try {
-        const form = document.getElementById("formMostrarHorasExtrasSector");
+        const form = document.getElementById("formTraeRemitosChacrasFecha");
         const formData = new FormData(form);
 
         const options = {

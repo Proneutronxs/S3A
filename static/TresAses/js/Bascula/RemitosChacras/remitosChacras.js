@@ -1,0 +1,303 @@
+
+
+const ComboxVer = document.getElementById("ComboxRemitosPor"); //selector de fecha o dia
+
+const FormDesdeHasta = document.getElementById("formTraeRemitosChacrasFecha"); //formulario de busqueda 
+
+const ComboxListRemitos = document.getElementById("ComboxTraeRemitosChacras");//selector de remito por patente y chacra
+
+const EncabezadoA = document.getElementById("encabezado-a");//detalle encabezado
+
+const EncabezadoB = document.getElementById("encabezado-b");//detalle encabezado
+
+const EncabezadoC = document.getElementById("encabezado-c");//detalle encabezado
+
+const TablaDetalle = document.getElementById("Tabla-Detalle-Remito");//detalle de la tabla
+
+const desdeInput = document.getElementById('desde');
+
+const hastaInput = document.getElementById('hasta');
+
+window.addEventListener("load", async () =>{
+    ocultarCombox();
+});
+
+const ocultarCombox = () =>{
+    FormDesdeHasta.style.display = 'none';
+    ComboxListRemitos.style.display = 'none';
+    EncabezadoA.style.display = 'none';
+    EncabezadoB.style.display = 'none';
+    EncabezadoC.style.display = 'none';
+    TablaDetalle.innerHTML = '';
+
+}
+
+
+ComboxVer.addEventListener("change", (event) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue === '0') {
+        ocultarCombox();
+    } else if (selectedValue === '1') {
+        desdeInput.value = '';
+        hastaInput.value = '';
+
+        listar_remitos();
+        FormDesdeHasta.style.display = 'none';
+    } else if (selectedValue === '2') {
+        fechaActual();
+        ComboxListRemitos.style.display = 'none';
+        FormDesdeHasta.style.display = 'block';
+    }
+});
+
+ComboxListRemitos.addEventListener("change", (event) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue === '0') {
+        EncabezadoA.style.display = 'none';
+        EncabezadoB.style.display = 'none';
+        EncabezadoC.style.display = 'none';
+        TablaDetalle.innerHTML = '';
+    } else {
+        busca_remito();
+    }
+});
+
+document.getElementById("buscaRemitosFecha").addEventListener("click", function() {
+    listar_remitos();
+});
+
+
+/// METODO PARA BUSCAR EL LISTADO
+const listar_remitos = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formTraeRemitosChacrasFecha");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("listado-remitos/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            let lista_datos = `<option value="0">Seleccione</option>`;
+            data.Datos.forEach((datos) => {
+                lista_datos += `
+                <option value="${datos.ID}">${datos.Detalle}</option>
+                `;
+            });
+            document.getElementById('ComboxTraeRemitosChacras').innerHTML = lista_datos;
+
+            ComboxListRemitos.style.display = 'block';
+            closeProgressBar();
+        }else {
+            ComboxListRemitos.style.display = 'none';
+            document.getElementById('ComboxTraeRemitosChacras').innerHTML = ``;
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        console.log(error)
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
+const busca_remito = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formTraeRemitosEncontrados");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("busca-remito/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            console.log(data)
+            let encabezado_a = ``;
+            let encabezado_b = ``;
+            let detalles = ``;
+            data.Datos.forEach((datos) => {
+                encabezado_a += `
+                <div class="info-item">
+                    <strong>Número Remito:</strong> ${datos.Remito}
+                </div>
+                <div class="info-item">
+                    <strong>Hora:</strong> ${datos.Hora}
+                </div>
+                <div class="info-item">
+                    <strong>Productor:</strong> ${datos.Productor}
+                </div>
+                <div class="info-item">
+                    <strong>Señor:</strong> ${datos.Señor}
+                </div>
+                <div class="info-item">
+                    <strong>Dirección:</strong> ${datos.Direccion}
+                </div>
+                <div class="info-item">
+                    <strong>Renspa:</strong> ${datos.Renspa}
+                </div>
+                <div class="info-item">
+                    <strong>UP:</strong> ${datos.UP}
+                </div>
+                <div class="info-item">
+                    <strong>Capataz:</strong> ${datos.Capataz}
+                </div>
+                `;
+                encabezado_b += `
+                <div class="info-item">
+                    <strong>Fecha:</strong> ${datos.Fecha}
+                </div>
+                <div class="info-item">
+                    <strong>Especie:</strong> ${datos.Especie}
+                </div>
+                <div class="info-item">
+                    <strong>Variedad:</strong> ${datos.Variedad}
+                </div>
+                <div class="info-item">
+                    <strong>Total Bins:</strong> ${datos.Total}
+                </div>
+                <div class="info-item">
+                    <strong>Chacra:</strong> ${datos.Chacra}
+                </div>
+                <div class="info-item">
+                    <strong>Chofer:</strong> ${datos.Chofer}
+                </div>
+                <div class="info-item">
+                    <strong>Camión:</strong> ${datos.Camion}
+                </div>
+                <div class="info-item">
+                    <strong>Patente:</strong> ${datos.Patente}
+                </div>
+                `;
+            });
+            data.Detalle.forEach((datos) => {
+                detalles += `
+                <tr>
+                    <td>${datos.Cantidad}</td>
+                    <td>${datos.Tamaño}</td>
+                    <td>${datos.Marca}</td>
+                </tr>
+                `;
+            });
+
+            document.getElementById('encabezado-a').innerHTML = encabezado_a;
+            document.getElementById('encabezado-b').innerHTML = encabezado_b;
+            document.getElementById("Tabla-Detalle-Remito").innerHTML = detalles;
+            EncabezadoA.style.display = 'block';
+            EncabezadoB.style.display = 'block';
+            EncabezadoC.style.display = 'block';
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        console.log(error)
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
+
+function fechaActual(){
+
+    var fecha = new Date();
+    var mes = fecha.getMonth() + 1;
+    var dia = fecha.getDate();
+    var ano = fecha.getFullYear();
+    if (dia < 10) dia = '0' + dia;
+    if (mes < 10) mes = '0' + mes;
+
+    //const formattedDate = `${dia}/${mes}/${ano}`;
+    const formattedDate = `${ano}-${mes}-${dia}`;
+    desdeInput.value = formattedDate;
+    hastaInput.value = formattedDate;
+
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.getElementById("closePopup").addEventListener("click", function() {
+    document.getElementById("popup").classList.remove("active");
+});
+
+const modalOverlay = document.querySelector('.modal-overlay');
+function openProgressBar() {
+  modalOverlay.style.display = 'block';
+}
+function closeProgressBar() {
+  modalOverlay.style.display = 'none';
+}
+
+
+
+function mostrarInfo(Message,Color) {
+    document.getElementById("popup").classList.add("active");
+    const colorBorderMsg = document.getElementById("popup");
+    const mensaje = document.getElementById("mensaje-pop-up");
+    colorBorderMsg.style.border = `2px solid ${Color}`;
+    mensaje.innerHTML = `<p style="color: black; font-size: 13px;"><b>${Message}</b></p>`;
+
+    setTimeout(() => {
+        document.getElementById("popup").classList.remove("active");
+    }, 5000);
+}

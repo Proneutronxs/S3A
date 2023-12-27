@@ -1,0 +1,101 @@
+{% extends "Bascula/Remitos/remitos.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row consola-btn">
+            <h4>REMITOS CHACRAS</h4>
+            <select class="selectores" type="select" id="ComboxRemitosPor" name="ComboxRemitosPor">
+              <option value="0">Seleccione</option>
+              <option value="1">Remitos del Día</option>
+              <option value="2">Remitos por Fecha</option>
+            </select>
+
+            <form id="formTraeRemitosChacrasFecha" method="POST" action="">
+              <div class="row">
+                <label class="letras" for="desde">Desde:</label>
+                <input type="date" id="desde" name="desde" class="selectores">
+              
+                <label class="letras" for="hasta">Hasta:</label>
+                <input type="date" id="hasta" name="hasta" class="selectores">
+
+                <button id="buscaRemitosFecha" class="btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+              </div>
+            </form>
+
+            <form id="formTraeRemitosEncontrados" method="POST" action="">
+              <select class="selectores" type="select" id="ComboxTraeRemitosChacras" name="ComboxTraeRemitosChacras">
+                  
+              </select>
+          </form>
+
+        </div>
+    </div>
+    <div class="vista-container">
+      <div class="card-encabezado" id="card-encabezado">
+          <div class="info-group" id="encabezado-a">
+            
+          </div>
+          <div class="info-group" id="encabezado-b">
+            
+          </div>
+          <div class="info-group-btn" id="encabezado-c">
+            <form id="formTraeRemitosEncontrados" method="POST" action="">
+                <label for="observaciones">Observaciones:</label><br>
+                <textarea type="text" id="observaciones" name="observaciones" rows="7" placeholder="Datos a modificar."></textarea>
+            </form>
+            <div class="button-container">
+                <button id="guardaObsrvaciones" class="btn-submit botones-remito" type="button">Guardar</button>
+                <button id="modificarRemito" class="btn-submit botones-remito" type="button">Modificar</button>
+                <button id="descargaRemito" class="btn-submit botones-remito" type="button">Descargar</button>
+            </div>
+          </div>
+      </div>  
+      <div class="card-cuerpo" id="card-cuerpo">
+        <table class="pre-hs-ex tabla-remitos">
+          <thead>
+            <tr>
+              <th>Cantidad</th>
+              <th>Envase</th>
+              <th>Marca</th>
+            </tr>
+          </thead>
+          <tbody id="Tabla-Detalle-Remito">
+          </tbody>
+        </table>
+      </div>        
+    </div>                  
+</div>
+
+<div class="modal-overlay">
+  <div class="modal-container">
+    <div class="demo-container">
+      <div class="progress-bar">
+        <div class="progress-bar-value"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
+  <div class="popup-content">
+    <p>¿Estás seguro de que deseas eliminar los items seleccionados?</p> <br>
+    <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+    <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+  </div>
+</div>
+
+<div id="popup" class="popup">
+  <span class="close" id="closePopup">&times;</span>
+  <div id="mensaje-pop-up">
+
+  </div>
+</div>
+
+  
+<script src="{%static 'TresAses/js/Bascula/RemitosChacras/remitosChacras.js' %}"></script>
+
+{% endblock %}

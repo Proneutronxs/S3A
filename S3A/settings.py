@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'Applications.Empaque',
     'Applications.Frio',
     'Applications.Logistica',
+    'Applications.Bascula',
 ]
 
 MIDDLEWARE = [

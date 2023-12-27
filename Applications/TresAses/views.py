@@ -15,6 +15,8 @@ def TresAses(request):
 def verificarPermisos(request, sector):
     user_has_permission = request.user.has_perm(sector + '.puede_ingresar')
     if user_has_permission:
+        if sector == 'Bascula':
+            return JsonResponse ({'Message': 'Success', 'URL': 'bascula/'})
         if sector == 'Empaque':
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
         if sector == 'RRHH':
