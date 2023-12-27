@@ -17,14 +17,14 @@
             <form id="formTraeRemitosChacrasFecha" method="POST" action="">
               <div class="row">
                 <label class="letras" for="desde">Desde:</label>
-                <input type="date" id="desde" name="desde" class="selectores" pattern="\d{2}/\d{2}/\d{4}" inputmode="numeric">
+                <input type="text" id="desde" name="desde" class="selectores" pattern="\d{2}/\d{2}/\d{4}" inputmode="numeric" placeholder="dd/mm/yyyy">
               
                 <label class="letras" for="hasta">Hasta:</label>
-                <input type="date" id="hasta" name="hasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}" inputmode="numeric">
-
+                <input type="text" id="hasta" name="hasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}" inputmode="numeric" placeholder="dd/mm/yyyy">
+            
                 <button id="buscaRemitosFecha" class="btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
               </div>
-            </form>
+            </form>            
 
             <form id="formTraeRemitosEncontrados" method="POST" action="">
               <select class="selectores" type="select" id="ComboxTraeRemitosChacras" name="ComboxTraeRemitosChacras">
