@@ -1160,7 +1160,12 @@ def guardaCosechaDiaria(request):
                 
                 affected_rows = cursor.fetchone()[0]
 
-                insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",str(affected_rows))
+                try:
+                    affected_rows = cursor.fetchone()[0]
+                except TypeError:
+                    # Manejar la excepción si no hay resultados
+                    affected_rows = None
+
 
             if affected_rows == 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
