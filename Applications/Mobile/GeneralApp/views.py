@@ -37,7 +37,7 @@ def login_app(request):
                             "BEGIN " \
                                 "SELECT        USUARIOS.CodEmpleado, (RTRIM(S3A.dbo.Chofer.Apellidos) + ' ' + RTRIM(S3A.dbo.Chofer.Nombres)) AS Nombre, " \
                                                     "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  " \
-                                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer " \
+                                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario " \
                                 "FROM            S3A.dbo.Chofer INNER JOIN " \
                                                         "USUARIOS INNER JOIN " \
                                                         "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado ON S3A.dbo.Chofer.IdChofer = USUARIOS.CodEmpleado " \
@@ -52,7 +52,7 @@ def login_app(request):
                                     "FROM TresAses_ISISPayroll.dbo.Empleados  " \
                                     "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE '-' END AS Nombres,  " \
                                     "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,   " \
-                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer  " \
+                                    "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario  " \
                                 "FROM            USUARIOS INNER JOIN  " \
                                                 "USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado  " \
                                 "WHERE        (USUARIOS.Usuario = @ParametroUser) AND (USUARIOS.Clave = @ParametroPass) " \
@@ -62,11 +62,11 @@ def login_app(request):
                 consulta = cursor.fetchone()
                 
                 if consulta:
-                    legajo, nombre, hExtras, asistencia, anticipos, pedidoFlete, crearRemito, reporteBins, chofer = map(str, consulta)
+                    legajo, nombre, hExtras, asistencia, anticipos, pedidoFlete, crearRemito, reporteBins, chofer, user = map(str, consulta)
                     response_data = {                        
                         'Legajo': legajo,
                         'Nombre': nombre,
-                        'Usuario': usuario,
+                        'Usuario': user,
                         'HExtras': hExtras,
                         'Asistencia': asistencia,
                         'Anticipos': anticipos,
