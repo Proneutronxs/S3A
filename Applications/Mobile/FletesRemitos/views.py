@@ -1161,6 +1161,8 @@ def guardaCosechaDiaria(request):
                 affected_rows = cursor.fetchone()[0]
 
             if affected_rows == 0:
+
+                insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",str(affected_rows))
                 return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
             elif affected_rows == 1:
                 return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro para hoy.'})
@@ -1169,7 +1171,7 @@ def guardaCosechaDiaria(request):
                 
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
+            insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",error)
         finally:
             cursor.close()
             connections['TRESASES_APLICATIVO'].close()
