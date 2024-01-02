@@ -1167,7 +1167,7 @@ def existeRegistro(usuario, idChacra):
                                 WHERE Usuario = %s
                                 AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE()) AND Chacra %s """
             cursor.execute(sql, values)
-            result = cursor.fetchone()[0]
+            result = cursor.fetchone()
             if result:
                 return True
             else:
@@ -1175,7 +1175,7 @@ def existeRegistro(usuario, idChacra):
             
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",error)
+        insertar_registro_error_sql("EXISTE REGISTRO","SELECT","usuario",error)
         return False
     finally:
         cursor.close()
