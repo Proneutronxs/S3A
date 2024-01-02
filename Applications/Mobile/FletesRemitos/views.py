@@ -1138,33 +1138,37 @@ def guardaCosechaDiaria(request):
             values = [usuario,chacra,usuario,productor,chacra,bins]
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
-                    DECLARE @Resultado INT
                     BEGIN
-                        IF NOT EXISTS (
-                            SELECT 1
-                            FROM Registro_Cosecha_Diaria
-                            WHERE Usuario = %s
-                            AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE()) AND Chacra = %s
-                        )
-                        BEGIN
-                            INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
-                            VALUES (%s, %s, %s, %s, GETDATE());
-                            SET @Resultado = 0
-                            SELECT @Resultado
-                        END
-                        ELSE
+                        BEGIN TRY
+                            IF NOT EXISTS (
+                                SELECT 1
+                                FROM Registro_Cosecha_Diaria
+                                WHERE Usuario = %s
+                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
+                            )
                             BEGIN
-                                SET @Resultado = 1
-                                SELECT @Resultado
+                                INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
+                                VALUES (%s, %s, %s, %s, GETDATE());
+                                SELECT 1 AS AffectedRows;
                             END
-                    END 
+                            ELSE
+                            BEGIN
+                                SELECT 0 AS AffectedRows;
+                            END
+                        END TRY
+                        BEGIN CATCH
+                            -- Manejar errores si es necesario
+                            SELECT 2 AS AffectedRows;
+                        END CATCH
+                    END
+
                     """
                 cursor.execute(sql, values)
                 affected_rows = cursor.fetchone()[0]
 
             if affected_rows == 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
-            elif affected_rows == 1:
+            elif affected_rows == 2:
                 return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro de hoy de esa chacra.'})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
