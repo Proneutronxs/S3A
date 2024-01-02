@@ -266,8 +266,7 @@ def listadoRechazados(request):
 @csrf_exempt
 def asignaViajeActualizaVacios(request):
     if request.method == 'POST':
-        try:
-            
+        try:            
             cantidad = request.POST.get('integerInput') or '0'
             ubicacion = request.POST.get('selectBox')
             idPedidoFlete = request.POST.get('idasignacion')
