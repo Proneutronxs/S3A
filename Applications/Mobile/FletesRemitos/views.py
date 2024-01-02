@@ -1136,55 +1136,50 @@ def guardaCosechaDiaria(request):
             chacra = str(json.loads(body)['idChacra'])
             bins = str(json.loads(body)['binsTotal'])
             values = [usuario,chacra,usuario,productor,chacra,bins]
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ 
-                    BEGIN
-                        BEGIN TRY
-                            IF NOT EXISTS (
-                                SELECT 1
-                                FROM Registro_Cosecha_Diaria
-                                WHERE Usuario = %s
-                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
-                            )
-                            BEGIN
-                                INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
-                                VALUES (%s, %s, %s, %s, GETDATE());
-                                SELECT 1 AS AffectedRows;
-                            END
-                            ELSE
-                            BEGIN
-                                SELECT 0 AS AffectedRows;
-                            END
-                        END TRY
-                        BEGIN CATCH
-                            -- Manejar errores si es necesario
-                            SELECT 2 AS AffectedRows;
-                        END CATCH
-                    END
-
-                    """
-                cursor.execute(sql, values)
-                affected_rows = cursor.fetchone()[0]
-
-            if affected_rows == 0:
-                return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
-            elif affected_rows == 2:
+            if existeRegistro(usuario,chacra):
                 return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro de hoy de esa chacra.'})
             else:
-                return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta) VALUES (%s, %s, %s, %s, GETDATE()); """
+                    cursor.execute(sql, values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
                 
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            cursor.close()
-            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
+def existeRegistro(usuario, idChacra):
+    try:
+        values = [usuario,idChacra]
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ SELECT 1
+                                FROM Registro_Cosecha_Diaria
+                                WHERE Usuario = %s
+                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE()) AND Chacra %s """
+            cursor.execute(sql, values)
+            result = cursor.fetchone()[0]
+            if result:
+                return True
+            else:
+                return False
+            
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",error)
+        return False
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 
 
