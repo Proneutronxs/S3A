@@ -1163,9 +1163,9 @@ def existeRegistro(usuario, idChacra):
         values = [usuario,idChacra]
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ SELECT 1
-                                FROM Registro_Cosecha_Diaria
-                                WHERE Usuario = %s
-                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE()) AND Chacra %s """
+                    FROM Registro_Cosecha_Diaria
+                    WHERE Usuario = %s
+                    AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE()) AND Chacra = %s """
             cursor.execute(sql, values)
             result = cursor.fetchone()
             if result:
