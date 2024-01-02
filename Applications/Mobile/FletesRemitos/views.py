@@ -1135,7 +1135,7 @@ def guardaCosechaDiaria(request):
             productor = str(json.loads(body)['idProductor'])
             chacra = str(json.loads(body)['idChacra'])
             bins = str(json.loads(body)['binsTotal'])
-            values = [usuario,chacra,usuario,productor,chacra,bins]
+            values = [usuario,productor,chacra,bins]
             if existeRegistro(usuario,chacra):
                 return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro de hoy de esa chacra.'})
             else:
