@@ -1135,24 +1135,25 @@ def guardaCosechaDiaria(request):
             productor = str(json.loads(body)['idProductor'])
             chacra = str(json.loads(body)['idChacra'])
             bins = str(json.loads(body)['binsTotal'])
-            values = [usuario,productor,chacra,bins,usuario]
+            values = [usuario,usuario,productor,chacra,bins]
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
-                            SELECT
-                                %s AS Usuario,
-                                %s AS Productor,
-                                %s AS Chacra,
-                                %s AS CantBins,
-                                GETDATE() AS FechaAlta
-                            WHERE NOT EXISTS (
+                sql = """ BEGIN
+                            IF NOT EXISTS (
                                 SELECT 1
                                 FROM Registro_Cosecha_Diaria
                                 WHERE Usuario = %s
                                 AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
                             )
-                            OPTION (MAXDOP 1) 
+                            BEGIN
+                                INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
+                                VALUES
+                                    (%s, %s, %s, %s, GETDATE());
+                            END
                             ELSE
-                            SELECT 1; """
+                            BEGIN
+                                SELECT 1 AS RESULT;
+                            END
+                        END """
                 cursor.execute(sql, values)
                 result = cursor.fetchone()
                 if result:
