@@ -54,6 +54,9 @@ urlpatterns = [
    ### METODO DATA FINALIZA REMITO 
    path('data-finaliza-remito/idAsignacion=<str:idAsignacion>', views.finalizaRemito, name="finaliza_remito"),
 
+   ### GUARDA COSECHA DIARIA
+   path('data-inserta/cosecha-diaria', views.guardaCosechaDiaria, name="cosecha_diaria"),
+
 
 
 ]

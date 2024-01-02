@@ -1126,7 +1126,53 @@ def finalizaRemito(request, idAsignacion):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def guardaCosechaDiaria(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            usuario = str(json.loads(body)['usuario'])
+            productor = str(json.loads(body)['idProductor'])
+            chacra = str(json.loads(body)['idChacra'])
+            bins = str(json.loads(body)['binsTotal'])
+            values = [usuario,productor,chacra,bins,usuario]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
+                            SELECT
+                                %s AS Usuario,
+                                %s AS Productor,
+                                %s AS Chacra,
+                                %s AS CantBins,
+                                GETDATE() AS FechaAlta
+                            WHERE NOT EXISTS (
+                                SELECT 1
+                                FROM Registro_Cosecha_Diaria
+                                WHERE Usuario = %s
+                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
+                            )
+                            OPTION (MAXDOP 1) 
+                            ELSE
+                            SELECT 1; """
+                cursor.execute(sql, values)
+                result = cursor.fetchone()
+                if result:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registo para Hoy.'})
+                
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
 
+            if affected_rows > 0:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
+        finally:
+            cursor.close()
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
