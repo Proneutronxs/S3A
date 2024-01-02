@@ -1148,21 +1148,21 @@ def guardaCosechaDiaria(request):
                         BEGIN
                             INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
                             VALUES (%s, %s, %s, %s, GETDATE());
-                            SELECT 2 AS AffectedRows;
                         END
                         ELSE
                         BEGIN
-                            SELECT 1 AS AffectedRows;
+                            SELECT 0 AS AffectedRows;
                         END
                     END 
-                """
+                    """
                 cursor.execute(sql, values)
-                
+
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                 affected_rows = cursor.fetchone()[0]
 
-            if affected_rows == 2:
+            if affected_rows > 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
-            elif affected_rows == 1:
+            elif affected_rows == 0:
                 return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro para hoy.'})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
