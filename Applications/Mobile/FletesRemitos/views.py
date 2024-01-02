@@ -1137,35 +1137,36 @@ def guardaCosechaDiaria(request):
             bins = str(json.loads(body)['binsTotal'])
             values = [usuario,usuario,productor,chacra,bins]
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ BEGIN
-                            IF NOT EXISTS (
-                                SELECT 1
-                                FROM Registro_Cosecha_Diaria
-                                WHERE Usuario = %s
-                                AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
-                            )
-                            BEGIN
-                                INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
-                                VALUES
-                                    (%s, %s, %s, %s, GETDATE());
-                            END
-                            ELSE
-                            BEGIN
-                                SELECT 1 AS RESULT;
-                            END
-                        END """
+                sql = """ 
+                    BEGIN
+                        IF NOT EXISTS (
+                            SELECT 1
+                            FROM Registro_Cosecha_Diaria
+                            WHERE Usuario = %s
+                            AND CONVERT(DATE, FechaAlta) = CONVERT(DATE, GETDATE())
+                        )
+                        BEGIN
+                            INSERT INTO Registro_Cosecha_Diaria (Usuario, Productor, Chacra, CantBins, FechaAlta)
+                            VALUES (%s, %s, %s, %s, GETDATE());
+                            SELECT 0 AS AffectedRows;
+                        END
+                        ELSE
+                        BEGIN
+                            SELECT 1 AS AffectedRows;
+                        END
+                    END 
+                """
                 cursor.execute(sql, values)
-                result = cursor.fetchone()
-                if result:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registo para Hoy.'})
                 
-                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                 affected_rows = cursor.fetchone()[0]
 
-            if affected_rows > 0:
+            if affected_rows == 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'Guardado.'})
+            elif affected_rows == 1:
+                return JsonResponse({'Message': 'Error', 'Nota': 'Ya se guardó el registro para hoy.'})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Guardar.'})
+                
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
