@@ -1172,6 +1172,7 @@ def guardaCosechaDiaria(request):
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FLETES REMITOS","GUARDA COSECHA","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
             connections['TRESASES_APLICATIVO'].close()
