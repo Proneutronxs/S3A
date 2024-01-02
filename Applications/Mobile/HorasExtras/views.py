@@ -344,7 +344,7 @@ def verHorasExtras(request):#HorasExtras_Sin_Procesar.Estado <> %s AND
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeDesde, " \
                                                 "103) + ' ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.DateTimeDesde, 108) + ' hs' AS DESDE, CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), " \
-                                                "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA, HorasExtras_Sin_Procesar.Estado AS Estado " \
+                                                "HorasExtras_Sin_Procesar.DateTimeHasta, 108) + ' hs' AS HASTA, HorasExtras_Sin_Procesar.Estado AS Estado, TresAses_ISISPayroll.dbo.Empleados.CodEmpleado " \
                         "FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "HorasExtras_Sin_Procesar ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Sin_Procesar.Legajo INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
@@ -355,7 +355,7 @@ def verHorasExtras(request):#HorasExtras_Sin_Procesar.Estado <> %s AND
                 if consulta:
                     lista_data = []
                     for row in consulta:
-                        nombre = str(row[0])
+                        nombre = str(row[0]) + " - " + str(row[4])
                         desde = str(row[1])
                         hasta = str(row[2])
                         estado = str(row[3])
