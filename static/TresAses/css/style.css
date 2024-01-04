@@ -569,6 +569,7 @@ input[type="checkbox"].input-checkbox {
   padding: 10px; /* Añadir espacio interno para separar del borde */
   display: flex;
   flex-direction: column; /* Establecer el diseño de columna */
+  border-left: 1px solid #a72626;
 }
 
 .info-group-btn label {

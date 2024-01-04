@@ -105,7 +105,6 @@ const listar_remitos = async () => {
             mostrarInfo(nota,color) 
         }
     } catch (error) {
-        console.log(error)
         closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -129,11 +128,11 @@ const busca_remito = async () => {
         const response = await fetch("busca-remito/", options);
         const data = await response.json();
         if(data.Message=="Success"){
-            console.log(data)
             let encabezado_a = ``;
             let encabezado_b = ``;
+            let encabezado_c = ``;
             let detalles = ``;
-            data.Datos.forEach((datos) => {
+            data.Datos.forEach((datos) => { 
                 encabezado_a += `
                 <div class="info-item">
                     <strong>Número Remito:</strong> ${datos.Remito}
@@ -184,8 +183,21 @@ const busca_remito = async () => {
                 </div>
                 <div class="info-item">
                     <strong>Patente:</strong> ${datos.Patente}
+                </div>              
+                `;
+                encabezado_c += `
+                <form id="formTraeObservacionRemito" method="POST" action="">
+                    <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                    <label for="observaciones">Observaciones:</label><br>
+                    <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="7" placeholder="Datos a modificar.">${datos.Obs}</textarea>
+                </form>
+                <div class="button-container">
+                    <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar</button>
+                    <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}');">Modificar</button>
+                    <button id="descargaRemito" class="btn-submit botones-remito" type="button">Descargar</button>
                 </div>
                 `;
+
             });
             data.Detalle.forEach((datos) => {
                 detalles += `
@@ -199,6 +211,7 @@ const busca_remito = async () => {
 
             document.getElementById('encabezado-a').innerHTML = encabezado_a;
             document.getElementById('encabezado-b').innerHTML = encabezado_b;
+            document.getElementById('encabezado-c').innerHTML = encabezado_c;
             document.getElementById("Tabla-Detalle-Remito").innerHTML = detalles;
             EncabezadoA.style.display = 'block';
             EncabezadoB.style.display = 'block';
@@ -206,7 +219,55 @@ const busca_remito = async () => {
             closeProgressBar();
         }else {
             closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
 
+
+function actualizaObs() {
+    const observacionesRemito = document.getElementById("observacionesRemito").value;
+    if (!observacionesRemito.trim()) {
+        var nota = "El campo de observaciones está vacío.";
+        var color = "red";
+        mostrarInfo(nota,color) 
+        alert();
+    } else {
+        actualizaObservaciones();
+    }
+
+    
+}
+
+const actualizaObservaciones = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formTraeObservacionRemito");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("actualiza-obs/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color) 
+            closeProgressBar();
+        }else {
+            closeProgressBar();
             var nota = data.Nota
             var color = "red";
             mostrarInfo(nota,color) 
@@ -234,10 +295,32 @@ function fechaActual(){
     const formattedDate = `${ano}-${mes}-${dia}`;
     desdeInput.value = formattedDate;
     hastaInput.value = formattedDate;
-
-    
 }
 
+
+const popUpModifica = async (numero) => {
+    openProgressBar();
+    try {
+        const response = await fetch("modifica/")
+        const data = await response.json();
+        if(data.Message=="Success"){
+            var color = "red";
+            mostrarInfo(numero,color) 
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        limpiarCampos(); 
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color)  
+    }
+}
 
 
 
