@@ -35,7 +35,7 @@ def datos_Iniciales_Flete(request):
                         listado_planta_destino.append(datos)
 
                 ## PRODUCTOR
-                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE Activo = 'S' ORDER BY RazonSocial"
+                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN(5000,5405,5200) ORDER BY RazonSocial"
                 cursor.execute(sql2)
                 consulta2 = cursor.fetchall()
                 if consulta2:
@@ -131,7 +131,6 @@ def idProductor_Zona(request,idProductor,idChacra):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 def idEspecie_Varierad(request,idEspecie):
     if request.method == 'GET':
@@ -269,9 +268,6 @@ def insertaPedidoFlete(request):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
-
-
-
 
 #### CREACION DE REMITOS DATOS A MOSTRAR ASIGNACIONES Y BINS 
 
