@@ -180,7 +180,7 @@ def actualizaObsRemito(request):
             values =  [observacion,num_remito]
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """ UPDATE Datos_Remito_MovBins SET Observaciones = %s, Modificado = 'Ping WHERE NumeroRemito = %s """
+                    sql = """ UPDATE Datos_Remito_MovBins SET Observaciones = %s, Modificado = 'P' WHERE NumeroRemito = %s """
                     cursor.execute(sql, values)
                    
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
