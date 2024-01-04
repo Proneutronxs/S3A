@@ -116,7 +116,7 @@ def buscaRemito(request):
                             camion = str(i[13])
                             patente = str(i[14])
                             fecha = str(i[15])
-                            hora = str(i[16])
+                            hora = str(i[16]) + " Hs."
                             idRemito = str(i[17])
                             observaciones= str(i[18])
                             datos = {'Remito':numero_remito,'Productor':productor, 'Señor':señor, 'Direccion':direccion, 'Renspa':renspa, 'UP':up, 'Total':total, 
