@@ -127,8 +127,8 @@ class Remito_Movimiento_Chacras(FPDF):
         self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
-        self.text(x=110, y=133, txt= 'C.A.I.: 47503100328571')
-        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 13/12/2024')
+        self.text(x=110, y=133, txt= 'C.A.I.: 49523204816019')
+        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 29/12/2024')
         self.ln(138)
 
 
@@ -163,9 +163,9 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.rect(x=5,y=5,w=200,h=138)
         self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
         self.set_font('Arial', 'I', 8)
-        self.text(x=50, y=12, txt= 'De TRES ASES S.A.')
+        self.text(x=50, y=12, txt= 'De RO-MIK S.A.')
         self.set_font('Arial', 'B', 8)
-        self.text(x=42, y=15, txt= 'LISANDRO DE LA TORRE N° 100')
+        self.text(x=42, y=15, txt= 'ROCA N° 495')
         self.text(x=44, y=18, txt= 'TEL: (0299) 4772183 / 4772139')
         self.text(x=39, y=21, txt= '4772183 / 4772139 FAX: (299) 4771573')
         self.text(x=49, y=24, txt= '(8324) CIPOLLETTI, R.N.')
@@ -257,8 +257,8 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
-        self.text(x=110, y=133, txt= 'C.A.I.: 47503100328571')
-        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 13/12/2024')
+        self.text(x=110, y=133, txt= 'C.A.I.: 50016204851055')
+        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 02/01/2025')
         self.ln(138)
 
 class Remito_Abadon_Movimiento_Chacras(FPDF):
@@ -385,6 +385,6 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
-        self.text(x=110, y=133, txt= 'C.A.I.: 47503100328571')
-        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 13/12/2024')
+        self.text(x=110, y=133, txt= 'C.A.I.: 49523204816077')
+        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 29/12/2024')
         self.ln(138)

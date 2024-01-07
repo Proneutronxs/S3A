@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404
 from django.views.static import serve
 from django.http import JsonResponse
 from S3A.funcionesGenerales import *
-from Applications.ModelosPDF.remitoChacra import Remito_Movimiento_Chacras
+from Applications.ModelosPDF.remitoChacra import *
 import barcode
 import json
 import os
@@ -472,7 +472,6 @@ def insertCreaciónRemitos(request):
             body = request.body.decode('utf-8')
             fechaActual = obtenerFechaActual()
             horaActual = obtenerHoraActual()
-            numero_chacra= "00017"
             Usuario = str(json.loads(body)['usuario'])
             capataz = str(json.loads(body)['nombre'])
             IdAsignación = str(json.loads(body)['idAsignacion'])
@@ -483,53 +482,112 @@ def insertCreaciónRemitos(request):
             total_bins = str(json.loads(body)['totalBins'])
             idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
-
-            #### primero inserta el remito para generar el número
-
-            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
-
-            ### busca datos de la Asignacion
-
-            productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
             
+            #### primero inserta el remito para generar el número
+            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
+            ### busca datos de la Asignacion
+            productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
             especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
-            pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+            if idPrductor == '5000':
+                numero_chacra= "00018"
+                pdf = Remito_Abadon_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                                     numero_remito, productor, productor, domicilio, 
                                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
                                     total_bins, capataz, Usuario,)
-            pdf.alias_nb_pages()
-            pdf.add_page()
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                for item in listadoBins:
+                    if index == 9:
+                        pdf.alias_nb_pages()
+                        pdf.add_page()
+                        index = 0
+                    IdMarca = item['idMarca']
+                    IdTamaño = item['idTamaño']
+                    Cantidad = item['cantidad']   
+                    marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                    ##INSERTA DATA BINS
+                    insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño,idPrductor)
+                    pdf.set_font('Arial', '', 8)
+                    pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                    pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                    index = index + 1   
+                fecha = str(fechaActual).replace('/', '')
+                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                actualizaNombrePDF(name,numero_remito)
+                pdf.output(nameDireccion, 'F')
+                nota = "El Remito se creó correctamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})
+            
+            elif idPrductor == '5200':
+                numero_chacra= "00001"
+                pdf = Remito_Romik_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+                    numero_remito, productor, productor, domicilio, 
+                    lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
+                    total_bins, capataz, Usuario,)
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                for item in listadoBins:
+                    if index == 9:
+                        pdf.alias_nb_pages()
+                        pdf.add_page()
+                        index = 0
+                    IdMarca = item['idMarca']
+                    IdTamaño = item['idTamaño']
+                    Cantidad = item['cantidad']   
+                    marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                    ##INSERTA DATA BINS
+                    insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño,idPrductor)
+                    pdf.set_font('Arial', '', 8)
+                    pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                    pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                    index = index + 1   
+                fecha = str(fechaActual).replace('/', '')
+                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                actualizaNombrePDF(name,numero_remito)
+                pdf.output(nameDireccion, 'F')
+                nota = "El Remito se creó correctamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})
+            
+            else:
+                numero_chacra= "00017"
+                pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
+                    numero_remito, productor, productor, domicilio, 
+                    lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
+                    total_bins, capataz, Usuario,)
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                for item in listadoBins:
+                    if index == 9:
+                        pdf.alias_nb_pages()
+                        pdf.add_page()
+                        index = 0
+                    IdMarca = item['idMarca']
+                    IdTamaño = item['idTamaño']
+                    Cantidad = item['cantidad']   
+                    marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
+                    ##INSERTA DATA BINS
+                    insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño,idPrductor)
+                    pdf.set_font('Arial', '', 8)
+                    pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
+                    pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
+                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                    index = index + 1   
+                fecha = str(fechaActual).replace('/', '')
+                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                actualizaNombrePDF(name,numero_remito)
+                pdf.output(nameDireccion, 'F')
+                nota = "El Remito se creó correctamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})
 
-            index = 0
-            for item in listadoBins:
-                if index == 9:
-                    pdf.alias_nb_pages()
-                    pdf.add_page()
-                    index = 0
-                IdMarca = item['idMarca']
-                IdTamaño = item['idTamaño']
-                Cantidad = item['cantidad']   
-                marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
-                ##INSERTA DATA BINS
-                insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño,idPrductor)
-                pdf.set_font('Arial', '', 8)
-                pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
-                pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
-                pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
-                index = index + 1
-                
-            fecha = str(fechaActual).replace('/', '')
-
-            name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
-            nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
-
-            actualizaNombrePDF(name,numero_remito)
-
-            pdf.output(nameDireccion, 'F')
-
-            nota = "El Remito se creó correctamente."
-            return JsonResponse({'Message': 'Success', 'Nota': nota})                  
         except Exception as e:
             error = f"ERROR: {type(e).__name__} - {str(e)}"
             insertar_registro_error_sql("FletesRemitos","insertCreacionRemitos","Aplicacion",error)
