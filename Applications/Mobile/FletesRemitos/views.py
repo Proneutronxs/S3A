@@ -310,19 +310,21 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = "SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte, " \
-                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor" \
-                        "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
-                                                "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
-                                                "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
-                                                "Zona AS Z ON PF.IdZona = Z.IdZona LEFT OUTER JOIN " \
-                                                "Ubicacion AS U ON PF.IdPlantaDestino = U.IdUbicacion LEFT OUTER JOIN " \
-                                                "Especie AS E ON PF.IdEspecie = E.IdEspecie LEFT OUTER JOIN " \
-                                                "Variedad AS V ON PF.IdVariedad = V.IdVariedad LEFT OUTER JOIN " \
-                                                "Transportista AS T ON PF.IdTransportista = T.IdTransportista LEFT OUTER JOIN " \
-                                                "Camion AS CA ON PF.IdCamion = CA.IdCamion LEFT OUTER JOIN " \
-                                                "Acoplado AS A ON PF.IdAcoplado = A.IdAcoplado " \
-                        "WHERE        (PF.IdPedidoFlete = %s)"
+                sql =   """
+                        SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte,
+                                    RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor
+                        FROM            PedidoFlete AS PF LEFT OUTER JOIN 
+                                    Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN 
+                                    Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN 
+                                    Zona AS Z ON PF.IdZona = Z.IdZona LEFT OUTER JOIN 
+                                    Ubicacion AS U ON PF.IdPlantaDestino = U.IdUbicacion LEFT OUTER JOIN 
+                                    Especie AS E ON PF.IdEspecie = E.IdEspecie LEFT OUTER JOIN 
+                                    Variedad AS V ON PF.IdVariedad = V.IdVariedad LEFT OUTER JOIN 
+                                    Transportista AS T ON PF.IdTransportista = T.IdTransportista LEFT OUTER JOIN 
+                                    Camion AS CA ON PF.IdCamion = CA.IdCamion LEFT OUTER JOIN 
+                                    Acoplado AS A ON PF.IdAcoplado = A.IdAcoplado 
+                        WHERE        (PF.IdPedidoFlete = %s)
+                        """
                 cursor.execute(sql, [idAsignacion])
                 consulta = cursor.fetchall()
                 if consulta:
