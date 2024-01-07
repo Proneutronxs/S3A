@@ -311,7 +311,7 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = "SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte, " \
-                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PedidoFlete.IdProductor " \
+                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor" \
                         "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
                                                 "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
                                                 "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
