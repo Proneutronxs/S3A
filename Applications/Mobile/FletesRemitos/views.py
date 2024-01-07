@@ -1101,9 +1101,9 @@ def textUbicacion(chofer):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    SELECT	CONVERT(VARCHAR(1), CASE Acepta WHEN 'S' THEN '*' ELSE '' END) + '   ' +
-                            CONVERT(VARCHAR(1), CASE WHEN LlegaChacra IS NULL THEN '' ELSE '*' END) + '   ' +
-                            CONVERT(VARCHAR(1), CASE WHEN SaleChacra IS NULL THEN '' ELSE '*' END) + '   ' +
+                    SELECT	CONVERT(VARCHAR(1), CASE Acepta WHEN 'S' THEN '*' ELSE '' END) + ' ' +
+                            CONVERT(VARCHAR(1), CASE WHEN LlegaChacra IS NULL THEN '' ELSE '*' END) + ' ' +
+                            CONVERT(VARCHAR(1), CASE WHEN SaleChacra IS NULL THEN '' ELSE '*' END) + ' ' +
                             CONVERT(VARCHAR(1), CASE WHEN Bascula IS NULL THEN '' ELSE '*' END)
                     FROM Logistica_Camiones_Seguimiento
                     WHERE Chofer = %s AND Estado = 'S'
