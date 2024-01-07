@@ -920,7 +920,7 @@ def actualizaEstadoPosicion(request):
 
                     if affected_rows > 0:
                         actualizaNumColumna(IdAsignacion)
-                        return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado'})
+                        return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado', 'Estado':textUbicacion(Chofer)})
                     else:
                         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
                 else:
@@ -995,7 +995,7 @@ def actualizaEstadoChofer(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado', 'Estado':textUbicacion(chofer)})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
             
