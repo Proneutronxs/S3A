@@ -479,11 +479,12 @@ def insertCreaciónRemitos(request):
             IdEspecie = str(json.loads(body)['idEspecie'])
             IdVariedad = str(json.loads(body)['idVariedad'])
             total_bins = str(json.loads(body)['totalBins'])
+            idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
 
             #### primero inserta el remito para generar el número
 
-            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario)
+            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
 
             ### busca datos de la Asignacion
 
@@ -509,7 +510,7 @@ def insertCreaciónRemitos(request):
                 Cantidad = item['cantidad']   
                 marca, bins = traeMarcaBinsConID(IdMarca, IdTamaño)
                 ##INSERTA DATA BINS
-                insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño)
+                insertaBinsRemito(numero_remito,Cantidad, IdMarca, IdTamaño,idPrductor)
                 pdf.set_font('Arial', '', 8)
                 pdf.cell(w=24, h=5, txt= str(Cantidad), border='LBR', align='C', fill=0)
                 pdf.cell(w=86, h=5, txt= str(bins), border='BR', align='C', fill=0)
@@ -608,12 +609,12 @@ def traeMarcaBinsConID(IdMarca,IdBins):
         cursor.close()
         connections['S3A'].close()
 
-def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario):
-    values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario]
+def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario, idProductor):
+    values = [idProductor, IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idProductor]
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario) " \
-			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins), %s, %s, %s, %s, %s, %s, getdate(), %s)"
+            sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario, IdProductor) " \
+			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins WHERE IdProductor = %s), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
             cursor.execute(sql, values)
             
             sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
@@ -629,12 +630,12 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_b
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins):
-    values = [numeroRemito, cantidad, idMarca, idBins]
+def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins, idProductor):
+    values = [numeroRemito, cantidad, idMarca, idBins, idProductor]
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Contenido_Remito_MovBins (NumeroRemito, Cantidad, IdMarca, IdBins) " \
-			        "VALUES (%s, %s, %s, %s)"
+            sql = "INSERT INTO Contenido_Remito_MovBins (NumeroRemito, Cantidad, IdMarca, IdBins, IdProductor) " \
+			        "VALUES (%s, %s, %s, %s, %s)"
             cursor.execute(sql, values)
     except Exception as e:
         error = str(e)
