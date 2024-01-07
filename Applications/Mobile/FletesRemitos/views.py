@@ -482,7 +482,7 @@ def insertCreaciónRemitos(request):
             total_bins = str(json.loads(body)['totalBins'])
             idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
-            
+
             #### primero inserta el remito para generar el número
             numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
             ### busca datos de la Asignacion
@@ -515,7 +515,7 @@ def insertCreaciónRemitos(request):
                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                     index = index + 1   
                 fecha = str(fechaActual).replace('/', '')
-                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                name = 'R_00018_' + str(numero_remito) + '_' + fecha + '.pdf'
                 nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
                 actualizaNombrePDF(name,numero_remito)
                 pdf.output(nameDireccion, 'F')
@@ -548,7 +548,7 @@ def insertCreaciónRemitos(request):
                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                     index = index + 1   
                 fecha = str(fechaActual).replace('/', '')
-                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                name = 'R_00001_' + str(numero_remito) + '_' + fecha + '.pdf'
                 nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
                 actualizaNombrePDF(name,numero_remito)
                 pdf.output(nameDireccion, 'F')
@@ -581,7 +581,7 @@ def insertCreaciónRemitos(request):
                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                     index = index + 1   
                 fecha = str(fechaActual).replace('/', '')
-                name = 'R_' + str(numero_remito) + '_' + fecha + '.pdf'
+                name = 'R_00017_' + str(numero_remito) + '_' + fecha + '.pdf'
                 nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
                 actualizaNombrePDF(name,numero_remito)
                 pdf.output(nameDireccion, 'F')
