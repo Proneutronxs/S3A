@@ -206,7 +206,7 @@ def insertaPedidoFlete(request):
             binsRojos = str(json.loads(body)['binsRojos'])
 
 
-            insertar_registro_error_sql("FletesRemitos","HORA REQUERIA","Aplicacion",horaRequerida)
+            #insertar_registro_error_sql("FletesRemitos","HORA REQUERIA","Aplicacion",horaRequerida)
 
             if tipoCarga == 'RAU':
                 values = [idPlanta, solicita, horaPedido, tipoDestino, tipoCarga, idProductor, idChacra, idZona, 
@@ -311,7 +311,7 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = "SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte, " \
-                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa " \
+                                        "RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PedidoFlete.IdProductor " \
                         "FROM            PedidoFlete AS PF LEFT OUTER JOIN " \
                                                 "Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN " \
                                                 "Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN " \
@@ -336,7 +336,9 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                         camion = str(row[5])
                         patente = str(row[6])
                         renspa = str(row[7])
-                        datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte, 'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa}
+                        idProductor = str(row[8])
+                        datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte,
+                                  'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa, 'IdProductor': idProductor}
                         listadoData_Asignaciones.append(datos)
                 
                 listadoData_UP = traeUPS(renspa)
