@@ -922,13 +922,13 @@ def actualizaEstadoPosicion(request):
                         actualizaNumColumna(IdAsignacion)
                         return JsonResponse({'Message': 'Success', 'Nota': 'Punto Actualizado', 'Estado':textUbicacion(Chofer)})
                     else:
-                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar'})
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Actualizar', 'Estado':textUbicacion(Chofer)})
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                         affected_rows = cursor.fetchone()[0]
                         
-                    return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos'})
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Se Actualizaron todos los Puntos', 'Estado':textUbicacion(Chofer)})
             
         except Exception as e:
             error = str(e)
