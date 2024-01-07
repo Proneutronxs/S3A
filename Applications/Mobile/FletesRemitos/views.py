@@ -74,7 +74,6 @@ def datos_Iniciales_Flete(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
 def idProductor_Chacra(request,idProductor):
     if request.method == 'GET':
         try:
@@ -188,7 +187,7 @@ def insertaPedidoFlete(request):
             idPlanta = "100"
             usuario = str(json.loads(body)['usuario'])
             fechaPedido = obtenerFechaActualUSA()
-            horaPedido = obtenerHoraActual()
+            horaPedido = obtenerHoraActual() + ":00"
             tipoDestino  = "P"
             tipoCarga = str(json.loads(body)['tipoCarga'])
             idProductor = str(json.loads(body)['idProductor'])
@@ -200,7 +199,7 @@ def insertaPedidoFlete(request):
             binsTotal = str(json.loads(body)['binsTotal'])
             traeVacios = str(json.loads(body)['traeVacios'])
             traeCuellos = str(json.loads(body)['traeCuellos'])
-            horaRequerida = str(json.loads(body)['horaRequerida'])
+            horaRequerida = str(json.loads(body)['horaRequerida']) + ":00"
             observaciones = str(json.loads(body)['observaciones'])
             estado = "P"
             fechaRequerida = str(json.loads(body)['fechaRequerida'])
@@ -866,9 +865,9 @@ def actualizaEstadoPosicion(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Retiró Bins'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Retiró Bins', 'Estado':textUbicacion(Chofer)})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.'})
+                    return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Final':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -885,9 +884,9 @@ def actualizaEstadoPosicion(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'F'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'F', 'Estado':textUbicacion(Chofer)})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar'})
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Cancelar':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
