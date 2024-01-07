@@ -1,12 +1,12 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 from S3A.funcionesGenerales import *
 import json
 from django.http import FileResponse
 import os
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from django.db import connections
-from django.http import JsonResponse
 
 
 def subirApp(request):

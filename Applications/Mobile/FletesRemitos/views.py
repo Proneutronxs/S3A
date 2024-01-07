@@ -995,7 +995,7 @@ def actualizaEstadoChofer(request):
                     affected_rows = cursor.fetchone()[0]
 
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado', 'Estado':textUbicacion(chofer)})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
             
@@ -1043,8 +1043,9 @@ def datosViajesAceptados(request, chofer):
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
                         datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra}
-                        listado_Viajes_Aceptados.append(datos)                    
-                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer)})
+                        listado_Viajes_Aceptados.append(datos)    
+                    
+                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer), 'Estado':textUbicacion(chofer)})
                 else:
                     return JsonResponse({'Message': 'No', 'DataEstadoChofer' : traeEstadoChofer(chofer)})
         except Exception as e:
@@ -1096,7 +1097,28 @@ def traeEstadoChofer(chofer):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-
+def textUbicacion(chofer):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT	CONVERT(VARCHAR(1), CASE Acepta WHEN 'S' THEN '*' ELSE '' END) + '   ' +
+                            CONVERT(VARCHAR(1), CASE WHEN LlegaChacra IS NULL THEN '' ELSE '*' END) + '   ' +
+                            CONVERT(VARCHAR(1), CASE WHEN SaleChacra IS NULL THEN '' ELSE '*' END) + '   ' +
+                            CONVERT(VARCHAR(1), CASE WHEN Bascula IS NULL THEN '' ELSE '*' END)
+                    FROM Logistica_Camiones_Seguimiento
+                    WHERE Chofer = %s AND Estado = 'S'
+                """
+            cursor.execute(sql, [chofer])
+            consulta = cursor.fetchone()
+            if consulta:
+                estado = str(consulta[0])
+                return estado
+            else:
+                return "-"
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","textUbicacion","consulta",error)
+        return "-"
 
 def finalizaRemito(request, idAsignacion):
     if request.method == 'GET':
