@@ -1107,7 +1107,10 @@ def datosViajesAceptados(request, chofer):
                         datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra}
                         listado_Viajes_Aceptados.append(datos)    
                     
-                    return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer), 'Estado':textUbicacion(chofer)})
+                    if  textUbicacion(chofer) == '-':
+                        return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer)})
+                    else:
+                        return JsonResponse({'Message': 'Success', 'DataViajesAceptado': listado_Viajes_Aceptados, 'DataEstadoChofer' : traeEstadoChofer(chofer), 'Estado':textUbicacion(chofer)})
                 else:
                     return JsonResponse({'Message': 'No', 'DataEstadoChofer' : traeEstadoChofer(chofer)})
         except Exception as e:
