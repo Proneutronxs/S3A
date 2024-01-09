@@ -12,7 +12,9 @@ const EncabezadoB = document.getElementById("encabezado-b");//detalle encabezado
 
 const EncabezadoC = document.getElementById("encabezado-c");//detalle encabezado
 
-const TablaDetalle = document.getElementById("Tabla-Detalle-Remito");//detalle de la tabla
+const TablaDetalle = document.getElementById("Tabla-Detalle-Remito");//detalle de la tabla refreshBusqueda
+
+const Refresh = document.getElementById("refreshBusqueda");
 
 const desdeInput = document.getElementById('desde');
 
@@ -33,6 +35,7 @@ const ocultarCombox = () =>{
     EncabezadoB.style.display = 'none';
     EncabezadoC.style.display = 'none';
     TablaDetalle.innerHTML = '';
+    Refresh.style.display = 'none';
 
 }
 
@@ -48,10 +51,13 @@ ComboxVer.addEventListener("change", (event) => {
 
         listar_remitos();
         FormDesdeHasta.style.display = 'none';
+
+        Refresh.style.display = 'block'; 
     } else if (selectedValue === '2') {
         fechaActual();
         ComboxListRemitos.style.display = 'none';
         FormDesdeHasta.style.display = 'block';
+        Refresh.style.display = 'none';
     }
 });
 
