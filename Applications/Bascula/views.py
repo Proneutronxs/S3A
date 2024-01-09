@@ -170,6 +170,19 @@ def verificaModificaRemito(request):
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
 @login_required
+@csrf_exempt   
+def verificaNuevoRemito(request):
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('Bascula.puede_insertar') and request.user.has_perm('Bascula.puede_borrar')
+        if user_has_permission:
+            return JsonResponse({'Message': 'Success'})
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
 @csrf_exempt
 def actualizaObsRemito(request):
     if request.method == 'POST':

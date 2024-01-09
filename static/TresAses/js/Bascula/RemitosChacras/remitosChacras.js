@@ -18,6 +18,10 @@ const desdeInput = document.getElementById('desde');
 
 const hastaInput = document.getElementById('hasta');
 
+const overlay = document.getElementById('overlay-remito-nuevo');
+
+const popup = document.getElementById('popup-nuevo-remito');
+
 window.addEventListener("load", async () =>{
     ocultarCombox();
 });
@@ -189,12 +193,15 @@ const busca_remito = async () => {
                 <form id="formTraeObservacionRemito" method="POST" action="">
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
                     <label for="observaciones">Observaciones:</label><br>
-                    <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="7" placeholder="Datos a modificar.">${datos.Obs}</textarea>
+                    <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="5" placeholder="Datos a modificar.">${datos.Obs}</textarea>
                 </form>
                 <div class="button-container">
                     <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar</button>
                     <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}');">Modificar</button>
-                    <button id="descargaRemito" class="btn-submit botones-remito" type="button">Descargar</button>
+                    <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo('${datos.IdRemito}');">Nuevo</button>
+                </div>
+                <div class="button-container">
+                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="">Descargar</button>
                 </div>
                 `;
 
@@ -241,9 +248,7 @@ function actualizaObs() {
         alert();
     } else {
         actualizaObservaciones();
-    }
-
-    
+    }    
 }
 
 const actualizaObservaciones = async () => {
@@ -301,7 +306,7 @@ function fechaActual(){
 const popUpModifica = async (numero) => {
     openProgressBar();
     try {
-        const response = await fetch("modifica/")
+        const response = await fetch("verifica-modifica/")
         const data = await response.json();
         if(data.Message=="Success"){
             var color = "red";
@@ -315,13 +320,43 @@ const popUpModifica = async (numero) => {
         }
     } catch (error) {
         closeProgressBar();
-        limpiarCampos(); 
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         mostrarInfo(nota,color)  
     }
 }
 
+
+const popUpNuevo= async (numero) => {
+    openProgressBar();
+    try {
+        const response = await fetch("verifica-nuevo/")
+        const data = await response.json();
+        if(data.Message=="Success"){
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+            var color = "red";
+            mostrarInfo(numero,color) 
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color)  
+    }
+}
+
+
+function ocultarNuevoRemito(){
+    overlay.style.display = 'none';
+    popup.style.display = 'none';
+}
 
 
 

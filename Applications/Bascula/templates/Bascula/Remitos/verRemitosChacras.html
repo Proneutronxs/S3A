@@ -73,11 +73,134 @@
   </div>
 </div>
 
-<div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
-  <div class="popup-content">
-    <p>¿Estás seguro de que deseas eliminar los items seleccionados?</p> <br>
-    <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
-    <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+
+<div class="overlay" id="overlay-remito-nuevo">
+  <div class="popup-remito-nuevo" id="popup-nuevo-remito">
+    <div class="popup-content-remito">
+      <div class="card-encabezado" id="popup-card-encabezado">
+        <div class="info-group" id="popup-encabezado-a">
+          <div class="info-item-nuevo">
+              <strong>Productor:</strong> TRES ASES S.A.
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Señor:</strong> GRISANTI ENRIQUE
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Dirección:</strong> LISANDRO DE LA TORRE 100
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Renspa:</strong> 121225326529
+          </div>
+          <div class="info-item-nuevo">
+            <input class="selectores" type="text" id="up" name="up" placeholder="UP" value="RN2345555" required>
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Capataz:</strong> CHAMBI JOSUE RUBEN
+          </div>
+        </div>
+        <div class="info-group" id="popup-encabezado-b">
+          <div class="info-item-nuevo">
+              <strong>Chacra:</strong> LA ANTOLA
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Chofer:</strong> ACUÑA JUAN
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Camión:</strong> MERCEDEZ 1114
+          </div>
+          <div class="info-item-nuevo">
+              <strong>Patente:</strong> SDF252
+          </div>
+          <div class="info-item-nuevo">
+            <div class="nuevo-remito-selector">
+              <select class="selectores" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
+                <option value="0">ESPECIE</option>
+                <option value="1">MANZANA</option>
+                <option value="2">PERA</option>
+              </select>
+            </div>
+          </div>
+          <div class="info-item-nuevo">
+            <div class="nuevo-remito-selector">
+              <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
+                <option value="0">VARIEDAD</option>
+                <option value="1">XXXXXX</option>
+                <option value="2">XXXXXX</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="info-group-btn-popup-crea" id="popup-encabezado-c">
+          <div class="display-nuevo-Remito">
+            <select class="selectores" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
+              <option value="0">Marca Bins</option>
+              <option value="1">TRES ASES</option>
+              <option value="2">NIRVANA</option>
+            </select>
+            <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
+              <option value="0">Tipo Bins</option>
+              <option value="1">GRANDE</option>
+              <option value="2">MEDIANO</option>
+            </select>
+            <input class="selectores" maxlength="2" type="number" id="cantidadBins" name="cantidadBins" placeholder="Cantidad" required>
+            <div class="btn-agrega-quita">
+              <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">add</button>
+              <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
+            </div>
+          </div>
+
+          <div class="container-nuevo-remito">
+            <table class="pre-hs-ex">
+              <thead>
+                <tr>
+                  <th>Cant.</th>
+                  <th>Envase</th>
+                  <th>Marca</th>
+                </tr>
+              </thead>
+              <tbody id="Tabla-Detalle-Remito">
+                <tr>
+                  <td>60</td>
+                  <td>GRANDE</td>
+                  <td>TRES ASES</td>
+                </tr>
+                <tr>
+                  <td>20</td>
+                  <td>GRANDE</td>
+                  <td>TRES ASES</td>
+                </tr>
+                <tr>
+                  <td>50</td>
+                  <td>MEDIANO</td>
+                  <td>TRES ASES</td>
+                </tr>
+                <tr>
+                  <td>50</td>
+                  <td>MEDIANO</td>
+                  <td>TRES ASES</td>
+                </tr>
+                <tr>
+                  <td>50</td>
+                  <td>MEDIANO</td>
+                  <td>TRES ASES</td>
+                </tr>
+                <tr>
+                  <td>50</td>
+                  <td>MEDIANO</td>
+                  <td>TRES ASES</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="btn-guarda-cancela">
+            <button id="cancela-creacion" class="btn-submit botones-remito" type="button" onclick="ocultarNuevoRemito()">Cancelar</button>
+            <button id="guarda-nuevo-remito" class="btn-submit botones-remito" type="button">Crear</button>
+          </div>
+          
+        </div>
+      </div> 
+    </div>
   </div>
 </div>
 

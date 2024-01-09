@@ -14,7 +14,9 @@ urlpatterns = [
 
     path('remitos-chacras/busca-remito/', views.buscaRemito, name='busca_remito'),
 
-    path('remitos-chacras/modifica/', views.verificaModificaRemito, name='verifica_modifica_remito'),
+    path('remitos-chacras/verifica-modifica/', views.verificaModificaRemito, name='verifica_modifica_remito'),
+
+    path('remitos-chacras/verifica-nuevo/', views.verificaNuevoRemito, name='verifica_nuevo_remito'),
 
     path('remitos-chacras/actualiza-obs/', views.actualizaObsRemito, name='actualiza_obserbaciones'),
 

@@ -35,7 +35,7 @@ def datos_Iniciales_Flete(request):
                         listado_planta_destino.append(datos)
 
                 ## PRODUCTOR
-                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN(5000,5405,5200) ORDER BY RazonSocial"
+                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN(5000,5405,5200,5212,5116,5163,5213) ORDER BY RazonSocial"
                 cursor.execute(sql2)
                 consulta2 = cursor.fetchall()
                 if consulta2:
@@ -80,6 +80,7 @@ def idProductor_Chacra(request,idProductor):
             with connections['S3A'].cursor() as cursor:
                 listado_Chacra = []
                 ## CHACRA
+
                 sql = "SELECT IdChacra, RTRIM(Nombre) FROM Chacra WHERE IdProductor = %s ORDER BY Nombre"
                 cursor.execute(sql, [idProductor])
                 consulta = cursor.fetchall()

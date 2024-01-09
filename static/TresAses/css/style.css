@@ -546,11 +546,15 @@ input[type="checkbox"].input-checkbox {
 .botones-remito{
   width: 100px;
 }
-
+.botones-remito-nuevo{
+  width: 100%;
+}
 .info-group {
   flex: 1; /* Hace que los grupos ocupen el espacio disponible */
   margin: 0 10px; /* Espaciado entre los grupos */
   margin-top: 5px;
+  display: flex;
+  flex-direction: column;
 }
 
 .info-item {
@@ -564,7 +568,7 @@ input[type="checkbox"].input-checkbox {
 
 .info-group-btn {
   color: #444343;
-  min-width: 360px;
+  max-height: 360px;
   margin: 5px;
   padding: 10px; /* Añadir espacio interno para separar del borde */
   display: flex;
@@ -579,7 +583,7 @@ input[type="checkbox"].input-checkbox {
 .info-group-btn textarea {
   background: #f1f1f1;
   color: #444343;
-  height: 120px; /* Altura del input text */
+  height: 105px; /* Altura del input text */
   width: 100%;
   padding: 5px; /* Añadir espacio interno alrededor del texto */
   box-sizing: border-box; /* Hace que el padding no afecte el tamaño total */
@@ -587,12 +591,13 @@ input[type="checkbox"].input-checkbox {
 }
 
 .button-container {
-  margin-top: 10px; /* Espaciado entre el input y los botones */
+  margin-top: 10px;
   text-align: center;
+  width: 100%;
 }
 
 .button-container button {
-  margin-bottom: 5px; /* Espaciado entre los botones */
+  margin-bottom: 10px; /* Espaciado entre los botones */
 }
 
 .card-cuerpo{
@@ -630,6 +635,158 @@ input[type="checkbox"].input-checkbox {
 
 
 
+
+
+.popup-remito-nuevo {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  z-index: 1000;
+}
+
+/* Estilo del contenido del popup */
+.popup-content-remito {
+  width: 1000px;
+  max-width: 1000px;
+  margin: 0 auto;
+  max-height: 500px;
+}
+
+/* Estilo del botón para cerrar el popup */
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+/* Estilo del fondo oscuro cuando el popup está abierto */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.info-group-btn-popup-crea {
+  color: #444343;
+  max-width: 380px;
+  min-width: 380px;
+  max-height: 360px;
+  margin: 5px;
+  padding: 10px; /* Añadir espacio interno para separar del borde */
+  display: flex;
+  flex-direction: column; /* Establecer el diseño de columna */
+  border-left: 1px solid #a72626;
+}
+
+
+.pre-hs-ex-remito-nuevo {
+  max-height: 150px; /* Ajusta la altura máxima según tus necesidades */
+  overflow-y: auto;
+  border-collapse: collapse;
+}
+
+.button-container {
+  margin-top: 10px; /* Ajusta el margen según tus necesidades */
+}
+
+.popup-content-remito {
+  max-height: 80vh; /* Ajusta la altura máxima según tus necesidades */
+  overflow-y: auto;
+}
+
+.popup-remito-nuevo {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+
+.display-nuevo-Remito {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.display-nuevo-Remito select {
+  width: 100%;
+  margin-bottom: 10px; /* Espacio entre los selectores */
+}
+
+.display-nuevo-Remito input {
+  width: 100%;
+  margin-bottom: 10px; /* Espacio entre el input y los botones */
+}
+
+.display-nuevo-Remito button {
+  width: 48%; /* Ajusta el ancho de los botones según tus necesidades */
+}
+
+.display-nuevo-Remito button:first-child {
+  margin-right: 4%; /* Espacio entre los botones */
+}
+
+.display-nuevo-Remito button:last-child {
+  margin-left: 4%; /* Espacio entre los botones */
+}
+
+
+.btn-agrega-quita {
+  display: flex;
+  justify-content: center; /* Centra los elementos horizontalmente */
+  align-items: center; /* Centra los elementos verticalmente */
+}
+
+.btn-agrega-quita button {
+  margin: 0 5px;
+  width: auto;
+}
+
+.btn-guarda-cancela {
+  display: flex;
+  justify-content: center; /* Centra los elementos horizontalmente */
+  align-items: center; /* Centra los elementos verticalmente */
+  margin-top: 5px;
+}
+
+.btn-guarda-cancela button {
+  margin: 0 5px;
+}
+
+.container-nuevo-remito {
+  margin-top: 5px;
+  overflow: auto;
+}
+
+.nuevo-remito-selector{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.info-item-nuevo {
+  margin-bottom: 10px; /* Espaciado entre elementos de información */
+  height: 100%;
+}
 
   
   
