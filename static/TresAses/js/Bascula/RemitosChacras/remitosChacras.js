@@ -52,7 +52,7 @@ ComboxVer.addEventListener("change", (event) => {
         listar_remitos();
         FormDesdeHasta.style.display = 'none';
 
-        Refresh.style.display = 'block'; 
+        
     } else if (selectedValue === '2') {
         fechaActual();
         ComboxListRemitos.style.display = 'none';
@@ -78,6 +78,13 @@ document.getElementById("buscaRemitosFecha").addEventListener("click", function(
     listar_remitos();
 });
 
+function refreshOnclick(){
+    listar_remitos();
+    EncabezadoA.style.display = 'none';
+    EncabezadoB.style.display = 'none';
+    EncabezadoC.style.display = 'none';
+    TablaDetalle.innerHTML = '';
+}
 
 /// METODO PARA BUSCAR EL LISTADO
 const listar_remitos = async () => {
@@ -105,6 +112,7 @@ const listar_remitos = async () => {
             document.getElementById('ComboxTraeRemitosChacras').innerHTML = lista_datos;
 
             ComboxListRemitos.style.display = 'block';
+            Refresh.style.display = 'block'; 
             closeProgressBar();
         }else {
             ComboxListRemitos.style.display = 'none';
