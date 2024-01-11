@@ -280,7 +280,7 @@ def llamaAsignacionesPendientes(request, usuario):
                                             Productor ON PedidoFlete.IdProductor = Productor.IdProductor
                             WHERE        (PedidoFlete.UserID = %s) 
                                             AND (PedidoFlete.Estado = 'A')
-                                            AND ((SELECT LlegaChacra FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = IdPedidoFlete AND Estado = 'S' ) IS NOT NULL)
+                                            --AND ((SELECT LlegaChacra FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = IdPedidoFlete AND Estado = 'S' ) IS NOT NULL)
                                             AND ((SELECT DISTINCT AsigCerrada FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins WHERE IdAsignacion = IdPedidoFlete) IS NULL)
                             ORDER BY IdPedidoFlete """
                 cursor.execute(sql, [usuario])
@@ -557,7 +557,8 @@ def insertCreaciónRemitos(request):
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
             
             else:
-                numero_chacra= "00017"
+                numero_chacra = "00017"
+                idPrductor = "5405"
                 pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 

@@ -9,4 +9,5 @@ class Bascula(models.Model):
             ("puede_insertar", "Puede Insertar"),
             ("puede_modificar", "Puede Modificar"),
             ("puede_borrar", "Puede Borrar"),
+            ("puede_crear_remito", "Puede Crear Remito"),
         ]

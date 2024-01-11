@@ -157,7 +157,7 @@
               <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
             </div>
           </div>
-
+          <br>
           <div class="container-nuevo-remito">
             <table class="pre-hs-ex">
               <thead>
@@ -212,6 +212,83 @@
     </div>
   </div>
 </div>
+
+<div class="overlay" id="overlay-remito-modifica" style="display: none;">
+  <div class="content-modifica">
+    <div class="remito-modifica-bins">
+      <div class="content-selectores">
+        <div class="selectores-container">
+          <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
+            <option value="0">Marca Bins</option>
+            <option value="1">TRES ASES</option>
+            <option value="2">NIRVANA</option>
+          </select> <br> <br>
+          <select class="selectores selectores-modifica" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
+            <option value="0">Tipo Bins</option>
+            <option value="1">GRANDE</option>
+            <option value="2">MEDIANO</option>
+          </select> <br> <br>
+          <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBins" name="cantidadBins" placeholder="Cantidad" required>
+        </div>
+        <div class="btn-agrega-quita-modifica">
+          <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">add</button>
+          <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
+        </div>
+      </div>
+      <br>
+      <div class="container-modifica-bins">
+        <table class="pre-hs-ex">
+          <thead>
+            <tr>
+              <th>Cant.</th>
+              <th>Envase</th>
+              <th>Marca</th>
+            </tr>
+          </thead>
+          <tbody id="Tabla-modifica-Remito">
+            <tr>
+              <td>60</td>
+              <td>GRANDEAAAAAAA</td>
+              <td>TRES ASES SASASAS</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>GRANDE</td>
+              <td>TRES ASES</td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>MEDIANO</td>
+              <td>TRES ASES</td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>MEDIANO</td>
+              <td>TRES ASES</td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>MEDIANO</td>
+              <td>TRES ASES</td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>MEDIANO</td>
+              <td>TRES ASES</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btn-guarda-cancela">
+        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="">Cancelar</button>
+        <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button">Guardar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
 <div id="popup" class="popup">
   <span class="close" id="closePopup">&times;</span>

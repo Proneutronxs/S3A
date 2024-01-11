@@ -646,14 +646,14 @@ input[type="checkbox"].input-checkbox {
   transform: translate(-50%, -50%);
   background-color: #fff;
   border: 1px solid #ccc;
-  padding: 20px;
+  padding: 10px;
   z-index: 1000;
 }
 
 /* Estilo del contenido del popup */
 .popup-content-remito {
-  width: 1000px;
-  max-width: 1000px;
+  width: 900px;
+  max-width: 900px;
   margin: 0 auto;
   max-height: 500px;
 }
@@ -680,8 +680,8 @@ input[type="checkbox"].input-checkbox {
 
 .info-group-btn-popup-crea {
   color: #444343;
-  max-width: 380px;
-  min-width: 380px;
+  max-width: 340px;
+  min-width: 340px;
   max-height: 360px;
   margin: 5px;
   padding: 10px; /* Añadir espacio interno para separar del borde */
@@ -689,6 +689,7 @@ input[type="checkbox"].input-checkbox {
   flex-direction: column; /* Establecer el diseño de columna */
   border-left: 1px solid #a72626;
 }
+
 
 
 .pre-hs-ex-remito-nuevo {
@@ -710,7 +711,7 @@ input[type="checkbox"].input-checkbox {
   display: none;
   position: fixed;
   top: 50%;
-  left: 55%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background-color: #fff;
   padding: 20px;
@@ -789,6 +790,71 @@ input[type="checkbox"].input-checkbox {
   height: 100%;
 }
 
-  
-  
-  
+.content-modifica {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+}
+.remito-modifica-bins {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-selectores {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.selectores-container {
+  flex: 1;
+}
+
+.selectores-modifica {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.btn-agrega-quita-modifica {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  margin-left: 10px;
+  justify-content: space-between;
+}
+
+.btn-agrega-quita-modifica button {
+  margin-bottom: 10px;
+}
+
+.container-modifica-bins {
+  overflow: auto;
+}
+
+.btn-guarda-cancela {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-guarda-cancela button {
+  flex: 1;
+  margin: 0 5px;
+}
+
+/* Media Query para hacerlo responsivo */
+@media only screen and (max-width: 600px) {
+  .content-modifica {
+    width: 90%;
+  }
+}

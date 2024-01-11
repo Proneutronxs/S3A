@@ -252,7 +252,7 @@ def verAnticipos(request):
             año = obtenerAñoActual()
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "SELECT        CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, '$ ' + CONVERT(VARCHAR(10), Auditoria_Anticipos.Monto, 2) " \
-                                                "AS IMPORTE, 'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO, , TresAses_ISISPayroll.dbo.Empleados.CodEmpleado " \
+                                                "AS IMPORTE, 'Tipo: ' + SUBSTRING(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde, LEN('CH - ADELANTO ') + 1, LEN(TresAses_ISISPayroll.dbo.EmpleadoAdelantos.MotivoAde)) AS MOTIVO, TresAses_ISISPayroll.dbo.Empleados.CodEmpleado " \
                         "FROM            TresAses_ISISPayroll.dbo.EmpleadoAdelantos INNER JOIN " \
                                                 "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                                 "Auditoria_Anticipos ON TresAses_ISISPayroll.dbo.Empleados.Regis_Epl = Auditoria_Anticipos.Destino ON TresAses_ISISPayroll.dbo.EmpleadoAdelantos.Regis_Epl = TresAses_ISISPayroll.dbo.Empleados.Regis_Epl " \
@@ -266,7 +266,7 @@ def verAnticipos(request):
                         nombre = str(row[0]) + " - " + str(row[3])
                         monto = str(row[1])
                         tipoA = str(row[2])
-                        datos = {'Nombre': nombre, 'Monto': monto, 'TipoA': tipoA, 'Estado': '00'}
+                        datos = {'Nombre': nombre, 'Monto': monto, 'TipoA': tipoA, 'Estado': ' 0'}
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Data': lista_data})
                 else:
@@ -274,6 +274,7 @@ def verAnticipos(request):
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
+            return JsonResponse({'Message': 'Not Found', 'Nota': 'Se produjo un error, intente nuevamente.'})
         finally:
             cursor.close()
             connections['TRESASES_APLICATIVO'].close()

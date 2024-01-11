@@ -206,12 +206,13 @@ const busca_remito = async () => {
                 encabezado_c += `
                 <form id="formTraeObservacionRemito" method="POST" action="">
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                    <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                     <label for="observaciones">Observaciones:</label><br>
                     <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="5" placeholder="Datos a modificar.">${datos.Obs}</textarea>
                 </form>
                 <div class="button-container">
                     <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar</button>
-                    <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}');">Modificar</button>
+                    <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}','${datos.IdProductor}');">Modificar</button>
                     <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo('${datos.IdRemito}');">Nuevo</button>
                 </div>
                 <div class="button-container">
@@ -259,7 +260,6 @@ function actualizaObs() {
         var nota = "El campo de observaciones está vacío.";
         var color = "red";
         mostrarInfo(nota,color) 
-        alert();
     } else {
         actualizaObservaciones();
     }    
@@ -317,14 +317,15 @@ function fechaActual(){
 }
 
 
-const popUpModifica = async (numero) => {
+const popUpModifica = async (numero,idProductor) => {
     openProgressBar();
     try {
         const response = await fetch("verifica-modifica/")
         const data = await response.json();
         if(data.Message=="Success"){
             var color = "red";
-            mostrarInfo(numero,color) 
+            var nota = numero + ' - - ' + idProductor;
+            mostrarInfo(nota,color) 
             closeProgressBar();
         }else {
             closeProgressBar();

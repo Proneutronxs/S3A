@@ -8,20 +8,20 @@ window.addEventListener("load", async () =>{
 
     setInterval(async () => {
         await listarChoferes();
-    }, 15000);
+    }, 10000);
 
 
     setInterval(async () => {
         await listarViajes();
-    }, 20000);
+    }, 10000);
 
     setInterval(async () => {
         await listarRechazados();
-    }, 20000);
+    }, 10000);
 
     setInterval(async () => {
         await listarAsignados();
-    }, 20000);
+    }, 10000);
 
 });
 
