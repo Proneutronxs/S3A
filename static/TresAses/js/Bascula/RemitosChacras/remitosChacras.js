@@ -52,6 +52,8 @@ ComboxVer.addEventListener("change", (event) => {
         listar_remitos();
         FormDesdeHasta.style.display = 'none';
 
+        Refresh.style.display = 'block';
+
         
     } else if (selectedValue === '2') {
         fechaActual();

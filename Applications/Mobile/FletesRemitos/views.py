@@ -281,7 +281,7 @@ def llamaAsignacionesPendientes(request, usuario):
                             WHERE        (PedidoFlete.UserID = %s) 
                                             AND (PedidoFlete.Estado = 'A')
                                             --AND ((SELECT LlegaChacra FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = IdPedidoFlete AND Estado = 'S' ) IS NOT NULL)
-                                            AND ((SELECT DISTINCT AsigCerrada FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins WHERE IdAsignacion = IdPedidoFlete) IS NULL)
+                                            --AND ((SELECT DISTINCT AsigCerrada FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins WHERE IdAsignacion = IdPedidoFlete) IS NULL)
                             ORDER BY IdPedidoFlete """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
