@@ -86,7 +86,7 @@ def buscaRemito(request):
                                                         RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
                                                         RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS CAPATAZ, RTRIM(S3A.dbo.Especie.Nombre) AS ESPECIE, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.PedidoFlete.Chofer) AS CHOFER, RTRIM(S3A.dbo.Camion.Nombre) AS CAMION, 
                                                         RTRIM(S3A.dbo.Camion.Patente) AS PATENTE, CONVERT(VARCHAR(10), Datos_Remito_MovBins.FechaAlta, 103) AS FECHA, CONVERT(VARCHAR(5), Datos_Remito_MovBins.FechaAlta, 108), Datos_Remito_MovBins.NumeroRemito, 
-                                                        CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END, S3A.dbo.Productor.IdProductor 
+                                                        CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END, S3A.dbo.Productor.IdProductor, Datos_Remito_MovBins.NombrePdf
                                 FROM            S3A.dbo.Camion INNER JOIN
                                                         S3A.dbo.Chacra INNER JOIN
                                                         S3A.dbo.Variedad INNER JOIN
@@ -122,9 +122,10 @@ def buscaRemito(request):
                             idRemito = str(i[17])
                             observaciones = str(i[18])
                             IdProductor = str(i[19])
+                            pdf = str(i[20])
                             datos = {'Remito':numero_remito,'Productor':productor, 'Señor':señor, 'Direccion':direccion, 'Renspa':renspa, 'UP':up, 'Total':total, 
                                      'Capataz':capataz, 'Especie':especie, 'Variedad':variedad, 'Chacra':chacra, 'Chofer':chofer, 'Camion':camion, 'Patente':patente,
-                                     'Fecha':fecha, 'Hora':hora, 'IdRemito':idRemito, 'Obs':observaciones, 'IdProductor':IdProductor}
+                                     'Fecha':fecha, 'Hora':hora, 'IdRemito':idRemito, 'Obs':observaciones, 'IdProductor':IdProductor, 'PDF':pdf}
                             data.append(datos)
 
                         sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				

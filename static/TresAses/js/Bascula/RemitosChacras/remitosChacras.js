@@ -218,7 +218,7 @@ const busca_remito = async () => {
                     <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo('${datos.IdRemito}');">Nuevo</button>
                 </div>
                 <div class="button-container">
-                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="">Descargar</button>
+                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="verPdf('${datos.PDF}')">Descargar</button>
                 </div>
                 `;
 
@@ -255,6 +255,10 @@ const busca_remito = async () => {
     }
 };
 
+function verPdf(nombrePDF) {
+    var enlace = 'http://192.168.1.110/api/fletes-remitos/data-ver-remito/' + nombrePDF;
+    window.open(enlace, '_blank');
+}
 
 function actualizaObs() {
     const observacionesRemito = document.getElementById("observacionesRemito").value;
