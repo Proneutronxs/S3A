@@ -46,7 +46,8 @@ def listadoRemitos(request):
                                                     S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN
                                                     S3A.dbo.Camion ON S3A.dbo.PedidoFlete.IdCamion = S3A.dbo.Camion.IdCamion
                             WHERE        (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) >= TRY_CONVERT(DATE, @P_Desde, 103)) 
-                                    AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) <= TRY_CONVERT(DATE, @P_Hasta, 103)) """
+                                    AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) <= TRY_CONVERT(DATE, @P_Hasta, 103))
+                                    AND Datos_Remito_MovBins.Modificado IS NULL """
                     cursor.execute(sql, [desde,hasta])
                     consulta = cursor.fetchall()
                     if consulta:
@@ -198,7 +199,7 @@ def actualizaObsRemito(request):
             values =  [observacion,num_remito,idProductor]
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """ UPDATE Datos_Remito_MovBins SET Observaciones = %s, Modificado = 'P' WHERE NumeroRemito = %s AND IdProductor = %s """
+                    sql = """ UPDATE Datos_Remito_MovBins SET Observaciones = %s WHERE NumeroRemito = %s AND IdProductor = %s """
                     cursor.execute(sql, values)
                    
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
