@@ -256,7 +256,7 @@ const busca_remito = async () => {
 };
 
 function verPdf(nombrePDF) {
-    var enlace = 'http://192.168.1.110/api/fletes-remitos/data-ver-remito/' + nombrePDF;
+    var enlace = 'http://tresasesvpn.ddnsfree.com:8000/api/fletes-remitos/data-ver-remito/' + nombrePDF;
     window.open(enlace, '_blank');
 }
 
