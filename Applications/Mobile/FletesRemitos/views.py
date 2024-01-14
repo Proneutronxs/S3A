@@ -483,9 +483,7 @@ def insertCreaciónRemitos(request):
             total_bins = str(json.loads(body)['totalBins'])
             idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
-
             insertar_registro_error_sql("FletesRemitos","REMITOS","Aplicacion",str(body))
-
             #### primero inserta el remito para generar el número
             numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
             ### busca datos de la Asignacion
@@ -497,7 +495,7 @@ def insertCreaciónRemitos(request):
                 pdf = Remito_Abadon_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                                     numero_remito, productor, productor, domicilio, 
                                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
-                                    total_bins, capataz, Usuario,)
+                                    total_bins, capataz)
                 pdf.alias_nb_pages()
                 pdf.add_page()
                 index = 0
@@ -564,7 +562,7 @@ def insertCreaciónRemitos(request):
                 pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
-                    total_bins, capataz, Usuario,)
+                    total_bins, capataz)
                 pdf.alias_nb_pages()
                 pdf.add_page()
                 index = 0
@@ -690,9 +688,6 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_b
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins, idProductor):
     values = [numeroRemito, cantidad, idMarca, idBins, idProductor]
