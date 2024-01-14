@@ -23,7 +23,8 @@ const hastaInput = document.getElementById('hasta');
 const overlay = document.getElementById('overlay-remito-nuevo');
 
 const popup = document.getElementById('popup-nuevo-remito');
-
+//overlay-remito-modifica
+const popupModifica = document.getElementById('overlay-remito-modifica');
 window.addEventListener("load", async () =>{
     ocultarCombox();
 });
@@ -60,6 +61,8 @@ ComboxVer.addEventListener("change", (event) => {
         ComboxListRemitos.style.display = 'none';
         FormDesdeHasta.style.display = 'block';
         Refresh.style.display = 'none';
+
+        ocultaRemito();
     }
 });
 
@@ -81,7 +84,11 @@ document.getElementById("buscaRemitosFecha").addEventListener("click", function(
 });
 
 function refreshOnclick(){
+    ocultaRemito();
     listar_remitos();
+}
+
+function ocultaRemito(){
     EncabezadoA.style.display = 'none';
     EncabezadoB.style.display = 'none';
     EncabezadoC.style.display = 'none';
@@ -213,12 +220,16 @@ const busca_remito = async () => {
                     <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="5" placeholder="Datos a modificar.">${datos.Obs}</textarea>
                 </form>
                 <div class="button-container">
+                    <form type="hidden" id="formNuevoRemito" method="POST" action="">
+                        <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                        <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
+                    </form>
                     <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar</button>
                     <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}','${datos.IdProductor}');">Modificar</button>
-                    <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo('${datos.IdRemito}');">Nuevo</button>
+                    <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo();">Nuevo</button>
                 </div>
                 <div class="button-container">
-                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="verPdf('${datos.PDF}')">Descargar</button>
+                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="verRemito()">Descargar</button>
                 </div>
                 `;
 
@@ -255,10 +266,60 @@ const busca_remito = async () => {
     }
 };
 
-function verPdf(nombrePDF) {
-    var enlace = 'http://tresasesvpn.ddnsfree.com:8000/api/fletes-remitos/data-ver-remito/' + nombrePDF;
+function verPdf(remito,productor) {
+    var enlace = 'http://192.168.0.2:8000/bascula/remitos-chacras/'
+    //var enlace = 'http://tresasesvpn.ddnsfree.com:8000/api/fletes-remitos/data-ver-remito/';
     window.open(enlace, '_blank');
 }
+
+const verRemito = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formNuevoRemito");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            body: formData
+        };
+
+        const response = await fetch("descarga-pdf/", options);
+        if (response.ok) {
+            const contentDisposition = response.headers.get('content-disposition');
+            const matches = /filename="([^"]+)"/.exec(contentDisposition);
+            const fileName = matches ? matches[1] : 'archivo.pdf';
+
+            const blob = await response.blob();
+
+            // Crear un enlace temporal
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+
+            // Nombre del archivo sin la extensión
+            const fileNameWithoutExtension = fileName.split('.')[0];
+
+            // Nombre final del archivo
+            const finalFileName = `${fileNameWithoutExtension}.pdf`;
+            link.download = finalFileName.trim();
+
+            // Hacer clic en el enlace y luego eliminarlo
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            var nota = `Error al descargar el PDF: ${response.statusText}`;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+
+        closeProgressBar();
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
 
 function actualizaObs() {
     const observacionesRemito = document.getElementById("observacionesRemito").value;
@@ -329,6 +390,10 @@ const popUpModifica = async (numero,idProductor) => {
         const response = await fetch("verifica-modifica/")
         const data = await response.json();
         if(data.Message=="Success"){
+
+            //muestro el pop-up
+            popupModifica.style.display = 'block';
+
             var color = "red";
             var nota = numero + ' - - ' + idProductor;
             mostrarInfo(nota,color) 
@@ -347,17 +412,29 @@ const popUpModifica = async (numero,idProductor) => {
     }
 }
 
+function ocultarModificaRemito(){
+    popupModifica.style.display = 'none';
+}
 
-const popUpNuevo= async (numero) => {
+
+const popUpNuevo= async () => {
     openProgressBar();
     try {
-        const response = await fetch("verifica-nuevo/")
+        const form = document.getElementById("formNuevoRemito");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+        const response = await fetch("verifica-crea-nuevo/", options);
         const data = await response.json();
         if(data.Message=="Success"){
+            //muestro overlay y pop-up
             overlay.style.display = 'block';
             popup.style.display = 'block';
-            var color = "red";
-            mostrarInfo(numero,color) 
             closeProgressBar();
         }else {
             closeProgressBar();
@@ -366,12 +443,44 @@ const popUpNuevo= async (numero) => {
             mostrarInfo(nota,color) 
         }
     } catch (error) {
+        console.log(error);
         closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         mostrarInfo(nota,color)  
     }
 }
+
+
+// const popUpNuevo= async (numero,idProductor) => {
+//     openProgressBar();
+//     try {
+//         const response = await fetch("verifica-nuevo/")
+//         const data = await response.json();
+//         if(data.Message=="Success"){
+//             overlay.style.display = 'block';
+//             popup.style.display = 'block';
+//             var color = "red";
+
+
+
+
+
+//             mostrarInfo(numero +"--"+idProductor,color) 
+//             closeProgressBar();
+//         }else {
+//             closeProgressBar();
+//             var nota = data.Nota
+//             var color = "red";
+//             mostrarInfo(nota,color) 
+//         }
+//     } catch (error) {
+//         closeProgressBar();
+//         var nota = "Se produjo un error al procesar la solicitud.";
+//         var color = "red";
+//         mostrarInfo(nota,color)  
+//     }
+// }
 
 
 function ocultarNuevoRemito(){

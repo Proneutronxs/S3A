@@ -21,7 +21,7 @@
               <option value="1">Remitos del Día</option>
               <option value="2">Remitos por Fecha</option>
             </select>
-           
+            
             <form id="formTraeRemitosChacrasFecha" method="POST" action="">
               <div class="row">
                 <label class="letras" for="desde">Desde:</label>
@@ -213,7 +213,9 @@
   </div>
 </div>
 
-<div class="overlay" id="overlay-remito-modifica" style="display: none;">
+
+
+<div class="overlay" id="overlay-remito-modifica">
   <div class="content-modifica">
     <div class="remito-modifica-bins">
       <div class="content-selectores">
@@ -281,7 +283,7 @@
       </div>
 
       <div class="btn-guarda-cancela">
-        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="">Cancelar</button>
+        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemito()">Cancelar</button>
         <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button">Guardar</button>
       </div>
 

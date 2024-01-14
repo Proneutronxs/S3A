@@ -16,9 +16,11 @@ urlpatterns = [
 
     path('remitos-chacras/verifica-modifica/', views.verificaModificaRemito, name='verifica_modifica_remito'),
 
-    path('remitos-chacras/verifica-nuevo/', views.verificaNuevoRemito, name='verifica_nuevo_remito'),
+    path('remitos-chacras/verifica-crea-nuevo/', views.verificaCreaNuevoRemito, name='verifica_nuevo_remito'),
 
     path('remitos-chacras/actualiza-obs/', views.actualizaObsRemito, name='actualiza_obserbaciones'),
+
+    path('remitos-chacras/descarga-pdf/', views.donwloadPdf, name='crea_descarga'),
 
 
 ]

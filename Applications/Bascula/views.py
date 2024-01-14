@@ -3,8 +3,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from S3A.funcionesGenerales import *
+from django.views.static import serve
+from Applications.ModelosPDF.remitoChacra import *
+from Applications.Mobile.FletesRemitos.views import actualizaNombrePDF
 from django.db import connections
 from django.http import JsonResponse
+from django.http import HttpResponse, Http404
+import os
 
 # Create your views here.
 
@@ -13,7 +18,6 @@ from django.http import JsonResponse
 @permission_required('Bascula.puede_ingresar', raise_exception=True)
 def Bascula(request):
     return render (request, 'Bascula/bascula.html')
-
 
 def remitos(request):
     return render (request, 'Bascula/Remitos/remitos.html')
@@ -47,7 +51,7 @@ def listadoRemitos(request):
                                                     S3A.dbo.Camion ON S3A.dbo.PedidoFlete.IdCamion = S3A.dbo.Camion.IdCamion
                             WHERE        (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) >= TRY_CONVERT(DATE, @P_Desde, 103)) 
                                     AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) <= TRY_CONVERT(DATE, @P_Hasta, 103))
-                                    AND Datos_Remito_MovBins.Modificado IS NULL """
+                                    --AND Datos_Remito_MovBins.Modificado IS NULL """
                     cursor.execute(sql, [desde,hasta])
                     consulta = cursor.fetchall()
                     if consulta:
@@ -133,7 +137,7 @@ def buscaRemito(request):
                                 FROM            S3A.dbo.Bins INNER JOIN
                                                         S3A.dbo.Marca INNER JOIN
                                                         Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
-                                WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s)"""
+                                WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL) """
                         cursor.execute(sqldetalle, values)
                         consultaDetalle = cursor.fetchall()
                         if consultaDetalle:
@@ -176,8 +180,8 @@ def verificaModificaRemito(request):
     
 @login_required
 @csrf_exempt   
-def verificaNuevoRemito(request):
-    if request.method == 'GET':
+def verificaCreaNuevoRemito(request):
+    if request.method == 'POST':
         user_has_permission = request.user.has_perm('Bascula.puede_crear_remito')
         if user_has_permission:
             return JsonResponse({'Message': 'Success'})
@@ -187,6 +191,195 @@ def verificaNuevoRemito(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
+@login_required
+@csrf_exempt   
+def donwloadPdf(request):
+    if request.method == 'POST':
+        remito = request.POST.get('numRemito')
+        productor = request.POST.get('idProductor')
+        print(remito)
+        print(productor)
+        nombre = creaDescarga(remito,productor)
+        filename = 'Applications/ReportesPDF/RemitosChacra/' + nombre
+        if os.path.exists(filename):
+            response = serve(request, os.path.basename(filename), os.path.dirname(filename))
+            response['Content-Disposition'] = f'attachment; filename="{nombre}"'
+            return response
+        else:
+            raise Http404
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+def creaDescarga(remito,productor):
+    values = [remito, productor]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            numero_remito,Nomproductor,señor,direccion,renspa,up,total,capataz,especie,variedad,chacra,chofer,camion,patente,fecha,hora = traeEncabezado(remito,productor)
+            if productor == '5000':
+                numero_chacra= "00018"
+                pdf = Remito_Abadon_Movimiento_Chacras(fecha, hora, numero_chacra, 
+                            numero_remito, Nomproductor, señor, direccion, 
+                            chacra, especie, variedad, renspa, up, chofer, camion, patente, 
+                            total, capataz)
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
+                        FROM            S3A.dbo.Bins INNER JOIN
+                                                S3A.dbo.Marca INNER JOIN
+                                                Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
+                        WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL) """
+                cursor.execute(sqldetalle, values)
+                consultaDetalle = cursor.fetchall()
+                if consultaDetalle:
+                    for row in consultaDetalle:
+                        cantidad = str(row[0])
+                        tamaño = str(row[1])
+                        marca = str(row[2])
+                        if index == 9:
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                        pdf.set_font('Arial', '', 8)
+                        pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                        pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                        pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                        index = index + 1
+                    fecha = str(fecha).replace('/', '')
+                    name = 'R_00018_' + str(numero_remito) + '_' + fecha + '.pdf'
+                    nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                    #actualizaNombrePDF(name,numero_remito)
+                    pdf.output(nameDireccion, 'F')
+                    return name
+            elif productor == '5200':
+                numero_chacra= "00001"
+                pdf = Remito_Romik_Movimiento_Chacras(fecha, hora, numero_chacra, 
+                            numero_remito, Nomproductor, señor, direccion, 
+                            chacra, especie, variedad, renspa, up, chofer, camion, patente, 
+                            total, capataz)
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
+                        FROM            S3A.dbo.Bins INNER JOIN
+                                                S3A.dbo.Marca INNER JOIN
+                                                Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
+                        WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL) """
+                cursor.execute(sqldetalle, values)
+                consultaDetalle = cursor.fetchall()
+                if consultaDetalle:
+                    for row in consultaDetalle:
+                        cantidad = str(row[0])
+                        tamaño = str(row[1])
+                        marca = str(row[2])
+                        if index == 9:
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                        pdf.set_font('Arial', '', 8)
+                        pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                        pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                        pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                        index = index + 1
+                    fecha = str(fecha).replace('/', '')
+                    name = 'R_00001_' + str(numero_remito) + '_' + fecha + '.pdf'
+                    nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                    #actualizaNombrePDF(name,numero_remito)
+                    pdf.output(nameDireccion, 'F')
+                    return name
+            else:
+                numero_chacra= "00017"
+                pdf = Remito_Movimiento_Chacras(fecha, hora, numero_chacra, 
+                            numero_remito, Nomproductor, señor, direccion, 
+                            chacra, especie, variedad, renspa, up, chofer, camion, patente, 
+                            total, capataz)
+                pdf.alias_nb_pages()
+                pdf.add_page()
+                index = 0
+                sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
+                        FROM            S3A.dbo.Bins INNER JOIN
+                                                S3A.dbo.Marca INNER JOIN
+                                                Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
+                        WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL) """
+                cursor.execute(sqldetalle, values)
+                consultaDetalle = cursor.fetchall()
+                if consultaDetalle:
+                    for row in consultaDetalle:
+                        cantidad = str(row[0])
+                        tamaño = str(row[1])
+                        marca = str(row[2])
+                        if index == 9:
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                        pdf.set_font('Arial', '', 8)
+                        pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                        pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                        pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                        index = index + 1
+                    fecha = str(fecha).replace('/', '')
+                    name = 'R_00017_' + str(numero_remito) + '_' + fecha + '.pdf'
+                    nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                    #actualizaNombrePDF(name,numero_remito)
+                    pdf.output(nameDireccion, 'F')
+                    return name
+    except Exception as e:
+        insertar_registro_error_sql("BÁSCULA","CREA DESCARGA","FUNCION",str(e))
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def traeEncabezado(remito,productor):
+    values = [remito, productor]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                        SELECT        FORMAT(Datos_Remito_MovBins.NumeroRemito, '00000000') AS NRO_REMITO, RTRIM(S3A.dbo.Productor.RazonSocial) AS RAZON_SOCIAL, RTRIM(S3A.dbo.Productor.Nombre) AS NOMBRE, 
+                                                RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
+                                                RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS CAPATAZ, RTRIM(S3A.dbo.Especie.Nombre) AS ESPECIE, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.PedidoFlete.Chofer) AS CHOFER, RTRIM(S3A.dbo.Camion.Nombre) AS CAMION, 
+                                                RTRIM(S3A.dbo.Camion.Patente) AS PATENTE, CONVERT(VARCHAR(10), Datos_Remito_MovBins.FechaAlta, 103) AS FECHA, CONVERT(VARCHAR(5), Datos_Remito_MovBins.FechaAlta, 108) + ' Hs.' AS HORA, Datos_Remito_MovBins.NumeroRemito, 
+                                                CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END AS OBS, S3A.dbo.Productor.IdProductor, Datos_Remito_MovBins.NombrePdf
+                        FROM            S3A.dbo.Camion INNER JOIN
+                                                S3A.dbo.Chacra INNER JOIN
+                                                S3A.dbo.Variedad INNER JOIN
+                                                S3A.dbo.Especie INNER JOIN
+                                                S3A.dbo.Productor INNER JOIN
+                                                Datos_Remito_MovBins INNER JOIN
+                                                S3A.dbo.PedidoFlete ON Datos_Remito_MovBins.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete ON S3A.dbo.Productor.IdProductor = S3A.dbo.PedidoFlete.IdProductor ON 
+                                                S3A.dbo.Especie.IdEspecie = Datos_Remito_MovBins.IdEspecie ON S3A.dbo.Variedad.IdVariedad = Datos_Remito_MovBins.IdVariedad ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON 
+                                                S3A.dbo.Camion.IdCamion = S3A.dbo.PedidoFlete.IdCamion
+                        WHERE        (Datos_Remito_MovBins.NumeroRemito = %s) AND (Datos_Remito_MovBins.IdProductor = %s)
+                    """
+            cursor.execute(sql, values)
+            result = cursor.fetchall()
+            if result:
+                for i in result:
+                    numero_remito = str(i[0])
+                    Nomproductor = str(i[1])
+                    señor = str(i[2])
+                    direccion = str(i[3])
+                    renspa = str(i[4])
+                    up = str(i[5])
+                    total = str(i[6])
+                    capataz = str(i[8])
+                    especie = str(i[9])
+                    variedad =str(i[10])
+                    chacra = str(i[11])
+                    chofer = str(i[12])
+                    camion = str(i[13])
+                    patente = str(i[14])
+                    fecha = str(i[15])
+                    hora = str(i[16])
+                    idRemito = str(i[17])
+                    observaciones = str(i[18])
+                    IdProductor = str(i[19])
+            return numero_remito,Nomproductor,señor,direccion,renspa,up,total,capataz,especie,variedad,chacra,chofer,camion,patente,fecha,hora
+            
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("BASCULA","TRAE ENCABEZADO","Consulta",error)
+
 @login_required
 @csrf_exempt
 def actualizaObsRemito(request):

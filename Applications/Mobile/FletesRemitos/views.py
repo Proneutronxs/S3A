@@ -528,7 +528,7 @@ def insertCreaciónRemitos(request):
                 pdf = Remito_Romik_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
-                    total_bins, capataz, Usuario,)
+                    total_bins, capataz)
                 pdf.alias_nb_pages()
                 pdf.add_page()
                 index = 0

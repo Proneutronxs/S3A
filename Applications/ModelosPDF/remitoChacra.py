@@ -7,7 +7,7 @@ class Remito_Movimiento_Chacras(FPDF):
     def __init__(self, fecha_remito, hora_remito, 
                  numero_chacra, numero_remito, productor, 
                  señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
-                 camion, patente, total_bins, capataz, usuario):
+                 camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
         self.hora_remito = hora_remito
@@ -26,7 +26,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.patente = patente
         self.total_bins = total_bins
         self.capataz = capataz
-        self.usuario = usuario
+        #self.usuario = usuario
         
 
     def header(self):
@@ -137,7 +137,7 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
     def __init__(self, fecha_remito, hora_remito, 
                  numero_chacra, numero_remito, productor, 
                  señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
-                 camion, patente, total_bins, capataz, usuario):
+                 camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
         self.hora_remito = hora_remito
@@ -156,7 +156,7 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.patente = patente
         self.total_bins = total_bins
         self.capataz = capataz
-        self.usuario = usuario
+        #self.usuario = usuario
         
 
     def header(self):
@@ -253,8 +253,8 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.cell(0, 11, 'Página ' + str(self.page_no()) + '/{nb}', 15, 0, 'R')
         self.rect(x=10,y=128,w=190,h=12)
         ###IMAGEN
-        barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
-        self.image(barcode_filename, x=22, y=129, w=65, h=12)
+        #barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+        #self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
         self.text(x=110, y=133, txt= 'C.A.I.: 50016204851055')
@@ -265,7 +265,7 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
     def __init__(self, fecha_remito, hora_remito, 
                  numero_chacra, numero_remito, productor, 
                  señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
-                 camion, patente, total_bins, capataz, usuario):
+                 camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
         self.hora_remito = hora_remito
@@ -284,7 +284,7 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.patente = patente
         self.total_bins = total_bins
         self.capataz = capataz
-        self.usuario = usuario
+        #self.usuario = usuario
         
 
     def header(self):
@@ -381,8 +381,8 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.cell(0, 11, 'Página ' + str(self.page_no()) + '/{nb}', 15, 0, 'R')
         self.rect(x=10,y=128,w=190,h=12)
         ###IMAGEN
-        barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
-        self.image(barcode_filename, x=22, y=129, w=65, h=12)
+        #barcode_filename = 'Applications/ReportesPDF/RemitosChacra/barcode.png'
+        #self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
         self.text(x=110, y=133, txt= 'C.A.I.: 49523204816077')
