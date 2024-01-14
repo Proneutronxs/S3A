@@ -484,6 +484,8 @@ def insertCreaciónRemitos(request):
             idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
 
+            insertar_registro_error_sql("FletesRemitos","REMITOS","Aplicacion",str(body))
+
             #### primero inserta el remito para generar el número
             numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
             ### busca datos de la Asignacion
