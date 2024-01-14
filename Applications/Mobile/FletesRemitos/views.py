@@ -206,6 +206,7 @@ def insertaPedidoFlete(request):
             fechaRequerida = str(json.loads(body)['fechaRequerida'])
             binsRojos = str(json.loads(body)['binsRojos'])
 
+            insertar_registro_error_sql(usuario,"REMITOS","Aplicacion",str(body))
 
             #insertar_registro_error_sql("FletesRemitos","HORA REQUERIA","Aplicacion",horaRequerida)
 
