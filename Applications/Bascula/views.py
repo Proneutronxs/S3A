@@ -51,7 +51,7 @@ def listadoRemitos(request):
                                                     S3A.dbo.Camion ON S3A.dbo.PedidoFlete.IdCamion = S3A.dbo.Camion.IdCamion
                             WHERE        (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) >= TRY_CONVERT(DATE, @P_Desde, 103)) 
                                     AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) <= TRY_CONVERT(DATE, @P_Hasta, 103))
-                                    --AND Datos_Remito_MovBins.Modificado IS NULL """
+                                    AND Datos_Remito_MovBins.Modificado IS NULL """
                     cursor.execute(sql, [desde,hasta])
                     consulta = cursor.fetchall()
                     if consulta:
