@@ -206,7 +206,7 @@ def insertaPedidoFlete(request):
             fechaRequerida = str(json.loads(body)['fechaRequerida'])
             binsRojos = str(json.loads(body)['binsRojos'])
 
-            insertar_registro_error_sql(usuario,"INSERTA FLETE","Aplicacion",str(body))
+            registroRealizado(usuario,"PEDIDO FLETE",str(body))
 
             #insertar_registro_error_sql("FletesRemitos","HORA REQUERIA","Aplicacion",horaRequerida)
 
@@ -485,7 +485,7 @@ def insertCreaciónRemitos(request):
             idPrductor = str(json.loads(body)['idProductor'])
             listadoBins = json.loads(body)['DataBins']
 
-            insertar_registro_error_sql(Usuario + " - " + capataz,"REMITOS","Aplicacion",str(body))
+            registroRealizado(Usuario,"CREACION DE REMITO",str(body))
             #### primero inserta el remito para generar el número
             numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
             ### busca datos de la Asignacion

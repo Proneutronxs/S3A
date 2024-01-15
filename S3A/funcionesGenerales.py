@@ -69,6 +69,15 @@ def inyectaData(Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector):
     finally:
         connections['TRESASES_APLICATIVO'].close()   
 
+def registroRealizado(Usuario,Descripcion,Body):
+    values = [Usuario,Descripcion,Body]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO RegistroRealiza (Usuario,Descripcion,FechaAlta,Body) VALUES (%s,%s,GETDATE(),%s)"
+            cursor.execute(sql,values)
+            cursor.commit()
+    except Exception as e:
+        insertar_registro_error_sql("FUNCION REGISTRO","registroRealizado","errores",str(e))
 
 def obtenerFechaActual():
     fecha_actual = datetime.now()
