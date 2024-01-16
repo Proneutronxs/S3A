@@ -81,7 +81,7 @@ def insert_anticipos(request):
                     LegajoNombre = obtieneNombres(item)
                     datosLegajo = LegajoNombre 
                     listadoJson.append(datosLegajo)
-                nota = 'Se cargaron anticipos. Las siguientes personas ya tiene un Adelanto de Sueldo este Mes: \n \n' + ', \n'.join(listadoJson) + '.'
+                nota = 'Se cargaron anticipos. Las siguientes personas ya tiene un Adelanto de Sueldo y/ó Ingreso este Mes: \n \n' + ', \n'.join(listadoJson) + '.'
                 estado = "E"
                 insertaRegistro(usuario, fechaHora, registro, estado)
                 return JsonResponse({'Message': 'Success', 'Nota': nota})  
