@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from S3A.funcionesGenerales import *
+from Applications.Mobile.FletesRemitos.views import traeIdEspecies, traeIdMarcas
 from django.views.static import serve
 from Applications.ModelosPDF.remitoChacra import *
 from Applications.Mobile.FletesRemitos.views import actualizaNombrePDF
@@ -197,8 +198,6 @@ def donwloadPdf(request):
     if request.method == 'POST':
         remito = request.POST.get('numRemito')
         productor = request.POST.get('idProductor')
-        print(remito)
-        print(productor)
         nombre = creaDescarga(remito,productor)
         filename = 'Applications/ReportesPDF/RemitosChacra/' + nombre
         if os.path.exists(filename):
@@ -409,7 +408,153 @@ def actualizaObsRemito(request):
             finally:
                 cursor.close()
                 connections['TRESASES_APLICATIVO'].close()
-        return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+
+##################### CARGA SPINNERS ##############################
+    
+def llamaEspecieMarca(request):
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('Bascula.puede_ver')
+        if user_has_permission:
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    listado = traeIdEspecies()
+                    cantValues = ','.join(['%s'] * len(listado))
+                    sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValues}) ORDER BY IdEspecie"
+                    cursor.execute(sql3, listado)
+                    consulta3 = cursor.fetchall()
+                    if consulta3:
+                        listado_especie = []
+                        for row3 in consulta3:
+                            idEspecie = str(row3[0])
+                            nombre = str(row3[1])
+                            datos = {'IdEspecie': idEspecie, 'NombreEspecie': nombre}
+                            listado_especie.append(datos)
+
+                    listado = traeIdMarcas()
+                    cantValues = ','.join(['%s'] * len(listado))
+                    listado_marca = []
+                    sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN ({cantValues})"
+                    cursor.execute(sql,listado)
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        for row in consulta:
+                            idMarca = str(row[0])
+                            nombreMarca = str(row[1])
+                            datos = {'idMarca': idMarca, 'NombreMarca': nombreMarca}
+                            listado_marca.append(datos)
+                    
+                    if listado_especie and listado_marca:
+                        return JsonResponse({'Message': 'Success', 'DataEspecie':listado_especie, 'DataMarca':listado_marca})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se Encontraron Datos.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("BASCULA","DatosInicialesFletes","Aplicacion",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                cursor.close()
+                connections['S3A'].close()
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+@login_required
+@csrf_exempt
+def traeTipoEnvase(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Bascula.puede_ver')
+        if user_has_permission:
+            values = str(request.POST.get('ComboxMarcaBinsModifica'))
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = " SELECT IdBins, RTRIM(Nombre) FROM Bins WHERE IdMarca = %s "
+                    cursor.execute(sql,[values])
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        listado_envase = []
+                        for row in consulta:
+                            idBins = str(row[0])
+                            nombreBins = str(row[1])
+                            datos = {'idBins': idBins, 'NombreBins': nombreBins}
+                            listado_envase.append(datos)
+                            
+                    if listado_envase:
+                        return JsonResponse({'Message': 'Success', 'DataEnvase':listado_envase})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se Encontraron Datos.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("FletesRemitos","traeTipoBins","Aplicacion",error)
+            finally:
+                cursor.close()
+                connections['S3A'].close()
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+@login_required
+@csrf_exempt
+def actualizaDatos(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Bascula.puede_modificar')
+        if user_has_permission:
+            num_remito = request.POST.get('numRemitoModifica')
+            num_productor = request.POST.get('idProductorModifica')
+            print(num_remito,num_productor)
+
+            cantidades = request.POST.getlist('cantidades[]')
+            envases = request.POST.getlist('envases[]')
+            marcas = request.POST.getlist('marcas[]')
+
+            # Haz algo con los datos, por ejemplo, imprimirlos
+            for cant, envase, marca in zip(cantidades, envases, marcas):
+                print(f"Cantidad: {cant}, Envase: {envase}, Marca: {marca}")
+                
+            return JsonResponse({'Message': 'Success'})
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

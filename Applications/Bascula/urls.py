@@ -22,5 +22,10 @@ urlpatterns = [
 
     path('remitos-chacras/descarga-pdf/', views.donwloadPdf, name='crea_descarga'),
 
+    path('remitos-chacras/carga-especie-marca/', views.llamaEspecieMarca, name='especie_chacra'),
+
+    path('remitos-chacras/carga-envase/', views.traeTipoEnvase, name='carga_envase'),
+
+    path('remitos-chacras/actualiza-datos/', views.actualizaDatos, name='actualiza_datos'),
 
 ]

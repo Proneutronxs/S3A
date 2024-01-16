@@ -57,7 +57,7 @@ def insert_anticipos(request):
                         finally:
                             connections['ISISPayroll'].close()
                 else:
-                    if verificaAdelantoIngresoHora(Regis_Epl, Hora, Año) is False:
+                    if verificaAdelantoIngresoHora(Regis_Epl, Mes, Año) is False:
                         auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
                         try:
                             with connections['ISISPayroll'].cursor() as cursor:
@@ -73,6 +73,8 @@ def insert_anticipos(request):
                             return JsonResponse({'Message': 'Error', 'Nota': error})
                         finally:
                             connections['ISISPayroll'].close()
+                    else:
+                        listadoAdelantosMes.append(Regis_Epl)
                 
             if listadoAdelantosMes:
                 for item in listadoAdelantosMes:
@@ -216,16 +218,16 @@ def verificaAnticipoMesAño(Regis_Epl, Mes, Año):
     finally:
         connections['ISISPayroll'].close()
 
-def verificaAdelantoIngresoHora(Regis_Epl, Hora, Año):
-    values = (Regis_Epl, Hora, Año)
+def verificaAdelantoIngresoHora(Regis_Epl, Mes, Año):
+    values = (Regis_Epl, Mes, Año)
     try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT Destino, DATEPART(HOUR, FechaHora) AS HORA " \
-                    "FROM Auditoria_Anticipos " \
-                    "WHERE  Destino = %s " \
-                            "AND Tipo = 'ADELANTO INGRESO' " \
-                            "AND DATEPART(HOUR, FechaHora) =  %s " \
-                            "AND YEAR(FechaHora) = %s "
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT Regis_Epl, FechaAde, ImporteAde " \
+                    "FROM EmpleadoAdelantos " \
+                    "WHERE  Regis_Epl = %s " \
+                            "AND MotivoAde = 'CH - ADELANTO INGRESO' " \
+                            "AND MONTH(FechaAde) =  %s " \
+                            "AND YEAR(FechaAde) = %s "
             cursor.execute(sql, values)
             consulta = cursor.fetchone()
             if consulta:
@@ -233,11 +235,11 @@ def verificaAdelantoIngresoHora(Regis_Epl, Hora, Año):
             return False
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("Anticipos","verificaAdelantoIngresoHora","Aplicacion",error)
+        insertar_registro_error_sql("Anticipos","verificaAdelantoIngresoMes","Aplicacion",error)
         print(error)
         return True
     finally:
-        connections['TRESASES_APLICATIVO'].close()
+        connections['ISISPayroll'].close()
 
 @csrf_exempt
 def verAnticipos(request):

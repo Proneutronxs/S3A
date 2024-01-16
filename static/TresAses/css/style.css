@@ -794,6 +794,10 @@ input[type="checkbox"].input-checkbox {
   position: fixed;
   top: 50%;
   left: 50%;
+  max-width: 460px;
+  min-width: 460px;
+  max-height: 460px;
+  min-height: 460px;
   transform: translate(-50%, -50%);
   background-color: #fff;
   padding: 20px;
@@ -804,6 +808,12 @@ input[type="checkbox"].input-checkbox {
   display: flex;
   justify-content: center;
 }
+
+.modifica-bins-tabla{
+  min-width: 400px;
+  min-height: 220px;
+}
+
 .remito-modifica-bins {
   display: flex;
   flex-direction: column;
@@ -840,6 +850,7 @@ input[type="checkbox"].input-checkbox {
 
 .container-modifica-bins {
   overflow: auto;
+  max-height: 220px;
 }
 
 .btn-guarda-cancela {

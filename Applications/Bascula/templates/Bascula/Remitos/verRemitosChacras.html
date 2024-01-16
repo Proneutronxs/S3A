@@ -122,16 +122,14 @@
           </div>
           <div class="info-item-nuevo">
             <div class="nuevo-remito-selector">
-              <select class="selectores" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
-                <option value="0">ESPECIE</option>
-                <option value="1">MANZANA</option>
-                <option value="2">PERA</option>
+              <select class="selectores" type="select" id="ComboxEspecieN" name="ComboxEspecieN">
+                
               </select>
             </div>
           </div>
           <div class="info-item-nuevo">
             <div class="nuevo-remito-selector">
-              <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
+              <select class="selectores" type="select" id="ComboxVariedadN" name="ComboxVariedadN">
                 <option value="0">VARIEDAD</option>
                 <option value="1">XXXXXX</option>
                 <option value="2">XXXXXX</option>
@@ -141,10 +139,8 @@
         </div>
         <div class="info-group-btn-popup-crea" id="popup-encabezado-c">
           <div class="display-nuevo-Remito">
-            <select class="selectores" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
-              <option value="0">Marca Bins</option>
-              <option value="1">TRES ASES</option>
-              <option value="2">NIRVANA</option>
+            <select class="selectores" type="select" id="ComboxMarcaBinsNuevo" name="ComboxMarcaBinsNuevo">
+
             </select>
             <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
               <option value="0">Tipo Bins</option>
@@ -220,71 +216,44 @@
     <div class="remito-modifica-bins">
       <div class="content-selectores">
         <div class="selectores-container">
-          <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBins" name="ComboxMarcaBins">
-            <option value="0">Marca Bins</option>
-            <option value="1">TRES ASES</option>
-            <option value="2">NIRVANA</option>
-          </select> <br> <br>
-          <select class="selectores selectores-modifica" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
-            <option value="0">Tipo Bins</option>
-            <option value="1">GRANDE</option>
-            <option value="2">MEDIANO</option>
-          </select> <br> <br>
-          <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBins" name="cantidadBins" placeholder="Cantidad" required>
+          <form id="formMarcaBinsModifica" method="POST" action="">
+            <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBinsModifica" name="ComboxMarcaBinsModifica">
+              
+            </select> 
+          </form>
+          <select class="selectores selectores-modifica" type="select" id="ComboxTipoBinsModifica" name="ComboxTipoBinsModifica">
+            
+          </select> <br>
+          <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBinsModifica" name="cantidadBinsModifica" placeholder="Cantidad" required>
         </div>
         <div class="btn-agrega-quita-modifica">
-          <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">add</button>
-          <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
+          <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="agregarFila()">add</button>
+          <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="quitarFila()">remove</button>
         </div>
       </div>
       <br>
       <div class="container-modifica-bins">
-        <table class="pre-hs-ex">
-          <thead>
-            <tr>
-              <th>Cant.</th>
-              <th>Envase</th>
-              <th>Marca</th>
-            </tr>
-          </thead>
-          <tbody id="Tabla-modifica-Remito">
-            <tr>
-              <td>60</td>
-              <td>GRANDEAAAAAAA</td>
-              <td>TRES ASES SASASAS</td>
-            </tr>
-            <tr>
-              <td>20</td>
-              <td>GRANDE</td>
-              <td>TRES ASES</td>
-            </tr>
-            <tr>
-              <td>50</td>
-              <td>MEDIANO</td>
-              <td>TRES ASES</td>
-            </tr>
-            <tr>
-              <td>50</td>
-              <td>MEDIANO</td>
-              <td>TRES ASES</td>
-            </tr>
-            <tr>
-              <td>50</td>
-              <td>MEDIANO</td>
-              <td>TRES ASES</td>
-            </tr>
-            <tr>
-              <td>50</td>
-              <td>MEDIANO</td>
-              <td>TRES ASES</td>
-            </tr>
-          </tbody>
-        </table>
+        <form id="formDatosBinsModifica" method="POST" action="">
+          <div id="identificadores-modifica"></div>
+          <div class="modifica-bins-tabla">
+            <table class="pre-hs-ex " >
+              <thead>
+                <tr>
+                  <th>Cant.</th>
+                  <th>Envase</th>
+                  <th>Marca</th>
+                </tr>
+              </thead>
+              <tbody id="Tabla-modifica-Remito">
+              </tbody>
+            </table>
+          </div>
+        </form>
       </div>
 
       <div class="btn-guarda-cancela">
         <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemito()">Cancelar</button>
-        <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button">Guardar</button>
+        <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button" onclick="enviaModificacion()">Guardar</button>
       </div>
 
     </div>

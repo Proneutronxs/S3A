@@ -25,8 +25,28 @@ const overlay = document.getElementById('overlay-remito-nuevo');
 const popup = document.getElementById('popup-nuevo-remito');
 //overlay-remito-modifica
 const popupModifica = document.getElementById('overlay-remito-modifica');
+
+//SPINNERS
+const MarcaModifica = document.getElementById('ComboxMarcaBinsModifica');
+
+
+
+
+
+
+//TABLA
+const tabla = document.getElementById('Tabla-modifica-Remito');
+const btnAgrega = document.getElementById('idAgregaBins');
+const btnQuita = document.getElementById('idQuitaBins');
+const marcaBins = document.getElementById('ComboxMarcaBinsModifica');
+const tipoBins = document.getElementById('ComboxTipoBinsModifica');
+const cantidadBins = document.getElementById('cantidadBinsModifica');
+
+
+
 window.addEventListener("load", async () =>{
     ocultarCombox();
+    cargaSpinnerMarcaEspecie();
 });
 
 const ocultarCombox = () =>{
@@ -393,10 +413,10 @@ const popUpModifica = async (numero,idProductor) => {
 
             //muestro el pop-up
             popupModifica.style.display = 'block';
-
-            var color = "red";
-            var nota = numero + ' - - ' + idProductor;
-            mostrarInfo(nota,color) 
+            document.getElementById('identificadores-modifica').innerHTML =`
+                <input type="hidden" id="numRemitoModifica" name="numRemitoModifica" value="'${numero}'"></input>
+                <input type="hidden" id="idProductorModifica" name="idProductorModifica" value="'${idProductor}'"></input>
+            `;
             closeProgressBar();
         }else {
             closeProgressBar();
@@ -412,8 +432,66 @@ const popUpModifica = async (numero,idProductor) => {
     }
 }
 
+
+// Función para agregar una fila a la tabla
+function agregarFila() {
+    // Verifica que se hayan seleccionado valores válidos
+    if (marcaBins.value !== '0' && tipoBins.value !== '0' && cantidadBins.value !== '') {
+        // Crea una nueva fila en la tabla
+        const newRow = tabla.insertRow();
+
+        // Añade celdas a la fila
+        const cell1 = newRow.insertCell(0);
+        const cell2 = newRow.insertCell(1);
+        const cell3 = newRow.insertCell(2);
+
+        // Llena las celdas con los valores seleccionados
+        cell1.innerHTML = cantidadBins.value;
+        cell2.innerHTML = tipoBins.options[tipoBins.selectedIndex].text + '-' + tipoBins.value;
+        cell3.innerHTML = marcaBins.options[marcaBins.selectedIndex].text + '-' + marcaBins.value;
+
+        // Reinicia los valores de los controles
+        marcaBins.value = '0';
+        tipoBins.value = '0';
+        cantidadBins.value = '';
+
+        var nota = "Agregado.";
+        var color = "green";
+        mostrarInfo(nota,color) 
+    } else {
+        var nota = "Complete los campos.";
+        var color = "red";
+        mostrarInfo(nota,color) 
+    }
+}
+
+// Función para quitar la última fila de la tabla
+function quitarFila() {
+    // Verifica si hay filas en la tabla
+    if (tabla.rows.length > 0) {
+        // Elimina la última fila
+        tabla.deleteRow(-1);
+        var nota = "Eliminado.";
+        var color = "green";
+        mostrarInfo(nota,color); 
+    } else {
+        var nota = "No hay más filas.";
+        var color = "red";
+        mostrarInfo(nota,color) 
+    }
+}
+
+function limpiarTabla() {
+    // Elimina todas las filas de la tabla
+    while (tabla.rows.length > 0) {
+        tabla.deleteRow(0);
+    }
+}
+
+
 function ocultarModificaRemito(){
     popupModifica.style.display = 'none';
+    limpiarTabla();
 }
 
 
@@ -486,6 +564,151 @@ const popUpNuevo= async () => {
 function ocultarNuevoRemito(){
     overlay.style.display = 'none';
     popup.style.display = 'none';
+}
+
+
+/// CARGA SPINNERS DEESPECIE Y MARCA
+
+const cargaSpinnerMarcaEspecie = async () => {
+    openProgressBar();
+    try {
+        const response = await fetch("carga-especie-marca/")
+        const data = await response.json();
+        if(data.Message=="Success"){
+            let seleccion_1 = `<option value="0">MARCA BINS</option>`;
+            let seleccion_2 = `<option value="0">ESPECIE</option>`;
+            data.DataMarca.forEach((datos) => {
+                seleccion_1 += `
+                <option value="${datos.idMarca}">${datos.NombreMarca}</option>
+                `;
+            });
+            data.DataEspecie.forEach((datos) => {
+                seleccion_2 += `
+                <option value="${datos.IdEspecie}">${datos.NombreEspecie}</option>
+                `;
+            });
+            MarcaModifica.innerHTML = seleccion_1;
+            document.getElementById('ComboxMarcaBinsNuevo').innerHTML = seleccion_1;
+            document.getElementById('ComboxEspecieN').innerHTML = seleccion_2;
+
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color)  
+    }
+}
+
+MarcaModifica.addEventListener("change", (event) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue === '0') {
+
+    } else {
+        listar_Envase();
+    }
+});
+
+const listar_Envase = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formMarcaBinsModifica");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("carga-envase/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            let lista_datos = `<option value="0">ENVASE</option>`;
+            data.DataEnvase.forEach((datos) => {
+                lista_datos += `
+                <option value="${datos.idBins}">${datos.NombreBins}</option>
+                `;
+            });
+            document.getElementById('ComboxTipoBinsModifica').innerHTML = lista_datos;
+
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
+  
+const mandaModificacion = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formDatosBinsModifica");
+        const formData = new FormData(form);
+        console.log(formData);
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("actualiza-datos/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            console.log(data)
+            closeProgressBar();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        console.log(error),
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
+function enviaModificacion(){
+    const tablaNoVacia = isTableNotEmpty('Tabla-modifica-Remito');
+
+    if (tablaNoVacia) {
+        mandaModificacion();
+    } else {
+        var nota = "No hay datos cargados.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+}
+
+function isTableNotEmpty(tableId) {
+    const table = document.getElementById(tableId);
+    
+    if (table && table.rows.length > 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
