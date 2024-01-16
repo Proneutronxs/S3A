@@ -433,22 +433,40 @@ const popUpModifica = async (numero,idProductor) => {
 }
 
 
-// Función para agregar una fila a la tabla
 function agregarFila() {
     // Verifica que se hayan seleccionado valores válidos
     if (marcaBins.value !== '0' && tipoBins.value !== '0' && cantidadBins.value !== '') {
         // Crea una nueva fila en la tabla
         const newRow = tabla.insertRow();
 
+        // Agrega campos de entrada ocultos en la fila
+        const hiddenInput1 = document.createElement('input');
+        hiddenInput1.type = 'hidden';
+        hiddenInput1.name = 'cantidades[]';
+        hiddenInput1.value = cantidadBins.value;
+        newRow.appendChild(hiddenInput1);
+
+        const hiddenInput2 = document.createElement('input');
+        hiddenInput2.type = 'hidden';
+        hiddenInput2.name = 'envases[]';
+        hiddenInput2.value = tipoBins.value;
+        newRow.appendChild(hiddenInput2);
+
+        const hiddenInput3 = document.createElement('input');
+        hiddenInput3.type = 'hidden';
+        hiddenInput3.name = 'marcas[]';
+        hiddenInput3.value = marcaBins.value;
+        newRow.appendChild(hiddenInput3);
+
         // Añade celdas a la fila
         const cell1 = newRow.insertCell(0);
         const cell2 = newRow.insertCell(1);
         const cell3 = newRow.insertCell(2);
 
-        // Llena las celdas con los valores seleccionados
+        // Llena las celdas con los textos seleccionados
         cell1.innerHTML = cantidadBins.value;
-        cell2.innerHTML = tipoBins.options[tipoBins.selectedIndex].text + '-' + tipoBins.value;
-        cell3.innerHTML = marcaBins.options[marcaBins.selectedIndex].text + '-' + marcaBins.value;
+        cell2.innerHTML = tipoBins.options[tipoBins.selectedIndex].text;
+        cell3.innerHTML = marcaBins.options[marcaBins.selectedIndex].text;
 
         // Reinicia los valores de los controles
         marcaBins.value = '0';
@@ -457,13 +475,14 @@ function agregarFila() {
 
         var nota = "Agregado.";
         var color = "green";
-        mostrarInfo(nota,color) 
+        mostrarInfo(nota, color) 
     } else {
         var nota = "Complete los campos.";
         var color = "red";
-        mostrarInfo(nota,color) 
+        mostrarInfo(nota, color) 
     }
 }
+
 
 // Función para quitar la última fila de la tabla
 function quitarFila() {
@@ -672,8 +691,15 @@ const mandaModificacion = async () => {
         const response = await fetch("actualiza-datos/", options);
         const data = await response.json();
         if(data.Message=="Success"){
-            console.log(data)
+            popupModifica.style.display = 'none';
             closeProgressBar();
+            ocultaRemito();
+            listar_remitos();
+            limpiarTabla();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color) 
+
         }else {
             closeProgressBar();
             var nota = data.Nota

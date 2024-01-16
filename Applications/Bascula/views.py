@@ -506,29 +506,92 @@ def actualizaDatos(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Bascula.puede_modificar')
         if user_has_permission:
-            num_remito = request.POST.get('numRemitoModifica')
-            num_productor = request.POST.get('idProductorModifica')
-            print(num_remito,num_productor)
+            num_remito = request.POST.get('numRemitoModifica').strip("'")
+            num_productor = request.POST.get('idProductorModifica').strip("'")
 
             cantidades = request.POST.getlist('cantidades[]')
             envases = request.POST.getlist('envases[]')
             marcas = request.POST.getlist('marcas[]')
 
-            # Haz algo con los datos, por ejemplo, imprimirlos
-            for cant, envase, marca in zip(cantidades, envases, marcas):
-                print(f"Cantidad: {cant}, Envase: {envase}, Marca: {marca}")
-                
-            return JsonResponse({'Message': 'Success'})
+            Cantidad_Total = sum(int(numero) for numero in cantidades)
+            items = len(cantidades)
+            index = 0
+            if eliminaBins(str(request.user),num_productor,num_remito):
+                for cant, envase, marca in zip(cantidades, envases, marcas):
+                    if insertaBins(num_productor,num_remito,cant.strip("'"),marca.strip("'"),envase.strip("'")):
+                        index = index + 1
+
+                if items == index:
+                    if actualizaCantidad(str(request.user),Cantidad_Total,num_productor,num_remito):
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se actualizó correctamentee.'})
+                else:
+                    return JsonResponse ({'Message': 'Error', 'Nota': 'No se pudo guardar los cambios.'})
+            else:
+                return JsonResponse ({'Message': 'Error', 'Nota': 'No se pudo guardar los cambios.'})
+
+            
         else:
             return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+def eliminaBins(user,num_productor,num_remito):
+    values = [user,num_productor,num_remito]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                UPDATE Contenido_Remito_MovBins SET Modificado = 'S',FechaModificado = GETDATE(), UserModificado = %s WHERE IdProductor = %s AND NumeroRemito = %s """
+            cursor.execute(sql, values)
+            
+            cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+            affected_rows = cursor.fetchone()[0]
+
+        if affected_rows > 0:
+            return True
+        else:
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("BASCULA","ELIMINA BINS","Consulta",error)
+        return False
 
 
 
+def insertaBins(num_productor,num_remito,cantidad,marca,bins):
+    values = [num_productor,num_remito,cantidad,marca,bins]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ INSERT INTO Contenido_Remito_MovBins (IdProductor,NumeroRemito,Cantidad,IdMarca,IdBins) VALUES (%s,%s,%s,%s,%s) """
+            cursor.execute(sql, values)
+            return True
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("BASCULA","INSERTA BINS","Consulta",error)
 
+        return False
+
+
+def actualizaCantidad(user,cantidad,num_productor,num_remito):
+    values = [user,cantidad,num_productor,num_remito]
+    try:    
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    UPDATE Datos_Remito_MovBins SET FechaModificado = GETDATE(), UserModificado = %s, Cantidad= %s WHERE IdProductor = %s AND NumeroRemito = %s
+                    """
+            cursor.execute(sql, values)
+            
+            cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+            affected_rows = cursor.fetchone()[0]
+
+        if affected_rows > 0:
+            return True
+        else:
+            return True
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("BASCULA","ELIMINA BINS","Consulta",error)
+        return False
 
 
 
