@@ -419,10 +419,10 @@ def traeUPS(renspa):
 def traeMarcaBins():
     try:
         with connections['S3A'].cursor() as cursor:
-            listado = traeIdMarcas()
-            cantValues = ','.join(['%s'] * len(listado))
+            # listado = traeIdMarcas()
+            # cantValues = ','.join(['%s'] * len(listado))
             listado_marca = []
-            sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN ({cantValues})"'-'
+            sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN (1,8200002,8200004,1000047,1000059,8200000,1000034,1000035,1000070,1000087,1000051)"'-'
             cursor.execute(sql,listado)
             consulta = cursor.fetchall()
             if consulta:
