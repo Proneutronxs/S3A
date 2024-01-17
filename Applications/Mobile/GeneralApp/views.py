@@ -50,7 +50,7 @@ def login_app(request):
                                     "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) IS NOT NULL  " \
                                     "THEN (SELECT CONVERT(VARCHAR(22), (TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple))  " \
                                     "FROM TresAses_ISISPayroll.dbo.Empleados  " \
-                                    "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE '-' END AS Nombres,  " \
+                                    "WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE @ParametroUser END AS Nombres,  " \
                                     "USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,   " \
                                     "USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario  " \
                                 "FROM            USUARIOS INNER JOIN  " \
