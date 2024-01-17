@@ -377,7 +377,7 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                 for item, dato in listados.items():
                     listadoData_TipoBins.append({item: dato})
                     
-                registroRealizado("USER","LISTAS CARGADAS",str(listadoData_Asignaciones) + "-" + str(listadoData_UP) + "-" + str(listadoData_Marca) + "-" + str(listadoData_TipoBins)) 
+                registroRealizado(str(idAsignacion),"LISTAS CARGADAS",str(listadoData_Asignaciones) + "-" + str(listadoData_UP) + "-" + str(listadoData_Marca) + "-" + str(listadoData_TipoBins)) 
                 if listadoData_Asignaciones and listadoData_UP and listadoData_Marca and listadoData_TipoBins:
                     return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP, 'DataMarcas': listadoData_Marca, 'DataTipo': listadoData_TipoBins})
                 else:
