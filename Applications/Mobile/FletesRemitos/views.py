@@ -423,7 +423,7 @@ def traeMarcaBins():
             # cantValues = ','.join(['%s'] * len(listado))
             listado_marca = []
             sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN (1,8200002,8200004,1000047,1000059,8200000,1000034,1000035,1000070,1000087,1000051)"'-'
-            cursor.execute(sql,listado)
+            cursor.execute(sql)
             consulta = cursor.fetchall()
             if consulta:
                 for row in consulta:
