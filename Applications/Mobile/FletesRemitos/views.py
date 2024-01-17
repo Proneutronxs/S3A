@@ -132,6 +132,22 @@ def idProductor_Zona(request,idProductor,idChacra):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def traeZona(idChacra):
+    try:
+        with connections['S3A'].cursor() as cursor:          
+            ## ZONA
+            sql2 = """ SELECT Zona FROM Chacra WHERE IdChacra = %s """
+            cursor.execute(sql2, [idChacra])
+            consulta2 = cursor.fetchone()
+            if consulta2:
+                return str(consulta2[0])
+            else:
+                return "0"
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","BUSCA ID ZONA","Aplicacion",error)
+        return "0"
+
 def idEspecie_Varierad(request,idEspecie):
     if request.method == 'GET':
         try:
@@ -193,7 +209,7 @@ def insertaPedidoFlete(request):
             tipoCarga = str(json.loads(body)['tipoCarga'])
             idProductor = str(json.loads(body)['idProductor'])
             idChacra = str(json.loads(body)['idChacra'])
-            idZona = str(json.loads(body)['idZona'])
+            idZona = traeZona(str(json.loads(body)['idChacra']))
             idPlantaDestino = None
             idEspecie = str(json.loads(body)['idEspecie'])
             idVariedad = str(json.loads(body)['idVariedad'])
@@ -406,7 +422,7 @@ def traeMarcaBins():
             listado = traeIdMarcas()
             cantValues = ','.join(['%s'] * len(listado))
             listado_marca = []
-            sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN ({cantValues})"
+            sql = f"SELECT IdMarca, RTRIM(Nombre) FROM Marca WHERE IdMarca IN ({cantValues})"'-'
             cursor.execute(sql,listado)
             consulta = cursor.fetchall()
             if consulta:
@@ -1240,7 +1256,6 @@ def guardaCosechaDiaria(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 def existeRegistro(usuario, idChacra):
     try:
