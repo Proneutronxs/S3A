@@ -504,15 +504,14 @@ def insertCreaciónRemitos(request):
             
 
             registroRealizado(Usuario,"CREACION DE REMITO",str(body))
-            
+            #### primero inserta el remito para generar el número
+            numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
+            ### busca datos de la Asignacion
+            productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
+            especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
 
             if idPrductor == '5000':
                 numero_chacra= "00018"
-                #### primero inserta el remito para generar el número
-                numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
-                ### busca datos de la Asignacion
-                productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
-                especie, variedad = traeEspecieVariedad(IdEspecie,IdVariedad)
                 pdf = Remito_Abadon_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                                     numero_remito, productor, productor, domicilio, 
                                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
@@ -546,10 +545,6 @@ def insertCreaciónRemitos(request):
             
             elif idPrductor == '5200':
                 numero_chacra= "00001"
-                #### primero inserta el remito para generar el número
-                numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
-                ### busca datos de la Asignacion
-                productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
                 pdf = Remito_Romik_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
@@ -584,10 +579,6 @@ def insertCreaciónRemitos(request):
             else:
                 numero_chacra = "00017"
                 idPrductor = "5405"
-                #### primero inserta el remito para generar el número
-                numero_remito = insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idPrductor)
-                ### busca datos de la Asignacion
-                productor, lote, zona, transporte, chofer, camion, patente, domicilio = datosRemito(IdAsignación)
                 pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
