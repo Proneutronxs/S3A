@@ -578,7 +578,6 @@ def insertCreaciónRemitos(request):
             
             else:
                 numero_chacra = "00017"
-                idPrductor = "5405"
                 pdf = Remito_Movimiento_Chacras(fechaActual, horaActual, numero_chacra, 
                     numero_remito, productor, productor, domicilio, 
                     lote, especie, variedad, Renspa, UP, chofer, camion, patente, 
