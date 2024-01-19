@@ -692,22 +692,40 @@ def traeMarcaBinsConID(IdMarca,IdBins):
         connections['S3A'].close()
 
 def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario, idProductor):
-    values = [idProductor, IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idProductor]
-    try:    
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario, IdProductor) " \
-			        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins WHERE IdProductor = %s), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
-            cursor.execute(sql, values)
-            
-            sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
-            cursor.execute(sql2, [IdAsignación])
-            consulta = cursor.fetchone()
-            if consulta:
-                numero_remito = str(consulta[0])
-            return numero_remito
-    except Exception as e:
-        error = str(e)
-        insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
+    if str(idProductor) == "5000" or str(idProductor) == "5200":
+        values = [idProductor, IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idProductor]
+        try:    
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario, IdProductor) " \
+                        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins WHERE IdProductor = %s), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
+                cursor.execute(sql, values)
+                
+                sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
+                cursor.execute(sql2, [IdAsignación])
+                consulta = cursor.fetchone()
+                if consulta:
+                    numero_remito = str(consulta[0])
+                return numero_remito
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
+    else:
+        values = [IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_bins, Usuario,idProductor]
+        try:    
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario, IdProductor) " \
+                        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins WHERE IdProductor = '5405'), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
+                cursor.execute(sql, values)
+                
+                sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
+                cursor.execute(sql2, [IdAsignación])
+                consulta = cursor.fetchone()
+                if consulta:
+                    numero_remito = str(consulta[0])
+                return numero_remito
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","InsertaDatosRemito","Consulta",error)
 
 def insertaBinsRemito(numeroRemito, cantidad, idMarca, idBins, idProductor):
     values = [numeroRemito, cantidad, idMarca, idBins, idProductor]
