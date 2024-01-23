@@ -140,12 +140,12 @@ DATABASES = {
     }
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'S3A/SQLite/db.SQLite',
-    },
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'S3A/SQLite/db.SQLite',
+#     },
+# }
 
 
 ###### LOCAL S3A
