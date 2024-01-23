@@ -201,6 +201,7 @@ a:hover{
   font-size: 14px;
   font-weight: 500;
   padding: 12px 20px;
+  height: 40px;
 }
 
 .menu{
@@ -288,7 +289,7 @@ a:hover{
 
 .selectores {
   color: black;
-  background-color: #fff;
+  background-color: #f0f0f0;
   border: 1px solid #a72626;
   font-size: 14px;
   padding: 5px;
@@ -317,6 +318,7 @@ a:hover{
 
 .botones{
   height: 35px;
+  background-color: #f0f0f0;
 }
 
 .input-number {
@@ -869,3 +871,112 @@ input[type="checkbox"].input-checkbox {
     width: 90%;
   }
 }
+
+/* ################  INICIO DE AGREGA AUTORIZADOS  ###################### */
+
+.vista-container-agrega {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 110px); 
+  width: calc(100vw - 170px); 
+}
+
+.div-1,
+.div-2 {
+  flex: 1; /* Ambos divs ocuparán el mismo espacio */
+  border: 1px solid #ccc; /* Bordes para visualizar mejor */
+}
+
+.horizontal-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 10px; /* ajusta el espacio entre el borde y el contenido */
+}
+
+.tabla-container {
+  max-height: calc(100% - 40px); /* Ajusta según tus necesidades */
+  overflow-y: auto; /* Agrega una barra de desplazamiento vertical si es necesario */
+}
+
+.ContenidoCadrsExtras{
+  padding: 10px;
+}
+
+.cardHora{
+  color: black;
+  background-color: #f0f0f0;
+  border: 1px solid #a72626;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 10px;
+  margin: 10px; /* Establece el ancho de la card según tus necesidades */
+  display: flex;
+}
+
+
+
+.leftDiv {
+  flex: 70%; /* El 70% del espacio disponible */
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rightDiv {
+  flex: 30%; /* El 30% del espacio disponible */
+  border-left: 1px solid #a72626;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.horas-item {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.strong-horas{
+  margin-left: 50px;
+}
+
+.input-checkbox-hs {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #a72626;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

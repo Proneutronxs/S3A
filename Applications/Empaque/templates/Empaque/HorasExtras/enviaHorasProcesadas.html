@@ -1,0 +1,101 @@
+{% extends "Empaque/HorasExtras/horasExtrasEmpaque.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row">
+            <form id="formHorasDePersonal" method="POST" action="">
+                <label class="letras" for="fechaBusqueda">Fecha</label>
+                <input type="date" id="fechaBusqueda" name="fechaBusqueda" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+                <label class="letras" for="TipoHora">Centros de Costos</label>
+                <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
+                </select>
+            </form>
+            <button id="idActualizaHoras" name="idActualizaHoras" class="selectores btn-submit botones bx material-symbols-outlined icon" type="button">refresh</button>
+        </div>
+    </div>
+    <div class="vista-container-agrega" >
+        <div class="div-1">
+            <div class="horizontal-container">
+            <button id="idEnviaPeronal" class="btn-submit botones bx material-symbols-outlined icon" type="button">send</button>
+            <button id="idEliminaPeronal" class="btn-submit botones bx material-symbols-outlined icon" type="button">person_remove</button>
+            </div>
+            <form id="formTransfiereHorasExtras" method="POST" action="#">
+                <div class="tabla-container">
+                    <div id="ContenidoCardHorasExtras" class="ContenidoCadrsExtras">
+                        
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+    </div>                  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal-overlay">
+    <div class="modal-container">
+        <div class="demo-container">
+        <div class="progress-bar">
+            <div class="progress-bar-value"></div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div id="popup" class="popup">
+    <span class="close" id="closePopup">&times;</span>
+    <div id="mensaje-pop-up">
+
+    </div>
+</div>
+
+
+
+<script src="{%static 'TresAses/js/Empaque/HorasExtras/enviaHorasProcesadasNuevo.js' %}"></script>
+{% endblock %}

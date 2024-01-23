@@ -1,0 +1,141 @@
+{% extends "Empaque/HorasExtras/horasExtrasEmpaque.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row">
+            <form id="formCentrosCostosBuscaPersonal" method="POST" action="">
+              <label class="letras" for="TipoHora">Centros de Costos</label>
+              <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
+              </select>
+            </form>
+        </div>
+    </div>
+    <div class="vista-container-agrega" >
+        <div class="div-1">
+            <form id="formGuardaPersonalAutorizado" method="POST" action="#">
+                <div class="horizontal-container">
+                    <div><h6 class="letras">PERSONAL NO AUTORIZADO: </h6></div>
+                <input type="date" id="fechaPre" name="fechaPre" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+                <button id="idGuardaPeronal" class="btn-submit botones bx material-symbols-outlined icon" type="button">save</button>
+                </div>
+                <div class="tabla-container">
+                    <table class="pre-hs-ex">
+                        <thead id="encabezado-tabla-hs-ex">
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th style="width: 80px; min-width: 80px;">Legajo</th>
+                            <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
+                        </tr>
+                        </thead>
+                        <tbody id="contenidoTablaCentrosCostos">
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+        <div class="div-2">
+            <form id="formListaPersonalAutorizado" method="POST" action="#">
+                <div class="horizontal-container">
+                <div><h6 class="letras">PERSONAL AUTORIZADO: </h6></div>
+                <input type="date" id="fechaAut" name="fechaAut" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+                <button id="idBuscaAutorizados" class="btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+                <button id="idRemovePersonal" class="btn-submit botones bx material-symbols-outlined icon" type="button">person_remove</button>
+                </div>
+                <div class="tabla-container">
+                    <table class="pre-hs-ex">
+                        <thead id="encabezado-tabla-hs-ex">
+                            <!-- <input type="checkbox" class="input-checkbox checkbox" id="selectAll"> -->
+                        <tr> 
+                            <th style="width: 40px;"></th>
+                            <th style="width: 80px; min-width: 80px;">Legajo</th>
+                            <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
+                        </tr>
+                        </thead>
+                        <tbody id="contenidoTablaAurorizados">
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>                  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal-overlay">
+    <div class="modal-container">
+        <div class="demo-container">
+        <div class="progress-bar">
+            <div class="progress-bar-value"></div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div id="popup" class="popup">
+    <span class="close" id="closePopup">&times;</span>
+    <div id="mensaje-pop-up">
+
+    </div>
+</div>
+
+
+
+<script src="{%static 'TresAses/js/Empaque/HorasExtras/agregaAutorizados.js' %}"></script>
+{% endblock %}

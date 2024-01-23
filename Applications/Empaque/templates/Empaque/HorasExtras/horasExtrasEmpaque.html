@@ -35,8 +35,8 @@
                     </li>
 
                     <li class="nav-link">
-                        <a href="#">
-                            <i class='bx material-symbols-outlined icon' >how_to_reg</i>
+                        <a href="{% url 'agrega_autorizados_empaque' %}">
+                            <i class='bx material-symbols-outlined icon' >person_add</i>
                             <span class="text nav-text">Agregar</span>
                         </a>
                     </li>
@@ -45,6 +45,13 @@
                         <a href="{% url 'horas_extras_empaque_autoriza' %}">
                             <i class='bx material-symbols-outlined icon' >check_circle</i>
                             <span class="text nav-text">Autoriza Hs.</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="{% url 'horas_extras_autoriza_nuevo' %}">
+                            <i class='bx material-symbols-outlined icon' >move_up</i>
+                            <span class="text nav-text">Envía Hs.</span>
                         </a>
                     </li>
                 </ul>
