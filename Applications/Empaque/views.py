@@ -378,7 +378,7 @@ def eliminaPersonalTildado(request):
                             cursor.commit()
                     except Exception as e:
                         error = str(e)
-                        insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",str(request.user),error)
+                        insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL TILDADO",str(request.user),error)
                     finally:
                         connections['TRESASES_APLICATIVO'].close()
                     index = index + 1
@@ -494,7 +494,7 @@ def insertaHorasExtrasNuevo(Legajo, Fdesde, Fhasta, Choras, Thora,user):
         with connections['S3A'].cursor() as cursor:
             sql = "INSERT INTO RH_HE_Horas_Extras (IdRepl,IdHoraExtra,IdLegajo,FechaDesde,HoraDesde,FechaHasta,HoraHasta,CantHoras,IdMotivo,IdAutoriza,Descripcion,TipoHoraExtra,Valor,Pagada,FechaAlta,UserID) " \
                     "VALUES ('100',(SELECT MAX (IdHoraExtra) + 1 FROM RH_HE_Horas_Extras),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,GETDATE(), %s)"
-            values = (Legajo, Fdesde, "00:00", Fhasta, "00:00", Choras, "17", "62", "Hora Reloj", Thora, "0", "N", user)
+            values = (Legajo, Fdesde, "00:00", Fhasta, "00:00", Choras, "17", "62", "HORAS EXTRAS APLICATIVO WEB", Thora, "0", "N", user)
             cursor.execute(sql, values)
             cursor.commit()
             cursor.close()
