@@ -562,7 +562,7 @@ def eliminaPersonalProcesado(request):
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
-                    insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL PROCESADO",str(request.user).upper(),error)
+                    insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL PROCESADO",str(request.user),error)
                 finally:
                     connections['TRESASES_APLICATIVO'].close()
                 index = index + 1
