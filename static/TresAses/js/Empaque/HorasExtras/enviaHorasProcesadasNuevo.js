@@ -206,7 +206,7 @@ const transfiere_personal = async () => {
 const elimina_personal_autorizado = async () => {
     openProgressBar();
     try {
-        const form = document.getElementById("formListaPersonalAutorizado");
+        const form = document.getElementById("formTransfiereHorasExtras");
         const formData = new FormData(form);
 
         const options = {

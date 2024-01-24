@@ -36,5 +36,5 @@ urlpatterns = [
 
     path('horas-extras/envia/tranferir-personal', views.transfierePersonalTildado, name='tranfiere_personal_tildado'),
 
-    path('horas-extras/envia/elimina-personal', views.eliminaPersonalTildado, name='envia_elimina_personal'),
+    path('horas-extras/envia/elimina-personal', views.eliminaPersonalProcesado, name='envia_elimina_personal_procesado'),
 ]

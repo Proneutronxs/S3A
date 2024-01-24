@@ -544,6 +544,36 @@ def actualizaHoraNueva(ID):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
+@csrf_exempt
+def eliminaPersonalProcesado(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Empaque.puede_borrar')
+        if user_has_permission:
+            legajos = request.POST.getlist('idCheck')
+            index = 0
+            for legajo in legajos:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                UPDATE Pre_Carga_Horas_Extras SET Estado = 'E', FechaModifica = GETDATE(), UserModifica = %s WHERE IdHora = %s
+                                
+                            """
+                        cursor.execute(sql, [str(request.user.upper()), legajo])
+                        cursor.commit()
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",str(request.user),error)
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+                index = index + 1
+            if index == len(legajos):
+                return JsonResponse({'Message': 'Success', 'Nota': 'Se eliminó el personal.'})
+            else:
+                return JsonResponse({'Message': 'Success', 'Nota': 'No se puedieron eliminar algunas horas.'})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 ########## FUNCION PARA PEDIR Y SOLICITAR PERMISOS ################
 
 def funcionGeneralPermisos(request):
