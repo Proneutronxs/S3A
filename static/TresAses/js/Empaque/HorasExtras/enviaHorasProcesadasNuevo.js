@@ -181,6 +181,7 @@ const transfiere_personal = async () => {
             var nota = data.Nota;
             var color = "green";
             mostrarInfo(nota, color);
+            Listar_Horas_Procesadas();
         } else {
             closeProgressBar();
             var nota = data.Nota;
