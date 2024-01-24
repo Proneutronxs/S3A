@@ -88,6 +88,7 @@ const Listar_Horas_Procesadas = async () => {
                             <label class="letras" for="cantHoras">Cant. Horas Extras:</label>
                             <input type="number" class="input-number" step="0.5" id="cantHoras" name="cantHoras" value="${datos.CantHoras}" />
                             <select class="selectores" type="checkbox" id="tipoHoraExtra" name="tipoHoraExtra">
+                                <option value="A">A</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
