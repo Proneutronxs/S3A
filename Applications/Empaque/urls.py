@@ -35,4 +35,6 @@ urlpatterns = [
     path('horas-extras/envia/lista-procesadas', views.listaHorasProcesadas, name='lista_horas_procesadas'),
 
     path('horas-extras/envia/tranferir-personal', views.transfierePersonalTildado, name='tranfiere_personal_tildado'),
+
+    path('horas-extras/envia/elimina-personal', views.eliminaPersonalTildado, name='envia_elimina_personal'),
 ]

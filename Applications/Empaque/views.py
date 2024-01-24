@@ -303,7 +303,7 @@ def guardaPersonalTildado(request):
                                     WHERE Legajo = @@Legajo AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, @@Fecha) AND Estado <> 'E'
                                 );
                              """
-                        cursor.execute(sql, [legajo,fecha,str(request.user)])
+                        cursor.execute(sql, [legajo,fecha,str(request.user.upper())])
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
@@ -374,7 +374,7 @@ def eliminaPersonalTildado(request):
                                     UPDATE Pre_Carga_Horas_Extras SET Estado = 'E', FechaModifica = GETDATE(), UserModifica = %s WHERE Legajo = %s AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, %s)
                                     
                                 """
-                            cursor.execute(sql, [str(request.user), legajo, fecha])
+                            cursor.execute(sql, [str(request.user.upper()), legajo, fecha])
                             cursor.commit()
                     except Exception as e:
                         error = str(e)

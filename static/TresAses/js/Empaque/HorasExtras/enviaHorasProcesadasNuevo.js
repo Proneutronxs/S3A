@@ -128,9 +128,15 @@ document.getElementById("idActualizaHoras").addEventListener("click", function()
 });
 
 document.getElementById("idEliminaPeronal").addEventListener("click", function() {
-    var message = "No Disponible.";
-    var color = "red";
-    mostrarInfo(message,color);
+    const checkboxes = document.querySelectorAll('#ContenidoCardHorasExtras .input-checkbox-hs');
+    const alMenosUnoMarcado = Array.from(checkboxes).some(checkbox => checkbox.checked);
+    if (alMenosUnoMarcado) {
+    elimina_personal_autorizado();
+    } else {
+        var message = "Debe seleccionar al menos un item.";
+        var color = "red";
+        mostrarInfo(message,color);
+    }
 });
 
 
@@ -139,11 +145,11 @@ const checkboxes = document.querySelectorAll('#ContenidoCardHorasExtras .input-c
 const alMenosUnoMarcado = Array.from(checkboxes).some(checkbox => checkbox.checked);
 if (alMenosUnoMarcado) {
     transfiere_personal();
-} else {
-    var message = "Debe seleccionar al menos un item.";
-    var color = "red";
-    mostrarInfo(message,color);
-}
+    } else {
+        var message = "Debe seleccionar al menos un item.";
+        var color = "red";
+        mostrarInfo(message,color);
+    }
 
 });
 
@@ -194,6 +200,40 @@ const transfiere_personal = async () => {
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         mostrarInfo(nota, color);
+    }
+};
+
+const elimina_personal_autorizado = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formListaPersonalAutorizado");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+        const response = await fetch("envia/elimina-personal", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color);
+            Listar_Horas_Procesadas();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);
     }
 };
 
