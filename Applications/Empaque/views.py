@@ -422,6 +422,7 @@ def listaHorasProcesadas(request):
                             WHERE TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s
                                     AND TRY_CONVERT(DATE, Pre_Carga_Horas_Extras.Fecha) = %s
                                     AND Estado ='A'
+                            ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
                          """
                     cursor.execute(sql, [cc,fecha])
                     results = cursor.fetchall()
