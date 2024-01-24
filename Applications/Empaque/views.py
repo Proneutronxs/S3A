@@ -303,7 +303,7 @@ def guardaPersonalTildado(request):
                                     WHERE Legajo = @@Legajo AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, @@Fecha) AND Estado <> 'E'
                                 );
                              """
-                        cursor.execute(sql, [legajo,fecha,str(request.user.upper())])
+                        cursor.execute(sql, [legajo,fecha,str(request.user)])
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
@@ -558,11 +558,11 @@ def eliminaPersonalProcesado(request):
                                 UPDATE Pre_Carga_Horas_Extras SET Estado = 'E', FechaModifica = GETDATE(), UserModifica = %s WHERE IdHora = %s
                                 
                             """
-                        cursor.execute(sql, [str(request.user.upper()), legajo])
+                        cursor.execute(sql, [str(request.user), legajo])
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
-                    insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",str(request.user),error)
+                    insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL PROCESADO",str(request.user).upper(),error)
                 finally:
                     connections['TRESASES_APLICATIVO'].close()
                 index = index + 1
