@@ -918,7 +918,7 @@ input[type="checkbox"].input-checkbox {
 
 
 .leftDiv {
-  flex: 70%; /* El 70% del espacio disponible */
+  flex: 60%; /* El 70% del espacio disponible */
   padding-right: 10px;
   display: flex;
   flex-direction: column;
@@ -926,7 +926,7 @@ input[type="checkbox"].input-checkbox {
 }
 
 .rightDiv {
-  flex: 30%; /* El 30% del espacio disponible */
+  flex: 40%; /* El 30% del espacio disponible */
   border-left: 1px solid #a72626;
   display: flex;
   flex-direction: column;
