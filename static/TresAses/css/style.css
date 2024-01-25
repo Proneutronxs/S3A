@@ -261,7 +261,6 @@ a:hover{
 }
 
 .container-tabla-he{
-  overflow-x: auto;
   overflow-y: auto;
   max-height: 475px;
   min-height: 475px;
@@ -870,6 +869,14 @@ input[type="checkbox"].input-checkbox {
   .content-modifica {
     width: 90%;
   }
+}
+
+.vista-container-autoriza-viejo{
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 160px); 
+  width: calc(100vw - 170px); 
+  overflow: auto;
 }
 
 /* ################  INICIO DE AGREGA AUTORIZADOS  ###################### */
