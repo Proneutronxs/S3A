@@ -261,7 +261,6 @@ a:hover{
 }
 
 .container-tabla-he{
-  overflow-y: auto;
   max-height: 475px;
   min-height: 475px;
 }
