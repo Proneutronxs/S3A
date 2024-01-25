@@ -873,7 +873,7 @@ input[type="checkbox"].input-checkbox {
 .vista-container-autoriza-viejo{
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 160px); 
+  height: calc(100vh - 150px); 
   width: calc(100vw - 170px); 
   overflow: auto;
 }
@@ -883,7 +883,7 @@ input[type="checkbox"].input-checkbox {
 .vista-container-agrega {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 120px); 
+  height: calc(100vh - 110px); 
   width: calc(100vw - 170px); 
 }
 
