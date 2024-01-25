@@ -292,14 +292,14 @@ def llamaAsignacionesPendientes(request, usuario):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = """ SELECT         IdPedidoFlete AS ID, CONVERT(VARCHAR, PedidoFlete.IdPedidoFlete) + ' - ' +  RTRIM(Productor.RazonSocial) AS ASIGNACION 
-                            FROM            PedidoFlete INNER JOIN 
-                                            Productor ON PedidoFlete.IdProductor = Productor.IdProductor
-                            WHERE        (PedidoFlete.UserID = %s) 
-                                            AND (PedidoFlete.Estado = 'A')
-                                            --AND ((SELECT LlegaChacra FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = IdPedidoFlete AND Estado = 'S' ) IS NOT NULL)
-                                            AND ((SELECT DISTINCT AsigCerrada FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins WHERE IdAsignacion = IdPedidoFlete) IS NULL)
-                            ORDER BY IdPedidoFlete """
+                sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, CONVERT(VARCHAR,PedidoFlete.IdPedidoFlete) + ' - ' + RTRIM(Chacra.Nombre) AS ASIGNACION
+                            FROM            PedidoFlete INNER JOIN
+                                                    Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra
+                            WHERE        (PedidoFlete.UserID = %s) AND (PedidoFlete.Estado = 'A') AND
+                                                        ((SELECT DISTINCT AsigCerrada
+                                                            FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins
+                                                            WHERE        (IdAsignacion = PedidoFlete.IdPedidoFlete)) IS NULL)
+                            ORDER BY PedidoFlete.IdPedidoFlete """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
                 if consulta:
