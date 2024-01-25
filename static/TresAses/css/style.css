@@ -883,7 +883,7 @@ input[type="checkbox"].input-checkbox {
 .vista-container-agrega {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 115px); 
+  height: calc(100vh - 120px); 
   width: calc(100vw - 170px); 
 }
 
