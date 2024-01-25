@@ -52,7 +52,8 @@ def listadoRemitos(request):
                                                     S3A.dbo.Camion ON S3A.dbo.PedidoFlete.IdCamion = S3A.dbo.Camion.IdCamion
                             WHERE        (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) >= TRY_CONVERT(DATE, @P_Desde, 103)) 
                                     AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta, 103) <= TRY_CONVERT(DATE, @P_Hasta, 103))
-                                    AND Datos_Remito_MovBins.Modificado IS NULL """
+                                    AND Datos_Remito_MovBins.Modificado IS NULL
+                            ORDER BY S3A.dbo.PedidoFlete.IdPedidoFlete """
                     cursor.execute(sql, [desde,hasta])
                     consulta = cursor.fetchall()
                     if consulta:
@@ -556,8 +557,6 @@ def eliminaBins(user,num_productor,num_remito):
         insertar_registro_error_sql("BASCULA","ELIMINA BINS","Consulta",error)
         return False
 
-
-
 def insertaBins(num_productor,num_remito,cantidad,marca,bins):
     values = [num_productor,num_remito,cantidad,marca,bins]
     try:    
@@ -570,7 +569,6 @@ def insertaBins(num_productor,num_remito,cantidad,marca,bins):
         insertar_registro_error_sql("BASCULA","INSERTA BINS","Consulta",error)
 
         return False
-
 
 def actualizaCantidad(user,cantidad,num_productor,num_remito):
     values = [user,cantidad,num_productor,num_remito]
