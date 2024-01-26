@@ -331,9 +331,9 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                 sql =   """
                         SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte,
                                     RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor, 
-									CASE WHEN (SELECT Telefono
+									CASE WHEN (SELECT DISTINCT Telefono
 													FROM Chofer
-													WHERE (RTRIM(Apellidos) + ' ' + RTRIM(Nombres)) = RTRIM(PF.Chofer)) IS NULL THEN '0' ELSE (SELECT Telefono
+													WHERE (RTRIM(Apellidos) + ' ' + RTRIM(Nombres)) = RTRIM(PF.Chofer)) IS NULL THEN '0' ELSE (SELECT DISTINCT Telefono
 													FROM Chofer
 													WHERE (RTRIM(Apellidos) + ' ' + RTRIM(Nombres)) = RTRIM(PF.Chofer)) END AS TELEFONO
                         FROM            PedidoFlete AS PF LEFT OUTER JOIN 
