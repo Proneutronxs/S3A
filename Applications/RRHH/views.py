@@ -307,6 +307,7 @@ def enviarHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS EN S3A
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('RRHH.puede_insertar')
         if user_has_permission:
+            usuario = str(request.user)
             importe = request.POST.get('valor', None)
             pagada = request.POST.get('HePagada', 'N')
             checkboxes_tildados = request.POST.getlist('idCheck')
@@ -315,7 +316,7 @@ def enviarHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS EN S3A
                 ID_HEP = str(i) 
                 fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
                 Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
-                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
+                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,usuario.upper())
                 resultados.append(resultado)
             if 0 in resultados:
                 data = "Se produjo un Error en alguna de las inserciones."
@@ -395,12 +396,12 @@ def buscaDatosParaInsertarHE(idHEP): ### SOLO FUNCIÓN, BUSCA DATOS PARA INSERTA
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
-def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora): ### FUNCION QUE INSERTA LAS HORAS EN EL S3A SOLO FUNCION (NO REQUIERE PERMISOS)
+def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,user): ### FUNCION QUE INSERTA LAS HORAS EN EL S3A SOLO FUNCION (NO REQUIERE PERMISOS)
     try:
         with connections['S3A'].cursor() as cursor:
             sql = "INSERT INTO RH_HE_Horas_Extras (IdRepl,IdHoraExtra,IdLegajo,FechaDesde,HoraDesde,FechaHasta,HoraHasta,CantHoras,IdMotivo,IdAutoriza,Descripcion,TipoHoraExtra,Valor,Pagada,FechaAlta,UserID) " \
-                    "VALUES ('100',(SELECT MAX (IdHoraExtra) + 1 FROM RH_HE_Horas_Extras),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 'APLICATIVO')"
-            values = (Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
+                    "VALUES ('100',(SELECT MAX (IdHoraExtra) + 1 FROM RH_HE_Horas_Extras),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            values = (Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,user)
             cursor.execute(sql, values)
             cursor.close()
             actualizarEstadoHEP(ID_HEP)

@@ -164,6 +164,7 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
         user_has_permission = request.user.has_perm('Empaque.puede_insertar') 
         if user_has_permission: 
+            usuario = str(request.user)
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
             importe = "0"
@@ -172,7 +173,7 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
                 ID_HEP = str(i) 
                 fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
                 Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
-                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
+                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,usuario.upper())
                 resultados.append(resultado)
 
             if 0 in resultados:
@@ -282,6 +283,7 @@ def guardaPersonalTildado(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Empaque.puede_insertar')
         if user_has_permission:
+            usuario = str(request.user)
             legajos = request.POST.getlist('idCheck')
             fecha = request.POST.get('fechaPre')
             index = 0
@@ -303,11 +305,11 @@ def guardaPersonalTildado(request):
                                     WHERE Legajo = @@Legajo AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, @@Fecha) AND Estado <> 'E'
                                 );
                              """
-                        cursor.execute(sql, [legajo,fecha,str(request.user)])
+                        cursor.execute(sql, [legajo,fecha,usuario.upper()])
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
-                    insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",str(request.user),error)
+                    insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",usuario.upper(),error)
                 finally:
                     connections['TRESASES_APLICATIVO'].close()
                 index = index + 1
@@ -363,6 +365,7 @@ def eliminaPersonalTildado(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Empaque.puede_borrar')
         if user_has_permission:
+            usuario = str(request.user)
             legajos = request.POST.getlist('idCheck')
             fecha = request.POST.get('fechaAut')
             if es_fecha_pasada(str(fecha)) is False:
@@ -374,11 +377,11 @@ def eliminaPersonalTildado(request):
                                     UPDATE Pre_Carga_Horas_Extras SET Estado = 'E', FechaModifica = GETDATE(), UserModifica = %s WHERE Legajo = %s AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, %s)
                                     
                                 """
-                            cursor.execute(sql, [str(request.user), legajo, fecha])
+                            cursor.execute(sql, [usuario.upper(), legajo, fecha])
                             cursor.commit()
                     except Exception as e:
                         error = str(e)
-                        insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL TILDADO",str(request.user),error)
+                        insertar_registro_error_sql("EMPAQUE","ELIMINA PERSONAL TILDADO",usuario.upper(),error)
                     finally:
                         connections['TRESASES_APLICATIVO'].close()
                     index = index + 1

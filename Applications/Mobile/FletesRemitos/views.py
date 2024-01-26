@@ -330,7 +330,12 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
             with connections['S3A'].cursor() as cursor:
                 sql =   """
                         SELECT        RTRIM(P.RazonSocial) AS Productor, RTRIM(C.Nombre) AS Chacra, RTRIM(Z.Nombre) AS Zona, RTRIM(CONVERT(VARCHAR(30), T.RazonSocial)) AS Transporte,
-                                    RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor
+                                    RTRIM(PF.Chofer), RTRIM(CA.Nombre) AS Camion, RTRIM(CA.Patente), RTRIM(C.RENSPA) AS Renspa, PF.IdProductor, 
+									CASE WHEN (SELECT Telefono
+													FROM Chofer
+													WHERE (RTRIM(Apellidos) + ' ' + RTRIM(Nombres)) = RTRIM(PF.Chofer)) IS NULL THEN '0' ELSE (SELECT Telefono
+													FROM Chofer
+													WHERE (RTRIM(Apellidos) + ' ' + RTRIM(Nombres)) = RTRIM(PF.Chofer)) END AS TELEFONO
                         FROM            PedidoFlete AS PF LEFT OUTER JOIN 
                                     Productor AS P ON PF.IdProductor = P.IdProductor LEFT OUTER JOIN 
                                     Chacra AS C ON PF.IdChacra = C.IdChacra LEFT OUTER JOIN 
@@ -357,8 +362,9 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                         patente = str(row[6])
                         renspa = str(row[7])
                         idProductor = str(row[8])
+                        tel = str(row[9])
                         datos = {'Productor': productor, 'Chacra': chacra, 'Zona': zona, 'Transporte': transporte,
-                                  'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa, 'IdProductor': idProductor}
+                                  'Chofer': chofer, 'Camion':camion, 'Patente': patente, 'Renspa': renspa, 'IdProductor': idProductor, 'Tel': tel}
                         listadoData_Asignaciones.append(datos)
                 
                 listadoData_UP = traeUPS(renspa)
@@ -790,7 +796,7 @@ def mostrarListadoRemitos(request, chofer):
                             WHERE RTRIM(PedidoFlete.Chofer) = %s
                                 AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) 
                                 AND PedidoFlete.Estado = 'A'
-                                AND (SELECT Final FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = PedidoFlete.IdPedidoFlete) IS NULL """
+                                --AND (SELECT Final FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = PedidoFlete.IdPedidoFlete) IS NULL """
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
                 if consulta:
@@ -1114,7 +1120,10 @@ def datosViajesAceptados(request, chofer):
                 sql = """ SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO,
                                                     CASE S3A.dbo.PedidoFlete.UbicacionVacios WHEN '0' THEN '-' ELSE CONVERT(VARCHAR, S3A.dbo.PedidoFlete.CantVacios) + ' B. VACIOS - ' + Logistica_Ubicacion_Chacras_Bins.Nombre END AS UBICACION_BINS, RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS SOLICITA, 
                                                     RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA,  CASE WHEN Logistica_Ubicacion_Chacras_Bins.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
-                                                    CASE WHEN Logistica_Ubicacion_Chacras_Bins_1.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins_1.Coordenadas END AS COORDENADAS_CHACRA 
+                                                    CASE WHEN Logistica_Ubicacion_Chacras_Bins_1.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins_1.Coordenadas END AS COORDENADAS_CHACRA, 
+													CASE WHEN (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
+													FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) COLLATE SQL_Latin1_General_CP1_CI_AS) IS NULL THEN '0'ELSE (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
+													FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) COLLATE SQL_Latin1_General_CP1_CI_AS) END AS TELEFONO
                             FROM            Logistica_Camiones_Seguimiento INNER JOIN
                                                     S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN
                                                     S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN
@@ -1140,7 +1149,8 @@ def datosViajesAceptados(request, chofer):
                         fecha = str(row[7])
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra}
+                        tel = str(row[10])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': tel}
                         listado_Viajes_Aceptados.append(datos)    
                     
                     if  textUbicacion(chofer) == '-':
