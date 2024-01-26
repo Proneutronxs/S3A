@@ -161,13 +161,13 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
-        self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
+        #self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
         self.set_font('Arial', 'I', 8)
         self.text(x=50, y=12, txt= 'De RO-MIK S.A.')
         self.set_font('Arial', 'B', 8)
-        self.text(x=42, y=15, txt= 'ROCA N° 495')
-        self.text(x=44, y=18, txt= 'TEL: (0299) 4772183 / 4772139')
-        self.text(x=39, y=21, txt= '4772183 / 4772139 FAX: (299) 4771573')
+        self.text(x=44, y=15, txt= 'ROCA N° 495')
+        ##self.text(x=44, y=18, txt= 'TEL: (0299) 4772183 / 4772139')
+        ##self.text(x=39, y=21, txt= '4772183 / 4772139 FAX: (299) 4771573')
         self.text(x=49, y=24, txt= '(8324) CIPOLLETTI, R.N.')
         self.set_font('Arial', '', 7)
         self.text(x=46, y=29, txt= 'IVA RESPONSABLE INSCRIPTO')
@@ -194,7 +194,7 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.set_font('Arial', 'I', 9)
         self.text(x=141, y=42, txt= 'FRUTA CERTIFICADA GLOBAL G.A.P.')
         self.set_font('Arial', 'BI', 9)
-        self.text(x=160, y=45, txt= 'GGN N°: 4049928936585')
+        self.text(x=160, y=45, txt= 'GGN N°: 4052852040471')
         ##################################################
         self.set_font('Arial', '', 8)
         self.text(x=10, y=38, txt= 'PRODUCTOR: ')
@@ -289,7 +289,7 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
-        self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
+        #self.image('static/imagenes/TA.png', x=8, y=10, w=30, h=20)
         self.set_font('Arial', 'I', 8)
         self.text(x=50, y=12, txt= 'De TRES ASES S.A.')
         self.set_font('Arial', 'B', 8)
@@ -322,7 +322,7 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.set_font('Arial', 'I', 9)
         self.text(x=141, y=42, txt= 'FRUTA CERTIFICADA GLOBAL G.A.P.')
         self.set_font('Arial', 'BI', 9)
-        self.text(x=160, y=45, txt= 'GGN N°: 4049928936585')
+        self.text(x=160, y=45, txt= 'GGN N°: 4052852042116')
         ##################################################
         self.set_font('Arial', '', 8)
         self.text(x=10, y=38, txt= 'PRODUCTOR: ')
