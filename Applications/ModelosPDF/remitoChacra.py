@@ -2,11 +2,11 @@ from fpdf import FPDF
 import barcode # pip install python-barcode
 
 
-
+### TRES ASES GENERAL
 class Remito_Movimiento_Chacras(FPDF):
-    def __init__(self, fecha_remito, hora_remito, 
-                 numero_chacra, numero_remito, productor, 
-                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
+    def __init__(self, fecha_remito, hora_remito,
+                 numero_chacra, numero_remito, productor,
+                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer,
                  camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
@@ -27,7 +27,7 @@ class Remito_Movimiento_Chacras(FPDF):
         self.total_bins = total_bins
         self.capataz = capataz
         #self.usuario = usuario
-        
+
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
@@ -112,11 +112,11 @@ class Remito_Movimiento_Chacras(FPDF):
         self.text(x=114, y=125, txt= 'CAPATAZ')
         self.line(148,121,148,126)
         self.set_font('Arial', 'B', 8)
-        self.text(x=12, y=122, txt= self.chofer) 
-        self.text(x=55, y=122, txt= self.camion) 
+        self.text(x=12, y=122, txt= self.chofer)
+        self.text(x=55, y=122, txt= self.camion)
         self.text(x=84, y=122, txt= self.patente)
         self.rect(x=110,y=112,w=90,h=5)
-        self.text(x=170, y=116, txt= self.total_bins) 
+        self.text(x=170, y=116, txt= self.total_bins)
         self.rect(x=110,y=121,w=90,h=5)
         self.text(x=160, y=125, txt= self.capataz)
         self.set_y(-20)
@@ -131,12 +131,11 @@ class Remito_Movimiento_Chacras(FPDF):
         self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 29/12/2024')
         self.ln(138)
 
-
-
+### REMITO ROMIK
 class Remito_Romik_Movimiento_Chacras(FPDF):
-    def __init__(self, fecha_remito, hora_remito, 
-                 numero_chacra, numero_remito, productor, 
-                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
+    def __init__(self, fecha_remito, hora_remito,
+                 numero_chacra, numero_remito, productor,
+                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer,
                  camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
@@ -157,7 +156,7 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.total_bins = total_bins
         self.capataz = capataz
         #self.usuario = usuario
-        
+
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
@@ -165,12 +164,15 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.set_font('Arial', 'I', 8)
         self.text(x=50, y=12, txt= 'De RO-MIK S.A.')
         self.set_font('Arial', 'B', 8)
-        self.text(x=44, y=15, txt= 'ROCA N° 495')
+        self.text(x=52, y=15, txt= 'ROCA N° 495')
         ##self.text(x=44, y=18, txt= 'TEL: (0299) 4772183 / 4772139')
         ##self.text(x=39, y=21, txt= '4772183 / 4772139 FAX: (299) 4771573')
-        self.text(x=49, y=24, txt= '(8324) CIPOLLETTI, R.N.')
+        self.text(x=44, y=18, txt= '(8324) CIPOLLETTI, R.N.')
         self.set_font('Arial', '', 7)
-        self.text(x=46, y=29, txt= 'IVA RESPONSABLE INSCRIPTO')
+        self.text(x=39, y=21, txt= 'IVA RESPONSABLE INSCRIPTO')
+        # self.text(x=49, y=24, txt= '(8324) CIPOLLETTI, R.N.')
+        # self.set_font('Arial', '', 7)
+        # self.text(x=46, y=29, txt= 'IVA RESPONSABLE INSCRIPTO')
         self.text(x=146, y=10, txt= 'DOCUMENTO NO VÁLIDO COMO FACTURA')
         self.rect(x=99,y=5,w=10,h=10)
         self.set_font('Arial', 'B', 26)
@@ -242,11 +244,11 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.text(x=114, y=125, txt= 'CAPATAZ')
         self.line(148,121,148,126)
         self.set_font('Arial', 'B', 8)
-        self.text(x=12, y=122, txt= self.chofer) 
-        self.text(x=55, y=122, txt= self.camion) 
+        self.text(x=12, y=122, txt= self.chofer)
+        self.text(x=55, y=122, txt= self.camion)
         self.text(x=84, y=122, txt= self.patente)
         self.rect(x=110,y=112,w=90,h=5)
-        self.text(x=170, y=116, txt= self.total_bins) 
+        self.text(x=170, y=116, txt= self.total_bins)
         self.rect(x=110,y=121,w=90,h=5)
         self.text(x=160, y=125, txt= self.capataz)
         self.set_y(-20)
@@ -261,10 +263,11 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 02/01/2025')
         self.ln(138)
 
+### REMITO ABADON
 class Remito_Abadon_Movimiento_Chacras(FPDF):
-    def __init__(self, fecha_remito, hora_remito, 
-                 numero_chacra, numero_remito, productor, 
-                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer, 
+    def __init__(self, fecha_remito, hora_remito,
+                 numero_chacra, numero_remito, productor,
+                 señor, domicilio, lote, especie, variedad, renspa, UP, chofer,
                  camion, patente, total_bins, capataz):
         super().__init__('L', 'mm', 'A5')
         self.fecha_remito = fecha_remito
@@ -285,7 +288,7 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.total_bins = total_bins
         self.capataz = capataz
         #self.usuario = usuario
-        
+
 
     def header(self):
         self.rect(x=5,y=5,w=200,h=138)
@@ -370,11 +373,11 @@ class Remito_Abadon_Movimiento_Chacras(FPDF):
         self.text(x=114, y=125, txt= 'CAPATAZ')
         self.line(148,121,148,126)
         self.set_font('Arial', 'B', 8)
-        self.text(x=12, y=122, txt= self.chofer) 
-        self.text(x=55, y=122, txt= self.camion) 
+        self.text(x=12, y=122, txt= self.chofer)
+        self.text(x=55, y=122, txt= self.camion)
         self.text(x=84, y=122, txt= self.patente)
         self.rect(x=110,y=112,w=90,h=5)
-        self.text(x=170, y=116, txt= self.total_bins) 
+        self.text(x=170, y=116, txt= self.total_bins)
         self.rect(x=110,y=121,w=90,h=5)
         self.text(x=160, y=125, txt= self.capataz)
         self.set_y(-20)
