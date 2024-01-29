@@ -169,7 +169,7 @@ def eliminaHorasEstadoHEP(ID_HEP):
 @csrf_exempt
 def eliminaHorasSeleccionadasFrio(request): ### ELIMINA LAS HORAS SELECCIONADAS
     if request.method == 'POST':   ### METODO POST PUT DELETE GET
-        user_has_permission = request.user.has_perm('Frio.puede_borrar')
+        user_has_permission = request.user.has_perm('HorasExtrasFrio.puede_borrar')
         if user_has_permission:
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
@@ -193,7 +193,7 @@ def eliminaHorasSeleccionadasFrio(request): ### ELIMINA LAS HORAS SELECCIONADAS
 @csrf_exempt
 def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
-        user_has_permission = request.user.has_perm('Frio.puede_insertar') 
+        user_has_permission = request.user.has_perm('HorasExtrasFrio.puede_autorizar') 
         if user_has_permission: 
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []

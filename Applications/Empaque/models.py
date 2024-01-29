@@ -10,3 +10,10 @@ class Empaque(models.Model):
             ("puede_modificar", "Puede Modificar"),
             ("puede_borrar", "Puede Borrar"),
         ]
+
+class HorasExtrasEmpaque(models.Model):
+    class Meta:
+        permissions = [
+            ("puede_autorizar", "Puede Autorizar"),
+            ("puede_borrar", "Puede Borrar"),
+        ]
