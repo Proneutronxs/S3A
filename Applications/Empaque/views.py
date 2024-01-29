@@ -162,7 +162,7 @@ def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
 @csrf_exempt
 def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
-        user_has_permission = request.user.has_perm('HorasExtrasEmpaque.puede_autorizar') 
+        user_has_permission = request.user.has_perm('Empaque.puede_autorizar') 
         if user_has_permission: 
             usuario = str(request.user)
             checkboxes_tildados = request.POST.getlist('idCheck')
@@ -222,7 +222,7 @@ def eliminaHorasEstadoHEP(ID_HEP):
 @csrf_exempt
 def eliminaHorasSeleccionadas(request): ### ELIMINA LAS HORAS SELECCIONADAS
     if request.method == 'POST':   ### METODO POST PUT DELETE GET
-        user_has_permission = request.user.has_perm('HorasExtrasEmpaque.puede_borrar')  ### 'Empaque.puede_ver' REEMPLAZAR POR EL SECTOR Y PERMISO
+        user_has_permission = request.user.has_perm('Empaque.puede_denegar')  ### 'Empaque.puede_ver' REEMPLAZAR POR EL SECTOR Y PERMISO
         if user_has_permission: ### VERIFICAR PERMISO SI ESTA CONCEDIDO
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
@@ -464,7 +464,7 @@ def listaHorasProcesadas(request):
 @csrf_exempt
 def transfierePersonalTildado(request):
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('HorasExtrasEmpaque.puede_autorizar')
+        user_has_permission = request.user.has_perm('Empaque.puede_autorizar')
         if user_has_permission:
             usuario = str(request.user)
             idHoras = request.POST.getlist('idCheck')
@@ -550,7 +550,7 @@ def actualizaHoraNueva(ID):
 @csrf_exempt
 def eliminaPersonalProcesado(request):
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('HorasExtrasEmpaque.puede_borrar')
+        user_has_permission = request.user.has_perm('Empaque.puede_denegar')
         if user_has_permission:
             legajos = request.POST.getlist('idCheck')
             index = 0
