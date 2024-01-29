@@ -1317,10 +1317,10 @@ def verReporteBins(request):
             fecha = str(json.loads(body)['fecha'])
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """
-                        DECLARE @@Fecha date;
+                        DECLARE @@Fecha DATE;
                         SET @@Fecha = %s;
-                        SELECT        TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple AS NOMBRE, S3A.dbo.Productor.RazonSocial AS PRODUCTOR, 
-                                                S3A.dbo.Chacra.Nombre AS CHACRA, Registro_Cosecha_Diaria.CantBins AS BINS_COSECHADOS, CONVERT(VARCHAR(5), Registro_Cosecha_Diaria.FechaAlta, 108) + ' HS.' AS HORA_INFORME,
+                        SELECT        TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple AS NOMBRE, RTRIM(S3A.dbo.Productor.RazonSocial) AS PRODUCTOR, 
+                                                RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, Registro_Cosecha_Diaria.CantBins AS BINS_COSECHADOS, CONVERT(VARCHAR(5), Registro_Cosecha_Diaria.FechaAlta, 108) + ' HS.' AS HORA_INFORME,
                                                 (SELECT SUM(Registro_Cosecha_Diaria.CantBins)
                                                     FROM Registro_Cosecha_Diaria
                                                     WHERE        (TRY_CONVERT(DATE, Registro_Cosecha_Diaria.FechaAlta) = TRY_CONVERT(DATE, @@Fecha ))) AS TOTAL_COSECHADO
