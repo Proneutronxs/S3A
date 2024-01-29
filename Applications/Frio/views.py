@@ -195,6 +195,7 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     if request.method == 'POST': 
         user_has_permission = request.user.has_perm('HorasExtrasFrio.puede_autorizar') 
         if user_has_permission: 
+            usuario = str(request.user)
             checkboxes_tildados = request.POST.getlist('idCheck')
             resultados = []
             importe = "0"
@@ -203,7 +204,7 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
                 ID_HEP = str(i) 
                 fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
                 Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
-                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora)
+                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,usuario.upper())
                 resultados.append(resultado)
 
             if 0 in resultados:

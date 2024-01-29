@@ -12,7 +12,6 @@ import os
 
 # Create your views here.
 
-
 def datos_Iniciales_Flete(request):
     if request.method == 'GET':
         try:
