@@ -57,6 +57,7 @@ urlpatterns = [
    ### GUARDA COSECHA DIARIA
    path('data-inserta/cosecha-diaria', views.guardaCosechaDiaria, name="cosecha_diaria"),
 
-
+   ### MUESTRA LA COSECHA POR FECHA
+   path('data-ver/cosecha-diaria', views.verReporteBins, name="ver_cosecha_diaria"),
 
 ]

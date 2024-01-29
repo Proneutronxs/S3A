@@ -1309,8 +1309,51 @@ def existeRegistro(usuario, idChacra):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-
-
+@csrf_exempt
+def verReporteBins(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            fecha = str(json.loads(body)['fecha'])
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                        DECLARE @@Fecha date;
+                        SET @@Fecha = %s;
+                        SELECT        TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple AS NOMBRE, S3A.dbo.Productor.RazonSocial AS PRODUCTOR, 
+                                                S3A.dbo.Chacra.Nombre AS CHACRA, Registro_Cosecha_Diaria.CantBins AS BINS_COSECHADOS, CONVERT(VARCHAR(5), Registro_Cosecha_Diaria.FechaAlta, 108) + ' HS.' AS HORA_INFORME,
+                                                (SELECT SUM(Registro_Cosecha_Diaria.CantBins)
+                                                    FROM Registro_Cosecha_Diaria
+                                                    WHERE        (TRY_CONVERT(DATE, Registro_Cosecha_Diaria.FechaAlta) = TRY_CONVERT(DATE, @@Fecha ))) AS TOTAL_COSECHADO
+                        FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN
+                                                Registro_Cosecha_Diaria INNER JOIN
+                                                USUARIOS ON Registro_Cosecha_Diaria.Usuario = USUARIOS.Usuario ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USUARIOS.CodEmpleado INNER JOIN
+                                                S3A.dbo.Productor ON Registro_Cosecha_Diaria.Productor = S3A.dbo.Productor.IdProductor INNER JOIN
+                                                S3A.dbo.Chacra ON Registro_Cosecha_Diaria.Chacra = S3A.dbo.Chacra.IdChacra
+                        WHERE        (TRY_CONVERT(DATE, Registro_Cosecha_Diaria.FechaAlta) = TRY_CONVERT(DATE, @@Fecha))
+                        ORDER BY Registro_Cosecha_Diaria.FechaAlta
+                    """
+                cursor.execute(sql,[fecha])
+                results = cursor.fetchall()
+                if results:
+                    listado = []
+                    for result in results:
+                        nombre = str(result[0])
+                        productor = str(result[1])
+                        chacra = str(result[2])
+                        cantidad = str(result[3])
+                        hora = str(result[4])
+                        total = str(result[5])
+                        datos = {'Nombre': nombre, 'Productor': productor, 'Chacra': chacra, 'Cantidad': cantidad, 'Hora': hora, 'Total': total}
+                        listado.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': listado})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("FLETES REMITOS","VER REPORTE DIARIO","usuario",error)
+                    return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
