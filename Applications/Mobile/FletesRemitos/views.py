@@ -72,7 +72,7 @@ def datos_Iniciales_Flete(request):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+
 def idProductor_Chacra(request,idProductor):
     if request.method == 'GET':
         try:
@@ -135,7 +135,7 @@ def traeZona(idChacra):
     try:
         with connections['S3A'].cursor() as cursor:          
             ## ZONA
-            sql2 = """ SELECT Zona FROM Chacra WHERE IdChacra = %s """
+            sql2 = """ SELECT LTRIM(RTRIM(Zona)) FROM Chacra WHERE IdChacra = %s """
             cursor.execute(sql2, [idChacra])
             consulta2 = cursor.fetchone()
             if consulta2:
@@ -369,8 +369,34 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                 listadoData_UP = traeUPS(renspa)
                 listadoData_Marca = traeMarcaBins()
 
-                listado_idMarcas = traeIdMarcas()
+                
+                listadoData_especie = []
+                listado_idEspecies = traeIdEspecies()
+                cantValuesEspecie = ','.join(['%s'] * len(listado_idEspecies))
+                sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValuesEspecie}) ORDER BY IdEspecie"
+                cursor.execute(sql3, listado_idEspecies)
+                consulta3 = cursor.fetchall()
+                if consulta3:
+                    for row3 in consulta3:
+                        idEspecie = str(row3[0])
+                        nombre = str(row3[1])
+                        datos = {'IdEspecie': idEspecie, 'NombreEspecie': nombre}
+                        listadoData_especie.append(datos)
 
+                ## VARIEDADES
+                listados = {item: [] for item in listado_idEspecies}
+
+                for item in listados.items():
+                    dato = traeTipoVariedad(item[0])
+                    listados[item[0]] = dato
+
+                listadoData_variedades = []
+
+                for item, dato in listados.items():
+                    listadoData_variedades.append({item: dato})   
+            
+                #### BINS
+                listado_idMarcas = traeIdMarcas()
                 listados = {item: [] for item in listado_idMarcas}
 
                 for item in listados.items():
@@ -384,7 +410,8 @@ def llamaDataAsignacionPendiente(request, idAsignacion):
                     
                 registroRealizado(str(idAsignacion),"LISTAS CARGADAS",str(listadoData_Asignaciones) + "-" + str(listadoData_UP) + "-" + str(listadoData_Marca) + "-" + str(listadoData_TipoBins)) 
                 if listadoData_Asignaciones and listadoData_UP and listadoData_Marca and listadoData_TipoBins:
-                    return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP, 'DataMarcas': listadoData_Marca, 'DataTipo': listadoData_TipoBins})
+                    return JsonResponse({'Message': 'Success', 'DataAsignaciones': listadoData_Asignaciones, 'DataUp': listadoData_UP, 'DataMarcas': listadoData_Marca, 'DataTipo': listadoData_TipoBins, 
+                                         'DataEspecie': listadoData_especie, 'DataVariedades':listadoData_variedades})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron Datos para la Asignacion seleccionada.'})
         except Exception as e:
@@ -417,9 +444,6 @@ def traeUPS(renspa):
         error = str(e)
         insertar_registro_error_sql("traeFletesRemitos","traeUPS","Aplicacion",error)
         return listadoUP_Renspa
-    finally:
-        cursor.close()
-        connections['S3A'].close()
 
 def traeMarcaBins():
     try:
@@ -443,9 +467,6 @@ def traeMarcaBins():
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","TraeMarcaBins","Aplicacion",error)
-    finally:
-        cursor.close()
-        connections['S3A'].close()
 
 def traeTipoBins(idMarca):
     try:
@@ -1355,13 +1376,119 @@ def verReporteBins(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+### PARTE NUEVA 
+@csrf_exempt
+def Carga_Inicial_Flete(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        usuario = str(json.loads(body)['usuario'])
+        print(usuario)
+        try:
+            with connections['S3A'].cursor() as cursor:
+
+                listado_chacras = []
+                listado_especie = []
+                listado_variedades = []
+                
+                listado_idChacras = chacrasUsuario(usuario)
+                print(listado_idChacras)
+                cantValuesChacras = ','.join(['%s'] * len(listado_idChacras))
+                ## CHACRAS ASIGNADAS
+                sql = f"SELECT IdChacra, RTRIM(Nombre) AS NOMBRE FROM Chacra WHERE IdChacra IN ({cantValuesChacras})"
+                cursor.execute(sql,listado_idChacras)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        IdChacra = str(row[0])
+                        NombreChacra = str(row[1])
+                        datos = {'IdChacra': IdChacra, 'NombreChacra': NombreChacra}
+                        listado_chacras.append(datos)
+                    
+               
+                ## ESPECIE
+                listado_idEspecies = traeIdEspecies()
+                cantValuesEspecie = ','.join(['%s'] * len(listado_idEspecies))
+                sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValuesEspecie}) ORDER BY IdEspecie"
+                cursor.execute(sql3, listado_idEspecies)
+                consulta3 = cursor.fetchall()
+                if consulta3:
+                    listado_especie = []
+                    for row3 in consulta3:
+                        idEspecie = str(row3[0])
+                        nombre = str(row3[1])
+                        datos = {'IdEspecie': idEspecie, 'NombreEspecie': nombre}
+                        listado_especie.append(datos)
+
+                ## VARIEDADES
+                listados = {item: [] for item in listado_idEspecies}
+
+                for item in listados.items():
+                    dato = traeTipoVariedad(item[0])
+                    listados[item[0]] = dato
+
+                listadoData_variedades = []
+
+                for item, dato in listados.items():
+                    listadoData_variedades.append({item: dato})   
 
 
 
+                if listado_chacras and listado_especie and listado_variedades:
+                    return JsonResponse({'Message': 'Success', 'DataChacras': listado_chacras, 'DataEspecie': listado_especie, 'DataVariedades': listadoData_variedades})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FLETES REMITO","CARGA INICIAL FLETE NUEVO",usuario,error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def chacrasUsuario(usuario):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT Chacras
+                    FROM USUARIOS
+                    WHERE Usuario = %s
+                """
+            cursor.execute(sql, [usuario])
+            consulta = cursor.fetchone()
+            if consulta:
+                datos = str(consulta[0])
+                listado_id = datos.split(',')
+                return listado_id
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FLETES REMITO","CHACRAS USUARIO",usuario,error)
+        return "-"
 
-
-
+def traeTipoVariedad(idEspecie):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            listado_tipo = []
+            sql = "SELECT IdVariedad, RTRIM(Nombre) FROM Variedad WHERE IdEspecie = %s"
+            cursor.execute(sql,[idEspecie])
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    idVariedad = str(row[0])
+                    nombreVariedad = str(row[1])
+                    datos = {'IdVarierad': idVariedad, 'NombreVariedad': nombreVariedad}
+                    listado_tipo.append(datos)
+                    
+                return listado_tipo
+            else: 
+                return listado_tipo
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","TRAE TIPO VARIEDAD","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['S3A'].close()
 
 
 

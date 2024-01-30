@@ -60,4 +60,9 @@ urlpatterns = [
    ### MUESTRA LA COSECHA POR FECHA
    path('data-ver/cosecha-diaria', views.verReporteBins, name="ver_cosecha_diaria"),
 
+
+   ###################### PARTE NUEVA ###########################
+
+   path('data-inicial-nuevo', views.Carga_Inicial_Flete, name="carga_inicial_flete"),
+
 ]
