@@ -34,7 +34,7 @@ def datos_Iniciales_Flete(request):
                         listado_planta_destino.append(datos)
 
                 ## PRODUCTOR
-                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN(5000,5405,5200,5212,5116,5163,5213) ORDER BY RazonSocial"
+                sql2 = "SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN(5000,5405,5200,5212,5116,5163,5213,5024) ORDER BY RazonSocial"
                 cursor.execute(sql2)
                 consulta2 = cursor.fetchall()
                 if consulta2:
