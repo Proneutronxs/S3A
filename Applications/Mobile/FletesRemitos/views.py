@@ -65,7 +65,7 @@ def datos_Iniciales_Flete(request):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
+            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletesPRODUCTORES","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             cursor.close()
@@ -73,6 +73,7 @@ def datos_Iniciales_Flete(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
 def datos_Iniciales_Flete_Productores(request):
     if request.method == 'POST':
         body = request.body.decode('utf-8')
@@ -130,7 +131,7 @@ def datos_Iniciales_Flete_Productores(request):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
+            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletesPRODUCTORES","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
