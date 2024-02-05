@@ -132,9 +132,6 @@ def datos_Iniciales_Flete_Productores(request):
             error = str(e)
             insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            cursor.close()
-            connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -254,9 +251,6 @@ def traeIdEspecies():
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","traeIdEspecies","Aplicacion",error)
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def traeIdProductor(productor):
     try:
@@ -271,9 +265,6 @@ def traeIdProductor(productor):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","TRAE PRODUCTORES","Aplicacion",error)
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 ### INSERTA POST DE UNA ASIGNACIÓN
 @csrf_exempt
