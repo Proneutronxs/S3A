@@ -6,6 +6,9 @@ urlpatterns = [
    ### DATA INICIAL PARA PEDIDO DE FLETES
    path('data-inicial', views.datos_Iniciales_Flete, name="data_inicial"),
 
+   ## DATA INICIAL PARA PEDIDO DE FLETES -- PRODUCTORES
+   path('data-inicial/productores', views.datos_Iniciales_Flete_Productores, name="data_inicial_productores"),
+
    ### DATA SEGUN ID DE PRODUCTOR
    path('data-productor/idProductor=<str:idProductor>', views.idProductor_Chacra, name="idProductor_Chacra_Zona"),
 

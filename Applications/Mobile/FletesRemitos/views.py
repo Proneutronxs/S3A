@@ -59,7 +59,72 @@ def datos_Iniciales_Flete(request):
                         datos = {'IdEspecie': idEspecie, 'NombreEspecie': nombre}
                         listado_especie.append(datos)
 
-                if listado_planta_destino and listado_productor and listado_especie:
+                if listado_productor and listado_especie:
+                    return JsonResponse({'Message': 'Success', 'DataPlanta': listado_planta_destino, 'DataProductor': listado_productor, 'DataEspecie': listado_especie})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+def datos_Iniciales_Flete_Productores(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        productor = str(json.loads(body)['usuario'])
+        try:
+            with connections['S3A'].cursor() as cursor:
+
+                listado_planta_destino = []
+                listado_productor = []
+                listado_especie = []
+
+                ## PLANTA DESTINO 
+                sql = "SELECT IdUbicacion, RTRIM(Descripcion) FROM Ubicacion ORDER BY Descripcion"
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_planta_destino = []
+                    for row in consulta:
+                        idUbicacion = str(row[0])
+                        descripcion = str(row[1])
+                        datos = {'IdUbicacion': idUbicacion, 'Descripcion': descripcion}
+                        listado_planta_destino.append(datos)
+
+                listadoProductores = traeIdProductor(productor)
+                cantValuesP = ','.join(['%s'] * len(listadoProductores))
+                ## PRODUCTOR
+                sql2 = f"SELECT IdProductor, RTRIM(RazonSocial) FROM Productor WHERE IdProductor IN({cantValuesP}) ORDER BY RazonSocial"
+                cursor.execute(sql2, listadoProductores)
+                consulta2 = cursor.fetchall()
+                if consulta2:
+                    listado_productor = []
+                    for row2 in consulta2:
+                        idProductor = str(row2[0])
+                        razonSocial = str(row2[1])
+                        datos2 = {'IdProductor': idProductor, 'RazonSocial': razonSocial}
+                        listado_productor.append(datos2)
+
+                ## ESPECIE
+                listado = traeIdEspecies()
+                cantValues = ','.join(['%s'] * len(listado))
+                sql3 = f"SELECT IdEspecie, RTRIM(Nombre) FROM Especie WHERE IdEspecie IN ({cantValues}) ORDER BY IdEspecie"
+                cursor.execute(sql3, listado)
+                consulta3 = cursor.fetchall()
+                if consulta3:
+                    listado_especie = []
+                    for row3 in consulta3:
+                        idEspecie = str(row3[0])
+                        nombre = str(row3[1])
+                        datos = {'IdEspecie': idEspecie, 'NombreEspecie': nombre}
+                        listado_especie.append(datos)
+
+                if listado_productor and listado_especie:
                     return JsonResponse({'Message': 'Success', 'DataPlanta': listado_planta_destino, 'DataProductor': listado_productor, 'DataEspecie': listado_especie})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
@@ -189,6 +254,23 @@ def traeIdEspecies():
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","traeIdEspecies","Aplicacion",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def traeIdProductor(productor):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "SELECT Productor FROM USUARIOS WHERE Usuario = %s"
+            cursor.execute(sql, [productor])
+            consulta = cursor.fetchone()
+            if consulta:
+                datos = str(consulta[0])
+                listado_id = datos.split(',')
+                return listado_id
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","TRAE PRODUCTORES","Aplicacion",error)
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
