@@ -973,9 +973,9 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                                 "WHEN EXISTS ( " \
                                     "SELECT Orden " \
                                     "FROM Logistica_Camiones_Seguimiento " \
-                                    "WHERE TRY_CONVERT(DATE, FechaHora) = TRY_CONVERT(DATE, GETDATE()) AND Chofer = %s " \
+                                    "WHERE Chofer = %s " \
                                 ") " \
-                                "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE AND Chofer = %s) " \
+                                "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE Chofer = %s) " \
                                 "ELSE 1 " \
                             "END , %s, %s, GETDATE(), %s, %s) "
                         cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, acepta]) 
@@ -1000,9 +1000,9 @@ def viajesAceptaRechaza(request, idAsignacion, chofer, acepta):
                                 "WHEN EXISTS ( " \
                                     "SELECT Orden " \
                                     "FROM Logistica_Camiones_Seguimiento " \
-                                    "WHERE TRY_CONVERT(DATE, FechaHora) = TRY_CONVERT(DATE, GETDATE()) AND Chofer = %s " \
+                                    "WHERE Chofer = %s " \
                                 ") " \
-                                "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE AND Chofer = %s) " \
+                                "THEN (SELECT MAX(Orden) + 1 FROM Logistica_Camiones_Seguimiento WHERE Chofer = %s) " \
                                 "ELSE 1 " \
                             "END , %s, %s, GETDATE(), %s, %s) "
                         cursor.execute(sql, [chofer,chofer, idAsignacion, chofer, acepta, "R"])
