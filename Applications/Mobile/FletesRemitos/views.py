@@ -889,7 +889,7 @@ def mostrarListadoRemitos(request, chofer):
                                             Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdVariedad = Variedad.IdVariedad 
                             WHERE RTRIM(PedidoFlete.Chofer) = %s
                                 AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) 
-                                AND PedidoFlete.Estado = 'A'
+                                --AND PedidoFlete.Estado = 'A'
                                 --AND (SELECT Final FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = PedidoFlete.IdPedidoFlete) IS NULL """
                 cursor.execute(sql, [chofer])
                 consulta = cursor.fetchall()
