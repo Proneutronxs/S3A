@@ -1214,10 +1214,10 @@ def datosViajesAceptados(request, chofer):
                 sql = """ SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO,
                                                     CASE S3A.dbo.PedidoFlete.UbicacionVacios WHEN '0' THEN '-' ELSE CONVERT(VARCHAR, S3A.dbo.PedidoFlete.CantVacios) + ' B. VACIOS - ' + Logistica_Ubicacion_Chacras_Bins.Nombre END AS UBICACION_BINS, RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS SOLICITA, 
                                                     RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA,  CASE WHEN Logistica_Ubicacion_Chacras_Bins.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
-                                                    CASE WHEN Logistica_Ubicacion_Chacras_Bins_1.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins_1.Coordenadas END AS COORDENADAS_CHACRA, 
-													CASE WHEN (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
-													FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) IS NULL THEN '0'ELSE (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
-													FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) END AS TELEFONO
+                                                    CASE WHEN Logistica_Ubicacion_Chacras_Bins_1.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins_1.Coordenadas END AS COORDENADAS_CHACRA--, 
+													--CASE WHEN (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
+													--FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) IS NULL THEN '0'ELSE (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
+													--FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) END AS TELEFONO
                             FROM            Logistica_Camiones_Seguimiento INNER JOIN
                                                     S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN
                                                     S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN
@@ -1243,8 +1243,8 @@ def datosViajesAceptados(request, chofer):
                         fecha = str(row[7])
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
-                        tel = str(row[10])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': tel}
+                        #tel = str(row[10])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': "tel"}
                         listado_Viajes_Aceptados.append(datos)    
                     
                     if  textUbicacion(chofer) == '-':
