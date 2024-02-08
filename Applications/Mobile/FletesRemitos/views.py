@@ -1244,7 +1244,7 @@ def datosViajesAceptados(request, chofer):
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
                         #tel = str(row[10])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': "tel"}
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': "0"}
                         listado_Viajes_Aceptados.append(datos)    
                     
                     if  textUbicacion(chofer) == '-':
