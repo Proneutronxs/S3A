@@ -20,9 +20,11 @@ import os
 def Bascula(request):
     return render (request, 'Bascula/bascula.html')
 
+@login_required
 def remitos(request):
     return render (request, 'Bascula/Remitos/remitos.html')
 
+@login_required
 def verRemitosChacras(request):
     return render (request, 'Bascula/Remitos/verRemitosChacras.html')
 

@@ -18,15 +18,19 @@ from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora
 def Empaque(request):
     return render (request, 'Empaque/empaque.html')
 
+@login_required
 def HorasExtrasEmpaque(request):
     return render (request, 'Empaque/HorasExtras/horasExtrasEmpaque.html')
 
+@login_required
 def AutorizaHorasExtrasEmpaque(request):
     return render (request, 'Empaque/HorasExtras/autorizaHorasExtras.html')
 
+@login_required
 def AgregaAutorizadosEmpaque(request):
     return render (request, 'Empaque/HorasExtras/agregaAutorizados.html')
 
+@login_required
 def EnviaHorasProcesadasEmpaque(request):
     return render (request, 'Empaque/HorasExtras/enviaHorasProcesadas.html')
 

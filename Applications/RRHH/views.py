@@ -24,10 +24,12 @@ def RRHH(request):
     return render (request, 'RRHH/rrhh.html')
 
 ### RENDERIZADO DE HORAS EXTRAS
+@login_required
 def horasExtras(request):
     return render (request, 'RRHH/HorasExtras/horasExtras.html')
 
 ### RENDERIZADO DE HORAS EXTRAS TRANSFERENCIA
+@login_required
 def transferenciaHorasExtras(request):
     return render (request, 'RRHH/HorasExtras/transferirhe.html')
 
