@@ -27,6 +27,7 @@ def listadoChofer(request):
                             FROM            Logistica_Estado_Camiones INNER JOIN
                                                     S3A.dbo.Chofer ON Logistica_Estado_Camiones.IdChofer = S3A.dbo.Chofer.IdChofer INNER JOIN
                                                     S3A.dbo.Transportista ON S3A.dbo.Chofer.IdTransportista = S3A.dbo.Transportista.IdTransportista
+                            WHERE Estado = 'A'
                             ORDER BY Logistica_Estado_Camiones.Disponible DESC, Logistica_Estado_Camiones.Actualizado DESC """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
