@@ -118,7 +118,7 @@ const listarAsignados = async () => {
                         <div class="data">${datos.Camion}</div>
                     </div>
                     <div class="ladoB">
-                        <div class="data" style="color: #008f39e7;">${datos.Alta}</div>
+                        <div class="data" style="color: #008f39;">${datos.Alta}</div>
                         <div class="data">${datos.Productor}</div>
                         <div class="data">${datos.Chacra}</div>
                         <div class="data">${datos.Zona}</div>
