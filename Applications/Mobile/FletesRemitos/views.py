@@ -889,7 +889,7 @@ def mostrarListadoRemitos(request, chofer):
                                             Variedad ON TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.IdVariedad = Variedad.IdVariedad 
                             WHERE RTRIM(PedidoFlete.Chofer) = %s
                                 AND TRY_CONVERT(DATE, TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta) = TRY_CONVERT(DATE, GETDATE()) 
-                                --AND PedidoFlete.Estado = 'A'
+                                --AND PedidoFlete.Estado IN ('A', 'C')
                                 --AND (SELECT Final FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento WHERE IdAsignacion = PedidoFlete.IdPedidoFlete) IS NULL 
                             ORDER BY TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins.FechaAlta """
                 cursor.execute(sql, [chofer])
@@ -1074,8 +1074,15 @@ def actualizaEstadoPosicion(request):
                     sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                     cursor.execute(sql, [Valor, IdAsignacion])           
 
-                    sqlUpdate = "UPDATE Logistica_Estado_Camiones SET Libre = 'S', Actualizado = GETDATE() WHERE NombreChofer = %s " 
-                    cursor.execute(sqlUpdate, [Chofer])     
+                    sqlUpdate = """UPDATE Logistica_Estado_Camiones 
+                                SET Libre = 'S', Actualizado = GETDATE() 
+                                WHERE NombreChofer = %s 
+                                AND NOT EXISTS (
+                                    SELECT 1 
+                                    FROM Logistica_Camiones_Seguimiento 
+                                    WHERE Chofer = %s AND Estado = 'S'
+                                )""" 
+                    cursor.execute(sqlUpdate, [Chofer,Chofer])     
 
                     sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
                     cursor.execute(sqlDelete, [IdAsignacion])
