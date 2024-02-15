@@ -173,7 +173,8 @@ def listadoAsignados(request):
             try:
                 with connections['S3A'].cursor() as cursor:
                     sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(Transportista.RazonSocial) AS TRANSPORTE, RTRIM(PedidoFlete.Chofer) AS CHOFER, RTRIM(Camion.Nombre) AS CAMION, RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, 
-                                                    RTRIM(Zona.Nombre) AS ZONA
+                                                    RTRIM(Zona.Nombre) AS ZONA, 
+                                                    CASE WHEN PedidoFlete.CantVacios IS NULL THEN '' ELSE 'NOTIFICADO' END
                             FROM            Transportista INNER JOIN
                                                     PedidoFlete ON Transportista.IdTransportista = PedidoFlete.IdTransportista INNER JOIN
                                                     Camion ON Transportista.IdTransportista = Camion.IdTransportista AND PedidoFlete.IdCamion = Camion.IdCamion INNER JOIN
@@ -200,8 +201,9 @@ def listadoAsignados(request):
                             productor = str(row[4])
                             chacra = str(row[5])
                             zona = str(row[6])
+                            noti = str(row[7])
                             datos = {'Flete':flete, 'Transporte':transporte, 'Nombre':nombre, 'Camion':camion, 
-                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':str(row[0])}
+                                     'Productor':productor, 'Chacra':chacra, 'Zona':zona, 'ID':str(row[0]), 'Alta':noti}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Data': data})
                     else:
