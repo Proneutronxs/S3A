@@ -23,7 +23,8 @@ const listarCentrosCostos = async () => {
         const response = await fetch("autoriza/carga-combox-legajos")
         const data = await response.json();
         if(data.Message=="Success"){
-            let listado = `<option value="0">Seleccione</option>`;
+            let listado = `<option value="0">SELECCIONE</option>
+                <option value="T">TODOS LOS PENDIENTES</option>`;
             data.Datos.forEach((datos) => {
                 listado += `
                 <option value="${datos.id}">${datos.cc}</option>
@@ -69,28 +70,26 @@ const Listar_Horas_Procesadas = async () => {
                     <div class="leftDiv">
                         <div class="horas-item">
                             <input class="input-checkbox-hs checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
-                            <strong>${datos.Legajo} - ${datos.Nombre}</strong>  
+                            <strong>${datos.Legajo} - ${datos.Nombre} - (${datos.CC} - ${datos.Sindicato})</strong>  
                         </div>
                         <div class="horas-item">
                             <strong>TURNO: </strong>${datos.Turno} 
-                            <strong class="strong-horas">HS. TURNO: </strong>${datos.HorasTurno}
                         </div>
                         <div class="horas-item">
-                            <strong>FICHA.: </strong>${datos.Fichada}
-                            <strong class="strong-horas">HS. FICHADA: </strong>${datos.HorasFichada}
+                            <strong>FICHADA: </strong>${datos.Fichada}
                         </div>
                     </div>
                     <div class="rightDiv">
                         <div class="horas-item">
-                            <strong>TIEMPO EXTRA: </strong> ${datos.TExtra}
+                            <strong>DÍA: </strong> ${datos.Dia}
                         </div>
                         <div class="horas-item">
                             <label class="letras" for="cantHoras">Cant. Horas Extras:</label>
                             <input type="number" class="input-number" step="0.5" id="cantHoras" name="cantHoras" value="${datos.CantHoras}" />
                             <select class="selectores" type="checkbox" id="tipoHoraExtra" name="tipoHoraExtra">
-                                <option value="A">A</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
+                            <option value="A" ${datos.Tipo === 'A' ? 'selected' : ''}>A</option>
+                            <option value="50" ${datos.Tipo === '50' ? 'selected' : ''}>50</option>
+                            <option value="100" ${datos.Tipo === '100' ? 'selected' : ''}>100</option>
                             </select>
                         </div>
                     </div>

@@ -101,7 +101,7 @@ def buscaCentroCostosEmpaqueIDDescrip():
             connections['ISISPayroll'].close()
     return lista_json
 
-###BUSCA POR EL LAGJO DEL SPINNER
+###BUSCA POR EL LAGAJO DEL SPINNER
 @login_required
 @csrf_exempt
 def mostrarHorasCargadasPorLegajoEmpaque(request): ### MUESTRA LA TABLA DE HORAS
@@ -417,49 +417,112 @@ def listaHorasProcesadas(request):
         if user_has_permission:
             cc = request.POST.get('ComboxCentrosCostos')
             fecha = request.POST.get('fechaBusqueda')
-            try:
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """ 
-                            SELECT        Pre_Carga_Horas_Extras.IdHora, Pre_Carga_Horas_Extras.Legajo, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE,
-                                            Pre_Carga_Horas_Extras.HoraTurno AS TURNO, CONVERT(VARCHAR(5),Pre_Carga_Horas_Extras.CantHorasTurno,108) AS HORAS_TURNO, Pre_Carga_Horas_Extras.HoraFichada AS FICHADA,
-                                            CONVERT(VARCHAR(5),Pre_Carga_Horas_Extras.CantHorasFichada,108) AS HORAS_FICHADA, CONVERT(VARCHAR(5),Pre_Carga_Horas_Extras.HorasExtras,108) AS CANT_HORAS_EXTRAS, FORMAT(Pre_Carga_Horas_Extras.CantHorasExtras, '0.0') AS CANT_EXTRA
-                            FROM            Pre_Carga_Horas_Extras INNER JOIN
-                                                    TresAses_ISISPayroll.dbo.Empleados ON Pre_Carga_Horas_Extras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
-                                                    TresAses_ISISPayroll.dbo.CentrosCostos ON TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo
-                            WHERE TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s
-                                    AND TRY_CONVERT(DATE, Pre_Carga_Horas_Extras.Fecha) = %s
-                                    AND Estado ='A'
-                            ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
-                         """
-                    cursor.execute(sql, [cc,fecha])
-                    results = cursor.fetchall()
-                    if results:
-                        data = []
-                        for row in results:
-                            idHora = str(row[0])
-                            legajo = str(row[1])
-                            nombre = str(row[2])
-                            turno = str(row[3])
-                            horasTurno = str(row[4])
-                            fichada = str(row[5])
-                            horasFichada = str(row[6])
-                            tiempoExtra = str(row[7])
-                            cantidaHoras = str(row[8]).replace(',','.')
-                            datos = {'ID':idHora, 'Legajo':legajo, 'Nombre':nombre, 'Turno':turno, 'HorasTurno':horasTurno, 'Fichada':fichada, 'HorasFichada': horasFichada,
-                                     'TExtra': tiempoExtra, 'CantHoras':cantidaHoras}
-                            data.append(datos)
-                        return JsonResponse({'Message': 'Success', 'Datos': data})
-                    else:
-                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
-            except Exception as e:
-                error = str(e)
-                insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
-            finally:
-                connections['TRESASES_APLICATIVO'].close()
-            index = index + 1
-        
-            return JsonResponse({'Message': 'Success', 'Nota': 'Existe personal tildado ya autorizado para esa fecha. Los demás se guardaron correctamente.'})
-            
+            if str(cc) != 'T':
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                SELECT        HorasExtras_Procesadas.ID_HEP, HorasExtras_Procesadas.Legajo, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
+                                                        FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, Listado_Turnos_Fichadas_Procesadas.Dia + ' - ' + CONVERT(VARCHAR(10), Listado_Turnos_Fichadas_Procesadas.Fecha, 103) AS FECHA, 
+                                                        CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TME, 108) AS TME, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TMS, 108) END AS TMS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TTE, 108) END AS TTE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TTS, 108) END AS TTS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TNE, 108) END AS TNE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TNS, 108) END AS TNS, CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FME, 108) AS FME, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FMS, 108) END AS FMS, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTE, 108) END AS FTE, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTS, 108) END AS FTS, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNE, 108) END AS FNE, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
+                                                        (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                                        CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'Empaque' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'Comercio' ELSE '' END AS SINDICATO,
+                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO
+                                FROM            HorasExtras_Procesadas INNER JOIN
+                                                        TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
+                                                        Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
+                                WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') AND (TRY_CONVERT(DATE, Listado_Turnos_Fichadas_Procesadas.Fecha) = TRY_CONVERT(DATE, %s))
+                                            AND (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = %s)
+                            """
+                        cursor.execute(sql, [fecha,cc])
+                        results = cursor.fetchall()
+                        if results:
+                            data = []
+                            for row in results:
+                                idHora = str(row[0])
+                                legajo = str(row[1])
+                                nombre = str(row[2])
+                                cantidaHoras = str(row[3]).replace(',','.')
+                                dia = str(row[4])
+                                turno = str(row[5]) + ' - ' + str(row[6]) + ' - ' + str(row[7]) + ' - ' + str(row[8]) + ' - ' + str(row[9]) + ' - ' + str(row[10])
+                                fichada = str(row[11]) + ' - ' + str(row[12]) + ' - ' + str(row[13]) + ' - ' + str(row[14]) + ' - ' + str(row[15]) + ' - ' + str(row[16])
+                                cc = str(row[17])
+                                sindicato = str(row[18])
+                                tipoHora = str(row[19])
+                                datos = {'ID':idHora, 'Legajo':legajo, 'Nombre':nombre, 'Turno':turno, 'Fichada':fichada,
+                                        'CantHoras':cantidaHoras, 'Dia': dia, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora}
+                                data.append(datos)
+                            return JsonResponse({'Message': 'Success', 'Datos': data})
+                        else:
+                            return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+            else:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                SELECT        HorasExtras_Procesadas.ID_HEP, HorasExtras_Procesadas.Legajo, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
+                                                        FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, Listado_Turnos_Fichadas_Procesadas.Dia + ' - ' + CONVERT(VARCHAR(10), Listado_Turnos_Fichadas_Procesadas.Fecha, 103) AS FECHA, 
+                                                        CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TME, 108) AS TME, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TMS, 108) END AS TMS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TTE, 108) END AS TTE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TTS, 108) END AS TTS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TNE, 108) END AS TNE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.TNS, 108) END AS TNS, CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FME, 108) AS FME, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FMS, 108) END AS FMS, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTE, 108) END AS FTE, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTS, 108) END AS FTS, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNE, 108) END AS FNE, CASE WHEN CONVERT(VARCHAR(5), 
+                                                        Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
+                                                        (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                                        CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
+                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO
+                                FROM            HorasExtras_Procesadas INNER JOIN
+                                                        TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
+                                                        Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
+                                WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4')
+
+                            """
+                        cursor.execute(sql)
+                        results = cursor.fetchall()
+                        if results:
+                            data = []
+                            for row in results:
+                                idHora = str(row[0])
+                                legajo = str(row[1])
+                                nombre = str(row[2])
+                                cantidaHoras = str(row[3]).replace(',','.')
+                                dia = str(row[4])
+                                turno = str(row[5]) + ' - ' + str(row[6]) + ' - ' + str(row[7]) + ' - ' + str(row[8]) + ' - ' + str(row[9]) + ' - ' + str(row[10])
+                                fichada = str(row[11]) + ' - ' + str(row[12]) + ' - ' + str(row[13]) + ' - ' + str(row[14]) + ' - ' + str(row[15]) + ' - ' + str(row[16])
+                                cc = str(row[17])
+                                sindicato = str(row[18])
+                                tipoHora = str(row[19])
+                                datos = {'ID':idHora, 'Legajo':legajo, 'Nombre':nombre, 'Turno':turno, 'Fichada':fichada,
+                                        'CantHoras':cantidaHoras, 'Dia': dia, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora}
+                                data.append(datos)
+
+                            return JsonResponse({'Message': 'Success', 'Datos': data})
+                        else:
+                            return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
+                    return JsonResponse({'Message': 'Error', 'Nota': error})
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()            
         else:
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
@@ -480,7 +543,7 @@ def transfierePersonalTildado(request):
                 legajo, fecha = traeDatosHora(str(idHora))
                 if legajo != "0":
                     if insertaHorasExtrasNuevo(str(legajo),str(fecha),str(fecha),str(horas[index]),str(tipo[index]),str(usuario.upper())):
-                        actualizaHoraNueva(str(idHora))
+                        actualizaHoraNueva(str(idHora),str(tipo[index]),str(horas[index]))
                     else:
                         listado_error.append(str(idHora))
                 else:
@@ -513,15 +576,15 @@ def insertaHorasExtrasNuevo(Legajo, Fdesde, Fhasta, Choras, Thora,user):
     finally:
         connections['S3A'].close()
 
-def traeDatosHora(ID):
+def traeDatosHora(ID_HEP):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                SELECT Legajo, CONVERT(VARCHAR(10),Fecha,121) AS FECHA
-                FROM Pre_Carga_Horas_Extras
-                WHERE IdHora = %s
+                SELECT Legajo, CONVERT(VARCHAR(10),FechaHoraDesde,121) AS FECHA
+                FROM HorasExtras_Procesadas
+                WHERE ID_HEP = %s
                  """
-            cursor.execute(sql, [ID])
+            cursor.execute(sql, [ID_HEP])
             results = cursor.fetchone()
             if results:
                 return  str(results[0]), str(results[1])
@@ -533,13 +596,13 @@ def traeDatosHora(ID):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
-def actualizaHoraNueva(ID):
+def actualizaHoraNueva(ID_HEP,Tipo,Cant):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                UPDATE Pre_Carga_Horas_Extras SET Estado = 'I' WHERE IdHora = %s
+               UPDATE HorasExtras_Procesadas SET EstadoEnvia = '0', TipoHoraExtra = %s, CantidadHoras = %s WHERE ID_HEP = %s
                  """
-            cursor.execute(sql, [ID])
+            cursor.execute(sql, [Tipo,Cant,ID_HEP])
             results = cursor.fetchone()
             if results:
                 return  str(results[0]), str(results[1])
@@ -547,6 +610,7 @@ def actualizaHoraNueva(ID):
                 return "0", "0"
     except Exception as e:
         insertar_registro_error_sql("EMPAQUE","TRAE DATOS HORA","request.user",str(e))
+        print(e)
         return "0", "0"
     finally:
         connections['TRESASES_APLICATIVO'].close()
@@ -556,16 +620,16 @@ def eliminaPersonalProcesado(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Empaque.puede_denegar')
         if user_has_permission:
-            legajos = request.POST.getlist('idCheck')
+            ID_HEP_S = request.POST.getlist('idCheck')
             index = 0
-            for legajo in legajos:
+            for ID_HEP in ID_HEP_S:
                 try:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         sql = """ 
-                                UPDATE Pre_Carga_Horas_Extras SET Estado = 'E', FechaModifica = GETDATE(), UserModifica = %s WHERE IdHora = %s
+                                UPDATE HorasExtras_Procesadas SET EstadoEnvia = '8' WHERE ID_HEP = %s
                                 
                             """
-                        cursor.execute(sql, [str(request.user), legajo])
+                        cursor.execute(sql, [ID_HEP])
                         cursor.commit()
                 except Exception as e:
                     error = str(e)
@@ -573,7 +637,7 @@ def eliminaPersonalProcesado(request):
                 finally:
                     connections['TRESASES_APLICATIVO'].close()
                 index = index + 1
-            if index == len(legajos):
+            if index == len(ID_HEP_S):
                 return JsonResponse({'Message': 'Success', 'Nota': 'Se eliminó el personal.'})
             else:
                 return JsonResponse({'Message': 'Success', 'Nota': 'No se puedieron eliminar algunas horas.'})
