@@ -442,6 +442,7 @@ def listaHorasProcesadas(request):
                                                         Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') AND (TRY_CONVERT(DATE, Listado_Turnos_Fichadas_Procesadas.Fecha) = TRY_CONVERT(DATE, %s))
                                             AND (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = %s)
+                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha
                             """
                         cursor.execute(sql, [fecha,cc])
                         results = cursor.fetchall()
@@ -493,6 +494,7 @@ def listaHorasProcesadas(request):
                                                         TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                                         Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4')
+                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha
 
                             """
                         cursor.execute(sql)
