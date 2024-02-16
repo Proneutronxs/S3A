@@ -215,7 +215,14 @@ def idEspecie_Varierad(request,idEspecie):
         try:
             with connections['S3A'].cursor() as cursor:
                 ## VARIEDAD
-                sql = "SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie FROM Variedad WHERE IdEspecie = %s and IdVariedad < 1000 ORDER BY Nombre"
+                sql = """
+                        SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie 
+                        FROM Variedad 
+                        WHERE IdEspecie = %s
+                                AND IdVariedad < 1000 
+                                AND IdVariedad NOT IN (940,957,927,951,906,948,934,937,950,908,122,73,84,97,931,935,83,963,86,933,85,936,932)
+                        ORDER BY Nombre
+                        """
                 cursor.execute(sql, [idEspecie])
                 consulta = cursor.fetchall()
                 if consulta:
