@@ -820,7 +820,7 @@ def insertaDatosRemito(IdAsignación, Renspa, UP, IdEspecie, IdVariedad, total_b
         try:    
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = "INSERT INTO Datos_Remito_MovBins (NumeroRemito, IdAsignacion, Renspa, UP, IdEspecie, IdVariedad, Cantidad, FechaAlta, Usuario, IdProductor) " \
-                        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins WHERE IdProductor = '5405'), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
+                        "VALUES ((SELECT (MAX(NumeroRemito) + 1) AS NumeroSiguiente FROM Datos_Remito_MovBins), %s, %s, %s, %s, %s, %s, getdate(), %s,%s)"
                 cursor.execute(sql, values)
                 
                 sql2 = "SELECT FORMAT(NumeroRemito, '00000000') FROM Datos_Remito_MovBins WHERE IdAsignacion = %s AND NombrePdf IS NULL"
