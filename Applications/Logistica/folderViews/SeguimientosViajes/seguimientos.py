@@ -287,7 +287,7 @@ def asignaViajeActualizaVacios(request):
                 ### ACA SE VA A ENVIAR EL VIAJE
                 chofer = traeChofer(idPedidoFlete)
                 if chofer != '0':
-                    ejecutar_url(idPedidoFlete,chofer,'S')
+                    ejecutar_url(str(idPedidoFlete),str(chofer),'S')
                 
                 return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
             else:
@@ -309,7 +309,7 @@ def traeChofer(idAsignacion):
             cursor.execute(sql, [idAsignacion]) 
             results = cursor.fetchone()
             if results:
-                chofer = str(results)
+                chofer = str(results[0])
                 return chofer
             else:
                 return '0'
