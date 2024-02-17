@@ -329,8 +329,8 @@ def ejecutar_url(Asignacion, Chofer, valor):
     try:  
         url = f"http://192.168.1.110/api/fletes-remitos/data-acepta-rechaza/isAsignacion={Asignacion_encoded}&chofer={Chofer_encoded}&acepta={valor_encoded}"
         response = urllib.request.urlopen(url)
-        
-        if response.status_code == 200:
+        data = json.loads(response.read().decode('utf-8'))
+        if 'Message' in data:
             return True
         else:
             return False
