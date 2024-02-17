@@ -266,7 +266,7 @@ def listadoRechazados(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
-
+@login_required
 @csrf_exempt
 def asignaViajeActualizaVacios(request):
     if request.method == 'POST':
@@ -284,12 +284,16 @@ def asignaViajeActualizaVacios(request):
                 affected_rows = cursor.fetchone()[0]
 
             if affected_rows > 0:
+                ### ACA SE VA A ENVIAR EL VIAJE
+                chofer = traeChofer(idPedidoFlete)
+                if chofer != '0':
+                    ejecutar_url(idPedidoFlete,chofer,'S')
+                
                 return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
         except Exception as e:
             error = str(e)
-            print(error)
             insertar_registro_error_sql("FletesRemitos","asignaViajesVacios","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
@@ -298,6 +302,37 @@ def asignaViajeActualizaVacios(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def traeChofer(idAsignacion):
+    try:  
+        with connections['S3A'].cursor() as cursor:
+            sql = """ SELECT RTRIM(Chofer) FROM PedidoFlete WHERE IdPedidoFlete = %s """
+            cursor.execute(sql, [idAsignacion]) 
+            results = cursor.fetchone()
+            if results:
+                chofer = str(results)
+                return chofer
+            else:
+                return '0'
+
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("SEGUIMIENTO","TRAE CHOFER","Aplicacion",error)
+        return '0'
+
+def ejecutar_url(Asignacion, Chofer, valor):
+    import urllib.request
+    try:  
+        url = f"http://192.168.1.110/api/fletes-remitos/data-acepta-rechaza/isAsignacion={Asignacion}&chofer={Chofer}&acepta={valor}"
+        response = urllib.request.urlopen(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("SEGUIMIENTO","EJECUTA URL","Aplicacion",error)
+        return False
+    
 
 def eliminaRechazado(request, idAsignacion):
     if request.method == 'GET':            
@@ -320,7 +355,6 @@ def eliminaRechazado(request, idAsignacion):
                 
         except Exception as e:
             error = str(e)
-            print(e)
             insertar_registro_error_sql("FletesRemitos","EliminaRechazados","Aplicacion",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
