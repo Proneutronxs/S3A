@@ -321,9 +321,15 @@ def traeChofer(idAsignacion):
 
 def ejecutar_url(Asignacion, Chofer, valor):
     import urllib.request
+    import urllib.parse
+    import urllib.request
+    Asignacion_encoded = urllib.parse.quote(Asignacion)
+    Chofer_encoded = urllib.parse.quote(Chofer)
+    valor_encoded = urllib.parse.quote(valor)
     try:  
-        url = f"http://192.168.1.110/api/fletes-remitos/data-acepta-rechaza/isAsignacion={Asignacion}&chofer={Chofer}&acepta={valor}"
+        url = f"http://192.168.1.110/api/fletes-remitos/data-acepta-rechaza/isAsignacion={Asignacion_encoded}&chofer={Chofer_encoded}&acepta={valor_encoded}"
         response = urllib.request.urlopen(url)
+        
         if response.status_code == 200:
             return True
         else:
