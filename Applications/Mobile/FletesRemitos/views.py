@@ -1105,13 +1105,8 @@ def actualizaEstadoPosicion(request):
                             return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
                         
                     else:
-                        try:
-
-                            return JsonResponse({'Message': 'Success', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.'})                       
-                        except Exception as e:
-                            error = str(e)
-                            insertar_registro_error_sql("FletesRemitos","ELSE DE ES BIN LLENO","Aplicacion",error)
-                            return JsonResponse({'Message': 'Error', 'Nota': error})
+                        return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})                       
+                        
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
