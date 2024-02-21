@@ -1239,7 +1239,7 @@ def verificaBinLleno(idAsignacion):
                 return 'VAC'
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("FletesRemitos","verifica Lote","consulta",error)
+        insertar_registro_error_sql("FletesRemitos","VERIFICA BIN LLENO","consulta",error)
         return 'VAC'
     
 @csrf_exempt
