@@ -1107,7 +1107,7 @@ def actualizaEstadoPosicion(request):
                     else:
                         try:
 
-                            return JsonResponse({'Message': 'Success', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})                       
+                            return JsonResponse({'Message': 'Success', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.'})                       
                         except Exception as e:
                             error = str(e)
                             insertar_registro_error_sql("FletesRemitos","ELSE DE ES BIN LLENO","Aplicacion",error)
