@@ -1105,7 +1105,7 @@ def actualizaEstadoPosicion(request):
                             return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
                         
                     else:
-                        return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})                       
+                        return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.'})                       
                         
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
