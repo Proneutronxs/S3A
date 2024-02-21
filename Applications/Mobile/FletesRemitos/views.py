@@ -1077,33 +1077,59 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Final':
-                #if verificaLote(IdAsignacion):
-                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
-                    cursor.execute(sql, [Valor, IdAsignacion])           
+                if verificaBinLleno(IdAsignacion) == 'RAU':
+                    if verificaLote(IdAsignacion):
+                        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                            sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                            cursor.execute(sql, [Valor, IdAsignacion])           
 
-                    sqlUpdate = """UPDATE Logistica_Estado_Camiones 
-                                SET Libre = 'S', Actualizado = GETDATE() 
-                                WHERE NombreChofer = %s 
-                                AND NOT EXISTS (
-                                    SELECT 1 
-                                    FROM Logistica_Camiones_Seguimiento 
-                                    WHERE Chofer = %s AND Estado = 'S'
-                                )""" 
-                    cursor.execute(sqlUpdate, [Chofer,Chofer])     
+                            sqlUpdate = """UPDATE Logistica_Estado_Camiones 
+                                        SET Libre = 'S', Actualizado = GETDATE() 
+                                        WHERE NombreChofer = %s 
+                                        AND NOT EXISTS (
+                                            SELECT 1 
+                                            FROM Logistica_Camiones_Seguimiento 
+                                            WHERE Chofer = %s AND Estado = 'S'
+                                        )""" 
+                            cursor.execute(sqlUpdate, [Chofer,Chofer])     
 
-                    sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
-                    cursor.execute(sqlDelete, [IdAsignacion])
+                            sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
+                            cursor.execute(sqlDelete, [IdAsignacion])
 
-                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                    affected_rows = cursor.fetchone()[0]
+                            cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                            affected_rows = cursor.fetchone()[0]
 
-                if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'F', 'Estado':textUbicacion(Chofer)})
+                        if affected_rows > 0:
+                            return JsonResponse({'Message': 'Success', 'Nota': 'F', 'Estado':textUbicacion(Chofer)})
+                        else:
+                            return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})
                 else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
-                # else:
-                #     return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
+                        cursor.execute(sql, [Valor, IdAsignacion])           
+
+                        sqlUpdate = """UPDATE Logistica_Estado_Camiones 
+                                    SET Libre = 'S', Actualizado = GETDATE() 
+                                    WHERE NombreChofer = %s 
+                                    AND NOT EXISTS (
+                                        SELECT 1 
+                                        FROM Logistica_Camiones_Seguimiento 
+                                        WHERE Chofer = %s AND Estado = 'S'
+                                    )""" 
+                        cursor.execute(sqlUpdate, [Chofer,Chofer])     
+
+                        sqlDelete = "DELETE Logistica_Campos_Temporales WHERE IdAsignacion = %s"
+                        cursor.execute(sqlDelete, [IdAsignacion])
+
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
+
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'F', 'Estado':textUbicacion(Chofer)})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Cancelar':
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -1184,7 +1210,7 @@ def actualizaNumColumna(idAsignacion):
 def verificaLote(idAsignacion):
     try:
         with connections['S3A'].cursor() as cursor:
-            sql = """ SELECT COUNT(*)
+            sql = """ SELECT 1
                         FROM Lote
                         WHERE IdPedidoFlete = %s """
             cursor.execute(sql, [idAsignacion])
@@ -1197,6 +1223,24 @@ def verificaLote(idAsignacion):
         error = str(e)
         insertar_registro_error_sql("FletesRemitos","verifica Lote","consulta",error)
         return False
+    
+def verificaBinLleno(idAsignacion):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = """ SELECT RTRIM(TipoCarga)
+                        FROM PedidoFlete
+                        WHERE IdPedidoFlete = %s """
+            cursor.execute(sql, [idAsignacion])
+            results = cursor.fetchone()
+            if results:
+                tipo = str(results[0])
+                return tipo
+            else:
+                return 'VAC'
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","verifica Lote","consulta",error)
+        return 'VAC'
     
 @csrf_exempt
 def actualizaEstadoChofer(request):
