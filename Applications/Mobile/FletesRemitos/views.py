@@ -1077,7 +1077,9 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Final':
+                insertar_registro_error_sql("NO PASA BIN LLENO",str(verificaLote(IdAsignacion)),"Aplicacion","error")
                 if verificaBinLleno(IdAsignacion) == 'RAU':
+                    insertar_registro_error_sql("PASA BIN LLENO",str(verificaLote(IdAsignacion)),"Aplicacion","error")
                     if verificaLote(IdAsignacion):
                         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                             sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
