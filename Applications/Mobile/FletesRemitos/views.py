@@ -1183,7 +1183,7 @@ def actualizaNumColumna(idAsignacion):
 
 def verificaLote(idAsignacion):
     try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+        with connections['S3A'].cursor() as cursor:
             sql = """ SELECT COUNT(*)
                         FROM Lote
                         WHERE IdPedidoFlete = %s """
