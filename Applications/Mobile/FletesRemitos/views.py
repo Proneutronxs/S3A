@@ -1105,7 +1105,9 @@ def actualizaEstadoPosicion(request):
                             return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
                         
                     else:
-                        insertar_registro_error_sql("ELSE BIN NO INGRESO","actualizaEstadoPosicion","Aplicacion",textUbicacion(Chofer))
+                        verificaLote(IdAsignacion)
+                        insertar_registro_error_sql("ELSE BIN NO INGRESO",str(verificaLote(IdAsignacion)),"Aplicacion",textUbicacion(Chofer))
+
                         return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})                       
                         
                 else:
