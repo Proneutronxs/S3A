@@ -1078,10 +1078,7 @@ def actualizaEstadoPosicion(request):
                 
             if Columna == 'Final':
                 if verificaBinLleno(IdAsignacion) == 'RAU':
-                    if verificaLote(IdAsignacion) == False:
-                        return JsonResponse({'Message': 'Error', 'Nota': 'EL VIAJE NO SE PUEDE FINALIZAR SI NO INGRESÓ EN BÁSCULA.', 'Estado':textUbicacion(Chofer)})                       
-
-                    else:
+                    if verificaLote(IdAsignacion):
                         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                             sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
                             cursor.execute(sql, [Valor, IdAsignacion])           
@@ -1106,6 +1103,9 @@ def actualizaEstadoPosicion(request):
                             return JsonResponse({'Message': 'Success', 'Nota': 'F', 'Estado':textUbicacion(Chofer)})
                         else:
                             return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})
+                        
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Finalizar', 'Estado':textUbicacion(Chofer)})                        
                 else:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         sql = f"UPDATE Logistica_Camiones_Seguimiento SET {Columna} = %s, HoraFinal = GETDATE(), Estado = 'F', Actualizacion = GETDATE() WHERE IdAsignacion = %s AND Estado = 'S' "
