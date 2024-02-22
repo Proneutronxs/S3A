@@ -1077,7 +1077,6 @@ def actualizaEstadoPosicion(request):
                     return JsonResponse({'Message': 'Error', 'Nota': 'Ya se confirmó el retiro.', 'Estado':textUbicacion(Chofer)})
                 
             if Columna == 'Final':
-                insertar_registro_error_sql("COLUMNA FINAL",str(verificaBinLleno(IdAsignacion)),str(verificaLote(IdAsignacion)),"error")
                 if verificaBinLleno(IdAsignacion) == 'RAU':
                     if verificaLote(IdAsignacion):
                         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
