@@ -34,6 +34,10 @@ def AgregaAutorizadosEmpaque(request):
 def EnviaHorasProcesadasEmpaque(request):
     return render (request, 'Empaque/HorasExtras/enviaHorasProcesadas.html')
 
+@login_required
+def verHorasExtras(request):
+    return render (request, 'Empaque/HorasExtras/verHorasExtras.html')
+
 ##LLAMA A LAS HORAS EXTRAS
 @login_required
 @csrf_exempt
@@ -659,11 +663,119 @@ def funcionGeneralPermisos(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
+##### VER HORAS EXTRAS ##############
+@login_required
+@csrf_exempt
+def listadoHorasExtrasEstado(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Empaque.puede_ver')
+        if user_has_permission:
+            usuario = str(request.user)
+            cc = str(request.POST.get('ComboxCentrosCostos'))
+            desde = request.POST.get('fechaBusquedaDesde')
+            hasta = request.POST.get('fechaBusquedaHasta')
+            estado = str(request.POST.get('ComboxEstadoHora'))
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            DECLARE @@Desde DATE;
+                            DECLARE @@Hasta DATE;
+                            DECLARE @@Centro INT;
+                            DECLARE @@Estado INT;
+                            SET @@Desde = %s;
+                            SET @@Hasta = %s;
+                            SET @@Centro = %s;
+                            SET @@Estado = %s;
+                            SELECT        HorasExtras_Procesadas.ID_HEP AS ID, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25),TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
+                                            (SELECT TresAses_ISISPayroll.dbo.CentrosCostos.AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                            CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS DESDE, CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) AS HASTA, 
+                                            (SELECT RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) FROM S3A.dbo.RH_HE_Motivo WHERE S3A.dbo.RH_HE_Motivo.IdMotivo= HorasExtras_Procesadas.IdMotivo) AS MOTIVO, 
+                                            RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CANTIDAD, 
+                                            CASE WHEN HorasExtras_Procesadas.ID_HESP IS NULL THEN 'WEB' ELSE 'APP' END AS SECTOR,
+                                            CASE WHEN HorasExtras_Procesadas.EstadoEnvia = '8' THEN 'RECHAZADO' WHEN HorasExtras_Procesadas.EstadoEnvia = '0' THEN 'AUTORIZADO' WHEN HorasExtras_Procesadas.EstadoEnvia = '4' THEN 'PENDIENTE'
+                                            WHEN HorasExtras_Procesadas.EstadoEnvia = '3' THEN 'PENDIENTE' ELSE 'DESCONOCIDO' END AS ESTADO, HorasExtras_Procesadas.EstadoEnvia AS ID_ESTADO
+                            FROM            HorasExtras_Procesadas INNER JOIN
+                                                    TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
+                            WHERE (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde) >= @@Desde OR @@Desde IS NULL OR @@Desde = '')
+                                        AND (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraHasta) <= @@Hasta OR @@Hasta IS NULL OR @@Hasta = '')
+                                        AND ((@@Estado = '0' AND EstadoEnvia = '0') OR
+                                            (@@Estado = '8' AND EstadoEnvia = '8') OR
+                                            (@@Estado = '10' AND EstadoEnvia IN (0,8)))
+                                        AND (HorasExtras_Procesadas.EstadoEnvia NOT IN (1,4,3))
+                                        AND ((TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN (1028,2079,2076,2077,1029,2082,2078,22) AND @@Centro = '0')
+                                        OR (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN (@@Centro) AND @@Centro <> '0'))
+                            ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple, HorasExtras_Procesadas.FechaHoraDesde, HorasExtras_Procesadas.FechaHoraHasta
 
+                        """
+                    cursor.execute(sql,[desde,hasta,cc,estado])
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            idHora = str(row[0])
+                            legajo = str(row[1])
+                            nombre = str(row[2])
+                            cc = str(row[3])
+                            desde = str(row[4])
+                            hasta = str(row[5])
+                            motivo = str(row[6])
+                            tipo = str(row[7])
+                            horas = str(row[8])
+                            dispositivo = str(row[9])
+                            estado = str(row[10])
+                            id_estado = str(row[11])
+                            datos = {'ID':idHora, 'Tipo':tipo, 'Legajo':legajo, 'Nombre':nombre, 'CC':cc, 'Desde':desde,
+                                    'Hasta':hasta, 'Motivo': motivo, 'Horas':horas, 'Dispositivo':dispositivo, 'Estado':estado, 'ID_Estado': id_estado}
+                            data.append(datos)
 
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
 
+@login_required
+@csrf_exempt
+def restauraHora(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Empaque.puede_restaurar')
+        if user_has_permission:
+            usuario = str(request.user)
+            Listado_ID_HEP = request.POST.getlist('idCheck')
+            index = 0
+            for ID_HEP in Listado_ID_HEP:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                UPDATE HorasExtras_Procesadas
+                                SET EstadoEnvia = CASE
+                                                WHEN ID_LTFP IS NULL THEN '3'
+                                                ELSE '4'
+                                            END
+                                WHERE ID_HEP = %s
 
+                            """
+                        cursor.execute(sql,[ID_HEP])
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","ACTUALIZA ESTADO HORAS",usuario.upper(),error)
+                    return JsonResponse ({'Message': 'Not Found', 'Nota': 'Se produjo un error al intentar resolver la petición.'}) 
+                index = index + 1
 
+            if len(Listado_ID_HEP) == index:
+                return JsonResponse ({'Message': 'Success', 'Nota': 'Los items se restauraron correctamente.'}) 
+            else:
+                return JsonResponse ({'Message': 'Not Found', 'Nota': 'Se produjo un error al intentar restaurar algunos items.'}) 
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
 
 # --INSERT INTO Pre_Carga_Horas_Extras (Legajo,UserAlta,FechaAlta) VALUES ('58015','Sideswipe',GETDATE())
 

@@ -11,6 +11,7 @@ class Empaque(models.Model):
             ("puede_borrar", "Puede Borrar"),
             ("puede_autorizar", "Puede Autorizar HE"),
             ("puede_denegar", "Puede Denegar HE"),
+            ("puede_restaurar", "Puede Restaurar HE"),
         ]
 
 # class HorasExtrasEmpaque(models.Model):
