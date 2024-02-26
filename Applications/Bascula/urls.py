@@ -28,4 +28,6 @@ urlpatterns = [
 
     path('remitos-chacras/actualiza-datos/', views.actualizaDatos, name='actualiza_datos'),
 
+    path('remitos-chacras/modifica-up/', views.actualizaUP, name='actualiza_up'),
+
 ]

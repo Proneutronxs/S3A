@@ -23,8 +23,12 @@ const hastaInput = document.getElementById('hasta');
 const overlay = document.getElementById('overlay-remito-nuevo');
 
 const popup = document.getElementById('popup-nuevo-remito');
-//overlay-remito-modifica
+
 const popupModifica = document.getElementById('overlay-remito-modifica');
+
+const overlay_up = document.getElementById('overlay-remito-modifica-up');
+
+const overlay_elimina = document.getElementById('overlay-remito-elimina');
 
 //SPINNERS
 const MarcaModifica = document.getElementById('ComboxMarcaBinsModifica');
@@ -178,6 +182,7 @@ const busca_remito = async () => {
             let encabezado_a = ``;
             let encabezado_b = ``;
             let encabezado_c = ``;
+            let modifica_up = ``;
             let detalles = ``;
             data.Datos.forEach((datos) => { 
                 encabezado_a += `
@@ -237,20 +242,27 @@ const busca_remito = async () => {
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
                     <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                     <label for="observaciones">Observaciones:</label><br>
-                    <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="5" placeholder="Datos a modificar.">${datos.Obs}</textarea>
+                    <textarea type="text" id="observacionesRemito" name="observacionesRemito" rows="5" placeholder="Observaciones.">${datos.Obs}</textarea>
                 </form>
                 <div class="button-container">
                     <form type="hidden" id="formNuevoRemito" method="POST" action="">
                         <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
                         <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                     </form>
-                    <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar</button>
-                    <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}','${datos.IdProductor}');">Modificar</button>
-                    <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="popUpNuevo();">Nuevo</button>
+                    <button id="guardaObservaciones" class="btn-submit botones-remito" type="button" onclick="actualizaObs()">Guardar Obs.</button>
+                    <button id="modificarRemito" class="btn-submit botones-remito" type="button" onclick="popUpModifica('${datos.IdRemito}','${datos.IdProductor}');">Modificar Bins</button>
+                    <button id="anularRemito" class="btn-submit botones-remito" type="button" onclick="mostrarEliminaRemito();">Eliminar</button>
                 </div>
                 <div class="button-container">
-                    <button id="nuevoRemito" class="btn-submit botones-remito-nuevo" type="button" onclick="verRemito()">Descargar</button>
+                    <button id="modificaRemitoUP" class="btn-submit botones-remito" type="button" onclick="mostrarModificaRemitoUP();">Modificar Up</button>
+                    <button id="modificaRemitoEsp" class="btn-submit botones-remito" type="button" onclick="modificarVar('${datos.IdRemito}','${datos.IdProductor}');">Modificar Var.</button>
+                    <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="verRemito()">Descargar</button>
                 </div>
+                `;
+                modifica_up += `
+                    <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                    <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
+                    <input class="input" type="text" style="text-transform:uppercase" id="nueva_up" name="nueva_up" placeholder="RN/NQ 000000" required>
                 `;
 
             });
@@ -267,6 +279,7 @@ const busca_remito = async () => {
             document.getElementById('encabezado-a').innerHTML = encabezado_a;
             document.getElementById('encabezado-b').innerHTML = encabezado_b;
             document.getElementById('encabezado-c').innerHTML = encabezado_c;
+            document.getElementById('formMarcaBinsModificaUP').innerHTML = modifica_up;
             document.getElementById("Tabla-Detalle-Remito").innerHTML = detalles;
             EncabezadoA.style.display = 'block';
             EncabezadoB.style.display = 'block';
@@ -483,7 +496,6 @@ function agregarFila() {
     }
 }
 
-
 // Función para quitar la última fila de la tabla
 function quitarFila() {
     // Verifica si hay filas en la tabla
@@ -512,7 +524,6 @@ function ocultarModificaRemito(){
     popupModifica.style.display = 'none';
     limpiarTabla();
 }
-
 
 const popUpNuevo= async () => {
     openProgressBar();
@@ -548,6 +559,58 @@ const popUpNuevo= async () => {
     }
 }
 
+function ocultarModificaRemitoUP(){
+    overlay_up.style.display = 'none';
+}
+
+function mostrarModificaRemitoUP(){
+    overlay_up.style.display = 'block';
+}
+
+function ocultarEliminaRemito(){
+    overlay_elimina.style.display = 'none';
+}
+
+function mostrarEliminaRemito(){
+    overlay_elimina.style.display = 'block';
+}
+
+const actualiza_up = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formMarcaBinsModificaUP");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("modifica-up/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color) 
+            busca_remito();
+            ocultarModificaRemitoUP();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        console.log(error);
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
 
 // const popUpNuevo= async (numero,idProductor) => {
 //     openProgressBar();
@@ -680,7 +743,6 @@ const mandaModificacion = async () => {
     try {
         const form = document.getElementById("formDatosBinsModifica");
         const formData = new FormData(form);
-        console.log(formData);
         const options = {
             method: 'POST',
             headers: {
@@ -693,8 +755,9 @@ const mandaModificacion = async () => {
         if(data.Message=="Success"){
             popupModifica.style.display = 'none';
             closeProgressBar();
-            ocultaRemito();
-            listar_remitos();
+            //ocultaRemito();
+            //listar_remitos();
+            busca_remito();
             limpiarTabla();
             var nota = data.Nota
             var color = "green";
@@ -707,7 +770,7 @@ const mandaModificacion = async () => {
             mostrarInfo(nota,color) 
         }
     } catch (error) {
-        console.log(error),
+        //console.log(error),
         closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
@@ -736,10 +799,6 @@ function isTableNotEmpty(tableId) {
         return false;
     }
 }
-
-
-
-
 
 
 

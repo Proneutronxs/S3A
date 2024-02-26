@@ -526,7 +526,7 @@ def actualizaDatos(request):
 
                 if items == index:
                     if actualizaCantidad(str(request.user),Cantidad_Total,num_productor,num_remito):
-                        return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se actualizó correctamentee.'})
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se actualizó correctamente.'})
                 else:
                     return JsonResponse ({'Message': 'Error', 'Nota': 'No se pudo guardar los cambios.'})
             else:
@@ -592,6 +592,43 @@ def actualizaCantidad(user,cantidad,num_productor,num_remito):
         error = str(e)
         insertar_registro_error_sql("BASCULA","ELIMINA BINS","Consulta",error)
         return False
+    
+
+@login_required
+@csrf_exempt
+def actualizaUP(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Bascula.puede_modificar')
+        if user_has_permission:
+            nueva_up = str(request.POST.get('nueva_up'))
+            usuario = str(request.user)
+            id_productor = request.POST.get('idProductor')
+            id_remito = request.POST.get('numRemito')
+            values = [nueva_up.upper(),usuario.upper(),id_productor,id_remito]
+            try:    
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                        UPDATE Datos_Remito_MovBins SET UP = %s ,FechaModificado = GETDATE(), UserModificado = %s WHERE IdProductor = %s AND NumeroRemito = %s """
+                    cursor.execute(sql, values)
+                    
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'La UP se actualizó correctamente.'})
+                else:
+                    return JsonResponse ({'Message': 'Error', 'Nota': 'La UP no se pudo actualizar.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("BASCULA","ACTUALIZA UP","Consulta",error)
+                print(e)
+                return JsonResponse ({'Message': 'Error', 'Nota': 'Se produjo un error al intentar procesar la solicitud.'})   
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})       
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
 
 
 

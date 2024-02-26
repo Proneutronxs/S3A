@@ -320,7 +320,6 @@ a:hover{
 }
 
 .input-number {
-  height: 35px;
   appearance: none;
   border: 1px solid #a72626;
   border-radius: 10px;
@@ -328,6 +327,15 @@ a:hover{
   font-size: 14px;
   width: 110px;
   height: 30px;
+}
+
+.input {
+  appearance: none;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  padding: 5px;
+  font-size: 14px;
+  width: 100%;
 }
 
 .input-number:focus {
@@ -346,14 +354,14 @@ input[type="checkbox"].input-checkbox {
 }
 
 .btn-submit {
-  padding: 2px 16px;
+  padding: 4px 10px;
   background-color: #ffffff;
   border: 1px solid #a72626;
   border-radius: 10px;
   color: #000000;
   transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-  height: 30px;
-  margin-right: 10px
+  height: auto;
+  margin-right: 5px
 }
 
 .btn-submit:hover {
@@ -545,8 +553,9 @@ input[type="checkbox"].input-checkbox {
 }
 
 .botones-remito{
-  width: 80px;
+  width: 116px;
 }
+
 .botones-remito-nuevo{
   width: 100%;
 }
@@ -571,9 +580,9 @@ input[type="checkbox"].input-checkbox {
   color: #444343;
   max-height: 360px;
   margin: 5px;
-  padding: 10px; /* Añadir espacio interno para separar del borde */
+  padding: 10px;
   display: flex;
-  flex-direction: column; /* Establecer el diseño de columna */
+  flex-direction: column; 
   border-left: 1px solid #a72626;
 }
 
@@ -595,6 +604,7 @@ input[type="checkbox"].input-checkbox {
   margin-top: 10px;
   text-align: center;
   width: 100%;
+
 }
 
 .button-container button {
@@ -668,6 +678,17 @@ input[type="checkbox"].input-checkbox {
 
 /* Estilo del fondo oscuro cuando el popup está abierto */
 .overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.overlay-up {
   display: none;
   position: fixed;
   top: 0;
@@ -798,6 +819,26 @@ input[type="checkbox"].input-checkbox {
   min-width: 460px;
   max-height: 460px;
   min-height: 460px;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+}
+
+.content-modifica-up {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  max-width: 420px;
+  max-height: 100px;
+  min-width: 420px;
+  min-height: 100px;
+  align-items: center;
   transform: translate(-50%, -50%);
   background-color: #fff;
   padding: 20px;

@@ -260,6 +260,46 @@
   </div>
 </div>
 
+<div class="overlay-up" id="overlay-remito-modifica-up">
+  <div class="content-modifica-up">
+    <div class="selectores-container">
+      <div class="btn-guarda-cancela">
+        <h5>MODIFICAR UP (Sin espacios ni guiones)</h5>
+      </div>
+      <form id="formMarcaBinsModificaUP" method="POST" action="">
+        
+      </form>
+
+      <div class="btn-guarda-cancela">
+        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemitoUP();">Cancelar</button>
+        <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button" onclick="actualiza_up();">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay-up" id="overlay-remito-elimina">
+  <div class="content-modifica-up">
+    <div class="selectores-container">
+      <form id="formMarcaBinsModificaUP" method="POST" action="">
+        
+      </form>
+
+      <div class="btn-guarda-cancela">
+        <p>¿Estás seguro de que deseas eliminar el remito?</p> <br>
+        <button id="cancelBtn" class="btn-submit botones" onclick="ocultarEliminaRemito();">Cancelar</button>
+        <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
+  <div class="popup-content">
+    <p>¿Estás seguro de que deseas eliminar el remito?</p> <br>
+    <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+    <button id="cancelBtn" class="btn-submit botones" onclick="ocultarEliminaRemito();">Cancelar</button>
+  </div>
+</div> -->
 
 <div id="popup" class="popup">
   <span class="close" id="closePopup">&times;</span>
