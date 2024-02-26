@@ -183,6 +183,7 @@ const busca_remito = async () => {
             let encabezado_b = ``;
             let encabezado_c = ``;
             let modifica_up = ``;
+            let elimina_remito = ``;
             let detalles = ``;
             data.Datos.forEach((datos) => { 
                 encabezado_a += `
@@ -262,7 +263,11 @@ const busca_remito = async () => {
                 modifica_up += `
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
                     <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
-                    <input class="input" type="text" style="text-transform:uppercase" id="nueva_up" name="nueva_up" placeholder="RN/NQ 000000" required>
+                    <input class="input" type="text" style="text-transform:uppercase" id="nueva_up" name="nueva_up" placeholder="RN000000" required>
+                `;
+                elimina_remito += `
+                    <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                    <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                 `;
 
             });
@@ -280,6 +285,7 @@ const busca_remito = async () => {
             document.getElementById('encabezado-b').innerHTML = encabezado_b;
             document.getElementById('encabezado-c').innerHTML = encabezado_c;
             document.getElementById('formMarcaBinsModificaUP').innerHTML = modifica_up;
+            document.getElementById('formEliminaRemito').innerHTML = elimina_remito;
             document.getElementById("Tabla-Detalle-Remito").innerHTML = detalles;
             EncabezadoA.style.display = 'block';
             EncabezadoB.style.display = 'block';
@@ -604,11 +610,49 @@ const actualiza_up = async () => {
             mostrarInfo(nota,color) 
         }
     } catch (error) {
-        console.log(error);
         closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         mostrarInfo(nota,color);  
+    }
+};
+
+const eliminaRemito = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formEliminaRemito");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("elimina-remito/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            ocultarEliminaRemito();
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color) 
+            listar_remitos();
+            ocultaRemito();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+            ocultarEliminaRemito();
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+        ocultarEliminaRemito();
     }
 };
 
