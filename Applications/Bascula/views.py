@@ -25,6 +25,7 @@ def remitos(request):
     return render (request, 'Bascula/Remitos/remitos.html')
 
 @login_required
+@csrf_exempt
 def verRemitosChacras(request):
     return render (request, 'Bascula/Remitos/verRemitosChacras.html')
 
@@ -95,7 +96,7 @@ def buscaRemito(request):
                                                         RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
                                                         RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS CAPATAZ, RTRIM(S3A.dbo.Especie.Nombre) AS ESPECIE, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.PedidoFlete.Chofer) AS CHOFER, RTRIM(S3A.dbo.Camion.Nombre) AS CAMION, 
                                                         RTRIM(S3A.dbo.Camion.Patente) AS PATENTE, CONVERT(VARCHAR(10), Datos_Remito_MovBins.FechaAlta, 103) AS FECHA, CONVERT(VARCHAR(5), Datos_Remito_MovBins.FechaAlta, 108), Datos_Remito_MovBins.NumeroRemito, 
-                                                        CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END, S3A.dbo.Productor.IdProductor, Datos_Remito_MovBins.NombrePdf
+                                                        CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END, S3A.dbo.Productor.IdProductor, Datos_Remito_MovBins.NombrePdf, Datos_Remito_MovBins.IdEspecie
                                 FROM            S3A.dbo.Camion INNER JOIN
                                                         S3A.dbo.Chacra INNER JOIN
                                                         S3A.dbo.Variedad INNER JOIN
@@ -132,9 +133,10 @@ def buscaRemito(request):
                             observaciones = str(i[18])
                             IdProductor = str(i[19])
                             pdf = str(i[20])
+                            idEspecie = str(i[21])
                             datos = {'Remito':numero_remito,'Productor':productor, 'Señor':señor, 'Direccion':direccion, 'Renspa':renspa, 'UP':up, 'Total':total, 
                                      'Capataz':capataz, 'Especie':especie, 'Variedad':variedad, 'Chacra':chacra, 'Chofer':chofer, 'Camion':camion, 'Patente':patente,
-                                     'Fecha':fecha, 'Hora':hora, 'IdRemito':idRemito, 'Obs':observaciones, 'IdProductor':IdProductor, 'PDF':pdf}
+                                     'Fecha':fecha, 'Hora':hora, 'IdRemito':idRemito, 'Obs':observaciones, 'IdProductor':IdProductor, 'PDF':pdf, 'IdEspecie': idEspecie}
                             data.append(datos)
 
                         sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
@@ -663,9 +665,81 @@ def eliminaRemito(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
+@login_required
+@csrf_exempt
+def llama_variedades(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Bascula.puede_ver')
+        if user_has_permission:
+            idEspecie = request.POST.get('idEspecie')
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    ## VARIEDAD
+                    sql = """
+                            SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie 
+                            FROM Variedad 
+                            WHERE IdEspecie = %s
+                                    AND IdVariedad < 1000 
+                                    AND IdVariedad NOT IN (940,957,927,951,906,948,934,937,950,908,122,73,84,97,931,935,83,963,86,933,85,936,932)
+                            ORDER BY Nombre
+                            """
+                    cursor.execute(sql, [idEspecie])
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        listado_variedad = []
+                        for row in consulta:
+                            idVariedad = str(row[0])
+                            nombreVariedad = str(row[1])
+                            datos = {'idVariedad': idVariedad, 'NombreVariedad': nombreVariedad}
+                            listado_variedad.append(datos)
+                            
+                        return JsonResponse({'Message': 'Success', 'Datos': listado_variedad})
+                    else:
+                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudieron obtener los datos.'})
+            except Exception as e:
+                error = str(e)
+                print(error)
+                insertar_registro_error_sql("FletesRemitos","DatosInicialesFletes","Aplicacion",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})   
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})       
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
+@login_required
+@csrf_exempt
+def actualizaVariedad(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Bascula.puede_modificar')
+        if user_has_permission:
+            usuario = str(request.user)
+            idVariedad = str(request.POST.get('ComboxVariedadModifica'))
+            id_productor = request.POST.get('idProductor')
+            id_remito = request.POST.get('numRemito')
+            values = [idVariedad,usuario.upper(),id_productor,id_remito]
+            try:    
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                        UPDATE Datos_Remito_MovBins SET IdVariedad = %s ,FechaModificado = GETDATE(), UserModificado = %s WHERE IdProductor = %s AND NumeroRemito = %s """
+                    cursor.execute(sql, values)
+                    
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
 
-
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'La Variedad se actualizó correctamente.'})
+                else:
+                    return JsonResponse ({'Message': 'Error', 'Nota': 'La Variedad no se pudo actualizar.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("BASCULA","ACTUALIZA UP","Consulta",error)
+                return JsonResponse ({'Message': 'Error', 'Nota': 'Se produjo un error al intentar procesar la solicitud.'})   
+        else:
+            return JsonResponse ({'Message': 'Error', 'Nota': 'No tiene permisos para resolver la petición.'})       
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 

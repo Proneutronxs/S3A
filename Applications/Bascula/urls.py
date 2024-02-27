@@ -32,4 +32,8 @@ urlpatterns = [
 
     path('remitos-chacras/elimina-remito/', views.eliminaRemito, name='elimina-remito'),
 
+    path('remitos-chacras/listado-variedades/', views.llama_variedades, name='llama_variedades'),
+
+    path('remitos-chacras/modifica-variedad/', views.actualizaVariedad, name='actualiza_variedad'),
+
 ]

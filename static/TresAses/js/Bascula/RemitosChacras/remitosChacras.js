@@ -28,13 +28,20 @@ const popupModifica = document.getElementById('overlay-remito-modifica');
 
 const overlay_up = document.getElementById('overlay-remito-modifica-up');
 
+const overlay_variedad = document.getElementById('overlay-remito-modifica-variedad');
+
 const overlay_elimina = document.getElementById('overlay-remito-elimina');
 
 //SPINNERS
 const MarcaModifica = document.getElementById('ComboxMarcaBinsModifica');
 
 
-
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+       // Evitar la acción predeterminada del Enter
+    }
+});
+  
 
 
 
@@ -183,6 +190,7 @@ const busca_remito = async () => {
             let encabezado_b = ``;
             let encabezado_c = ``;
             let modifica_up = ``;
+            let modifica_variedad = ``;
             let elimina_remito = ``;
             let detalles = ``;
             data.Datos.forEach((datos) => { 
@@ -255,8 +263,11 @@ const busca_remito = async () => {
                     <button id="anularRemito" class="btn-submit botones-remito" type="button" onclick="mostrarEliminaRemito();">Eliminar</button>
                 </div>
                 <div class="button-container">
+                    <form type="hidden" id="formModVarRemito" method="POST" action="">
+                        <input type="hidden" id="idEspecie" name="idEspecie" value="${datos.IdEspecie}">
+                    </form>
                     <button id="modificaRemitoUP" class="btn-submit botones-remito" type="button" onclick="mostrarModificaRemitoUP();">Modificar Up</button>
-                    <button id="modificaRemitoEsp" class="btn-submit botones-remito" type="button" onclick="modificarVar('${datos.IdRemito}','${datos.IdProductor}');">Modificar Var.</button>
+                    <button id="modificaRemitoEsp" class="btn-submit botones-remito" type="button" onclick="mostrar_popup_variedad();">Modificar Var.</button>
                     <button id="descargaRemito" class="btn-submit botones-remito" type="button" onclick="verRemito()">Descargar</button>
                 </div>
                 `;
@@ -264,6 +275,10 @@ const busca_remito = async () => {
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
                     <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                     <input class="input" type="text" style="text-transform:uppercase" id="nueva_up" name="nueva_up" placeholder="RN000000" required>
+                `;
+                modifica_variedad += `
+                    <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
+                    <input type="hidden" id="idProductor" name="idProductor" value="${datos.IdProductor}">
                 `;
                 elimina_remito += `
                     <input type="hidden" id="numRemito" name="numRemito" value="${datos.IdRemito}">
@@ -285,6 +300,7 @@ const busca_remito = async () => {
             document.getElementById('encabezado-b').innerHTML = encabezado_b;
             document.getElementById('encabezado-c').innerHTML = encabezado_c;
             document.getElementById('formMarcaBinsModificaUP').innerHTML = modifica_up;
+            document.getElementById('data-id').innerHTML = modifica_variedad;
             document.getElementById('formEliminaRemito').innerHTML = elimina_remito;
             document.getElementById("Tabla-Detalle-Remito").innerHTML = detalles;
             EncabezadoA.style.display = 'block';
@@ -581,6 +597,61 @@ function mostrarEliminaRemito(){
     overlay_elimina.style.display = 'block';
 }
 
+function ocultarVariedadRemito(){
+    overlay_variedad.style.display = 'none';
+}
+
+function mostrarVariedadRemito(){
+    overlay_variedad.style.display = 'block';
+}
+/// click pop up modifica variedad remito 
+
+function mostrar_popup_variedad(){
+    llamar_variedades();
+}
+
+const llamar_variedades = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formModVarRemito");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("listado-variedades/", options);
+        const data = await response.json();
+        console.log(data);
+        if(data.Message=="Success"){
+            let lista_datos = `<option value="0">Seleccione</option>`;
+            data.Datos.forEach((datos) => {
+                lista_datos += `
+                <option value="${datos.idVariedad}">${datos.NombreVariedad}</option>
+                `;
+            });
+            document.getElementById('ComboxVariedadModifica').innerHTML = lista_datos;
+            mostrarVariedadRemito();
+            closeProgressBar();
+        }else {
+            document.getElementById('ComboxVariedadModifica').innerHTML = ``;
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        console.log(error);
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
 const actualiza_up = async () => {
     openProgressBar();
     try {
@@ -598,11 +669,47 @@ const actualiza_up = async () => {
         const data = await response.json();
         if(data.Message=="Success"){
             closeProgressBar();
-            var nota = data.Nota
+            var nota = data.Nota;
             var color = "green";
             mostrarInfo(nota,color) 
             busca_remito();
             ocultarModificaRemitoUP();
+        }else {
+            closeProgressBar();
+            var nota = data.Nota;
+            var color = "red";
+            mostrarInfo(nota,color) 
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);  
+    }
+};
+
+const actualiza_variedad = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formModificaVarierdad");
+        const formData = new FormData(form);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("modifica-variedad/", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color) 
+            busca_remito();
+            ocultarVariedadRemito();
         }else {
             closeProgressBar();
             var nota = data.Nota
@@ -614,6 +721,7 @@ const actualiza_up = async () => {
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
         mostrarInfo(nota,color);  
+        ocultarVariedadRemito();
     }
 };
 
@@ -656,6 +764,18 @@ const eliminaRemito = async () => {
     }
 };
 
+
+function actualiza_var(){
+    const selector = document.getElementById("ComboxVariedadModifica");
+    const selectedIndex = selector.selectedIndex;
+    if (selectedIndex === 0) {
+        var nota = 'Seleccione una variedad.';
+        var color = "red";
+        mostrarInfo(nota,color) 
+    } else {
+        actualiza_variedad();
+    }
+}
 // const popUpNuevo= async (numero,idProductor) => {
 //     openProgressBar();
 //     try {
@@ -846,8 +966,28 @@ function isTableNotEmpty(tableId) {
 
 
 
+document.getElementById("overlay-remito-modifica-up").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Evita la acción predeterminada del Enter
+      document.getElementById("guarda-nuevo-up").click(); // Simula el clic en el primer botón
+    }
+});
 
 
+document.getElementById("overlay-remito-modifica-variedad").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Evita la acción predeterminada del Enter
+      document.getElementById("guarda-variedad").click(); // Simula el clic en el primer botón
+    }
+});
+
+
+document.getElementById("overlay-remito-elimina").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Evita la acción predeterminada del Enter
+      document.getElementById("confirmBtn").click(); // Simula el clic en el primer botón
+    }
+});
 
 
 
