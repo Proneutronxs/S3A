@@ -375,8 +375,10 @@ def llamaAsignacionesPendientes(request, usuario):
                 sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, CONVERT(VARCHAR,PedidoFlete.IdPedidoFlete) + ' - ' + RTRIM(Chacra.Nombre) AS ASIGNACION
                             FROM            PedidoFlete INNER JOIN
                                                     Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra
-                            WHERE        (PedidoFlete.UserID = %s) AND (PedidoFlete.Estado = 'A') AND
-                                                        ((SELECT DISTINCT AsigCerrada
+                            WHERE        (PedidoFlete.UserID = %s) 
+                                        AND (PedidoFlete.TipoCarga = 'RAU')
+                                        AND (PedidoFlete.Estado = 'A') 
+                                        AND ((SELECT DISTINCT AsigCerrada
                                                             FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins
                                                             WHERE        (IdAsignacion = PedidoFlete.IdPedidoFlete)) IS NULL)
                             ORDER BY PedidoFlete.IdPedidoFlete """
