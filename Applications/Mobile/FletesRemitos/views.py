@@ -1719,9 +1719,10 @@ def verReporteCalidad(request):
                         obsAD = str(result[15])
                         obsAV = str(result[16])
                         obsControl = str(result[17])
-                        user = str(result[18])
+                        hexa = str(result[18])
+                        user = str(result[19])
                         datos = {'Productor': productor, 'Lote': lote, 'Fecha': fecha, 'Variedad': variedad, 'Bins': bins, 'Chacra': chacra,
-                                 'Condicion': condicion, 'ObsAD': obsAD, 'ObsAV': obsAV, 'ObsControl': obsControl, 'Usuario': user}
+                                 'Condicion': condicion, 'ObsAD': obsAD, 'ObsAV': obsAV, 'ObsControl': obsControl, 'Hexa': hexa, 'Usuario': user}
                         listado.append(datos)
                     return JsonResponse({'Message': 'Success', 'Datos': listado})
                 else:
