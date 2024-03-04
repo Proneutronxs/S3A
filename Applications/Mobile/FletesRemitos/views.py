@@ -1685,7 +1685,7 @@ def verReporteCalidad(request):
                         SET @@Desde = %s ;
                         SET @@Hasta = %s ;
                         SELECT        Datos_Remito_MovBins.IdAsignacion AS ID_ASIGNACION, Datos_Remito_MovBins.IdProductor AS ID_PRODUCTOR, RTRIM(S3A.dbo.Productor.RazonSocial) AS PRODUCTOR, Datos_Remito_MovBins.NumeroRemito AS NUM_REMITO, 
-                                        S3A.dbo.Lote.IdRemito AS ID_REMITO, S3A.dbo.Lote.IdLote AS NUM_LOTE, S3A.dbo.Lote.IdProductor AS ID_PRODUCTOR1, S3A.dbo.Lote.IdVariedad AS ID_VARIEDAD, S3A.dbo.Lote.Fecha AS FECHA, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, S3A.dbo.Lote.CantBins AS CANT_BINS, 
+                                        S3A.dbo.Lote.IdRemito AS ID_REMITO, S3A.dbo.Lote.IdLote AS NUM_LOTE, S3A.dbo.Lote.IdProductor AS ID_PRODUCTOR1, S3A.dbo.Lote.IdVariedad AS ID_VARIEDAD, RTRIM(S3A.dbo.Lote.Fecha) AS FECHA, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, S3A.dbo.Lote.CantBins AS CANT_BINS, 
                                         S3A.dbo.Lote.IdChacra AS ID_CHACRA, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, S3A.dbo.ControlCalidad.IdCC AS ID_CONTROL, RTRIM(S3A.dbo.ControlCalidad.CondLote) AS CONDICION, 
                                         CASE WHEN S3A.dbo.ControlCalidad.ObsAD IS NULL THEN '' ELSE RTRIM(S3A.dbo.ControlCalidad.ObsAD) END AS OBS_AD_EXTERNO,
                                         CASE WHEN S3A.dbo.ControlCalidad.ObsAV IS NULL THEN '' ELSE RTRIM(S3A.dbo.ControlCalidad.ObsAV) END AS OBS_AV_EXTERNO,
