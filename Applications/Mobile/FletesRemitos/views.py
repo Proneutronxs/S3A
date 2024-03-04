@@ -1552,7 +1552,6 @@ def verReporteBins(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 ### PARTE NUEVA 
 @csrf_exempt
 def Carga_Inicial_Flete(request):
@@ -1667,7 +1666,72 @@ def traeTipoVariedad(idEspecie):
         cursor.close()
         connections['S3A'].close()
 
-
+#### CONSULTA DE CALIDAD SEGUN LAS CHACRAS ######
+@csrf_exempt
+def verReporteCalidad(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        usuario = str(json.loads(body)['usuario'])
+        desde = str(json.loads(body)['desde'])
+        hasta = str(json.loads(body)['hasta'])
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                        SET DATEFORMAT dmy;
+                        DECLARE @@Usuario VARCHAR(12);
+                        DECLARE @@Desde DATE;
+                        DECLARE @@Hasta DATE;
+                        SET @@Usuario = %s ;
+                        SET @@Desde = %s ;
+                        SET @@Hasta = %s ;
+                        SELECT        Datos_Remito_MovBins.IdAsignacion AS ID_ASIGNACION, Datos_Remito_MovBins.IdProductor AS ID_PRODUCTOR, RTRIM(S3A.dbo.Productor.RazonSocial) AS PRODUCTOR, Datos_Remito_MovBins.NumeroRemito AS NUM_REMITO, 
+                                        S3A.dbo.Lote.IdRemito AS ID_REMITO, S3A.dbo.Lote.IdLote AS NUM_LOTE, S3A.dbo.Lote.IdProductor AS ID_PRODUCTOR1, S3A.dbo.Lote.IdVariedad AS ID_VARIEDAD, S3A.dbo.Lote.Fecha AS FECHA, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, S3A.dbo.Lote.CantBins AS CANT_BINS, 
+                                        S3A.dbo.Lote.IdChacra AS ID_CHACRA, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, S3A.dbo.ControlCalidad.IdCC AS ID_CONTROL, RTRIM(S3A.dbo.ControlCalidad.CondLote) AS CONDICION, 
+                                        CASE WHEN S3A.dbo.ControlCalidad.ObsAD IS NULL THEN '' ELSE RTRIM(S3A.dbo.ControlCalidad.ObsAD) END AS OBS_AD_EXTERNO,
+                                        CASE WHEN S3A.dbo.ControlCalidad.ObsAV IS NULL THEN '' ELSE RTRIM(S3A.dbo.ControlCalidad.ObsAV) END AS OBS_AV_EXTERNO,
+                                        CASE WHEN S3A.dbo.ControlCalidad.ObsControlCalidad IS NULL THEN '' ELSE RTRIM(S3A.dbo.ControlCalidad.ObsControlCalidad) END AS OBS_CONTROL_INTERNO,
+                                        CASE WHEN RTRIM(S3A.dbo.ControlCalidad.CondLote) = 'ACEPTADO' THEN '#00913f' WHEN RTRIM(S3A.dbo.ControlCalidad.CondLote) = 'RECHAZADO' THEN '#FF0000' ELSE '#ff8000' END AS HEXADECIMAL,
+                                        Datos_Remito_MovBins.Usuario AS USUARIO
+                        FROM            Datos_Remito_MovBins INNER JOIN
+                                                S3A.dbo.Lote ON Datos_Remito_MovBins.NumeroRemito = S3A.dbo.Lote.IdRemito AND Datos_Remito_MovBins.IdProductor = S3A.dbo.Lote.IdProductor INNER JOIN
+                                                S3A.dbo.Variedad ON S3A.dbo.Lote.IdVariedad = S3A.dbo.Variedad.IdVariedad INNER JOIN
+                                                S3A.dbo.Chacra ON S3A.dbo.Lote.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN
+                                                S3A.dbo.ControlCalidad ON S3A.dbo.Lote.IdLote = S3A.dbo.ControlCalidad.IdLote INNER JOIN
+                                                S3A.dbo.Productor ON Datos_Remito_MovBins.IdProductor = S3A.dbo.Productor.IdProductor
+                        WHERE        (Datos_Remito_MovBins.Usuario = @@Usuario OR @@Usuario IS NULL OR @@Usuario = '') 
+                                    AND (Datos_Remito_MovBins.Modificado IS NULL) 
+                                    AND (TRY_CONVERT(DATE, S3A.dbo.Lote.Fecha) >= @@Desde OR @@Desde IS NULL OR @@Desde = '') 
+                                    AND (TRY_CONVERT(DATE, S3A.dbo.Lote.Fecha) <= @@Hasta OR @@Hasta IS NULL OR @@Hasta = '')
+                        ORDER BY TRY_CONVERT(DATE, S3A.dbo.Lote.Fecha), Datos_Remito_MovBins.Usuario
+                    """
+                cursor.execute(sql,[usuario,desde,hasta])
+                results = cursor.fetchall()
+                if results:
+                    listado = []
+                    for result in results:
+                        productor = str(result[2])
+                        lote = str(result[5])
+                        fecha = str(result[8])
+                        variedad = str(result[9])
+                        bins = str(result[10])
+                        chacra = str(result[12])
+                        condicion = str(result[14])
+                        obsAD = str(result[15])
+                        obsAV = str(result[16])
+                        obsControl = str(result[17])
+                        user = str(result[18])
+                        datos = {'Productor': productor, 'Lote': lote, 'Fecha': fecha, 'Variedad': variedad, 'Bins': bins, 'Chacra': chacra,
+                                 'Condicion': condicion, 'ObsAD': obsAD, 'ObsAV': obsAV, 'ObsControl': obsControl, 'Usuario': user}
+                        listado.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': listado})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("FLETES REMITOS","VER REPORTE CHACRAS",usuario,error)
+                    return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

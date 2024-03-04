@@ -68,4 +68,7 @@ urlpatterns = [
 
    path('data-inicial-nuevo', views.Carga_Inicial_Flete, name="carga_inicial_flete"),
 
+   #### MUESTRA CONTROL DE CALIDAD ENTRE FECHAS
+   path('data-ver/cosecha-calidad', views.verReporteCalidad, name="ver_reporte_calidad"),
+
 ]
