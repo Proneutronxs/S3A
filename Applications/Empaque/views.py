@@ -294,37 +294,41 @@ def guardaPersonalTildado(request):
             usuario = str(request.user)
             legajos = request.POST.getlist('idCheck')
             fecha = request.POST.get('fechaPre')
-            index = 0
-            for legajo in legajos:
-                try:
-                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                        sql = """ 
-                                DECLARE @@Legajo INT;
-                                DECLARE @@Fecha DATE;
-                                DECLARE @@User VARCHAR(255);
-                                SET @@Legajo = %s;
-                                SET @@Fecha = %s;
-                                SET @@User = %s;
-                                INSERT INTO Pre_Carga_Horas_Extras (Legajo, Fecha, UserAlta, FechaAlta, Estado)
-                                SELECT @@Legajo, TRY_CONVERT(DATE, @@Fecha), @@User, GETDATE(), 'P'
-                                WHERE NOT EXISTS (
-                                    SELECT 1
-                                    FROM Pre_Carga_Horas_Extras
-                                    WHERE Legajo = @@Legajo AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, @@Fecha) AND Estado <> 'E'
-                                );
-                             """
-                        cursor.execute(sql, [legajo,fecha,usuario.upper()])
-                        cursor.commit()
-                except Exception as e:
-                    error = str(e)
-                    insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",usuario.upper(),error)
-                finally:
-                    connections['TRESASES_APLICATIVO'].close()
-                index = index + 1
-            if index == len(legajos):
-                return JsonResponse({'Message': 'Success', 'Nota': 'Se guardó el personal.'})
+            if es_fecha_actual_o_posterior(fecha):
+                index = 0
+                for legajo in legajos:
+                    try:
+                        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                            sql = """ 
+                                    DECLARE @@Legajo INT;
+                                    DECLARE @@Fecha DATE;
+                                    DECLARE @@User VARCHAR(255);
+                                    SET @@Legajo = %s;
+                                    SET @@Fecha = %s;
+                                    SET @@User = %s;
+                                    INSERT INTO Pre_Carga_Horas_Extras (Legajo, Fecha, UserAlta, FechaAlta, Estado)
+                                    SELECT @@Legajo, TRY_CONVERT(DATE, @@Fecha), @@User, GETDATE(), 'P'
+                                    WHERE NOT EXISTS (
+                                        SELECT 1
+                                        FROM Pre_Carga_Horas_Extras
+                                        WHERE Legajo = @@Legajo AND TRY_CONVERT(DATE, Fecha)  = TRY_CONVERT(DATE, @@Fecha) AND Estado <> 'E'
+                                    );
+                                """
+                            cursor.execute(sql, [legajo,fecha,usuario.upper()])
+                            cursor.commit()
+                    except Exception as e:
+                        error = str(e)
+                        insertar_registro_error_sql("EMPAQUE","GUARDA PERSONAL TILDADO",usuario.upper(),error)
+                    finally:
+                        connections['TRESASES_APLICATIVO'].close()
+                    index = index + 1
+                if index == len(legajos):
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Se guardó el personal.'})
+                else:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Existe personal tildado ya autorizado para esa fecha. Los demás se guardaron correctamente.'})
             else:
-                return JsonResponse({'Message': 'Success', 'Nota': 'Existe personal tildado ya autorizado para esa fecha. Los demás se guardaron correctamente.'})
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se puede guardar personal de fechas anteriores, sólo fecha actual o posteriores.'})
+
         else:
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
@@ -776,6 +780,14 @@ def restauraHora(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
+    
+
+def es_fecha_actual_o_posterior(fecha):
+    from datetime import datetime
+    fecha_actual = datetime.now().date()
+    fecha_objeto = datetime.strptime(fecha, '%Y-%m-%d').date()
+
+    return fecha_objeto >= fecha_actual
 
 # --INSERT INTO Pre_Carga_Horas_Extras (Legajo,UserAlta,FechaAlta) VALUES ('58015','Sideswipe',GETDATE())
 
