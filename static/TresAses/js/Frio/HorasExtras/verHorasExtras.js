@@ -104,7 +104,7 @@ const restauraHorasEliminadas = async () => {
 const listarCentrosCostos = async () => {
     openProgressBar();
     try {
-        const response = await fetch("autoriza/carga-combox-legajos")
+        const response = await fetch("autoriza/carga-combox-cc")
         const data = await response.json();
         if(data.Message=="Success"){
             let listado = `<option value="0">TODOS LOS CENTROS</option>`;
