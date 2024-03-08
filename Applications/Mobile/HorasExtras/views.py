@@ -115,7 +115,7 @@ def insert_HoraExtra(request):
                 for legajo in lista_hora_es_antes:
                     Apellido = traeApellidos(str(legajo))
                     nombres.append(Apellido)
-                nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras que no superen las 24hs de la FECHA y HORA ACTUAL.'
+                nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras que no superen las 24hsnhacia atrás de la FECHA y HORA ACTUAL.'
                 est = "E"
                 insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
@@ -133,7 +133,7 @@ def es_posterior_a_actual(datetime_str):
     datetime_str = str(datetime_str).replace('T',' ')
     fecha_hora = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
     fecha_hora_actual = datetime.now()
-    fecha_hora_margen = fecha_hora_actual + timedelta(days=1)
+    fecha_hora_margen = fecha_hora_actual - timedelta(days=1)
     return fecha_hora > fecha_hora_margen
 
 ### RETORNA HH:MM DE UN DATE TIME
