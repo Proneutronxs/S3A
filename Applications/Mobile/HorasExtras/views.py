@@ -94,6 +94,7 @@ def insert_HoraExtra(request):
                             cursor.execute(sql, values)
                 else:
                     lista_hora_es_antes.append(Legajo)
+
             if len(lista_hora_es_antes) == 0:
                 if len(lista_tieneHE_asignada) == 0:
                     nota = "Los Horas Extras se envíaron correctamente."
@@ -111,13 +112,14 @@ def insert_HoraExtra(request):
                     return JsonResponse({'Message': 'Success', 'Nota': nota})
             else:
                 nombres = []
-                for legajo in lista_tieneHE_asignada:
+                for legajo in lista_hora_es_antes:
                     Apellido = traeApellidos(str(legajo))
                     nombres.append(Apellido)
                 nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras posteriores a la FECHA y HORA ACTUAL.'
                 est = "E"
                 insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
+            
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("HorasExtras","insert_horaExtra","usuario",error)
