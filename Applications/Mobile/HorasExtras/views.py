@@ -93,7 +93,7 @@ def insert_HoraExtra(request):
                             values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
                             cursor.execute(sql, values)
                 else:
-                    lista_hora_es_antes.append(legajo)
+                    lista_hora_es_antes.append(Legajo)
             if len(lista_hora_es_antes) == 0:
                 if len(lista_tieneHE_asignada) == 0:
                     nota = "Los Horas Extras se envíaron correctamente."
