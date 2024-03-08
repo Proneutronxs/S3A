@@ -36,4 +36,7 @@ urlpatterns = [
 
     path('remitos-chacras/modifica-variedad/', views.actualizaVariedad, name='actualiza_variedad'),
 
+    ### NUEVO REMITO CHACRA
+    path('remitos-chacras/nuevo-remito/', views.nuevoRemitoChacra, name='nuevo_remito_chacra'),
+
 ]

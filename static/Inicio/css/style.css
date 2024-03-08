@@ -112,17 +112,17 @@
 
 
 .container{
-    height: 100%;
-    background-color: #2653a70d;
+  height: 100%;
+  background-color: #2653a70d;
 }
 .encabezado{
-    height: 60px;
-    background-color: #a72626;
-    border-radius: 5px;
+  height: 60px;
+  background-color: #a72626;
+  border-radius: 5px;
 }
 
 .contenedor{
-    color: #fff;
+  color: #fff;
 }
 
 .formularios{

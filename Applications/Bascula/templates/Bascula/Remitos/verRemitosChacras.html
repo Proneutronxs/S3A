@@ -1,330 +1,323 @@
-<html lang="es">
-<head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="{%static 'TresAses/img/TA.ico' %}" rel="icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{%static 'TresAses/css/style.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <title>Tres Ases</title> 
-</head>
+{% extends "Bascula/Remitos/remitos.html" %}
+
+{% load static %}
+
 
 {% block content %}
-
-<div class="contenedor">
-    <div class="text letras">
-        <div class="row consola-btn">
-            <h4>REMITOS CHACRAS</h4>
-            <select class="selectores" type="select" id="ComboxRemitosPor" name="ComboxRemitosPor">
-              <option value="0">Seleccione</option>
-              <option value="1">Remitos del Día</option>
-              <option value="2">Remitos por Fecha</option>
-            </select>
-            
-            <form id="formTraeRemitosChacrasFecha" method="POST" action="">
-              <div class="row">
-                <label class="letras" for="desde">Desde:</label>
-                <input type="date" id="desde" name="desde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-              
-                <label class="letras" for="hasta">Hasta:</label>
-                <input type="date" id="hasta" name="hasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}" >
-
-                <button id="buscaRemitosFecha" class="btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
-              </div>
-            </form>
-
-            <form id="formTraeRemitosEncontrados" method="POST" action="">
-              <select class="selectores" type="select" id="ComboxTraeRemitosChacras" name="ComboxTraeRemitosChacras">
-                  
-              </select>
-              
-            </form>
-            <button id="refreshBusqueda" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="refreshOnclick()">refresh</button>
-        </div>
-    </div>
-    <div class="vista-container">
-      <div class="card-encabezado" id="card-encabezado">
-          <div class="info-group" id="encabezado-a">
-            
-          </div>
-          <div class="info-group" id="encabezado-b">
-            
-          </div>
-          <div class="info-group-btn" id="encabezado-c">
-           
-          </div>
-      </div>  
-
-      <div class="card-cuerpo" id="card-cuerpo">
-        <table class="pre-hs-ex tabla-remitos">
-          <thead>
-            <tr>
-              <th>Cantidad</th>
-              <th>Envase</th>
-              <th>Marca</th>
-            </tr>
-          </thead>
-          <tbody id="Tabla-Detalle-Remito">
-          </tbody>
-        </table>
-      </div>        
-    </div>                  
-</div>
-
-<div class="modal-overlay">
-  <div class="modal-container">
-    <div class="demo-container">
-      <div class="progress-bar">
-        <div class="progress-bar-value"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="overlay" id="overlay-remito-nuevo">
-  <div class="popup-remito-nuevo" id="popup-nuevo-remito">
-    <div class="popup-content-remito">
-      <div class="card-encabezado" id="popup-card-encabezado">
-        <div class="info-group" id="popup-encabezado-a">
-          <div class="info-item-nuevo">
-              <strong>Productor:</strong> TRES ASES S.A.
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Señor:</strong> GRISANTI ENRIQUE
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Dirección:</strong> LISANDRO DE LA TORRE 100
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Renspa:</strong> 121225326529
-          </div>
-          <div class="info-item-nuevo">
-            <input class="selectores" type="text" id="up" name="up" placeholder="UP" value="RN2345555" required>
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Capataz:</strong> CHAMBI JOSUE RUBEN
-          </div>
-        </div>
-        <div class="info-group" id="popup-encabezado-b">
-          <div class="info-item-nuevo">
-              <strong>Chacra:</strong> LA ANTOLA
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Chofer:</strong> ACUÑA JUAN
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Camión:</strong> MERCEDEZ 1114
-          </div>
-          <div class="info-item-nuevo">
-              <strong>Patente:</strong> SDF252
-          </div>
-          <div class="info-item-nuevo">
-            <div class="nuevo-remito-selector">
-              <select class="selectores" type="select" id="ComboxEspecieN" name="ComboxEspecieN">
+  
+    <div class="contenedor">
+        <div class="text letras">
+            <div class="row consola-btn">
+                <h4>REMITOS CHACRAS</h4>
+                <select class="selectores" type="select" id="ComboxRemitosPor" name="ComboxRemitosPor">
+                  <option value="0">Seleccione</option>
+                  <option value="1">Remitos del Día</option>
+                  <option value="2">Remitos por Fecha</option>
+                </select>
                 
-              </select>
-            </div>
-          </div>
-          <div class="info-item-nuevo">
-            <div class="nuevo-remito-selector">
-              <select class="selectores" type="select" id="ComboxVariedadN" name="ComboxVariedadN">
-                <option value="0">VARIEDAD</option>
-                <option value="1">XXXXXX</option>
-                <option value="2">XXXXXX</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="info-group-btn-popup-crea" id="popup-encabezado-c">
-          <div class="display-nuevo-Remito">
-            <select class="selectores" type="select" id="ComboxMarcaBinsNuevo" name="ComboxMarcaBinsNuevo">
+                <form id="formTraeRemitosChacrasFecha" method="POST" action="">
+                  <div class="row">
+                    <label class="letras" for="desde">Desde:</label>
+                    <input type="date" id="desde" name="desde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+                  
+                    <label class="letras" for="hasta">Hasta:</label>
+                    <input type="date" id="hasta" name="hasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}" >
 
-            </select>
-            <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
-              <option value="0">Tipo Bins</option>
-              <option value="1">GRANDE</option>
-              <option value="2">MEDIANO</option>
-            </select>
-            <input class="selectores" maxlength="2" type="number" id="cantidadBins" name="cantidadBins" placeholder="Cantidad" required>
-            <div class="btn-agrega-quita">
-              <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">add</button>
-              <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
+                    <button id="buscaRemitosFecha" class="btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+                  </div>
+                </form>
+
+                <form id="formTraeRemitosEncontrados" method="POST" action="">
+                  <select class="selectores" type="select" id="ComboxTraeRemitosChacras" name="ComboxTraeRemitosChacras">
+                      
+                  </select>
+                  
+                </form>
+                <button id="refreshBusqueda" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="refreshOnclick()">refresh</button>
             </div>
-          </div>
-          <br>
-          <div class="container-nuevo-remito">
-            <table class="pre-hs-ex">
+        </div>
+        <div class="vista-container">
+          <div class="card-encabezado" id="card-encabezado">
+              <div class="info-group" id="encabezado-a">
+                
+              </div>
+              <div class="info-group" id="encabezado-b">
+                
+              </div>
+              <div class="info-group-btn" id="encabezado-c">
+              
+              </div>
+          </div>  
+
+          <div class="card-cuerpo" id="card-cuerpo">
+            <table class="pre-hs-ex tabla-remitos">
               <thead>
                 <tr>
-                  <th>Cant.</th>
+                  <th>Cantidad</th>
                   <th>Envase</th>
                   <th>Marca</th>
                 </tr>
               </thead>
               <tbody id="Tabla-Detalle-Remito">
-                <tr>
-                  <td>60</td>
-                  <td>GRANDE</td>
-                  <td>TRES ASES</td>
-                </tr>
-                <tr>
-                  <td>20</td>
-                  <td>GRANDE</td>
-                  <td>TRES ASES</td>
-                </tr>
-                <tr>
-                  <td>50</td>
-                  <td>MEDIANO</td>
-                  <td>TRES ASES</td>
-                </tr>
-                <tr>
-                  <td>50</td>
-                  <td>MEDIANO</td>
-                  <td>TRES ASES</td>
-                </tr>
-                <tr>
-                  <td>50</td>
-                  <td>MEDIANO</td>
-                  <td>TRES ASES</td>
-                </tr>
-                <tr>
-                  <td>50</td>
-                  <td>MEDIANO</td>
-                  <td>TRES ASES</td>
-                </tr>
               </tbody>
             </table>
+          </div>        
+        </div>                  
+    </div>
+
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="demo-container">
+          <div class="progress-bar">
+            <div class="progress-bar-value"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="overlay" id="overlay-remito-nuevo">
+      <div class="popup-remito-nuevo" id="popup-nuevo-remito">
+        <div class="popup-content-remito">
+          <div class="card-encabezado" id="popup-card-encabezado">
+            <div class="info-group" id="popup-encabezado-a">
+              <div class="info-item-nuevo">
+                  <strong>Productor:</strong> TRES ASES S.A.
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Señor:</strong> GRISANTI ENRIQUE
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Dirección:</strong> LISANDRO DE LA TORRE 100
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Renspa:</strong> 121225326529
+              </div>
+              <div class="info-item-nuevo">
+                <input class="selectores" type="text" id="up" name="up" placeholder="UP" value="RN2345555" required>
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Capataz:</strong> CHAMBI JOSUE RUBEN
+              </div>
+            </div>
+            <div class="info-group" id="popup-encabezado-b">
+              <div class="info-item-nuevo">
+                  <strong>Chacra:</strong> LA ANTOLA
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Chofer:</strong> ACUÑA JUAN
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Camión:</strong> MERCEDEZ 1114
+              </div>
+              <div class="info-item-nuevo">
+                  <strong>Patente:</strong> SDF252
+              </div>
+              <div class="info-item-nuevo">
+                <div class="nuevo-remito-selector">
+                  <select class="selectores" type="select" id="ComboxEspecieN" name="ComboxEspecieN">
+                    
+                  </select>
+                </div>
+              </div>
+              <div class="info-item-nuevo">
+                <div class="nuevo-remito-selector">
+                  <select class="selectores" type="select" id="ComboxVariedadN" name="ComboxVariedadN">
+                    <option value="0">VARIEDAD</option>
+                    <option value="1">XXXXXX</option>
+                    <option value="2">XXXXXX</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="info-group-btn-popup-crea" id="popup-encabezado-c">
+              <div class="display-nuevo-Remito">
+                <select class="selectores" type="select" id="ComboxMarcaBinsNuevo" name="ComboxMarcaBinsNuevo">
+
+                </select>
+                <select class="selectores" type="select" id="ComboxTipoBins" name="ComboxTipoBins">
+                  <option value="0">Tipo Bins</option>
+                  <option value="1">GRANDE</option>
+                  <option value="2">MEDIANO</option>
+                </select>
+                <input class="selectores" maxlength="2" type="number" id="cantidadBins" name="cantidadBins" placeholder="Cantidad" required>
+                <div class="btn-agrega-quita">
+                  <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">add</button>
+                  <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button">remove</button>
+                </div>
+              </div>
+              <br>
+              <div class="container-nuevo-remito">
+                <table class="pre-hs-ex">
+                  <thead>
+                    <tr>
+                      <th>Cant.</th>
+                      <th>Envase</th>
+                      <th>Marca</th>
+                    </tr>
+                  </thead>
+                  <tbody id="Tabla-Detalle-Remito">
+                    <tr>
+                      <td>60</td>
+                      <td>GRANDE</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                    <tr>
+                      <td>20</td>
+                      <td>GRANDE</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                    <tr>
+                      <td>50</td>
+                      <td>MEDIANO</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                    <tr>
+                      <td>50</td>
+                      <td>MEDIANO</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                    <tr>
+                      <td>50</td>
+                      <td>MEDIANO</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                    <tr>
+                      <td>50</td>
+                      <td>MEDIANO</td>
+                      <td>TRES ASES</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="btn-guarda-cancela">
+                <button id="cancela-creacion" class="btn-submit botones-remito" type="button" onclick="ocultarNuevoRemito()">Cancelar</button>
+                <button id="guarda-nuevo-remito" class="btn-submit botones-remito" type="button">Crear</button>
+              </div>
+              
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="overlay" id="overlay-remito-modifica">
+      <div class="content-modifica">
+        <div class="remito-modifica-bins">
+          <div class="content-selectores">
+            <div class="selectores-container">
+              <form id="formMarcaBinsModifica" method="POST" action="">
+                <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBinsModifica" name="ComboxMarcaBinsModifica">
+                  
+                </select> 
+              </form>
+              <select class="selectores selectores-modifica" type="select" id="ComboxTipoBinsModifica" name="ComboxTipoBinsModifica">
+                
+              </select> <br>
+              <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBinsModifica" name="cantidadBinsModifica" placeholder="Cantidad" required>
+            </div>
+            <div class="btn-agrega-quita-modifica">
+              <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="agregarFila()">add</button>
+              <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="quitarFila()">remove</button>
+            </div>
+          </div>
+          <br>
+          <div class="container-modifica-bins">
+            <form id="formDatosBinsModifica" method="POST" action="">
+              <div id="identificadores-modifica"></div>
+              <div class="modifica-bins-tabla">
+                <table class="pre-hs-ex " >
+                  <thead>
+                    <tr>
+                      <th>Cant.</th>
+                      <th>Envase</th>
+                      <th>Marca</th>
+                    </tr>
+                  </thead>
+                  <tbody id="Tabla-modifica-Remito">
+                  </tbody>
+                </table>
+              </div>
+            </form>
           </div>
 
           <div class="btn-guarda-cancela">
-            <button id="cancela-creacion" class="btn-submit botones-remito" type="button" onclick="ocultarNuevoRemito()">Cancelar</button>
-            <button id="guarda-nuevo-remito" class="btn-submit botones-remito" type="button">Crear</button>
+            <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemito()">Cancelar</button>
+            <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button" onclick="enviaModificacion()">Guardar</button>
           </div>
-          
+
         </div>
-      </div> 
+      </div>
     </div>
-  </div>
-</div>
 
-
-
-<div class="overlay" id="overlay-remito-modifica">
-  <div class="content-modifica">
-    <div class="remito-modifica-bins">
-      <div class="content-selectores">
+    <div class="overlay-up" id="overlay-remito-modifica-up">
+      <div class="content-modifica-up">
         <div class="selectores-container">
-          <form id="formMarcaBinsModifica" method="POST" action="">
-            <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBinsModifica" name="ComboxMarcaBinsModifica">
-              
+          <div class="btn-guarda-cancela">
+            <h5>MODIFICAR UP (Sin espacios ni guiones)</h5>
+          </div>
+          <form id="formMarcaBinsModificaUP" method="POST" action="">
+            
+          </form>
+
+          <div class="btn-guarda-cancela">
+            <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemitoUP();">Cancelar</button>
+            <button id="guarda-nuevo-up" class="btn-submit botones-remito" type="button" onclick="actualiza_up();">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay-up" id="overlay-remito-modifica-variedad">
+      <div class="content-modifica-up">
+        <div class="selectores-container">
+          <div class="btn-guarda-cancela">
+            <h5>MODIFICAR VARIEDAD</h5>
+          </div>
+          <form id="formModificaVarierdad" method="POST" action="">
+            <div id="data-id">
+
+            </div>
+            <select class="selectores selectores-modifica" type="select" id="ComboxVariedadModifica" name="ComboxVariedadModifica">
+                  
             </select> 
           </form>
-          <select class="selectores selectores-modifica" type="select" id="ComboxTipoBinsModifica" name="ComboxTipoBinsModifica">
-            
-          </select> <br>
-          <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBinsModifica" name="cantidadBinsModifica" placeholder="Cantidad" required>
-        </div>
-        <div class="btn-agrega-quita-modifica">
-          <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="agregarFila()">add</button>
-          <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="quitarFila()">remove</button>
-        </div>
-      </div>
-      <br>
-      <div class="container-modifica-bins">
-        <form id="formDatosBinsModifica" method="POST" action="">
-          <div id="identificadores-modifica"></div>
-          <div class="modifica-bins-tabla">
-            <table class="pre-hs-ex " >
-              <thead>
-                <tr>
-                  <th>Cant.</th>
-                  <th>Envase</th>
-                  <th>Marca</th>
-                </tr>
-              </thead>
-              <tbody id="Tabla-modifica-Remito">
-              </tbody>
-            </table>
+
+          <div class="btn-guarda-cancela">
+            <button id="cancela-modifica-var" class="btn-submit botones-remito" type="button" onclick="ocultarVariedadRemito();">Cancelar</button>
+            <button id="guarda-variedad" class="btn-submit botones-remito" type="button" onclick="actualiza_var();">Guardar</button>
           </div>
-        </form>
-      </div>
-
-      <div class="btn-guarda-cancela">
-        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemito()">Cancelar</button>
-        <button id="guarda-nuevo-bins" class="btn-submit botones-remito" type="button" onclick="enviaModificacion()">Guardar</button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<div class="overlay-up" id="overlay-remito-modifica-up">
-  <div class="content-modifica-up">
-    <div class="selectores-container">
-      <div class="btn-guarda-cancela">
-        <h5>MODIFICAR UP (Sin espacios ni guiones)</h5>
-      </div>
-      <form id="formMarcaBinsModificaUP" method="POST" action="">
-        
-      </form>
-
-      <div class="btn-guarda-cancela">
-        <button id="cancela-modifica" class="btn-submit botones-remito" type="button" onclick="ocultarModificaRemitoUP();">Cancelar</button>
-        <button id="guarda-nuevo-up" class="btn-submit botones-remito" type="button" onclick="actualiza_up();">Guardar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="overlay-up" id="overlay-remito-modifica-variedad">
-  <div class="content-modifica-up">
-    <div class="selectores-container">
-      <div class="btn-guarda-cancela">
-        <h5>MODIFICAR VARIEDAD</h5>
-      </div>
-      <form id="formModificaVarierdad" method="POST" action="">
-        <div id="data-id">
-
         </div>
-        <select class="selectores selectores-modifica" type="select" id="ComboxVariedadModifica" name="ComboxVariedadModifica">
-              
-        </select> 
-      </form>
-
-      <div class="btn-guarda-cancela">
-        <button id="cancela-modifica-var" class="btn-submit botones-remito" type="button" onclick="ocultarVariedadRemito();">Cancelar</button>
-        <button id="guarda-variedad" class="btn-submit botones-remito" type="button" onclick="actualiza_var();">Guardar</button>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="overlay-up" id="overlay-remito-elimina">
-  <div class="content-modifica-up">
-    <div class="selectores-container">
-      <form id="formEliminaRemito" method="POST" action="">
-        
-      </form>
+    <div class="overlay-up" id="overlay-remito-elimina">
+      <div class="content-modifica-up">
+        <div class="selectores-container">
+          <form id="formEliminaRemito" method="POST" action="">
+            
+          </form>
 
-      <div class="btn-guarda-cancela">
-        <p>¿Estás seguro de que deseas eliminar el remito?</p> <br>
-        <button id="cancelBtn" class="btn-submit botones" onclick="ocultarEliminaRemito();">Cancelar</button>
-        <button id="confirmBtn" class="btn-submit botones" onclick="eliminaRemito();">Confirmar</button>
+          <div class="btn-guarda-cancela">
+            <p>¿Estás seguro de que deseas eliminar el remito?</p> <br>
+            <button id="cancelBtn" class="btn-submit botones" onclick="ocultarEliminaRemito();">Cancelar</button>
+            <button id="confirmBtn" class="btn-submit botones" onclick="eliminaRemito();">Confirmar</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div id="popup" class="popup">
-  <span class="close" id="closePopup">&times;</span>
-  <div id="mensaje-pop-up">
+    <div id="popup" class="popup">
+      <span class="close" id="closePopup">&times;</span>
+      <div id="mensaje-pop-up">
 
-  </div>
-</div>
+      </div>
+    </div>
 
-  
-<script src="{%static 'TresAses/js/Bascula/RemitosChacras/remitosChacras.js' %}"></script>
+      
+    <script src="{%static 'TresAses/js/Bascula/RemitosChacras/remitosChacras.js' %}"></script>
 
 {% endblock %}

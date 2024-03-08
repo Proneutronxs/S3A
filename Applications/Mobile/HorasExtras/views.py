@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from S3A.funcionesGenerales import *
 from S3A.conexionessql import *
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from Applications.TareasProgramadas.tasks import buscaSector
@@ -59,6 +59,7 @@ def insert_HoraExtra(request):
     if request.method == 'POST':
         try:
             lista_tieneHE_asignada = []
+            lista_hora_es_antes = []
             body = request.body.decode('utf-8')
             usuario = str(json.loads(body)['usuario'])
             fechaHora = str(json.loads(body)['actual'])
@@ -83,26 +84,37 @@ def insert_HoraExtra(request):
                 Estado = "1" ### ESTADO PRE CARGA SIEMPRE EN 1 
 
                 fechaHasta = retornaYYYYMMDD(Hasta)
-                
-                if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
-                    lista_tieneHE_asignada.append(Legajo)
+                if es_posterior_a_actual(Hasta):
+                    if buscaHoras(fechaHasta,Legajo,Desde.replace('T', ' '),Hasta.replace('T', ' ')):
+                        lista_tieneHE_asignada.append(Legajo)
+                    else:
+                        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                            sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
+                            cursor.execute(sql, values)
                 else:
-                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                        sql = "INSERT INTO HorasExtras_Sin_Procesar (Legajo, Regis_Epl, DateTimeDesde, DateTimeHasta, IdMotivo, DescripcionMotivo, Arreglo, ImpArreglo, Sector, UsuarioEncargado, Autorizado, FechaAlta, Estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        values = (Legajo, Regis_Epl, Desde, Hasta, idMotivo, Descripcion, Arreglo, Importe, Sector, Usuario, Autorizado, fechaAlta, Estado)
-                        cursor.execute(sql, values)
-
-            if len(lista_tieneHE_asignada) == 0:
-                nota = "Los Horas Extras se envíaron correctamente."
-                est = "E"
-                insertaRegistro(usuario,fechaHora,registro,est)
-                return JsonResponse({'Message': 'Success', 'Nota': nota})
+                    lista_hora_es_antes.append(legajo)
+            if len(lista_hora_es_antes) == 0:
+                if len(lista_tieneHE_asignada) == 0:
+                    nota = "Los Horas Extras se envíaron correctamente."
+                    est = "E"
+                    insertaRegistro(usuario,fechaHora,registro,est)
+                    return JsonResponse({'Message': 'Success', 'Nota': nota})
+                else:
+                    nombres = []
+                    for legajo in lista_tieneHE_asignada:
+                        Apellido = traeApellidos(str(legajo))
+                        nombres.append(Apellido)
+                    nota = "Los siguientes Apellidos ya tienen asignadas horas extras en ese rango horario: \n" + ', \n'.join(nombres) + '.\nVea los horarios guardados.'
+                    est = "E"
+                    insertaRegistro(usuario,fechaHora,registro,est) 
+                    return JsonResponse({'Message': 'Success', 'Nota': nota})
             else:
                 nombres = []
                 for legajo in lista_tieneHE_asignada:
                     Apellido = traeApellidos(str(legajo))
                     nombres.append(Apellido)
-                nota = "Los siguientes Apellidos ya tienen asignadas horas extras en ese rango horario: \n" + ', \n'.join(nombres) + '.\nVea los horarios guardados.'
+                nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras posteriores a la FECHA y HORA ACTUAL.'
                 est = "E"
                 insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
@@ -112,10 +124,14 @@ def insert_HoraExtra(request):
             est = "F"
             insertaRegistro(usuario,fechaHora,registro,est) 
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def es_posterior_a_actual(datetime_str):
+    fecha_hora = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+    fecha_hora_actual = datetime.now()
+    fecha_hora_margen = fecha_hora_actual + timedelta(minutes=15)
+    return fecha_hora > fecha_hora_margen
 
 ### RETORNA HH:MM DE UN DATE TIME
 def retornaHHMM(hora1,hora2):

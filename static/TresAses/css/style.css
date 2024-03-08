@@ -258,6 +258,7 @@ a:hover{
   display: flex;
   flex-direction: column;
   color: #444343;
+  min-height: 84%;
 }
 
 .container-tabla-he{
@@ -309,6 +310,13 @@ a:hover{
 .items-row{
   padding: 12px;
 }
+.consola-btn{
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  max-width: 100%;
+  width: 100%;
+}
 
 .items-row:last-child {
   margin-left: auto;
@@ -326,7 +334,6 @@ a:hover{
   padding: 5px;
   font-size: 14px;
   width: 110px;
-  height: 30px;
 }
 
 .input {
@@ -535,13 +542,6 @@ input[type="checkbox"].input-checkbox {
 ::-webkit-scrollbar-thumb:hover {
   background: #a72626;
 }
-
-.consola-btn{
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-
 
 .card-encabezado{
   border-radius: 10px;
@@ -801,8 +801,15 @@ input[type="checkbox"].input-checkbox {
 }
 
 .nuevo-remito-selector{
+  padding-top: 10px;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+}
+
+.nuevo-remito-selector-variedad{
+  display: flex;
+  flex-direction: row;
   align-items: stretch;
 }
 
@@ -931,7 +938,7 @@ input[type="checkbox"].input-checkbox {
 .div-1,
 .div-2 {
   flex: 1; /* Ambos divs ocuparán el mismo espacio */
-  border: 1px solid #ccc; /* Bordes para visualizar mejor */
+  /*border: 1px solid #ccc;  Bordes para visualizar mejor */
 }
 
 .horizontal-container {
@@ -999,6 +1006,18 @@ input[type="checkbox"].input-checkbox {
   cursor: pointer;
 }
 
+.info-group-nuevo-remito {
+  flex: 1; /* Hace que los grupos ocupen el espacio disponible */
+  margin: 0 10px; /* Espaciado entre los grupos */
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  border: 1px solid #a72626;
+  min-height: 100%;
+}
 
 
 

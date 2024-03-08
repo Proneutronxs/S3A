@@ -1,0 +1,186 @@
+{% extends "Bascula/Remitos/remitos.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="text letras">
+        <div class="row consola-btn">
+            <div class="items-row row">
+                <h4>NUEVO REMITO</h4>
+                <button id="nuevoRemito" class="btn-submit botones " type="button" onclick="">Nuevo Remito</button>
+            </div>
+            <div class="items-row" style="margin-right: 2px;">
+                <button id="nuevoRemito" class="btn-submit botones " type="button" onclick="">Crear Remito</button>
+                <label class="letras" for="numRemito">Número de Remito: </label>
+                <input class="input-number" type="number" id="idNumRemito" name="numRemito" readonly>
+            </div>
+        </div>
+    </div>
+    <!-- ESTE DIV ES AL 100% -->
+    <div class="vista-container-agrega" >
+        <div class="div-1" style="max-width: 23rem;">
+            <div class="info-group-nuevo-remito" id="encabezado-selectores-a">
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idProductorNuevo">Productor: </label>
+                    <select class="selectores" type="select" id="idProductorNuevo" name="idProductorNuevo">
+                        <option value="0">PRODUCTOR</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idChacraNuevo">Chacra: </label>
+                    <select class="selectores" type="select" id="idChacraNuevo" name="idChacraNuevo">
+                        <option value="0">CHACRA</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idZonaNuevo">Zona: </label>
+                    <select class="selectores" type="select" id="idZonaNuevo" name="idZonaNuevo">
+                        <option value="0">ZONA</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idTransporteNuevo">Transporte: </label>
+                    <select class="selectores" type="select" id="idTransporteNuevo" name="idTransporteNuevo">
+                        <option value="0">TRANSPORTE</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idChoferNuevo">Chofer: </label>
+                    <select class="selectores" type="select" id="idChoferNuevo" name="idChoferNuevo">
+                        <option value="0">CHOFER</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idCamionNuevo">Camion: </label>
+                    <select class="selectores" type="select" id="idCamionNuevo" name="idCamionNuevo">
+                        <option value="0">CAMION</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <label class="letras" for="idCapatazNuevo">Capataz: </label>
+                    <select class="selectores" type="select" id="idCapatazNuevo" name="idCapatazNuevo">
+                        <option value="0">CAPATAZ</option>
+                        <option value="1">XXXXXX</option>
+                        <option value="2">XXXXXX</option>
+                    </select>
+                </div>
+                <div class="nuevo-remito-selector">
+                    <button id="guardaDatosIniciales" class="btn-submit selectores" type="button" onclick="">Guardar Datos</button>
+                </div>
+            </div> 
+        </div> 
+        <div class="div-2">
+            <div class="info-group-nuevo-remito" style="max-width: 100%;" id="encabezado-selectores-b">
+                <div class="nuevo-remito-selector-variedad">
+                    <div class="div-1">
+                        <div class="nuevo-remito-selector">
+                            <label class="letras" for="numResnpa">RENSPA: </label>
+                            <input class="selectores" type="number" style="text-transform:uppercase" id="idNumResnpa" name="numResnpa" placeholder="sólo números">
+                        </div>
+                        <div class="nuevo-remito-selector">
+                            <label class="letras" for="idNumUP">UP: </label>
+                            <input class="selectores" type="text" style="text-transform:uppercase" id="idNumUP" name="idNumUP" placeholder="Sin espacios ni guiones"> 
+                        </div>
+                    </div>
+                    <div class="div-2">
+                        <div class="nuevo-remito-selector">
+                            <label class="letras" for="idEspecieNuevo">Especie: </label>
+                            <select class="selectores" type="select" id="idEspecieNuevo" name="idEspecieNuevo">
+                                <option value="0">ESPECIE</option>
+                                <option value="1">XXXXXX</option>
+                                <option value="2">XXXXXX</option>
+                            </select>
+                        </div>
+                        <div class="nuevo-remito-selector">
+                            <label class="letras" for="idVariedadNuevo">Variedad: </label>
+                            <select class="selectores" type="select" id="idVariedadNuevo" name="idVariedadNuevo">
+                                <option value="0">VARIEDAD</option>
+                                <option value="1">XXXXXX</option>
+                                <option value="2">XXXXXX</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-1">
+                    <div class="nuevo-remito-selector">
+                        <div class="div-1">
+                            <div class="nuevo-remito-selector-variedad">
+                                <div class="div-1">
+                                    <div class="selectores-container">
+                                        <form id="formMarcaBinsModifica" method="POST" action="">
+                                          <select class="selectores selectores-modifica" type="select" id="ComboxMarcaBinsModifica" name="ComboxMarcaBinsModifica">
+                                            
+                                          </select> 
+                                        </form>
+                                        <select class="selectores selectores-modifica" type="select" id="ComboxTipoBinsModifica" name="ComboxTipoBinsModifica">
+                                          
+                                        </select> <br>
+                                        <input class="selectores selectores-modifica" maxlength="2" type="number" id="cantidadBinsModifica" name="cantidadBinsModifica" placeholder="CANTIDAD" required>
+                                    </div>
+                                </div>
+                                <div class="div-2" >
+                                    <div class="horizontal-container" style="min-height: 100%;">
+                                        <button id="idAgregaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="agregarFila()">add</button>
+                                        <button id="idQuitaBins" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="quitarFila()">remove</button>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="div-2">
+                            <table class="pre-hs-ex " >
+                                <thead>
+                                  <tr>
+                                    <th>Cant.</th>
+                                    <th>Envase</th>
+                                    <th>Marca</th>
+                                  </tr>
+                                </thead>
+                                <tbody id="tabla-nuevo-remito">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>                  
+</div>
+
+<div class="modal-overlay">
+    <div class="modal-container">
+        <div class="demo-container">
+            <div class="progress-bar">
+                <div class="progress-bar-value">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popup" class="popup">
+    <span class="close" id="closePopup">&times;</span>
+    <div id="mensaje-pop-up">
+
+    </div>
+</div>
+
+    
+    <!-- <script src="{%static 'TresAses/js/Bascula/RemitosChacras/remitosChacras.js' %}"></script> -->
+
+{% endblock %}

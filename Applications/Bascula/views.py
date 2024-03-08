@@ -31,6 +31,11 @@ def verRemitosChacras(request):
 
 @login_required
 @csrf_exempt
+def nuevoRemitoChacra(request):
+    return render (request, 'Bascula/Remitos/nuevoRemitoChacra.html')
+
+@login_required
+@csrf_exempt
 def listadoRemitos(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Bascula.puede_ver')
@@ -540,7 +545,6 @@ def actualizaDatos(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 def eliminaBins(user,num_productor,num_remito):
     values = [user,num_productor,num_remito]
     try:    
@@ -594,8 +598,7 @@ def actualizaCantidad(user,cantidad,num_productor,num_remito):
         error = str(e)
         insertar_registro_error_sql("BASCULA","ELIMINA BINS","Consulta",error)
         return False
-    
-
+   
 @login_required
 @csrf_exempt
 def actualizaUP(request):
