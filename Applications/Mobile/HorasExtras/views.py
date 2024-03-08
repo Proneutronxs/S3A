@@ -115,7 +115,7 @@ def insert_HoraExtra(request):
                 for legajo in lista_hora_es_antes:
                     Apellido = traeApellidos(str(legajo))
                     nombres.append(Apellido)
-                nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras que no superen las 24hsnhacia atrás de la FECHA y HORA ACTUAL.'
+                nota = "Los siguientes Apellidos no se pueden guardar: \n" + ', \n'.join(nombres) + '.\nSólo se pueden cargar horas extras que no superen las 24hs. hacia atrás de la FECHA y HORA ACTUAL.'
                 est = "E"
                 insertaRegistro(usuario,fechaHora,registro,est) 
                 return JsonResponse({'Message': 'Success', 'Nota': nota})
