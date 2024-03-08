@@ -128,7 +128,8 @@ def insert_HoraExtra(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 def es_posterior_a_actual(datetime_str):
-    fecha_hora = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+    datetime_str = str(datetime_str).replace('T',' ')
+    fecha_hora = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
     fecha_hora_actual = datetime.now()
     fecha_hora_margen = fecha_hora_actual + timedelta(minutes=15)
     return fecha_hora > fecha_hora_margen
