@@ -264,7 +264,7 @@ def listadoHorasExtrasEstado(request):
                             SET @@Estado = %s;
                             SELECT        HorasExtras_Procesadas.ID_HEP AS ID, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25),TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
                                             (SELECT TresAses_ISISPayroll.dbo.CentrosCostos.AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
-                                            (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) + '-' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108)) AS DESDE, (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) + '-' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108)) AS HASTA, 
+                                            (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) + ' - ' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) + ' Hs.') AS DESDE, (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) + ' - ' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) + ' Hs.') AS HASTA, 
                                             (SELECT RTRIM(S3A.dbo.RH_HE_Motivo.Descripcion) FROM S3A.dbo.RH_HE_Motivo WHERE S3A.dbo.RH_HE_Motivo.IdMotivo= HorasExtras_Procesadas.IdMotivo) AS MOTIVO, 
                                             RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CANTIDAD, 
                                             CASE WHEN HorasExtras_Procesadas.ID_HESP IS NULL THEN 'WEB' ELSE 'APP' END AS SECTOR,
