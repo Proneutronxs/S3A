@@ -6,7 +6,7 @@ from S3A.funcionesGenerales import *
 from django.db import connections
 from django.http import JsonResponse
 import datetime
-from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos, insertaHorasExtras
+from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos
 
 # Create your views here.
 
@@ -193,7 +193,6 @@ def eliminaHorasSeleccionadasFrio(request): ### ELIMINA LAS HORAS SELECCIONADAS
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
-
 @login_required
 @csrf_exempt
 def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
@@ -202,15 +201,21 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
         if user_has_permission: 
             usuario = str(request.user)
             checkboxes_tildados = request.POST.getlist('idCheck')
+            horas = request.POST.getlist('cantHoras')
+            tipo = request.POST.getlist('tipoHoraExtra')
             resultados = []
             importe = "0"
             pagada = "N"
+            index = 0
             for i in checkboxes_tildados:
                 ID_HEP = str(i) 
+                tipo_hora = str(tipo[index])
+                cant_hora = str(horas[index])
                 fecha_y_hora = str(obtener_fecha_hora_actual_con_milisegundos())
                 Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora = buscaDatosParaInsertarHE(ID_HEP) 
-                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,usuario.upper())
+                resultado = insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, cant_hora, IdMotivo, IdAutoriza, Descripcion, tipo_hora, importe, pagada, fecha_y_hora,usuario.upper())
                 resultados.append(resultado)
+                index = index + 1
 
             if 0 in resultados:
                 data = "Se produjo un Error en alguna de las inserciones."
@@ -222,6 +227,29 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,user): ### FUNCION QUE INSERTA LAS HORAS EN EL S3A SOLO FUNCION (NO REQUIERE PERMISOS)
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = "INSERT INTO RH_HE_Horas_Extras (IdRepl,IdHoraExtra,IdLegajo,FechaDesde,HoraDesde,FechaHasta,HoraHasta,CantHoras,IdMotivo,IdAutoriza,Descripcion,TipoHoraExtra,Valor,Pagada,FechaAlta,UserID) " \
+                    "VALUES ('100',(SELECT MAX (IdHoraExtra) + 1 FROM RH_HE_Horas_Extras),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            values = (Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, IdMotivo, IdAutoriza, Descripcion, Thora, importe, pagada, fecha_y_hora,user)
+            cursor.execute(sql, values)
+            actualizarEstadoHEP(ID_HEP,Thora,Choras)
+            return 1
+    except Exception as e:
+        insertar_registro_error_sql("FRIGORIFICO","insertaHorasExtras","request.user",str(e))
+        return 0
+    finally:
+        connections['S3A'].close()
+
+def actualizarEstadoHEP(ID_HEP, tipo, horas): ### FUNCIÓN QUE ACTUALIZA EL ESTADO SI SE ENVÍO LA HS EXTRA SÓLO FUNCIÓN (NO REQUIERE PERMISOS)
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '0', CantidadHoras = %s, TipoHoraExtra = %s WHERE ID_HEP = %s"
+            cursor.execute(sql, [horas,tipo,ID_HEP])
+    except Exception as e:
+        insertar_registro_error_sql("FRIGORIFICO","actualizarEstadoHEP","request.user",str(e))
 
 def autorizaHorasEstadoHEP(ID_HEP):
     try:
@@ -231,7 +259,7 @@ def autorizaHorasEstadoHEP(ID_HEP):
             #return True
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("Empaque","autorizaHorasEstadoHEP","usuario",error)
+        insertar_registro_error_sql("FRIO","autorizaHorasEstadoHEP","usuario",error)
         #return False
     finally:
         cursor.close()

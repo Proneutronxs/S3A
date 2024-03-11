@@ -421,9 +421,6 @@ def actualizarEstadoHEP(ID_HEP): ### FUNCIÓN QUE ACTUALIZA EL ESTADO SI SE ENV�
             cursor.execute(sql, [ID_HEP])
     except Exception as e:
         insertar_registro_error_sql("RRHH","actualizarEstadoHEP","request.user",str(e))
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def eliminaHEP(ID_HEP): ### FUNCIÓN QUE ELIMNA LAS HORAS SELECCIONADS SEGUN EL ID SÓLO FUNCIÓN(NO REQUIERE PERMISOS)
     try:

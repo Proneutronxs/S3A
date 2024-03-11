@@ -160,7 +160,6 @@ const transfiere_personal = async () => {
         
         // Crear un objeto FormData para enviar al servidor
         const formData = new FormData();
-
         checkboxes.forEach(checkbox => {
             const cardDiv = checkbox.closest('.cardHora');  // Obtener el div cardHora más cercano
             const cantHoras = cardDiv.querySelector('#cantHoras').value;
