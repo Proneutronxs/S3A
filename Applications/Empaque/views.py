@@ -346,7 +346,7 @@ def muestraPersonalAutorizado(request):
                             SELECT        Pre_Carga_Horas_Extras.Legajo AS LEGAJO, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE
                             FROM            Pre_Carga_Horas_Extras INNER JOIN
                                                     TresAses_ISISPayroll.dbo.Empleados ON Pre_Carga_Horas_Extras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
-                            WHERE TRY_CONVERT(DATE, Pre_Carga_Horas_Extras.Fecha) = %s AND Pre_Carga_Horas_Extras.Estado <> 'E'
+                            WHERE TRY_CONVERT(DATE, Pre_Carga_Horas_Extras.Fecha) = %s --AND Pre_Carga_Horas_Extras.Estado <> 'E'
                             ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
                         """
                     cursor.execute(sql, [fecha])
