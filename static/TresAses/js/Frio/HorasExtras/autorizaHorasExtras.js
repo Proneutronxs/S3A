@@ -231,12 +231,12 @@ const selectAllCheckbox = document.getElementById("selectAll");
 
 selectAllCheckbox.addEventListener("change", function () {
     if (selectAllCheckbox.checked) {
-        const checkboxes = document.querySelectorAll(".input-checkbox");
+        const checkboxes = document.querySelectorAll(".input-checkbox-hs");
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
         });
     } else {
-        const checkboxes = document.querySelectorAll(".input-checkbox");
+        const checkboxes = document.querySelectorAll(".input-checkbox-hs");
         checkboxes.forEach(checkbox => {
             checkbox.checked = false;
         });
@@ -281,7 +281,7 @@ const encabezadoHorasExtras = document.getElementById("encabezado-tabla-hs-ex");
 elminaHEAutoriza.addEventListener("click", () => {
     const tablaHorasProcesadas = document.getElementById("tablaHorasProcesadasFrio");
     const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
-    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox-hs");
     const encabezadoHorasExtras = document.getElementById("encabezado-tabla-hs-ex");
     let alMenosUnTildado = false;
     for (const checkbox of checkboxes) {
