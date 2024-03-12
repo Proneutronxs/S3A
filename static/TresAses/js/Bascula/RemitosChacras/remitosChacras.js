@@ -32,6 +32,10 @@ const overlay_variedad = document.getElementById('overlay-remito-modifica-varied
 
 const overlay_elimina = document.getElementById('overlay-remito-elimina');
 
+const input_remito = document.getElementById('idRemito');
+
+const busca_numero_remito = document.getElementById('buscaRemitosNumero');
+
 //SPINNERS
 const MarcaModifica = document.getElementById('ComboxMarcaBinsModifica');
 
@@ -68,7 +72,8 @@ const ocultarCombox = () =>{
     EncabezadoC.style.display = 'none';
     TablaDetalle.innerHTML = '';
     Refresh.style.display = 'none';
-
+    input_remito.style.display = 'none';
+    busca_numero_remito.style.display = 'none';
 }
 
 
@@ -84,6 +89,8 @@ ComboxVer.addEventListener("change", (event) => {
         listar_remitos();
         FormDesdeHasta.style.display = 'none';
 
+        input_remito.style.display = 'none';
+        busca_numero_remito.style.display = 'none';
         Refresh.style.display = 'block';
 
         
@@ -92,8 +99,17 @@ ComboxVer.addEventListener("change", (event) => {
         ComboxListRemitos.style.display = 'none';
         FormDesdeHasta.style.display = 'block';
         Refresh.style.display = 'none';
+        input_remito.style.display = 'none';
+        busca_numero_remito.style.display = 'none';
 
         ocultaRemito();
+    }else if (selectedValue === '3') {
+        ocultaRemito();
+        input_remito.style.display = 'block';
+        busca_numero_remito.style.display = 'block';
+        ComboxListRemitos.style.display = 'none';
+        Refresh.style.display = 'none';
+        FormDesdeHasta.style.display = 'none';
     }
 });
 
@@ -173,7 +189,16 @@ const listar_remitos = async () => {
 const busca_remito = async () => {
     openProgressBar();
     try {
-        const form = document.getElementById("formTraeRemitosEncontrados");
+        const selector = document.getElementById("ComboxRemitosPor");
+        const opcionSeleccionada = selector.value;
+        
+        let form;
+        if (opcionSeleccionada === "3") {
+            form = document.getElementById("formTraeRemitosNumero");
+        } else {
+            form = document.getElementById("formTraeRemitosEncontrados");
+        }
+        
         const formData = new FormData(form);
 
         const options = {

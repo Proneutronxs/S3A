@@ -94,10 +94,15 @@ def buscaRemito(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Bascula.puede_ver')
         if user_has_permission:
-            values = str(request.POST.get('ComboxTraeRemitosChacras')).split('-')
+            values = str(request.POST.get('ComboxTraeRemitosChacras') or str(request.POST.get('idRemito')) + '-').split('-')
+            #print(values)
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """ SELECT        FORMAT(Datos_Remito_MovBins.NumeroRemito, '00000000') AS NRO_REMITO, RTRIM(S3A.dbo.Productor.RazonSocial) AS RAZON_SOCIAL, RTRIM(S3A.dbo.Productor.Nombre) AS NOMBRE, 
+                    sql = """   DECLARE @P_Remito INT;
+                                DECLARE @P_Productor INT;
+                                SET @P_Remito = %s;
+                                SET @P_Productor = %s;
+                                SELECT        FORMAT(Datos_Remito_MovBins.NumeroRemito, '00000000') AS NRO_REMITO, RTRIM(S3A.dbo.Productor.RazonSocial) AS RAZON_SOCIAL, RTRIM(S3A.dbo.Productor.Nombre) AS NOMBRE, 
                                                         RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
                                                         RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS CAPATAZ, RTRIM(S3A.dbo.Especie.Nombre) AS ESPECIE, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.PedidoFlete.Chofer) AS CHOFER, RTRIM(S3A.dbo.Camion.Nombre) AS CAMION, 
                                                         RTRIM(S3A.dbo.Camion.Patente) AS PATENTE, CONVERT(VARCHAR(10), Datos_Remito_MovBins.FechaAlta, 103) AS FECHA, CONVERT(VARCHAR(5), Datos_Remito_MovBins.FechaAlta, 108), Datos_Remito_MovBins.NumeroRemito, 
@@ -111,7 +116,8 @@ def buscaRemito(request):
                                                         S3A.dbo.PedidoFlete ON Datos_Remito_MovBins.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete ON S3A.dbo.Productor.IdProductor = S3A.dbo.PedidoFlete.IdProductor ON 
                                                         S3A.dbo.Especie.IdEspecie = Datos_Remito_MovBins.IdEspecie ON S3A.dbo.Variedad.IdVariedad = Datos_Remito_MovBins.IdVariedad ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON 
                                                         S3A.dbo.Camion.IdCamion = S3A.dbo.PedidoFlete.IdCamion
-                                WHERE        (Datos_Remito_MovBins.NumeroRemito = %s) AND (Datos_Remito_MovBins.IdProductor = %s) """
+                                WHERE        (Datos_Remito_MovBins.NumeroRemito = @P_Remito OR @P_Remito IS NULL OR @P_Remito = '') 
+                                                AND (Datos_Remito_MovBins.IdProductor = @P_Productor OR @P_Productor IS NULL OR @P_Productor = '') """
                     cursor.execute(sql, values)
                     consulta = cursor.fetchall()
                     if consulta:
@@ -144,11 +150,18 @@ def buscaRemito(request):
                                      'Fecha':fecha, 'Hora':hora, 'IdRemito':idRemito, 'Obs':observaciones, 'IdProductor':IdProductor, 'PDF':pdf, 'IdEspecie': idEspecie}
                             data.append(datos)
 
-                        sqldetalle = """ SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
+                        sqldetalle = """ 
+                                DECLARE @P_Remito INT;
+                                DECLARE @P_Productor INT;
+                                SET @P_Remito = %s;
+                                SET @P_Productor = %s;
+                                SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
                                 FROM            S3A.dbo.Bins INNER JOIN
                                                         S3A.dbo.Marca INNER JOIN
                                                         Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
-                                WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL) """
+                                WHERE       (Contenido_Remito_MovBins.NumeroRemito = @P_Remito OR @P_Remito IS NULL OR @P_Remito = '') 
+                                            AND (Contenido_Remito_MovBins.IdProductor = @P_Productor OR @P_Productor IS NULL OR @P_Productor = '') 
+                                            AND (Contenido_Remito_MovBins.Modificado IS NULL) """
                         cursor.execute(sqldetalle, values)
                         consultaDetalle = cursor.fetchall()
                         if consultaDetalle:

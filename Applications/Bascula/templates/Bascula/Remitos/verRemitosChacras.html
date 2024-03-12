@@ -13,6 +13,7 @@
                   <option value="0">Seleccione</option>
                   <option value="1">Remitos del Día</option>
                   <option value="2">Remitos por Fecha</option>
+                  <option value="3">Número de Remito</option>
                 </select>
                 
                 <form id="formTraeRemitosChacrasFecha" method="POST" action="">
@@ -33,6 +34,10 @@
                   </select>
                   
                 </form>
+                <form id="formTraeRemitosNumero" method="POST" action="">
+                  <input type="number" id="idRemito" name="idRemito" class="selectores" >
+                </form>
+                <button id="buscaRemitosNumero" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="busca_remito()">search</button>
                 <button id="refreshBusqueda" class="btn-submit botones bx material-symbols-outlined icon" type="button" onclick="refreshOnclick()">refresh</button>
             </div>
         </div>
