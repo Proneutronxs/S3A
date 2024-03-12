@@ -198,7 +198,7 @@ const busca_remito = async () => {
         } else {
             form = document.getElementById("formTraeRemitosEncontrados");
         }
-        
+
         const formData = new FormData(form);
 
         const options = {
@@ -333,6 +333,7 @@ const busca_remito = async () => {
             EncabezadoC.style.display = 'block';
             closeProgressBar();
         }else {
+            ocultaRemito()
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
