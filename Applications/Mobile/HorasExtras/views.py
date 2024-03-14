@@ -400,10 +400,11 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
         estado = '8'
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS " \
+                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), HorasExtras_Sin_Procesar.FechaAlta, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), HorasExtras_Sin_Procesar.FechaAlta, 103) AS FECHAS, HorasExtras_Sin_Procesar.FechaAlta " \
                         "FROM            HorasExtras_Sin_Procesar INNER JOIN " \
                                                 "USUARIOS ON HorasExtras_Sin_Procesar.UsuarioEncargado = USUARIOS.CodEmpleado " \
-                        "WHERE        (USUARIOS.Usuario = %s) AND FechaAlta >= DATEADD(DAY, -29, GETDATE()) "
+                        "WHERE        (USUARIOS.Usuario = %s) AND FechaAlta >= DATEADD(DAY, -60, GETDATE()) " \
+                        "ORDER BY HorasExtras_Sin_Procesar.FechaAlta DESC "
                 cursor.execute(sql, [User])
                 consulta = cursor.fetchall()
                 if consulta:

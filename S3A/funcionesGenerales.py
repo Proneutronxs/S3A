@@ -94,3 +94,36 @@ def obtenerHoraActual():
     hora = hora_actual.strftime('%H:%M')
     return hora
 
+def buscaCentroCostosPorUsuario(codigo,usuario):
+    data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                    DECLARE @P_Codigo VARCHAR(255);
+                    DECLARE @P_Usuario VARCHAR(255);
+                    SET @P_Codigo = %s;
+                    SET @P_Usuario = %s;
+                    IF EXISTS (SELECT 1 FROM Parametros_Aplicativo WHERE Usuario = @P_Usuario AND Codigo = @P_Codigo)
+                    BEGIN
+                        SELECT Texto
+                        FROM Parametros_Aplicativo
+                        WHERE Codigo = @P_Codigo AND Usuario = @P_Usuario;
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT Texto
+                        FROM Parametros_Aplicativo
+                        WHERE Codigo = @P_Codigo AND Usuario IS NULL;
+                    END
+                """
+            cursor.execute(sql, [codigo,usuario])
+            consulta = cursor.fetchone()
+            if consulta:
+                data = str(consulta[0]).split('-')
+                return data
+            else:
+                return data
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("CODIGO USUARIO","BUSCA DATA TEXTO",usuario,error)
+        return data

@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('horas-extras/autoriza/elimina/horas-extras', views.eliminaHorasSeleccionadasFrio, name='elimina_horas_extras_frio'),
 
-    path('horas-extras/autoriza/horas-extras', views.autorizaHorasCargadas, name='elimina_horas_extras_frio'),
+    path('horas-extras/autoriza/horas-extras', views.autorizaHorasCargadas, name='autoriza_horas_extras_frio'),
 
 
     path('horas-extras/ver', views.verHorasExtras, name='ver_horas_extras_frio'),

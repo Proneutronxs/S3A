@@ -9,6 +9,10 @@ urlpatterns = [
     
     path('seguimiento-viajes/', views.seguimientoViajes, name="seguimiento_viajes"),
 
+    path('horas-extras/', views.horasExtras, name="horas_extras_logistica"),
+
+    path('horas-extras/autoriza', views.horasExtras_autoriza, name="horas_extras_logistica_autoriza"),
+
     ### INICIO JAVA SCRIPT SEGUIMIENTOS ###
 
     path('seguimiento-viajes/listado-choferes/', seguimientos.listadoChofer, name="listado_chofer"),
@@ -25,6 +29,21 @@ urlpatterns = [
 
     ### FINAL JAVA SCRIPT SEGUIMIENTOS ###
 
+    ### HORAS EXTRAS LOGISTICA ###
+
+    path('horas-extras/autoriza/carga-combox-cc', views.cargaCentrosEmpaque, name="centros_logistica_autoriza"),
+
+    path('horas-extras/autoriza/ver-horas-extras', views.mostrarHorasCargadasPorCC, name='horas_extras_logistica'),
+
+    path('horas-extras/autoriza/horas-extras', views.autorizaHorasCargadas, name='autoriza_horas_extras_logistica'),
+
+    path('horas-extras/autoriza/elimina/horas-extras', views.eliminaHorasSeleccionadas, name='elimina_horas_extras_logistica'),
+
+    path('horas-extras/ver', views.verHorasExtras, name='ver_horas_extras_logistica'),
+
+    path('horas-extras/ver/listado-horas', views.listadoHorasExtrasEstadoL, name='listado_horas_extras_estado_logistica'),
+
+    path('horas-extras/ver/restaura-horas', views.restauraHoraL, name='restaura_horas_logistica'),
 
 
 ]
