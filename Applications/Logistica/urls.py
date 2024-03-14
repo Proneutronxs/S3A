@@ -33,7 +33,7 @@ urlpatterns = [
 
     path('horas-extras/autoriza/carga-combox-cc', views.cargaCentrosEmpaque, name="centros_logistica_autoriza"),
 
-    path('horas-extras/autoriza/ver-horas-extras', views.mostrarHorasCargadasPorCC, name='horas_extras_logistica'),
+    path('horas-extras/autoriza/ver-horas-extras', views.mostrarHorasCargadasPorCC, name='ver_horas_extras_logistica'),
 
     path('horas-extras/autoriza/horas-extras', views.autorizaHorasCargadas, name='autoriza_horas_extras_logistica'),
 
