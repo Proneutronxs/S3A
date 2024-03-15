@@ -45,4 +45,7 @@ urlpatterns = [
     path('horas-extras/ver/listado-horas', views.listadoHorasExtrasEstado, name='listado_horas_extras_estado'),
 
     path('horas-extras/ver/restaura-horas', views.restauraHora, name='restaura_horas'),
+
+    path('horas-extras/ver/exportar-excel', views.creaExcelHorasMostradas, name='exporta_excel_horas_empaque'),
+
 ]

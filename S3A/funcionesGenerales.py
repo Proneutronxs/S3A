@@ -127,3 +127,41 @@ def buscaCentroCostosPorUsuario(codigo,usuario):
         error = str(e)
         insertar_registro_error_sql("CODIGO USUARIO","BUSCA DATA TEXTO",usuario,error)
         return data
+
+
+from datetime import datetime
+
+def fecha_hora_actual_texto():
+    dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+
+    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  
+    ahora = datetime.now()
+    
+    dia_semana = dias_semana[ahora.weekday()]
+    dia_mes = ahora.day
+    mes = meses[ahora.month - 1]
+    año = ahora.year
+    
+    hora = ahora.hour
+    minutos = ahora.minute
+    
+    fecha_hora_str = f"{dia_semana} {dia_mes} de {mes} del {año} - {hora}:{minutos:02d} Hs."
+    
+    return fecha_hora_str
+
+def NombreCentro(cc):
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = "SELECT DescrCtroCosto " \
+                "FROM CentrosCostos " \
+                "WHERE Regis_CCo = %s"
+            cursor.execute(sql,[cc])
+            consulta = cursor.fetchone()
+            if consulta:
+                ids = str(consulta[0])
+                return ids
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("Empaque","NOMBRE CENTRO","usuario",error)
+        return ""

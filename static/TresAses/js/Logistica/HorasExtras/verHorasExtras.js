@@ -184,7 +184,94 @@ const verEstadodeHoras = async () => {
     }
 };
 
+const exportaExcel = async () => {
+    openProgressBar();
+    try {
+        const form = document.getElementById("formVerHoras");
+        const formData = new FormData(form);
 
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("ver/exportar-excel", options);
+        if (!response.ok) {
+            closeProgressBar();
+            //throw new Error('Error al exportar datos');
+            var nota = "Error al exportar datos.";
+            var color = "red";
+            mostrarInfo(nota,color); 
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Horas_extras'+ obtenerFechaHora_NombreArchivo() +'.xlsx';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        closeProgressBar();
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color); 
+    }
+};
+
+
+document.getElementById("creaExcel").addEventListener("click", function() {
+    const tablaHorasProcesadas = document.getElementById("tablaVerHorasEmpaque");
+    const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    
+    if (!tieneFilas) {
+        var message = "No se encontraron horas.";
+        var color = "red";
+        mostrarInfo(message,color);
+    } else {
+        exportaExcel();
+    }
+});
+
+document.getElementById("creaPdf").addEventListener("click", function() {
+    const tablaHorasProcesadas = document.getElementById("tablaVerHorasEmpaque");
+    const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    
+    if (!tieneFilas) {
+        var message = "No se encontraron horas.";
+        var color = "red";
+        mostrarInfo(message,color);
+    } else {
+        var message = "No Disponible.";
+        var color = "red";
+        mostrarInfo(message,color);
+    }
+});
+
+
+function obtenerFechaHora_NombreArchivo() {
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const mes = ahora.getMonth() + 1;
+    const dia = ahora.getDate();
+    const horas = ahora.getHours();
+    const minutos = ahora.getMinutes();
+    const segundos = ahora.getSeconds();
+
+    const formatoDosDigitos = valor => valor.toString().padStart(2, '0');
+
+    const cadenaFechaHora = `_${formatoDosDigitos(dia)}_${formatoDosDigitos(mes)}_${año}_${formatoDosDigitos(horas)}_${formatoDosDigitos(minutos)}_${formatoDosDigitos(segundos)}`;
+
+    return cadenaFechaHora;
+}
 
 
 

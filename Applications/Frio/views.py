@@ -5,6 +5,12 @@ from django.contrib.auth.decorators import login_required
 from S3A.funcionesGenerales import *
 from django.db import connections
 from django.http import JsonResponse
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
+from openpyxl.drawing.image import Image
+from openpyxl.styles import Alignment, PatternFill, Border, Side, Font
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 import datetime
 from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos
 
@@ -33,8 +39,9 @@ def verHorasExtras(request):
 @csrf_exempt
 def cargaCentrosCostosFrio(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':
+        usuario = str(request.user)
         try:
-            data = buscaCentroCostosFrioIDDescripHE()
+            data = buscaCentroCostos("CENTROS-FRIO",usuario.upper())
             if data:
                 return JsonResponse({'Message': 'Success', 'Datos': data})
             else:
@@ -48,8 +55,8 @@ def cargaCentrosCostosFrio(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CE
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
-def buscaCentroCostosFrioIDDescripHE():
-    listado =  buscaCentroCostosFrioHE()
+def buscaCentroCostos(codigo,usuario):
+    listado =  buscaCentroCostosPorUsuario(codigo,usuario)
     lista_json = []
     for item in listado:
         try:
@@ -66,34 +73,34 @@ def buscaCentroCostosFrioIDDescripHE():
                     lista_json.append(data)
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("Frio","buscaCentroCostosFrioIDDescrip","usuario",error)
+            insertar_registro_error_sql("LOGISTICA","BUSCA CENTROS DE COSTO",usuario,error)
             return lista_json
         finally:
             cursor.close()
             connections['ISISPayroll'].close()
     return lista_json
 
-def buscaCentroCostosFrioHE():
-    data = []
-    try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT Texto " \
-                "FROM Parametros_Aplicativo " \
-                "WHERE Codigo = 'APP-F-IDCC'"
-            cursor.execute(sql)
-            consulta = cursor.fetchone()
-            if consulta:
-                data = str(consulta[0]).split('-')
-                return data
-            else:
-                return data
-    except Exception as e:
-        error = str(e)
-        insertar_registro_error_sql("Frio","buscaCentroCostosFrio","usuario",error)
-        return data
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
+# def buscaCentroCostosFrioHE():
+#     data = []
+#     try:
+#         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+#             sql = "SELECT Texto " \
+#                 "FROM Parametros_Aplicativo " \
+#                 "WHERE Codigo = 'APP-F-IDCC'"
+#             cursor.execute(sql)
+#             consulta = cursor.fetchone()
+#             if consulta:
+#                 data = str(consulta[0]).split('-')
+#                 return data
+#             else:
+#                 return data
+#     except Exception as e:
+#         error = str(e)
+#         insertar_registro_error_sql("Frio","buscaCentroCostosFrio","usuario",error)
+#         return data
+#     finally:
+#         cursor.close()
+#         connections['TRESASES_APLICATIVO'].close()
 
 @login_required
 @csrf_exempt
@@ -251,19 +258,19 @@ def actualizarEstadoHEP(ID_HEP, tipo, horas): ### FUNCIÓN QUE ACTUALIZA EL ESTA
     except Exception as e:
         insertar_registro_error_sql("FRIGORIFICO","actualizarEstadoHEP","request.user",str(e))
 
-def autorizaHorasEstadoHEP(ID_HEP):
-    try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '1' WHERE ID_HEP = %s"
-            cursor.execute(sql, [ID_HEP])
-            #return True
-    except Exception as e:
-        error = str(e)
-        insertar_registro_error_sql("FRIO","autorizaHorasEstadoHEP","usuario",error)
-        #return False
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
+# def autorizaHorasEstadoHEP(ID_HEP):
+#     try:
+#         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+#             sql = "UPDATE HorasExtras_Procesadas SET EstadoEnvia = '1' WHERE ID_HEP = %s"
+#             cursor.execute(sql, [ID_HEP])
+#             #return True
+#     except Exception as e:
+#         error = str(e)
+#         insertar_registro_error_sql("FRIO","autorizaHorasEstadoHEP","usuario",error)
+#         #return False
+#     finally:
+#         cursor.close()
+#         connections['TRESASES_APLICATIVO'].close()
 
 
 ####VER HORAS EXTRAS ESTADO DE LAS HORAS RECHAZADAS Y/O AUTORIZADAS
@@ -275,13 +282,18 @@ def listadoHorasExtrasEstado(request):
         user_has_permission = request.user.has_perm('Frio.puede_ver')
         if user_has_permission:
             usuario = str(request.user)
+            ###NUEVA
+            listado =  buscaCentroCostosPorUsuario("CENTROS-EMPAQUE",usuario)
+            numeros_str = [str(numero) for numero in listado]
+            numeros_concatenados = ', '.join(numeros_str)
+            ###NUEVA
             cc = str(request.POST.get('ComboxCentrosCostos'))
             desde = request.POST.get('fechaBusquedaDesde')
             hasta = request.POST.get('fechaBusquedaHasta')
             estado = str(request.POST.get('ComboxEstadoHora'))
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """ 
+                    sql = f""" 
                             DECLARE @@Desde DATE;
                             DECLARE @@Hasta DATE;
                             DECLARE @@Centro INT;
@@ -307,7 +319,7 @@ def listadoHorasExtrasEstado(request):
                                             (@@Estado = '8' AND EstadoEnvia = '8') OR
                                             (@@Estado = '10' AND EstadoEnvia IN (0,8)))
                                         AND (HorasExtras_Procesadas.EstadoEnvia NOT IN (1,4,3))
-                                        AND ((TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN (2083,2087,2089,2090,2085,27) AND @@Centro = '0')
+                                        AND ((TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN ({numeros_concatenados}) AND @@Centro = '0')
                                         OR (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN (@@Centro) AND @@Centro <> '0'))
                             ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple, HorasExtras_Procesadas.FechaHoraDesde, HorasExtras_Procesadas.FechaHoraHasta
 
@@ -339,6 +351,145 @@ def listadoHorasExtrasEstado(request):
             except Exception as e:
                 error = str(e)
                 insertar_registro_error_sql("FRIO","LISTA HORAS PROCESADAS",str(request.user),error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
+    
+@login_required
+@csrf_exempt
+def creaExcelHorasMostradas(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Empaque.puede_ver')
+        if user_has_permission:
+            usuario = str(request.user)
+            ###NUEVA
+            listado =  buscaCentroCostosPorUsuario("CENTROS-EMPAQUE",usuario)
+            numeros_str = [str(numero) for numero in listado]
+            numeros_concatenados = ', '.join(numeros_str)
+            ###NUEVA
+            cc = str(request.POST.get('ComboxCentrosCostos'))
+            desde = request.POST.get('fechaBusquedaDesde')
+            hasta = request.POST.get('fechaBusquedaHasta')
+            estado = str(request.POST.get('ComboxEstadoHora'))
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = f""" 
+                            DECLARE @@Desde DATE;
+                            DECLARE @@Hasta DATE;
+                            DECLARE @@Centro INT;
+                            DECLARE @@Estado INT;
+                            SET @@Desde = %s;
+                            SET @@Hasta = %s;
+                            SET @@Centro = %s;
+                            SET @@Estado = %s;
+                            SELECT        HorasExtras_Procesadas.ID_HEP AS ID, HorasExtras_Procesadas.Legajo AS LEGAJO, CONVERT(VARCHAR(25),TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
+                                            (SELECT TresAses_ISISPayroll.dbo.CentrosCostos.AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                            (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) + ' - ' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraDesde, 108) + ' Hs.') AS DESDE, (CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraHasta, 103) + ' - ' + CONVERT(VARCHAR(5), HorasExtras_Procesadas.FechaHoraHasta, 108) + ' Hs.') AS HASTA, 
+                                            HorasExtras_Procesadas.DescripcionMotivo AS MOTIVO, 
+                                            RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CANTIDAD, 
+                                            CASE WHEN HorasExtras_Procesadas.ID_HESP IS NULL THEN 'WEB' ELSE 'APP' END AS SECTOR,
+                                            CASE WHEN HorasExtras_Procesadas.EstadoEnvia = '8' THEN 'RECHAZADO' WHEN HorasExtras_Procesadas.EstadoEnvia = '0' THEN 'AUTORIZADO' WHEN HorasExtras_Procesadas.EstadoEnvia = '4' THEN 'PENDIENTE'
+                                            WHEN HorasExtras_Procesadas.EstadoEnvia = '3' THEN 'PENDIENTE' ELSE 'DESCONOCIDO' END AS ESTADO
+                            FROM            HorasExtras_Procesadas INNER JOIN
+                                                    TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
+                            WHERE (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde) >= @@Desde OR @@Desde IS NULL OR @@Desde = '')
+                                        AND (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraHasta) <= @@Hasta OR @@Hasta IS NULL OR @@Hasta = '')
+                                        AND ((@@Estado = '0' AND EstadoEnvia = '0') OR
+                                            (@@Estado = '8' AND EstadoEnvia = '8') OR
+                                            (@@Estado = '10' AND EstadoEnvia IN (0,8)))
+                                        AND (HorasExtras_Procesadas.EstadoEnvia NOT IN (1,4,3))
+                                        AND ((TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN ({numeros_concatenados}) AND @@Centro = '0')
+                                        OR (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo IN (@@Centro) AND @@Centro <> '0'))
+                            ORDER BY TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple, HorasExtras_Procesadas.FechaHoraDesde, HorasExtras_Procesadas.FechaHoraHasta
+
+                        """
+                    cursor.execute(sql,[desde,hasta,cc,estado])
+                    results = cursor.fetchall()
+                    if results:
+                        
+                        workbook = Workbook()
+                        sheet = workbook.active
+                        sheet.title = "Horas_Extras"
+                        
+                        headers = ['ID_HORA', 'LEGAJO', 'NOMBRE', 'CC', 'FECHA HORA INICIO', 'FECHA HORA FIN', 'DESCRIPCIÓN - MOTIVO', 'TIPO', 'CANTIDAD', 'SISTEMA', 'ESTADO']
+                        
+                        sheet.append(headers)
+                        header_fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+                        for cell in sheet[1]:
+                            cell.fill = header_fill
+
+                        border = Border(left=Side(border_style='thin', color='000000'),
+                                right=Side(border_style='thin', color='000000'),
+                                top=Side(border_style='thin', color='000000'),
+                                bottom=Side(border_style='thin', color='000000'))
+                        
+                        for row in sheet.iter_rows(min_row=1, max_row=1):
+                            for cell in row:
+                                cell.border = border
+                        
+                        for row in sheet.iter_rows(min_row=2, max_row=len(results) + 1, min_col=1, max_col=len(headers)):
+                            for cell in row:
+                                cell.border = border
+
+                        sheet.insert_rows(1)
+                        sheet.insert_rows(1)
+                        sheet.insert_rows(1)
+                        sheet.insert_rows(1)
+                        sheet.insert_rows(1)
+                        sheet.insert_rows(1)
+
+                        sheet.insert_cols(1)
+
+                        for row_number, row_data in enumerate(results, start=8):
+                            for col_number, value in enumerate(row_data, start=2):
+                                sheet.cell(row=row_number, column=col_number, value=value).alignment = Alignment(horizontal='left', vertical='center')
+
+                        
+                        for col in sheet.columns:
+                            max_length = 0
+                            column = col[0].column_letter
+                            for cell in col:
+                                try:
+                                    if len(str(cell.value)) > max_length:
+                                        max_length = len(cell.value)
+                                except:
+                                    pass
+                            adjusted_width = (max_length + 3)
+                            sheet.column_dimensions[column].width = adjusted_width
+
+                        for row in sheet.iter_rows():
+                            for cell in row:
+                                cell.alignment = Alignment(horizontal='left', vertical='center')
+                        
+                        img = Image('static/imagenes/TA.png')
+                        img.width = 160 
+                        img.height = 80
+                        sheet.add_image(img, 'B2')
+
+                        centro = str(NombreCentro(cc))
+                        if cc == '0':
+                            centro = "TODOS LOS CENTROS"
+                        
+                        sheet['E2'] = "HORAS EXTRAS - " + centro
+                        sheet['E2'].font = Font(bold=True)
+                        sheet['H2'] = fecha_hora_actual_texto()
+                        sheet['H4'].font = Font(bold=True)
+                        sheet['H4'] = "USUARIO: " + usuario.upper()
+
+                        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                        response['Content-Disposition'] = 'attachment; filename=datos.xlsx'
+
+                        workbook.save(response)
+
+                        return response
+                    else:
+                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
+            except Exception as e:
+                error = str(e)
+                print(error)
+                insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
         else:
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})

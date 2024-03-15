@@ -24,5 +24,7 @@ urlpatterns = [
 
     path('horas-extras/ver/restaura-horas', views.restauraHora, name='restaura_horas_frio'),
 
+    path('horas-extras/ver/exportar-excel', views.creaExcelHorasMostradas, name='exporta_excel_horas_frio'),
+
 
 ]

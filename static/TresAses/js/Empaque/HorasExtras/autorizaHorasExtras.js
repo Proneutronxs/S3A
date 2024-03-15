@@ -10,7 +10,7 @@ window.addEventListener("load", async () =>{
 document.getElementById("autorizaFormHorasExtras").addEventListener("click", function() {
     const tablaHorasProcesadas = document.getElementById("tablaHorasProcesadasEmpaque");
     const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
-    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox-hs");
     let alMenosUnTildado = false;
     for (const checkbox of checkboxes) {
         if (checkbox.checked) {
@@ -34,8 +34,27 @@ document.getElementById("autorizaFormHorasExtras").addEventListener("click", fun
 const enviarHorasExtras_autorizado = async () => {
     openProgressBar();
     try {
-        const form = document.getElementById("formEnviaHorasExtrasEmpaque");
-        const formData = new FormData(form);
+        
+        const checkboxes = document.querySelectorAll('.input-checkbox-hs:checked');
+        const formData = new FormData();
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const cardDiv = checkbox.closest('tr');
+                const cantHorasInput = cardDiv.querySelector('.cant-horas');
+                const tipoHoraExtraSelect = cardDiv.querySelector('.tipo-hora-extra');
+
+                if (cantHorasInput && tipoHoraExtraSelect) {
+                    const cantHoras = cantHorasInput.value;
+                    const tipoHoraExtra = tipoHoraExtraSelect.value;
+
+                    // Agregar los datos al objeto FormData
+                    formData.append('idCheck', checkbox.value);
+                    formData.append('cantHoras', cantHoras);
+                    formData.append('tipoHoraExtra', tipoHoraExtra);
+                }
+            }
+        });
 
         const options = {
             method: 'POST',
@@ -130,16 +149,25 @@ const verHorasExtras_transferencia_por_legajos_empaque = async () => {
             data.Datos.forEach((datos) => {
                 datos_he += `<tr>
                 <td >
-                    <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
+                    <input class="input-checkbox-hs checkbox" type="checkbox" id="idCheck" name="idCheck" value="${datos.ID}">
                 </td>
-                <td >${datos.tipo}</td>
+                <td>
+                    <select class="selectores tipo-hora-extra" style="max-width: 60px;" name="tipoHoraExtra">
+                        <option value="A"${datos.tipo === 'A' ? 'selected' : ''}>A</option>
+                        <option value="50"${datos.tipo === '50' ? 'selected' : ''}>50</option>
+                        <option value="100"${datos.tipo === '100' ? 'selected' : ''}>100</option>
+                        <option value="N"${datos.tipo === 'N' ? 'selected' : ''}>N</option>
+                    </select>
+                </td>
                 <td >${datos.legajo}</td>
                 <td >${datos.nombres}</td>
-                <td >${datos.centro}</td>
                 <td >${datos.desde}</td>
                 <td >${datos.hasta}</td>
+                <td>
+                    <input class="input-number cant-horas" type="number" name="cantHoras" step="0.5" style="max-width: 80px;" value="${datos.horas}">
+                </td>
                 <td >${datos.motivo} - ${datos.descripcion}</td>
-                <td >${datos.horas}</td>
+                <td >${datos.centro}</td>
                 <td >${datos.solicita}</td>
               </tr>`
             });
@@ -168,12 +196,12 @@ const selectAllCheckbox = document.getElementById("selectAll");
 
 selectAllCheckbox.addEventListener("change", function () {
     if (selectAllCheckbox.checked) {
-        const checkboxes = document.querySelectorAll(".input-checkbox");
+        const checkboxes = document.querySelectorAll(".input-checkbox-hs");
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
         });
     } else {
-        const checkboxes = document.querySelectorAll(".input-checkbox");
+        const checkboxes = document.querySelectorAll(".input-checkbox-hs");
         checkboxes.forEach(checkbox => {
             checkbox.checked = false;
         });
@@ -219,7 +247,7 @@ const encabezadoHorasExtras = document.getElementById("encabezado-tabla-hs-ex");
 elminaHEAutoriza.addEventListener("click", () => {
     const tablaHorasProcesadas = document.getElementById("tablaHorasProcesadasEmpaque");
     const tieneFilas = tablaHorasProcesadas.getElementsByTagName("tr").length > 0;
-    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox");
+    const checkboxes = tablaHorasProcesadas.getElementsByClassName("input-checkbox-hs");
     const encabezadoHorasExtras = document.getElementById("encabezado-tabla-hs-ex");
     let alMenosUnTildado = false;
     for (const checkbox of checkboxes) {

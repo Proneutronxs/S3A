@@ -6,24 +6,29 @@
 
 <div class="contenedor">
     <div class="text letras">
-        <div class="row">
-            <form id="formVerHoras" method="POST" action="">
-                <label class="letras" for="fechaBusquedaDesde">Desde</label>
-                <input type="date" id="fechaBusquedaDesde" name="fechaBusquedaDesde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-                <label class="letras" for="fechaBusquedaHasta">Hasta</label>
-                <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-                <label class="letras" for="EstadoHora">Tipo</label>
-                <select class="selectores" type="checkbox" id="ComboxEstadoHora" name="ComboxEstadoHora">
-                    <option value="10">TODO</option>
-                    <option value="0">AUTORIZADOS</option>
-                    <option value="8">RECHAZADOS</option>
-                </select>
-                <!-- <label class="letras" for="TipoHora">Centro</label> -->
-                <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
-                </select>
-            </form>
-            <button id="idBuscaHoras" name="idBuscaHoras" class="selectores btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+      <div class="row">
+        <form id="formVerHoras" method="POST" action="">
+            <label class="letras" for="fechaBusquedaDesde">Desde</label>
+            <input type="date" id="fechaBusquedaDesde" name="fechaBusquedaDesde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+            <label class="letras" for="fechaBusquedaHasta">Hasta</label>
+            <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+            <label class="letras" for="EstadoHora">Tipo</label>
+            <select class="selectores" type="checkbox" id="ComboxEstadoHora" name="ComboxEstadoHora">
+              <option value="10">TODO</option>
+              <option value="0">AUTORIZADOS</option>
+              <option value="8">RECHAZADOS</option>
+            </select>
+            <!-- <label class="letras" for="TipoHora">Centro</label> -->
+            <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
+            </select>
+        </form>
+        <button id="idBuscaHoras" name="idBuscaHoras" class="selectores btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+        <div>
+          <button id="creaPdf" name="creaPdf" class="btn-submit selectores " type="button">PDF</button>
+          <button id="creaExcel" name="creaExcel" class="btn-submit selectores " type="button">EXCEL</button>
         </div>
+        
+      </div>
     </div>
     <div class="vista-container" >
         <form id="formRestauraHorasExtras" method="POST" action="#">
