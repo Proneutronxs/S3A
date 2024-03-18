@@ -219,7 +219,7 @@ def insertaHorasExtras(ID_HEP,Legajo, Fdesde, Hdesde, Fhasta, Hhasta, Choras, Id
             actualizarEstadoHEP(ID_HEP,Thora,Choras)
             return 1
     except Exception as e:
-        insertar_registro_error_sql("FRIGORIFICO","insertaHorasExtras","request.user",str(e))
+        insertar_registro_error_sql("EMPAQUE","insertaHorasExtras","request.user",str(e))
         return 0
     finally:
         connections['S3A'].close()

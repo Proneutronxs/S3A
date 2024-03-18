@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'Applications.Frio',
     'Applications.Logistica',
     'Applications.Bascula',
+    'Applications.Estadisticas',
 ]
 
 MIDDLEWARE = [
@@ -140,12 +141,25 @@ DATABASES = {
     }
 }
 
+
+
+
+
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': 'S3A/SQLite/db.SQLite',
 #     },
 # }
+
+
+
+
+
+
+
+
 
 
 ###### LOCAL S3A
@@ -252,6 +266,22 @@ DATABASES = {
 #     }
 # }
 
+# DECLARE @P_Desde DATE;
+# DECLARE @P_Hasta DATE;
+# DECLARE @P_Especie INT;
+# SET @P_Desde = '2023-02-01';
+# SET @P_Hasta = '2023-02-28';
+# SET @P_Especie = '2';
+
+# SELECT  SUM(Lote.CantBins) AS CANTIDAD_BINS, CONVERT(VARCHAR(5), Lote.Fecha, 108) AS FECHA,
+# 		RTRIM(Especie.Nombre) AS ESPECIE
+# FROM Lote INNER JOIN
+#     Especie ON Lote.IdEspecie = Especie.IdEspecie
+# WHERE (TRY_CONVERT(DATE, Lote.Fecha) >= @P_Desde OR @P_Desde IS NULL OR @P_Desde = '')
+#     AND (TRY_CONVERT(DATE, Lote.Fecha) <= @P_Hasta OR @P_Hasta IS NULL OR @P_Hasta = '')
+#     AND (Lote.IdEspecie = @P_Especie OR @P_Especie IS NULL OR @P_Especie = '')
+# GROUP BY
+#     Lote.Fecha, Especie.Nombre;
 
 
 # Password validation

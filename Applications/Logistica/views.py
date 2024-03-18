@@ -328,7 +328,7 @@ def creaExcelHorasMostradas(request):
         if user_has_permission:
             usuario = str(request.user)
             ###NUEVA
-            listado =  buscaCentroCostosPorUsuario("CENTROS-EMPAQUE",usuario)
+            listado =  buscaCentroCostosPorUsuario("CENTROS-LOGISTICA",usuario)
             numeros_str = [str(numero) for numero in listado]
             numeros_concatenados = ', '.join(numeros_str)
             ###NUEVA
