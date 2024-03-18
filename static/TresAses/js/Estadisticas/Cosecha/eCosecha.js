@@ -247,7 +247,7 @@ const muestraResultados = async () => {
                 const data = {
                     labels: labels,
                     datasets: [{
-                        label: `${tipoFruta} (${totalBins})`, // Tipo de fruta con la cantidad de bins
+                        label: `${tipoFruta} (${totalBins} - Bins)`, // Tipo de fruta con la cantidad de bins
                         data: datos,
                         borderColor: 'blue',
                         backgroundColor: 'transparent',
