@@ -34,23 +34,28 @@
                             <span class="text nav-text">Inicio</span>
                         </a>
                     </li>
-                    <form action="" id="formEstadisticas" method="POST">
+                    <form action="" id="formEstadisticas" method="POST" style="margin-top: 20px;">
                         <li class="nav-link" style="width: 100%;">
-                            <select class="selectores" type="checkbox" id="ComboxEstadoHora" name="ComboxEstadoHora" style="width: 100%;">
-                                <option value="01">ENERO</option>
-                                <option value="02">FEBRERO</option>
-                                <option value="03">MARZO</option>
-                                <option value="04">ABRIL</option>
-                                <option value="05">MAYO</option>
+                            <select class="selectores" type="checkbox" id="ComboxMes" name="ComboxMes" style="width: 100%;">
+                                <option value="1">ENERO</option>
+                                <option value="2">FEBRERO</option>
+                                <option value="3">MARZO</option>
+                                <option value="4">ABRIL</option>
+                                <option value="5">MAYO</option>
                             </select>
                         </li>
                         
-                        <!-- <li class="nav-link">
-                            <label class="letras" for="fechaBusquedaHasta">Hasta</label>
-                            <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-                        </li> -->
+                        <li class="nav-link">
+                            <select class="selectores" type="checkbox" id="ComboxEspecie" name="ComboxEspecie" style="width: 100%;">
+                                <option value="1">MANZANA</option>
+                                <option value="2">PERA</option>
+                                <!-- <option value="3">MARZO</option>
+                                <option value="4">ABRIL</option>
+                                <option value="5">MAYO</option> -->
+                            </select>
+                        </li>
                     </form>
-                    <li class="nav-link" style="display: flex; text-align: center;">
+                    <li class="nav-link" style="display: flex; text-align: center; margin-bottom: 20px;">
                         <button id="confirmBtn"  style="width: 156px;" class="btn-submit botones" onclick="muestraResultados();">Buscar</button>
                     </li>
                 </ul>

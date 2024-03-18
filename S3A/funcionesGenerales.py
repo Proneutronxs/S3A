@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db import connections
 from Applications.TresAses.models import *
 from datetime import datetime
+import calendar
 
 
 
@@ -163,5 +164,42 @@ def NombreCentro(cc):
                 return ids
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("Empaque","NOMBRE CENTRO","usuario",error)
+        insertar_registro_error_sql("GENERALES","NOMBRE CENTRO","usuario",error)
         return ""
+
+def NombreEspecie(id):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = "SELECT RTRIM(Nombre) " \
+                "FROM Especie " \
+                "WHERE IdEspecie = %s"
+            cursor.execute(sql,[id])
+            consulta = cursor.fetchone()
+            if consulta:
+                ids = str(consulta[0])
+                return ids
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GENERALES","NOMBRE ESPECIE","usuario",error)
+        return ""
+    
+def obtener_dias_mes(año, mes):
+    año = int(año)
+    mes = int(mes) 
+    num_dias_mes = calendar.monthrange(año, mes)[1]
+    primer_dia_semana = calendar.monthrange(año, mes)[0]
+    
+    dias_mes = [f"{año}-{mes:02d}-{dia:02d}" for dia in range(1, num_dias_mes + 1)]
+    
+    return dias_mes
+
+def formatear_fecha_a_dia_mes(fecha):
+    año, mes, dia = fecha.split('-')
+    fecha_formateada = f"{dia}/{mes}"
+    
+    return fecha_formateada
+
+def obtener_año_actual():
+    import datetime
+    año_actual = datetime.datetime.now().year
+    return str(año_actual)
