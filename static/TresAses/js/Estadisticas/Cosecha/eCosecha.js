@@ -210,7 +210,13 @@ const muestraResultados = async () => {
 };
 
 
+ComboxMes.addEventListener("change", (event) => {
+    muestraResultados();
+});
 
+ComboxEspecie.addEventListener("change", (event) => {
+    muestraResultados();
+});
 
 
 
