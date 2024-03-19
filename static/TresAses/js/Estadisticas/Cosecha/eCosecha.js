@@ -155,15 +155,22 @@ const muestraResultados = async () => {
                             }
                         },
                         plugins: {
-                            datalabels: {
-                                display: function(context) {
-                                    return context.dataset.data[context.dataIndex] > 0; // Mostrar el valor solo si es mayor que cero
-                                },
-                                color: 'black',
-                                align: 'top',
-                                formatter: function(value, context) {
-                                    return value; // Formatear el valor como desees
-                                }
+                            annotation: {
+                                annotations: datos.map((dato, index) => {
+                                    return {
+                                        type: 'line',
+                                        mode: 'horizontal',
+                                        scaleID: 'y',
+                                        value: dato,
+                                        borderColor: 'red',
+                                        borderWidth: 1,
+                                        label: {
+                                            content: dato.toString(),
+                                            enabled: true,
+                                            position: 'right'
+                                        }
+                                    };
+                                })
                             }
                         }
                     }
