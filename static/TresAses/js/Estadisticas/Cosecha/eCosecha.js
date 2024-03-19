@@ -83,7 +83,7 @@ const muestraResultados = async () => {
             const selectedOptionEspecie = selectEspecie.options[selectEspecie.selectedIndex].text;
             const selectedOptionVariedad = selectVariedad.options[selectVariedad.selectedIndex].text;
             const selectedOptionChacra = selectChacra.options[selectChacra.selectedIndex].text;
-            divDataSeleccion.innerHTML = `<p style="font-size: 15px;">Especie: ${selectedOptionEspecie} - Variedad: ${selectedOptionVariedad} - Chacra: ${selectedOptionChacra}</p>`;
+            divDataSeleccion.innerHTML = `<p style="font-size: 15px;">${selectedOptionEspecie} - ${selectedOptionVariedad} - ${selectedOptionChacra}</p>`;
         } else {
             closeProgressBar();
             const nota = dato.Nota;
