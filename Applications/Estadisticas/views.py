@@ -40,7 +40,9 @@ def estadisticaCosecha(request):
             usuario = str(request.user)
             mes = str(request.POST.get('ComboxMes'))
             especie = str(request.POST.get('ComboxEspecie'))
-            data_detalle = busqueda(mes,especie,"","")
+            variedad = str(request.POST.get('ComboxVariedad'))
+            chacra = str(request.POST.get('ComboxChacra'))
+            data_detalle = busqueda(mes,especie,variedad,chacra)
             if data_detalle:
                 result_dict = {}
                 for cantidad, fecha, fruta in data_detalle:
