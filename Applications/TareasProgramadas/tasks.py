@@ -1227,7 +1227,7 @@ def InsertaInicioFinal(ID,Inicio,Final):
                 if Final_Nocturna_20_00:
                     #### INICIA EN  13/20 Y TERMINA 20/00
                     horaInicio = Inicio
-                    horaInicio = soloFecha + " 13:00"
+                    #horaInicio = soloFecha + " 13:00"
                     horaFinal = soloFecha + " 20:00"
                     estado = "1"
                     tipoHora = "100"

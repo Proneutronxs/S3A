@@ -196,9 +196,9 @@ const muestraResultados = async () => {
 
 
 
-ComboxMes.addEventListener("change", (event) => {
-    muestraResultados();
-});
+// ComboxMes.addEventListener("change", (event) => {
+//     muestraResultados();
+// });
 
 ComboxEspecie.addEventListener("change", (event) => {
     cargarSelector();
