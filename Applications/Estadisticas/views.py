@@ -52,7 +52,6 @@ def estadisticaCosecha(request):
                         result_dict[fruta] = []
                     result_dict[fruta].append({"Cantidad": str(cantidad), "Fecha": fecha})
                 json_data = json.dumps(result_dict)
-                print(json_data)
                 return JsonResponse({'Message': 'Success', 'Datos': json_data})
             else:
                 return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
@@ -102,7 +101,6 @@ def busqueda(desde,hasta,especie,variedad,chacra):
                     dato = (0,fecha,nombreEspecie)
                     data.append(dato)
         except Exception as e:
-            print(e)
             insertar_registro_error_sql("ESTADISTICAS","BUSQUEDA","request.user",str(e))
     return data 
 
