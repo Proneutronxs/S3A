@@ -9,88 +9,6 @@ window.addEventListener("load", async () =>{
 });
 
 
-// const muestraResultados = async () => {
-//     openProgressBar();
-//     try {
-//         const form = document.getElementById("formEstadisticas");
-//         const formData = new FormData(form);
-
-//         const options = {
-//             method: 'POST',
-//             headers: {},
-//             body: formData
-//         };
-
-//         const response = await fetch("ver-estadisticas/", options);
-//         const dato = await response.json();
-
-//         if (dato.Message === "Success") {
-//             closeProgressBar();
-
-//             const dataDatos = JSON.parse(dato.Datos);
-
-//             // Obtener el contexto del lienzo
-//             const canvasContainer = document.getElementById('canvas-container');
-
-//             // Limpiar el contenedor de gráficos
-//             canvasContainer.innerHTML = '';
-
-//             // Iterar sobre cada tipo de fruta y crear un gráfico para cada una
-//             Object.keys(dataDatos).forEach(tipoFruta => {
-//                 const labels = dataDatos[tipoFruta].map(entry => entry.Fecha);
-//                 const datos = dataDatos[tipoFruta].map(entry => parseInt(entry.Cantidad));
-
-//                 // Sumar la cantidad de bins
-//                 const totalBins = datos.reduce((acc, curr) => acc + curr, 0);
-
-//                 // Crear el objeto de datos para el gráfico
-//                 const data = {
-//                     labels: labels,
-//                     datasets: [{
-//                         label: `${tipoFruta} (${totalBins} - Bins)`, // Tipo de fruta con la cantidad de bins
-//                         data: datos,
-//                         borderColor: 'blue',
-//                         backgroundColor: 'transparent',
-//                         borderWidth: 2
-//                     }]
-//                 };
-
-//                 // Crear un elemento canvas para el gráfico
-//                 const canvas = document.createElement('canvas');
-//                 canvasContainer.appendChild(canvas);
-
-//                 // Obtener el contexto del lienzo para el gráfico actual
-//                 const ctx = canvas.getContext('2d');
-
-//                 // Crear el gráfico de líneas para esta fruta
-//                 new Chart(ctx, {
-//                     type: 'line',
-//                     data: data,
-//                     options: {
-//                         scales: {
-//                             y: {
-//                                 beginAtZero: true
-//                             }
-//                         }
-//                     }
-//                 });
-//             });
-
-//         } else {
-//             closeProgressBar();
-//             const nota = dato.Nota;
-//             const color = "red";
-//             mostrarInfo(nota, color);
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         closeProgressBar();
-//         const nota = "Se produjo un error al procesar la solicitud.";
-//         const color = "red";
-//         mostrarInfo(nota, color);
-//     }
-// };
-
 const muestraResultados = async () => {
     openProgressBar();
     try {
@@ -153,25 +71,6 @@ const muestraResultados = async () => {
                             y: {
                                 beginAtZero: true
                             }
-                        },
-                        plugins: {
-                            afterDraw: (chart) => {
-                                console.log('afterDraw function is executed.'); // Mensaje de depuración
-                                const { ctx, chartArea, scales: { y } } = chart;
-                                ctx.save();
-                                ctx.fillStyle = 'black';
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'middle';
-                                data.datasets.forEach(dataset => {
-                                    for (let i = 0; i < dataset.data.length; i++) {
-                                        console.log(i); 
-                                        const model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
-                                        const yScale = y.getPixelForValue(dataset.data[i]);
-                                        ctx.fillText(dataset.data[i], model.x, yScale - 10);
-                                    }
-                                });
-                                ctx.restore();
-                            }
                         }
                     }
                 });
@@ -184,13 +83,113 @@ const muestraResultados = async () => {
             mostrarInfo(nota, color);
         }
     } catch (error) {
-        console.log(error);
         closeProgressBar();
         const nota = "Se produjo un error al procesar la solicitud.";
         const color = "red";
         mostrarInfo(nota, color);
     }
 };
+
+// const muestraResultados = async () => {
+//     openProgressBar();
+//     try {
+//         const form = document.getElementById("formEstadisticas");
+//         const formData = new FormData(form);
+
+//         const options = {
+//             method: 'POST',
+//             headers: {},
+//             body: formData
+//         };
+
+//         const response = await fetch("ver-estadisticas/", options);
+//         const dato = await response.json();
+
+//         if (dato.Message === "Success") {
+//             closeProgressBar();
+
+//             const dataDatos = JSON.parse(dato.Datos);
+
+//             // Obtener el contexto del lienzo
+//             const canvasContainer = document.getElementById('canvas-container');
+
+//             // Limpiar el contenedor de gráficos
+//             canvasContainer.innerHTML = '';
+
+//             // Iterar sobre cada tipo de fruta y crear un gráfico para cada una
+//             Object.keys(dataDatos).forEach(tipoFruta => {
+//                 const labels = dataDatos[tipoFruta].map(entry => entry.Fecha);
+//                 const datos = dataDatos[tipoFruta].map(entry => parseInt(entry.Cantidad));
+
+//                 // Sumar la cantidad de bins
+//                 const totalBins = datos.reduce((acc, curr) => acc + curr, 0);
+
+//                 // Crear el objeto de datos para el gráfico
+//                 const data = {
+//                     labels: labels,
+//                     datasets: [{
+//                         label: `${tipoFruta} (${totalBins} - Bins)`, // Tipo de fruta con la cantidad de bins
+//                         data: datos,
+//                         borderColor: 'blue',
+//                         backgroundColor: 'transparent',
+//                         borderWidth: 2
+//                     }]
+//                 };
+
+//                 // Crear un elemento canvas para el gráfico
+//                 const canvas = document.createElement('canvas');
+//                 canvasContainer.appendChild(canvas);
+
+//                 // Obtener el contexto del lienzo para el gráfico actual
+//                 const ctx = canvas.getContext('2d');
+
+//                 // Crear el gráfico de líneas para esta fruta
+//                 new Chart(ctx, {
+//                     type: 'line',
+//                     data: data,
+//                     options: {
+//                         scales: {
+//                             y: {
+//                                 beginAtZero: true
+//                             }
+//                         },
+//                         plugins: {
+//                             afterDraw: (chart) => {
+//                                 console.log('afterDraw function is executed.'); // Mensaje de depuración
+//                                 const { ctx, chartArea, scales: { y } } = chart;
+//                                 ctx.save();
+//                                 ctx.fillStyle = 'black';
+//                                 ctx.textAlign = 'center';
+//                                 ctx.textBaseline = 'middle';
+//                                 data.datasets.forEach(dataset => {
+//                                     for (let i = 0; i < dataset.data.length; i++) {
+//                                         console.log(i); 
+//                                         const model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
+//                                         const yScale = y.getPixelForValue(dataset.data[i]);
+//                                         ctx.fillText(dataset.data[i], model.x, yScale - 10);
+//                                     }
+//                                 });
+//                                 ctx.restore();
+//                             }
+//                         }
+//                     }
+//                 });
+//             });
+
+//         } else {
+//             closeProgressBar();
+//             const nota = dato.Nota;
+//             const color = "red";
+//             mostrarInfo(nota, color);
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         closeProgressBar();
+//         const nota = "Se produjo un error al procesar la solicitud.";
+//         const color = "red";
+//         mostrarInfo(nota, color);
+//     }
+// };
 
 
 
