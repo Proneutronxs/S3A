@@ -4,6 +4,7 @@ const hasta = document.getElementById('fechaBusquedaHasta');
 
 
 window.addEventListener("load", async () =>{
+    fechaActual();
     cargarSelector();
     cargarSelectorChacra();
 });

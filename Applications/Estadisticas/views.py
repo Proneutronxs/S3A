@@ -38,22 +38,70 @@ def estadisticaCosecha(request):
         user_has_permission = request.user.has_perm('Estadisticas.puede_ver') 
         if user_has_permission: 
             usuario = str(request.user)
-            mes = str(request.POST.get('ComboxMes'))
+            desde = str(request.POST.get('fechaBusquedaDesde'))
+            hasta = str(request.POST.get('fechaBusquedaHasta'))
             especie = str(request.POST.get('ComboxEspecie'))
             variedad = str(request.POST.get('ComboxVariedad'))
             chacra = str(request.POST.get('ComboxChacra'))
-            data_detalle = busqueda(mes,especie,variedad,chacra)
-            if data_detalle:
-                result_dict = {}
-                for cantidad, fecha, fruta in data_detalle:
-                    if fruta not in result_dict:
-                        result_dict[fruta] = []
-                    result_dict[fruta].append({"Cantidad": str(cantidad), "Fecha": fecha})
-                json_data = json.dumps(result_dict)
+            #data_detalle = busqueda(mes,especie,variedad,chacra)
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = """
+                            DECLARE @P_Fecha DATE;
+                            DECLARE @P_Hasta DATE;
+                            DECLARE @P_Especie INT;
+                            DECLARE @P_Variedad INT;
+                            DECLARE @P_Chacra INT;
+                            SET @P_Fecha = %s;
+                            SET @P_Hasta = %s;
+                            SET @P_Especie = %s;
+                            SET @P_Variedad = %s;
+                            SET @P_Chacra = %s;
 
-                return JsonResponse({'Message': 'Success', 'Datos': json_data})
-            else:
-                return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+                            DECLARE @Fechas TABLE (Fecha DATE);
+                            DECLARE @FechaActual DATE = @P_Fecha;
+                            WHILE @FechaActual <= @P_Hasta
+                            BEGIN
+                                INSERT INTO @Fechas (Fecha) VALUES (@FechaActual);
+                                SET @FechaActual = DATEADD(DAY, 1, @FechaActual);
+                            END;
+
+                            SELECT
+                                ISNULL(SUM(CONVERT(INT, L.CantBins)), 0) AS CANTIDAD_BINS,
+                                CONVERT(VARCHAR(5), F.Fecha, 103) AS FECHA,
+                                RTRIM(E.Nombre) AS ESPECIE
+                            FROM
+                                @Fechas F
+                            CROSS JOIN
+                                Especie E
+                            LEFT JOIN
+                                Lote L ON F.Fecha = CONVERT(DATE, L.FechaAlta, 103)
+                                    AND E.IdEspecie = L.IdEspecie
+                                    AND (L.IdVariedad = @P_Variedad OR @P_Variedad IS NULL OR @P_Variedad = '')
+                                    AND (L.IdChacra = @P_Chacra OR @P_Chacra IS NULL OR @P_Chacra = '')
+                            WHERE
+                                (E.IdEspecie = @P_Especie OR @P_Especie IS NULL OR @P_Especie = '')
+                            GROUP BY
+                                F.Fecha, E.Nombre
+                            ORDER BY
+                                F.Fecha;
+
+                        """
+                    cursor.execute(sql,[desde,hasta,especie,variedad,chacra])
+                    results = cursor.fetchall()
+                    if results:
+                        result_dict = {}
+                        for cantidad, fecha, fruta in results:
+                            if fruta not in result_dict:
+                                result_dict[fruta] = []
+                            result_dict[fruta].append({"Cantidad": str(cantidad), "Fecha": fecha})
+                        json_data = json.dumps(result_dict)
+
+                        return JsonResponse({'Message': 'Success', 'Datos': json_data})
+                    else:
+                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+            except Exception as e:
+                insertar_registro_error_sql("ESTADISTICAS","BUSQUEDA","request.user",str(e))
         return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'}) 
     else:
         data = "No se pudo resolver la Petición"

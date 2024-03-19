@@ -36,13 +36,11 @@
                     </li>
                     <form action="" id="formEstadisticas" method="POST" style="margin-top: 20px;">
                         <li class="nav-link" style="width: 100%;">
-                            <select class="selectores" type="checkbox" id="ComboxMes" name="ComboxMes" style="width: 100%;">
-                                <option value="1">ENERO</option>
-                                <option value="2">FEBRERO</option>
-                                <option value="3">MARZO</option>
-                                <option value="4">ABRIL</option>
-                                <option value="5">MAYO</option>
-                            </select>
+                            <input type="date" id="fechaBusquedaDesde" name="fechaBusquedaDesde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
+                        </li>
+
+                        <li class="nav-link" style="width: 100%;">
+                            <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
                         </li>
                         
                         <li class="nav-link">
