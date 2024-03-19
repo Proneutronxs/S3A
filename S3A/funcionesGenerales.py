@@ -2,7 +2,7 @@
 from django.utils import timezone
 from django.db import connections
 from Applications.TresAses.models import *
-from datetime import datetime
+from datetime import datetime, timedelta
 import calendar
 
 
@@ -203,3 +203,14 @@ def obtener_año_actual():
     import datetime
     año_actual = datetime.datetime.now().year
     return str(año_actual)
+
+def obtener_fechas_entre(fecha_inicio, fecha_fin):
+    fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+    fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d')
+    
+    dias_entre_fechas = []
+    while fecha_inicio <= fecha_fin:
+        dias_entre_fechas.append(fecha_inicio.strftime('%Y-%m-%d'))
+        fecha_inicio += timedelta(days=1)
+    
+    return dias_entre_fechas
