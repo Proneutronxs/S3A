@@ -156,6 +156,7 @@ const muestraResultados = async () => {
                         },
                         plugins: {
                             afterDraw: (chart) => {
+                                console.log('afterDraw function is executed.'); // Mensaje de depuración
                                 const { ctx, chartArea, scales: { y } } = chart;
                                 ctx.save();
                                 ctx.fillStyle = 'black';
@@ -163,6 +164,7 @@ const muestraResultados = async () => {
                                 ctx.textBaseline = 'middle';
                                 data.datasets.forEach(dataset => {
                                     for (let i = 0; i < dataset.data.length; i++) {
+                                        console.log(i); 
                                         const model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model;
                                         const yScale = y.getPixelForValue(dataset.data[i]);
                                         ctx.fillText(dataset.data[i], model.x, yScale - 10);
