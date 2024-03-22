@@ -361,7 +361,7 @@ def listadoHorasExtrasEstado(request):
 @csrf_exempt
 def creaExcelHorasMostradas(request):
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('Empaque.puede_ver')
+        user_has_permission = request.user.has_perm('Frio.puede_ver')
         if user_has_permission:
             usuario = str(request.user)
             ###NUEVA
