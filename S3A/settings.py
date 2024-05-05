@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy # type: ignore
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -172,7 +172,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.11',
+#         'HOST': '192.168.0.200',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -183,18 +183,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TresAses_ISISPayroll',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.11',
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     },
-#     'principal': {
-#         'ENGINE': 'sql_server.pyodbc',
-#         'NAME': 'principal',
-#         'USER': 'sa',
-#         'HOST': '192.168.0.11',
+#         'HOST': '192.168.0.200',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -205,7 +194,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'S3A',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.11',
+#         'HOST': '192.168.0.200',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {

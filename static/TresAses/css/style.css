@@ -1019,6 +1019,31 @@ input[type="checkbox"].input-checkbox {
   min-height: 100%;
 }
 
+.popup-agrega {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; /* Ancho completo */
+  height: 100%; /* Altura completa */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+  z-index: 1000; /* Z-index alto para que esté por encima de otros elementos */
+}
+
+
+
+.popup-content-agrega {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff; /* Fondo blanco del pop-up */
+  width: 400px; /* Ancho del pop-up */
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 1001; /* Z-index más alto que el sombreado */
+}
+
 
 
 

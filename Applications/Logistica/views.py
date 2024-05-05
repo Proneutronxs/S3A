@@ -83,7 +83,7 @@ def buscaCentroCostos(codigo,usuario):
             connections['ISISPayroll'].close()
     return lista_json
 
-login_required
+@login_required
 @csrf_exempt
 def mostrarHorasCargadasPorCC(request): ### MUESTRA LA TABLA DE HORAS
     if request.method == 'POST':
@@ -104,7 +104,7 @@ def mostrarHorasCargadasPorCC(request): ### MUESTRA LA TABLA DE HORAS
                                         "TresAses_ISISPayroll.dbo.Empleados INNER JOIN " \
                                         "HorasExtras_Procesadas ON TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = HorasExtras_Procesadas.Legajo ON S3A.dbo.RH_HE_Motivo.IdMotivo = HorasExtras_Procesadas.IdMotivo ON S3A.dbo.RH_HE_Autoriza.IdAutoriza = HorasExtras_Procesadas.Autorizado ON " \
                                         "TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo " \
-                        "WHERE     (TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s) AND (HorasExtras_Procesadas.EstadoEnvia = '3') " \
+                        "WHERE     (TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo = %s) AND (HorasExtras_Procesadas.EstadoEnvia IN (1,3)) " \
                         "ORDER BY LEGAJO, HorasExtras_Procesadas.FechaHoraDesde"
                     cursor.execute(sql, [cc])
                     consulta = cursor.fetchall()

@@ -38,6 +38,7 @@ urlpatterns = [
 
     path('horas-extras/envia/elimina-personal', views.eliminaPersonalProcesado, name='envia_elimina_personal_procesado'),
 
+    path('horas-extras/envia/agrega-hora', views.agregaHoraExtra, name='envia_agrega_hora'),
 
     ##### VER HORAS EXTRAS ######
     path('horas-extras/ver', views.verHorasExtras, name='ver_horas_extras'),

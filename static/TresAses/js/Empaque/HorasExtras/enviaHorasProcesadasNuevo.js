@@ -2,6 +2,9 @@ const ComboxCentrosCostos = document.getElementById("ComboxCentrosCostos");
 
 const fechaEnvia = document.getElementById('fechaBusqueda');
 
+const pop_agrega = document.getElementById('pop-agrega');
+
+
 window.addEventListener("load", async () =>{
     await listarCentrosCostos();
     fechaActual();
@@ -62,9 +65,14 @@ const Listar_Horas_Procesadas = async () => {
 
         const response = await fetch("envia/lista-procesadas", options);
         const data = await response.json();
-        if(data.Message=="Success"){
+        if (data.Message == "Success") {
             let listado = ``;
-            data.Datos.forEach((datos) => {//${datos.Legajo}
+            data.Datos.forEach((datos) => {
+                if (datos.DiaNombre === "SÁBADO") {
+                    var displayStyle = 'inline';
+                } else {
+                    var displayStyle = 'none';
+                }
                 listado += `
                 <div class="cardHora">
                     <div class="leftDiv">
@@ -74,6 +82,7 @@ const Listar_Horas_Procesadas = async () => {
                         </div>
                         <div class="horas-item">
                             <strong>TURNO: </strong>${datos.Turno} 
+                            <strong style="margin-left: 7rem;" >HORAS TURNO: </strong>${datos.HorasTurno} 
                         </div>
                         <div class="horas-item">
                             <strong>FICHADA: </strong>${datos.Fichada}
@@ -82,35 +91,37 @@ const Listar_Horas_Procesadas = async () => {
                     <div class="rightDiv">
                         <div class="horas-item">
                             <strong>DÍA: </strong> ${datos.Dia}
+                            <strong id="strongElement" style="margin-left: 75px; display: ${displayStyle};"></strong>
+                            <button id="boton" onClick="agregaHora(${datos.ID})" class="btn-submit botones bx material-symbols-outlined icon" type="button" style="display: ${displayStyle};">More_time</button>
                         </div>
                         <div class="horas-item">
                             <label class="letras" for="cantHoras">Cant. Horas Extras:</label>
                             <input type="number" class="input-number" step="0.5" id="cantHoras" name="cantHoras" value="${datos.CantHoras}" />
                             <select class="selectores" type="checkbox" id="tipoHoraExtra" name="tipoHoraExtra">
-                            <option value="A" ${datos.Tipo === 'A' ? 'selected' : ''}>A</option>
-                            <option value="50" ${datos.Tipo === '50' ? 'selected' : ''}>50</option>
-                            <option value="100" ${datos.Tipo === '100' ? 'selected' : ''}>100</option>
+                                <option value="A" ${datos.Tipo === 'A' ? 'selected' : ''}>A</option>
+                                <option value="50" ${datos.Tipo === '50' ? 'selected' : ''}>50</option>
+                                <option value="100" ${datos.Tipo === '100' ? 'selected' : ''}>100</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                `
+                `;
             });
             document.getElementById('ContenidoCardHorasExtras').innerHTML = listado;
             closeProgressBar();
-        }else {
+        } else {
             document.getElementById('ContenidoCardHorasExtras').innerHTML = ``;
             closeProgressBar();
             var nota = data.Nota
             var color = "red";
-            mostrarInfo(nota,color);
+            mostrarInfo(nota, color);
         }
     } catch (error) {
         console.log(error)
         closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud.";
         var color = "red";
-        mostrarInfo(nota,color); 
+        mostrarInfo(nota, color);
     }
 };
 
@@ -270,9 +281,63 @@ const elimina_personal_autorizado = async () => {
 //     }
 // };
 
+const enviaHoraAgregada = async () => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        
+        // Agregar campos manualmente al FormData
+        formData.append('cantHorasAgrega', document.getElementById('cantHorasAgrega').value);
+        formData.append('tipoHoraExtraAgrega', document.getElementById('tipoHoraExtraAgrega').value);
+        formData.append('idHoraAgrega', document.getElementById('idHoraAgrega').value);
+
+        const options = {
+            method: 'POST',
+            headers: {
+                // Puedes agregar encabezados personalizados si es necesario
+            },
+            body: formData
+        };
+        const response = await fetch("envia/agrega-hora", options);
+        const data = await response.json();
+        if(data.Message=="Success"){
 
 
 
+            closeProgressBar();
+            cierraAgrega();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color);
+            Listar_Horas_Procesadas();
+        }else {
+            cierraAgrega();
+            closeProgressBar();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud.";
+        var color = "red";
+        mostrarInfo(nota,color);
+    }
+}
+
+
+function agregaHora(id){
+    let idHora = ``;
+    idHora += `<input type="hidden" id="idHoraAgrega" name="idHoraAgrega" value="${id}">`;
+    document.getElementById('itemIdHora').innerHTML = idHora;
+
+    pop_agrega.style.display = 'block';
+}
+
+
+function cierraAgrega(){
+    pop_agrega.style.display = 'none';
+}
 
 
 

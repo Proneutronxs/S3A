@@ -287,7 +287,8 @@ def eliminaHorasSeleccionadas(request): ### ELIMINA LAS HORAS SELECCIONADAS
         return JsonResponse({'Message': 'Error', 'Nota': data})
    
 #### PARTE NUEVA
-    
+
+@login_required    
 @csrf_exempt
 def personal_por_Ccostos(request):
     if request.method == 'POST':
@@ -322,7 +323,8 @@ def personal_por_Ccostos(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+
+@login_required   
 @csrf_exempt
 def guardaPersonalTildado(request):
     if request.method == 'POST':
@@ -370,7 +372,8 @@ def guardaPersonalTildado(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+
+@login_required   
 @csrf_exempt
 def muestraPersonalAutorizado(request):
     if request.method == 'POST':
@@ -409,6 +412,7 @@ def muestraPersonalAutorizado(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@login_required
 @csrf_exempt
 def eliminaPersonalTildado(request):
     if request.method == 'POST':
@@ -454,7 +458,7 @@ def es_fecha_pasada(fecha_str):
     return fecha < fecha_actual
 
 ###HORAS PROCESADAS #####
-
+@login_required
 @csrf_exempt
 def listaHorasProcesadas(request):
     if request.method == 'POST':
@@ -481,13 +485,14 @@ def listaHorasProcesadas(request):
                                                         Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
                                                         (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
                                                         CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'Empaque' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'Comercio' ELSE '' END AS SINDICATO,
-                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO
+                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, Listado_Turnos_Fichadas_Procesadas.Dia AS DIA, 
+                                                        CASE WHEN Listado_Turnos_Fichadas_Procesadas.HorasTurno IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.HorasTurno, 108) END AS HORA_TURNO
                                 FROM            HorasExtras_Procesadas INNER JOIN
                                                         TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                                         Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') AND (TRY_CONVERT(DATE, Listado_Turnos_Fichadas_Procesadas.Fecha) = TRY_CONVERT(DATE, %s))
                                             AND (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = %s)
-                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha
+                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
                             """
                         cursor.execute(sql, [fecha,cc])
                         results = cursor.fetchall()
@@ -498,14 +503,16 @@ def listaHorasProcesadas(request):
                                 legajo = str(row[1])
                                 nombre = str(row[2])
                                 cantidaHoras = str(row[3]).replace(',','.')
-                                dia = str(row[4])
+                                diaFecha = str(row[4])
                                 turno = str(row[5]) + ' - ' + str(row[6]) + ' - ' + str(row[7]) + ' - ' + str(row[8]) + ' - ' + str(row[9]) + ' - ' + str(row[10])
                                 fichada = str(row[11]) + ' - ' + str(row[12]) + ' - ' + str(row[13]) + ' - ' + str(row[14]) + ' - ' + str(row[15]) + ' - ' + str(row[16])
                                 cc = str(row[17])
                                 sindicato = str(row[18])
                                 tipoHora = str(row[19])
+                                diaNombre = str(row[20])
+                                horaturno = str(row[21])
                                 datos = {'ID':idHora, 'Legajo':legajo, 'Nombre':nombre, 'Turno':turno, 'Fichada':fichada,
-                                        'CantHoras':cantidaHoras, 'Dia': dia, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora}
+                                        'CantHoras':cantidaHoras, 'Dia': diaFecha, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora, 'DiaNombre': diaNombre, 'HorasTurno': horaTurno}
                                 data.append(datos)
                             return JsonResponse({'Message': 'Success', 'Datos': data})
                         else:
@@ -534,12 +541,13 @@ def listaHorasProcesadas(request):
                                                         Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
                                                         (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
                                                         CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
-                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO
+                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, Listado_Turnos_Fichadas_Procesadas.Dia AS DIA, 
+                                                        CASE WHEN Listado_Turnos_Fichadas_Procesadas.HorasTurno IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.HorasTurno, 108) END AS HORA_TURNO
                                 FROM            HorasExtras_Procesadas INNER JOIN
                                                         TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                                         Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4')
-                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha
+                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
 
                             """
                         cursor.execute(sql)
@@ -551,14 +559,16 @@ def listaHorasProcesadas(request):
                                 legajo = str(row[1])
                                 nombre = str(row[2])
                                 cantidaHoras = str(row[3]).replace(',','.')
-                                dia = str(row[4])
+                                diaFecha = str(row[4])
                                 turno = str(row[5]) + ' - ' + str(row[6]) + ' - ' + str(row[7]) + ' - ' + str(row[8]) + ' - ' + str(row[9]) + ' - ' + str(row[10])
                                 fichada = str(row[11]) + ' - ' + str(row[12]) + ' - ' + str(row[13]) + ' - ' + str(row[14]) + ' - ' + str(row[15]) + ' - ' + str(row[16])
                                 cc = str(row[17])
                                 sindicato = str(row[18])
                                 tipoHora = str(row[19])
+                                diaNombre = str(row[20])
+                                horaTurno = str(row[21])
                                 datos = {'ID':idHora, 'Legajo':legajo, 'Nombre':nombre, 'Turno':turno, 'Fichada':fichada,
-                                        'CantHoras':cantidaHoras, 'Dia': dia, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora}
+                                        'CantHoras':cantidaHoras, 'Dia': diaFecha, 'CC':cc, 'Sindicato':sindicato, 'Tipo':tipoHora, 'DiaNombre': diaNombre, 'HorasTurno': horaTurno}
                                 data.append(datos)
 
                             return JsonResponse({'Message': 'Success', 'Datos': data})
@@ -575,6 +585,7 @@ def listaHorasProcesadas(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@login_required
 @csrf_exempt
 def transfierePersonalTildado(request):
     if request.method == 'POST':
@@ -662,6 +673,7 @@ def actualizaHoraNueva(ID_HEP,Tipo,Cant):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
+@login_required
 @csrf_exempt
 def eliminaPersonalProcesado(request):
     if request.method == 'POST':
@@ -692,6 +704,53 @@ def eliminaPersonalProcesado(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+@login_required
+@csrf_exempt
+def agregaHoraExtra(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Empaque.puede_autorizar')
+        if user_has_permission:
+            ID_HEP = request.POST.get('idHoraAgrega')
+            Cantidad = request.POST.get('cantHorasAgrega')
+            Tipo = request.POST.get('tipoHoraExtraAgrega')
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            DECLARE @P_IdHora INT;
+                            DECLARE @P_Cantidad NUMERIC(5,2);
+                            DECLARE @P_Tipo VARCHAR(3);
+
+                            SET @P_IdHora = %s;
+                            SET @P_Cantidad = %s;
+                            SET @P_Tipo = %s;
+
+                            INSERT INTO HorasExtras_Procesadas (Legajo,FechaHoraDesde,FechaHoraHasta,IdMotivo,DescripcionMotivo,Autorizado,TipoHoraExtra,CantidadHoras,ID_LTFP,EstadoEnvia)
+                                VALUES ((SELECT Legajo FROM HorasExtras_Procesadas WHERE ID_HEP = @P_IdHora),(SELECT FechaHoraDesde FROM HorasExtras_Procesadas WHERE ID_HEP = @P_IdHora),
+                                (SELECT FechaHoraHasta FROM HorasExtras_Procesadas WHERE ID_HEP = @P_IdHora),'17','AGREGADO MANUAL','100', @P_Tipo,@P_Cantidad,(SELECT ID_LTFP FROM HorasExtras_Procesadas WHERE ID_HEP = @P_IdHora),'4')
+                            
+                        """
+                    cursor.execute(sql, [ID_HEP,Cantidad,Tipo])
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'Se agregaron las horas.'})
+                    else:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'Ocurrió un error al intentar procesar la solicitud.'})  
+            except Exception as e:
+                error = str(e)
+                print(error)
+                insertar_registro_error_sql("EMPAQUE","AGREGA HORA EXTRA",str(request.user),error)
+                return JsonResponse({'Message': 'Not Found', 'Nota': 'Ocurrió un error al intentar procesar la solicitud: ' + error})  
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
 ########## FUNCION PARA PEDIR Y SOLICITAR PERMISOS ################
 
 def funcionGeneralPermisos(request):
