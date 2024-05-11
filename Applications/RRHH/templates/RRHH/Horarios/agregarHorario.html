@@ -1,0 +1,132 @@
+{% extends "RRHH/Horarios/horarios.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{%static 'TresAses/css/chosen.min.css' %}">
+
+<div class="contenedor">
+    <div class="content-divs">
+        <div class="div-2">
+            <select class="chosen-select chosen-container-custom2" multiple data-placeholder="Seleccione Centro Costo...">
+                <option value="a">MARIANA</option>
+                <option value="b">DAIANA</option>
+                <option value="c">JAZMIN</option>
+                <option value="d">GALLARDO</option>
+                <option value="a">JOSUE</option>
+                <option value="b">RUBEN</option>
+                <option value="c">CHAMBI</option>
+                <option value="d">MILAGROS</option>
+                <option value="a">JESSICA</option>
+            </select>
+        </div>
+        <div class="div-2">
+            <select class="chosen-select chosen-container-custom2" multiple data-placeholder="Seleccione Personal..">
+                <option value="a">MARIANA</option>
+                <option value="b">DAIANA</option>
+                <option value="c">JAZMIN</option>
+                <option value="d">GALLARDO</option>
+                <option value="a">JOSUE</option>
+                <option value="b">RUBEN</option>
+                <option value="c">CHAMBI</option>
+                <option value="d">MILAGROS</option>
+                <option value="a">JESSICA</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+  
+<script src="{%static 'TresAses/js/Librerias/jquery-3.6.0.min.js' %}"></script>
+<script src="{%static 'TresAses/js/Librerias/chosen.jquery.min.js' %}"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal-overlay">
+    <div class="modal-container">
+        <div class="demo-container">
+        <div class="progress-bar">
+            <div class="progress-bar-value"></div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="popup-agrega" style="display: none;" id="pop-agrega">
+    <div class="popup-content-agrega">
+        <p>Agregar Hora sobre el día.</p> <br>
+        <div id="itemIdHora">
+
+        </div>
+        <div class="horas-item">
+            <label class="letras" for="cantHoras">Cant. Horas:</label>
+            <input type="number" class="input-number" step="0.5" id="cantHorasAgrega" name="cantHorasAgrega" value="0"/>
+            <select class="selectores" type="checkbox" id="tipoHoraExtraAgrega" name="tipoHoraExtraAgrega">
+                <option value="A">A</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <button onclick="cierraAgrega();" class="btn-submit botones">Cancelar</button>
+        <button onclick="enviaHoraAgregada();" id="confirmBtn" class="btn-submit botones">Confirmar</button>
+    </div>
+</div>
+
+
+
+<div id="popup" class="popup">
+    <span class="close" id="closePopup">&times;</span>
+    <div id="mensaje-pop-up">
+
+    </div>
+</div>
+
+
+
+<script >$(document).ready(function(){
+    $('.chosen-select').chosen();
+});</script>
+{% endblock %}

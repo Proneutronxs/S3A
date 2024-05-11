@@ -282,7 +282,7 @@ a:hover{
 
 .letras{
   color: black;
-  font-size: 14px;
+  font-size: 14;
   font-weight: bold;
 }
 
@@ -409,18 +409,18 @@ input[type="checkbox"].input-checkbox {
 
 
 
-.text.letras {
+.text .letras {
   display: flex;
   align-items: center; /* Alinea verticalmente los elementos */
 }
 
-.text.letras .row {
+.text .letras .row {
   display: flex;
   align-items: center; /* Alinea verticalmente los elementos */
   gap: 4px; /* Espacio entre los elementos */
 }
 
-.text.letras .row h4 {
+.text .letras .row h4 {
   margin: 0; /* Elimina el margen por defecto del h4 */
   margin-right: 20px; /* Agrega margen a la derecha del h4 */
 }
@@ -632,10 +632,12 @@ input[type="checkbox"].input-checkbox {
   flex-direction: column;
   color: white;
   height: 100%;
-  margin: 0; /* Asegurarse de que no haya márgenes */
-  padding: 0; /* Asegurarse de que no haya relleno */
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
+
+
 
 
 
@@ -1052,7 +1054,70 @@ input[type="checkbox"].input-checkbox {
 
 
 
+/* .chosen-container-custom1 {
+  width: 7rem;
+  font-size: 14px;
+} */
 
+.chosen-container-custom2 {
+  width: 25rem;
+  font-size: 2rem;
+}
+
+.chosen-container .chosen-drop {
+  width: 25rem;
+  max-width: 25rem;
+  border: 1px solid #a72626; 
+}
+
+/* .chosen-select {
+  font-size: 2rem;
+} */
+
+.chosen-container-multi .chosen-choices  {
+  height: auto; 
+  width: 25rem;
+  max-width: 25rem;
+  max-height: 8rem;
+  overflow-y: auto;
+}   
+
+.div-2{
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  margin-left: 2rem;
+}
+
+.content-divs{
+  display: flex;
+  align-items: center;
+  
+}
+
+.chosen-container-multi .chosen-choices li.search-choice {
+  color: black;
+  border: 1px solid #a72626; 
+  font-size: 14;
+  width: auto;
+  border-radius: 5px;
+  height: 20px;
+  background-color: #FFF;
+}
+
+
+
+.chosen-container-multi .chosen-choices li.search-choice span {
+  word-wrap: break-word;
+  font-size: 14;
+}
+
+
+
+/* .chosen-container-single .chosen-single {
+width: 300px;
+border: 1px solid #a72626; 
+font-size: 8px;
+} */
 
 
 

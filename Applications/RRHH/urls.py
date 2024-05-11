@@ -9,6 +9,10 @@ urlpatterns = [
     ### REDIRECCIÓN A HORAS EXTRAS
     path('horas-extras/', views.horasExtras, name="horasExtras"),
 
+    path('horarios/', views.Horarios, name="Horarios"),
+
+    path('horarios/agregar', views.agregarHorarios, name="agrega_horarios"),
+
     ### REDIRECCIÓN A HORAS EXTRAS
     path('horas-extras/transferencia', views.transferenciaHorasExtras, name="horasExtrasTrasnferir"),
 

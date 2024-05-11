@@ -1,0 +1,78 @@
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="{%static 'TresAses/img/TA.ico' %}" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{%static 'TresAses/css/style.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <title>Tres Ases</title> 
+</head>
+<body>
+    <nav class="sidebar">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="{%static 'TresAses/img/TA.png' %}" alt="">
+                </span>
+
+                <div class="text logo-text">
+                    <span class="name"></span>
+                    <span class="profession"> <b>Tres Ases</b> </span>
+                </div>
+            </div>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="{% url 'tresases' %}">
+                            <i class='bx material-symbols-outlined icon'>home</i>
+                            <span class="text nav-text">Inicio</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="{% url 'agrega_horarios' %}">
+                            <i class='bx material-symbols-outlined icon' >add_circle</i>
+                            <span class="text nav-text">Agregar</span>
+                        </a>
+                    </li>
+
+                    <!-- <li class="nav-link">
+                        <a href="{% url 'horasExtrasTrasnferir' %}">
+                            <i class='bx material-symbols-outlined icon' >move_up</i>
+                            <span class="text nav-text">Transferir Hs.</span>
+                        </a>
+                    </li> -->
+                </ul>
+            </div> 
+
+            <div class="bottom-content">
+                <li class="">
+                    <a href="{% url 'logout' %}">
+                        <i class='bx material-symbols-outlined icon' >logout</i>
+                        <span class="text"><b>{{user.username}}</b></span>
+                    </a>
+                </li>                
+            </div>
+        </div>
+    </nav>
+    <section class="home">
+        <div class="container">   
+            <div class="encabezado" style="background-color: #a72626">
+                <div class="text" style="font-size: 20px;">RECURSOS HUMANOS - HORARIOS</div>
+            </div>
+            {% block content %}         
+                
+            {% endblock %}
+        </div>
+    </section>
+
+    <!-- <script src="script.js"></script> -->
+    
+</body>
+</html>

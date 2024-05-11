@@ -1,4 +1,4 @@
-from django.shortcuts import render # type: ignore
+from django.shortcuts import render
 from S3A.funcionesGenerales import *
 from django.contrib.auth.decorators import login_required # type: ignore
 from django.views.decorators.csrf import csrf_exempt # type: ignore
@@ -23,6 +23,15 @@ def funcionGeneralPermisos(request):
 def RRHH(request):
     return render (request, 'RRHH/rrhh.html')
 
+@login_required
+def Horarios(request):
+    return render (request, 'RRHH/Horarios/horarios.html')
+
+@login_required
+def agregarHorarios(request):
+    return render (request, 'RRHH/Horarios/agregarHorario.html')
+
+
 ### RENDERIZADO DE HORAS EXTRAS
 @login_required
 def horasExtras(request):
@@ -32,6 +41,8 @@ def horasExtras(request):
 @login_required
 def transferenciaHorasExtras(request):
     return render (request, 'RRHH/HorasExtras/transferirhe.html')
+
+
 
 def obtener_fecha_hora_actual_con_milisegundos():
     now = datetime.datetime.now()

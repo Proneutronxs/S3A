@@ -150,12 +150,14 @@ const verHorasExtras_transferencia_por_cc_Frio = async () => {
                     <input class="input-checkbox-hs checkbox" type="checkbox" name="idCheck" value="${datos.ID}">
                 </td>
                 <td>
-                    <select class="selectores tipo-hora-extra" style="max-width: 60px;" name="tipoHoraExtra">
+                    <select class="selectores tipo-hora-extra" style="max-width: 84px;" name="tipoHoraExtra">
+                        <option value="AC-50">AC 50</option>
+                        <option value="AC-100">AC 100</option>
                         <option value="A"${datos.tipo === 'A' ? 'selected' : ''}>A</option>
                         <option value="50"${datos.tipo === '50' ? 'selected' : ''}>50</option>
                         <option value="100"${datos.tipo === '100' ? 'selected' : ''}>100</option>
                         <option value="N"${datos.tipo === 'N' ? 'selected' : ''}>N</option>
-                    </select>
+                    </select
                 </td>
                 <td>${datos.legajo}</td>
                 <td>${datos.nombres}</td>
