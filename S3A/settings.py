@@ -172,7 +172,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.200',
+#         'HOST': '192.168.0.240',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -183,7 +183,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TresAses_ISISPayroll',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.200',
+#         'HOST': '192.168.0.240',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -194,7 +194,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'S3A',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.200',
+#         'HOST': '192.168.0.240',
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {

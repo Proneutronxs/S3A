@@ -210,6 +210,8 @@ def autorizaHorasCargadas(request): ### INSERTA LAS HORAS SELECCIONADAS
             checkboxes_tildados = request.POST.getlist('idCheck')
             horas = request.POST.getlist('cantHoras')
             tipo = request.POST.getlist('tipoHoraExtra')
+
+           
             resultados = []
             importe = "0"
             pagada = "N"
