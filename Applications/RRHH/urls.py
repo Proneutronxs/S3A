@@ -30,7 +30,18 @@ urlpatterns = [
 
     ### URL CARGA COMBOX POR LEGAJO
     path('horas-extras/transferencia/cargar-combox-legajos', views.cargaLegajos, name="cargaComboxLegajos"),
+
     ### URL ELIMINAHORAS EXTRAS
     path('horas-extras/transferencia/elimina/listado-horas', views.eliminaHorasCargadas, name="eliminaHorasCargadas"),
+
+
+
+    #### ARCHIVOS A EXPORTAR ####
+
+    path('archivos/', views.Archivos, name="archivos"),
+
+    path('archivos/ver/listado-horas/', views.mostrarHorasArchivo, name="archivos_mostrar_horas"),
+
+    path('archivos/descarga-excel-he/', views.CreaExcelISIS, name="archivos_excel_horas"),
 
 ]

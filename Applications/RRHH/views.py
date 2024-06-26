@@ -3,9 +3,11 @@ from S3A.funcionesGenerales import *
 from django.contrib.auth.decorators import login_required # type: ignore
 from django.views.decorators.csrf import csrf_exempt # type: ignore
 import datetime 
-
+import openpyxl
+from openpyxl.styles import Protection
+from io import BytesIO
 from django.db import connections # type: ignore
-from django.http import JsonResponse # type: ignore
+from django.http import JsonResponse, HttpResponse # type: ignore
 
 def funcionGeneralPermisos(request):
     if request.method == 'POST':
@@ -31,6 +33,9 @@ def Horarios(request):
 def agregarHorarios(request):
     return render (request, 'RRHH/Horarios/agregarHorario.html')
 
+@login_required
+def Archivos(request):
+    return render (request, 'RRHH/Archivos/archivos.html')
 
 ### RENDERIZADO DE HORAS EXTRAS
 @login_required
@@ -476,10 +481,333 @@ def eliminaHorasCargadas(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCION
 
 
 
+@login_required
+@csrf_exempt
+def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONADAS (REQUIERE PERMISOS delete)
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('RRHH.puede_ver')
+        if user_has_permission:
+            desde = request.POST.get('Inicio')
+            hasta = request.POST.get('Final')
+            legajos = request.POST.get('Legajo') or '0'
+            values = [desde,hasta,legajos]
+            Horas = []
+            Nombres = [{'Legajo': '0', 'Nombre': 'TODOS'}]
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = """  
+                        DECLARE @@Inicio DATE;
+                        DECLARE @@Final DATE;
+                        DECLARE @@Legajo INT;
+                        SET @@Inicio = %s;
+                        SET @@Final = %s;
+                        SET @@Legajo = %s;
+
+                        SELECT 
+                            RH_HE_Horas_Extras.IdLegajo AS LEGAJO, 
+                            CASE 
+                                WHEN ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) = 0 
+                                THEN '-' 
+                                ELSE CONVERT(VARCHAR, ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2)) 
+                            END AS HORAS_50,
+                            CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = RH_HE_Horas_Extras.IdLegajo) WHEN '10' THEN '534' WHEN '9' THEN '630' WHEN '2' THEN '760'
+                            WHEN '4' THEN '825' WHEN '11' THEN '882' ELSE '-' END AS COD_50,
+                            CASE 
+                                WHEN ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) = 0 
+                                THEN '-' 
+                                ELSE CONVERT(VARCHAR, ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2)) 
+                            END AS HORAS_100,
+                            CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = RH_HE_Horas_Extras.IdLegajo) WHEN '10' THEN '536' WHEN '9' THEN '635' WHEN '2' THEN '765'
+                            WHEN '4' THEN '820' WHEN '11' THEN '884' ELSE '-' END AS COD_100,
+                            CASE 
+                                WHEN ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'S' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) = 0 
+                                THEN '-' 
+                                ELSE CONVERT(VARCHAR, ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'S' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2)) 
+                            END AS HORAS_S,
+                            CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = RH_HE_Horas_Extras.IdLegajo) WHEN '10' THEN '532' ELSE '-' END AS COD_S,
+                            CASE 
+                                WHEN ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) = 0 
+                                THEN '-' 
+                                ELSE CONVERT(VARCHAR, ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2)) 
+                            END AS HORAS_AC_50,
+                            CASE 
+                                WHEN ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) = 0 
+                                THEN '-' 
+                                ELSE CONVERT(VARCHAR, ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2)) 
+                            END AS HORAS_AC_100,
+                            (SELECT CASE Sindicatos.DescrSindicato WHEN NULL THEN 'SIN SINDICATO **' ELSE Sindicatos.DescrSindicato END
+                                FROM   TresAses_ISISPayroll.dbo.Empleados INNER JOIN
+                                            TresAses_ISISPayroll.dbo.Sindicatos ON Empleados.Regis_Sin = Sindicatos.Regis_Sin
+                                WHERE (Empleados.CodEmpleado = RH_HE_Horas_Extras.IdLegajo)) AS SINDICATO,
+                            (SELECT (RTRIM(RH_Legajo.Apellidos) + ' ' + RTRIM(RH_Legajo.Nombres)) FROM RH_Legajo WHERE RH_Legajo.IdLegajo = RH_HE_Horas_Extras.IdLegajo) AS NOMBRE,
+                            (SELECT        CentrosCostos.AbrevCtroCosto
+                                    FROM            TresAses_ISISPayroll.dbo.Empleados INNER JOIN
+                                                            TresAses_ISISPayroll.dbo.CentrosCostos ON Empleados.Regis_CCo = CentrosCostos.Regis_CCo
+                                    WHERE        (Empleados.CodEmpleado = RH_HE_Horas_Extras.IdLegajo)) AS CENTRO,RH_Legajo.Apellidos
+                        FROM 
+                            RH_HE_Horas_Extras INNER JOIN
+                            RH_Legajo ON RH_HE_Horas_Extras.IdLegajo = RH_Legajo.IdLegajo
+                        WHERE 
+                            CONVERT(DATE, FechaDesde) >= @@Inicio
+                            AND CONVERT(DATE, FechaHasta) <= @@Final
+                            AND RTRIM(TipoHoraExtra) IN ('50', '100', 'S', 'AC-50', 'AC-100')
+                            AND ((SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = RH_HE_Horas_Extras.IdLegajo) NOT IN ('8'))
+                            AND (@@Legajo = '0' OR @@Legajo = RH_HE_Horas_Extras.IdLegajo)
+                        GROUP BY 
+                            RH_HE_Horas_Extras.IdLegajo,RH_Legajo.Apellidos
+                        ORDER BY 
+                            RH_Legajo.Apellidos;
+                    """
+                    cursor.execute(sql, values)
+                    results = cursor.fetchall()
+                    if results:
+                        for row in results:
+                            legajo = str(row[0])
+                            h_50 = str(row[1])
+                            h_100 = str(row[3])
+                            h_s = str(row[5])
+                            ac_50 = str(row[7])
+                            ac_100 = str(row[8])
+                            sindicato = str(row[9])
+                            nombre = str(row[10])
+                            abrev = str(row[11])
+                            datos = {'Legajo': legajo, 'Nombre': nombre, 'Abrev': abrev, 
+                                     'Horas50': h_50, 'Horas100': h_100, 'HorasS': h_s, 
+                                     'AC50': ac_50, 'AC100': ac_100, 'Sindicato':sindicato}
+                            dato = {'Legajo': legajo, 'Nombre': legajo + ' - ' + nombre}
+                            Horas.append(datos)
+                            if dato not in Nombres:
+                                Nombres.append(dato)
+                        texto = ''
+                        if retornaInicioFinalExcel() != '0':
+                            inicio, final = retornaInicioFinalExcel()
+                            fechaUno = formatear_fecha(inicio)
+                            fechaDos = formatear_fecha(final)
+                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
+                        return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
+                    else:
+                        texto = ''
+                        if retornaInicioFinalExcel() != '0':
+                            inicio, final = retornaInicioFinalExcel()
+                            fechaUno = formatear_fecha(inicio)
+                            fechaDos = formatear_fecha(final)
+                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
+                        data = "No se encontraron horas extras."
+                        return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
+
+            except Exception as e:
+                insertar_registro_error_sql("RRHH","mostrarHorasArchivo",str(request.user).upper(),str(e))
+                return JsonResponse ({'Message': 'Not Found', 'Nota': 'Hubo un error al intentar resolver la petición. ' + str(e) })
+            finally:
+                cursor.close()
+                connections['S3A'].close()
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 
+def retornaInicioFinalExcel():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                SELECT 
+                    CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
+                    CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
+                FROM 
+                    Parametros_Aplicativo
+                WHERE 
+                    Codigo = 'EXCEL-ISIS-HE';
+            """
+            cursor.execute(sql)
+            results = cursor.fetchone()
+            if results:
+                inicio = str(results[0])
+                final = str(results[1])
+                return inicio,final
+            else:
+                return '0'
+    except Exception as e:
+        insertar_registro_error_sql("RRHH","RETORNA INICIO FINAL","request.user",str(e))
+        return '0'
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+
+##CAMBIAR CONSULTA
+# SELECT 
+#     CONVERT(VARCHAR, YEAR(DATEADD(MONTH, -1, GETDATE()))) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(DATEADD(MONTH, -1, GETDATE()))), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
+#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
+# FROM 
+#     Parametros_Aplicativo
+# WHERE 
+#     Codigo = 'EXCEL-ISIS-HE';
 
 
 
+def calcular_porcentajes(numero): 
+    diez_por_ciento = round(numero * 0.10, 2)
+    noventa_por_ciento = round(numero * 0.90, 2)
+    return diez_por_ciento, noventa_por_ciento
 
+
+def traeHorasExtras(): ### COLUMNA 0=LEGAJO
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = """
+                DECLARE @@Inicio DATE;
+                DECLARE @@Final DATE;
+                SET @@Inicio = %s;
+                SET @@Final = %s;
+                SELECT 
+                    IdLegajo AS LEGAJO, 
+                    ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
+                    CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = IdLegajo) WHEN '10' THEN '534' WHEN '9' THEN '630' WHEN '2' THEN '760'
+                    WHEN '4' THEN '825' WHEN '11' THEN '882' ELSE '-' END AS COD_50,
+                    ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_100,
+                    CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = IdLegajo) WHEN '10' THEN '536' WHEN '9' THEN '635' WHEN '2' THEN '765'
+                    WHEN '4' THEN '820' WHEN '11' THEN '884' ELSE '-' END AS COD_100,
+                    ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'S' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_S,
+                    CASE (SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = IdLegajo) WHEN '10' THEN '532' ELSE '-' END AS COD_S,
+                    ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_AC_50,
+                    ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = 'AC-100' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_AC_100,
+                    (SELECT CASE Sindicatos.DescrSindicato WHEN NULL THEN 'SIN SINDICATO **' ELSE Sindicatos.DescrSindicato END
+                        FROM   TresAses_ISISPayroll.dbo.Empleados INNER JOIN
+                                    TresAses_ISISPayroll.dbo.Sindicatos ON Empleados.Regis_Sin = Sindicatos.Regis_Sin
+                        WHERE (Empleados.CodEmpleado = IdLegajo)) AS SINDICATO,
+                    (SELECT (RTRIM(RH_Legajo.Apellidos) + ' ' + RTRIM(RH_Legajo.Nombres)) FROM RH_Legajo WHERE RH_Legajo.IdLegajo = RH_HE_Horas_Extras.IdLegajo) AS NOMBRE
+                FROM 
+                    RH_HE_Horas_Extras
+                WHERE 
+                    CONVERT(DATE, FechaDesde) >= @@Inicio
+                    AND CONVERT(DATE, FechaHasta) <= @@Final
+                    AND RTRIM(TipoHoraExtra) IN ('50', '100', 'S', 'AC-50', 'AC-100')
+                    AND ((SELECT Regis_Sin FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = IdLegajo) NOT IN ('8'))
+                    --AND IdLegajo IN ('59510','2278', '47087','52026','54965')
+                GROUP BY 
+                    IdLegajo
+                ORDER BY 
+                    IdLegajo;
+            """
+            inicio,final = retornaInicioFinalExcel()
+            cursor.execute(sql,[inicio,final])
+            results = cursor.fetchall()
+            data = []
+            if results:
+                for row in results:
+                    Legajo = str(row[0])
+                    Sindicato = str(row[9])
+                    Hora_50 = ''
+                    Concepto_50 = ''
+                    Hora_100 = ''
+                    Concepto_100 = ''
+                    Acuerdo_50 = str(row[7])
+                    Acuerdo_100 = str(row[8])
+                    Hora_50 = row[1]
+                    Concepto_50 = str(row[2])
+                    Hora_100 = row[3]
+                    Concepto_100 = str(row[4])
+                    Float_50 = float(row[7])
+                    Float_100 = float(row[8])
+
+                    if Sindicato == 'FRIGORIFICO':
+                        if Acuerdo_100 != '0.0' or Acuerdo_50 != '0.0':
+                            if Float_50 >= 6:
+                                hora_10_50, hora_90_50 = calcular_porcentajes(Float_50)
+                                datos = {"LEGAJO": Legajo, "HORAS": str(hora_10_50), "CONCEPTO": Concepto_50}
+                                data.append(datos)
+                            else:
+                                if Acuerdo_50 != '0.0':
+                                    datos = {"LEGAJO": Legajo, "HORAS": Acuerdo_50, "CONCEPTO": Concepto_50}
+                                    data.append(datos)
+                            if Float_100 >= 6:
+                                hora_10_100, hora_90_100 = calcular_porcentajes(Float_100)
+                                datos = {"LEGAJO": Legajo, "HORAS": str(hora_10_100), "CONCEPTO": Concepto_100}
+                                data.append(datos)
+                            else:
+                                if Acuerdo_100 != '0.0':
+                                    datos = {"LEGAJO": Legajo, "HORAS": Acuerdo_100, "CONCEPTO": Concepto_100}
+                                    data.append(datos)
+                            
+                        else:
+                            if str(Hora_50) != '0.0':
+                                datos = {"LEGAJO": Legajo, "HORAS": str(round(Hora_50, 2)), "CONCEPTO": Concepto_50}
+                                data.append(datos)
+                            if str(Hora_100) != '0.0':
+                                datos = {"LEGAJO": Legajo, "HORAS": str(round(Hora_100, 2)), "CONCEPTO": Concepto_100}
+                                data.append(datos)
+                    else:
+                        if str(Hora_50) != '0.0':
+                            datos = {"LEGAJO": Legajo, "HORAS": str(round(Hora_50, 2)), "CONCEPTO": Concepto_50}
+                            data.append(datos)
+                        if str(Hora_100) != '0.0':
+                            datos = {"LEGAJO": Legajo, "HORAS": str(round(Hora_100, 2)), "CONCEPTO": Concepto_100}
+                            data.append(datos)   
+                return {"datos": data}
+            else:
+                return {"datos": []}
+    except Exception as e:
+        insertar_registro_error_sql("RRHH","TRAE HORAS EXTRAS","request.user",str(e))
+        return '0'
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+   
+
+@login_required  
+@csrf_exempt
+def CreaExcelISIS(request): 
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('RRHH.puede_ver')
+        if user_has_permission:
+            data_dict = traeHorasExtras() 
+            if data_dict != '0':
+                file_name='horas_extras_isis.xlsx'
+                wb = openpyxl.Workbook()
+                ws = wb.active
+
+                for idx, entry in enumerate(data_dict['datos'], start=1):
+                    ws[f'A{idx}'] = entry['LEGAJO']
+                    ws[f'B{idx}'] = entry['CONCEPTO']
+                    ws[f'C{idx}'] = entry['HORAS']
+                ws.protection.sheet = True
+                ws.protection.enable()
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(
+                    output,
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )
+                response['Content-Disposition'] = 'attachment; filename=output.xlsx'
+                return response
+            else:
+                return JsonResponse ({'Message': 'Not Found', 'Nota': 'No se pudo completar la petición.'})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+# def generate_excel_from_dict():
+#     data_dict = traeHorasExtras() 
+#     file_name='output.xlsx'
+#     wb = openpyxl.Workbook()
+#     ws = wb.active
+
+#     for idx, entry in enumerate(data_dict['datos'], start=1):
+#         ws[f'A{idx}'] = entry['LEGAJO']
+#         ws[f'B{idx}'] = entry['CONCEPTO']
+#         ws[f'C{idx}'] = entry['HORAS']
+
+#     # Save the workbook to a file
+#     wb.save(file_name)
+#     print(f"Excel file '{file_name}' generated successfully.")
+
+# # Example usage
+
+
+# generate_excel_from_dict(traeHorasExtras(), 'output.xlsx')

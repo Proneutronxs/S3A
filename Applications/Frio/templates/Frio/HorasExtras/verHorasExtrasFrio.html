@@ -5,73 +5,77 @@
 {% block content %}
 
 <div class="contenedor">
-    <div class="text letras">
-        <div class="row">
-            <form id="formVerHoras" method="POST" action="">
-                <label class="letras" for="fechaBusquedaDesde">Desde</label>
-                <input type="date" id="fechaBusquedaDesde" name="fechaBusquedaDesde" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-                <label class="letras" for="fechaBusquedaHasta">Hasta</label>
-                <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores" pattern="\d{2}/\d{2}/\d{4}">
-                <label class="letras" for="EstadoHora">Tipo</label>
-                <select class="selectores" type="checkbox" id="ComboxEstadoHora" name="ComboxEstadoHora">
-                    <option value="10">TODO</option>
-                    <option value="0">AUTORIZADOS</option>
-                    <option value="8">RECHAZADOS</option>
-                </select>
-                <!-- <label class="letras" for="TipoHora">Centro</label> -->
-                <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
-                </select>
-            </form>
-            <button id="idBuscaHoras" name="idBuscaHoras" class="selectores btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
-            <div>
-              <button id="creaPdf" name="creaPdf" class="btn-submit selectores " type="button">PDF</button>
-              <button id="creaExcel" name="creaExcel" class="btn-submit selectores " type="button">EXCEL</button>
-            </div>
-        </div>
+  <div class="text letras">
+    <div class="row">
+      <form id="formVerHoras" method="POST" action="">
+        <label class="letras" for="fechaBusquedaDesde">Desde</label>
+        <input type="date" id="fechaBusquedaDesde" name="fechaBusquedaDesde" class="selectores"
+          pattern="\d{2}/\d{2}/\d{4}">
+        <label class="letras" for="fechaBusquedaHasta">Hasta</label>
+        <input type="date" id="fechaBusquedaHasta" name="fechaBusquedaHasta" class="selectores"
+          pattern="\d{2}/\d{2}/\d{4}">
+        <label class="letras" for="EstadoHora">Tipo</label>
+        <select class="selectores" type="checkbox" id="ComboxEstadoHora" name="ComboxEstadoHora">
+          <option value="10">TODO</option>
+          <option value="0">AUTORIZADOS</option>
+          <option value="8">RECHAZADOS</option>
+        </select>
+        <!-- <label class="letras" for="TipoHora">Centro</label> -->
+        <select class="selectores" type="checkbox" id="ComboxCentrosCostos" name="ComboxCentrosCostos">
+        </select>
+      </form>
+      <button id="idBuscaHoras" name="idBuscaHoras"
+        class="selectores btn-submit botones bx material-symbols-outlined icon" type="button">search</button>
+      <div>
+        <button id="creaPdf" name="creaPdf" class="btn-submit selectores " type="button">PDF</button>
+        <button id="creaExcel" name="creaExcel" class="btn-submit selectores " type="button">EXCEL</button>
+      </div>
     </div>
-    <div class="vista-container" >
-        <form id="formRestauraHorasExtras" method="POST" action="#">
-            <div class="formularios">
-              <div class="row_items">
-                <div style="display: flex;">
-                  <div class="items-row">
-                      <button id="restauraFormHorasExtras" class="btn-submit botones" type="button"><b>Restaurar</b></button>
-                  </div>
-                  <!-- <div class="items-row">
+  </div>
+  <div class="vista-container">
+    <form id="formRestauraHorasExtras" method="POST" action="#">
+      <div class="formularios">
+        <div class="row_items">
+          <div style="display: flex;">
+            <div class="items-row">
+              <button id="restauraFormHorasExtras" class="btn-submit botones" type="button"><b>Restaurar</b></button>
+            </div>
+            <!-- <div class="items-row">
                     <button id="elminaHEAutoriza" class="btn-submit botones" type="button"><b>Eliminar</b></button>
                   </div> -->
-                </div>
-              </div>
-            </div>
-          
+          </div>
+        </div>
+      </div>
 
-            <div class="vista-container-autoriza-viejo" >
-              <div class="div-1">
-                  <table class="pre-hs-ex">
-                      <thead id="encabezado-tabla-hs-ex">
-                        <tr>
-                          <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox" id="selectAll" disabled></th>
-                          <th style="width: 60px; min-width: 60px;">Tipo</th>
-                          <th style="width: 80px; min-width: 80px;">Legajo</th>
-                          <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
-                          <th style="width: 100px; min-width: 100px;">Centro</th>
-                          <th style="width: 180px; min-width: 180px;">Desde - Fecha y Hora</th>
-                          <th style="width: 180px; min-width: 180px;">Hasta - Fecha y Hora</th>
-                          <th style="width: 400px; min-width: 400px;">Motivo</th>
-                          <th style="width: 80px; min-width: 80px;">Horas</th>
-                          <th style="width: 100px; min-width: 100px;">Dipos.</th>
-                          <th style="width: 140px; min-width: 140px;">Estado</th>
-                        </tr>
-                      </thead>
-                      <tbody id="tablaVerHorasEmpaque">
-                        
-                      </tbody>
-                    </table> 
-              </div>
-            </div>  
-                               
-        </form>
-    </div>                  
+
+      <div class="vista-container-autoriza-viejo">
+        <div class="div-1">
+          <table class="pre-hs-ex">
+            <thead id="encabezado-tabla-hs-ex">
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox" id="selectAll" disabled>
+                </th>
+                <th style="width: 60px; min-width: 60px;">Tipo</th>
+                <th style="width: 80px; min-width: 80px;">Legajo</th>
+                <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
+                <th style="width: 100px; min-width: 100px;">Centro</th>
+                <th style="width: 180px; min-width: 180px;">Desde - Fecha y Hora</th>
+                <th style="width: 180px; min-width: 180px;">Hasta - Fecha y Hora</th>
+                <th style="width: 400px; min-width: 400px;">Motivo</th>
+                <th style="width: 80px; min-width: 80px;">Horas</th>
+                <th style="width: 100px; min-width: 100px;">Dipos.</th>
+                <th style="width: 140px; min-width: 140px;">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaVerHorasEmpaque">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </form>
+  </div>
 </div>
 
 <div class="modal-overlay">
@@ -99,7 +103,7 @@
   </div>
 </div>
 
-  
+
 <script src="{%static 'TresAses/js/Frio/HorasExtras/verHorasExtras.js' %}"></script>
 
 {% endblock %}

@@ -157,7 +157,7 @@ const verHorasExtras_transferencia_por_cc_Frio = async () => {
                         <option value="50"${datos.tipo === '50' ? 'selected' : ''}>50</option>
                         <option value="100"${datos.tipo === '100' ? 'selected' : ''}>100</option>
                         <option value="N"${datos.tipo === 'N' ? 'selected' : ''}>N</option>
-                    </select
+                    </select>
                 </td>
                 <td>${datos.legajo}</td>
                 <td>${datos.nombres}</td>

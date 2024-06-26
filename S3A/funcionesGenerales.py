@@ -214,3 +214,12 @@ def obtener_fechas_entre(fecha_inicio, fecha_fin):
         fecha_inicio += timedelta(days=1)
     
     return dias_entre_fechas
+
+
+def formatear_fecha(fecha):
+    try:
+        fecha_obj = datetime.strptime(fecha, '%Y-%m-%d')
+        fecha_formateada = fecha_obj.strftime('%d/%m/%Y')
+        return fecha_formateada
+    except ValueError:
+        return "Formato de fecha incorrecto"

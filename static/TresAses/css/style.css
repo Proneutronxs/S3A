@@ -293,7 +293,7 @@ a:hover{
   font-size: 14px;
   padding: 5px;
   border-radius: 10px;
-  height: 30px;
+  height: 35px;
   margin-right: 10px
 }
   
@@ -367,8 +367,8 @@ input[type="checkbox"].input-checkbox {
   border-radius: 10px;
   color: #000000;
   transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-  height: auto;
-  margin-right: 5px
+  height: 35px;
+  margin-right: 5px;
 }
 
 .btn-submit:hover {
@@ -484,6 +484,7 @@ input[type="checkbox"].input-checkbox {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .popup-content {
@@ -505,6 +506,7 @@ input[type="checkbox"].input-checkbox {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.356);
   padding: 10px;
   transition: right 0.3s ease;
+  z-index: 99999;
 }
 
 .popup.active {
@@ -1047,6 +1049,128 @@ input[type="checkbox"].input-checkbox {
 }
 
 
+/* CHOICES */
+
+.chosen-select {
+	display: flex;
+	width: 100%;
+}
+
+.choices {
+	cursor: pointer;
+	max-height: 35px;
+	min-height: 35px;
+	box-sizing: border-box;
+	border: 1px solid #a72626;
+	border-radius: 0.5rem;
+	font-size: 14px;
+	/* font-weight: bold; */
+	width: 100%;
+	color: #001327;
+	text-align: start;
+	line-height: 20px;
+}
+
+.choices__list--single .choices__item {
+	width: 100%;
+	font-size: 14px;
+}
+
+.choices__list--single {
+	display: inline-block;
+	width: 100%;
+	padding: 0;
+}
+
+.choices__inner {
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+	padding: 7.5px 7.5px 3.75px;
+	border-radius: 2.5px;
+	font-size: 14px;
+	min-height: 35px;
+	overflow: hidden;
+	border: none;
+	background-color: none;
+
+}
+
+.choices__list--dropdown, .choices__list[aria-expanded] {
+	visibility: hidden;
+	z-index: 1;
+	position: absolute;
+	width: 100%;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	top: 100%;
+	margin-top: -1px;
+	border-bottom-left-radius: 2.5px;
+	border-bottom-right-radius: 2.5px;
+	overflow: hidden;
+	word-break: break-all;
+	z-index: 9999;
+	will-change: visibility;
+}
+
+.bootstrap-select .dropdown-toggle {
+	position: relative;
+	width: 100%;
+	text-align: right;
+	white-space: nowrap;
+	display: -webkit-inline-box;
+	display: -webkit-inline-flex;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	cursor: pointer;
+	max-height: 4rem;
+	min-height: 4rem;
+	padding: 0.5rem;
+	box-sizing: border-box;
+	border: 1px solid #a72626;
+	border-radius: 0.5rem;
+	font-size: 0.5rem;
+	font-weight: bold;
+	width: 100%;
+}
+
+.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+	width: 100%;
+}
+
+.choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item {
+	position: relative;
+	padding: 4px;
+	font-size: 14px;
+}
+
+.choices__input {
+	font-size: 14px;
+}
+
+/* .choices__list--multiple .choices__item {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 3.75px;
+  margin-bottom: 3.75px;
+  background-color: #a72626;
+  border: 1px solid #a72626;
+  color: #fff;
+  word-break: break-all;
+  box-sizing: border-box;
+} */
 
 
 
@@ -1058,15 +1182,50 @@ input[type="checkbox"].input-checkbox {
 
 
 
+/* CHOICES */
+
+.table_center{
+  text-align: center;
+}
 
 
 
 
+/* ARCHIVOS */
+
+.descarga_excel_HE{
+  display: none;
+  height: 380px;
+  width: 380px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+
+.butons_confirm{
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between; 
+  width: 100%;
+}
 
 
 
+.btn-submit-nuevo {
+  padding: 4px 10px;
+  background-color: #ffffff;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+  color: #000000;
+  transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+  height: 35px;
+  margin-right: 5px;
+  width: 50%;
+}
 
-
-
-
-
+.btn-submit-nuevo:hover {
+  border-color: #a72626;
+  background-color: #a72626;
+  color: #ffffff;
+}
