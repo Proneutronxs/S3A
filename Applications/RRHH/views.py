@@ -713,6 +713,22 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                     Float_50 = float(row[7])
                     Float_100 = float(row[8])
 
+                    if Legajo == '9':
+                        Concepto_50 = '825'
+                        Concepto_100 = '820'
+                    if Legajo == '234':
+                        Concepto_50 = '825'
+                        Concepto_100 = '862'
+                    if Legajo == '53979':
+                        Concepto_50 = '825'
+                        Concepto_100 = '862'
+                    if Legajo == '56095':
+                        Concepto_50 = '760'
+                        Concepto_100 = '765'
+                    if Legajo == '238':
+                        Concepto_50 = '760'
+                        Concepto_100 = '765'
+
                     if Sindicato == 'FRIGORIFICO':
                         if Acuerdo_100 != '0.0' or Acuerdo_50 != '0.0':
                             if Float_50 >= 6:
