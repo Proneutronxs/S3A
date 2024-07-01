@@ -583,7 +583,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
+                            texto = 'Fecha de Inicio: 01/06/2024, Fecha de Cierre: 29/06/2024.'
                         return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
                     else:
                         texto = ''
@@ -660,8 +660,8 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
             sql = """
                 DECLARE @@Inicio DATE;
                 DECLARE @@Final DATE;
-                SET @@Inicio = %s;
-                SET @@Final = %s;
+                SET @@Inicio = '2024-06-01';
+                SET @@Final = '2024-06-29';
                 SELECT 
                     IdLegajo AS LEGAJO, 
                     ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
@@ -693,7 +693,7 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                     IdLegajo;
             """
             inicio,final = retornaInicioFinalExcel()
-            cursor.execute(sql,[inicio,final])
+            cursor.execute(sql)#,[inicio,final])
             results = cursor.fetchall()
             data = []
             if results:
@@ -789,8 +789,8 @@ def CreaExcelISIS(request):
                     ws[f'A{idx}'] = entry['LEGAJO']
                     ws[f'B{idx}'] = entry['CONCEPTO']
                     ws[f'C{idx}'] = entry['HORAS']
-                ws.protection.sheet = True
-                ws.protection.enable()
+                # ws.protection.sheet = True
+                # ws.protection.enable()
                 output = BytesIO()
                 wb.save(output)
                 output.seek(0)
