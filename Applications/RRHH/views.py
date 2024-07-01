@@ -591,7 +591,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
+                            texto = 'Fecha de Inicio: 01/06/2024, Fecha de Cierre: 29/06/2024.'
                         data = "No se encontraron horas extras."
                         return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
 
