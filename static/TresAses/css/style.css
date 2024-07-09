@@ -1419,3 +1419,20 @@ input[type="checkbox"].input-checkbox {
 .mg_300px_R {
   margin-right: 400px;
 }
+
+
+@media (max-width: 768px) {
+  .mg_300px_L, .mg_300px_R, .magin_lr_200 {
+      
+  margin-left: 0px;
+  margin-right: 0px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .mg_300px_L, .mg_300px_R, .magin_lr_200 {
+      
+  margin-left: 0px;
+  margin-right: 0px;
+  }
+}
