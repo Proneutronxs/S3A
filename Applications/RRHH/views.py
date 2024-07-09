@@ -48,6 +48,15 @@ def transferenciaHorasExtras(request):
     return render (request, 'RRHH/HorasExtras/transferirhe.html')
 
 
+@login_required
+def Ranking(request):
+    return render (request, 'RRHH/RankingFaltas/ranking.html')
+
+@login_required
+def RankingFaltas(request):
+    return render (request, 'RRHH/RankingFaltas/rankingFaltas.html')
+
+
 
 def obtener_fecha_hora_actual_con_milisegundos():
     now = datetime.datetime.now()

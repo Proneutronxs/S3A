@@ -1,0 +1,155 @@
+{% extends "RRHH/RankingFaltas/ranking.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="contenedor">
+    <div class="rows_date">
+        <div class="divs_form mg_300px_L">
+            <h4>DESDE</h4>
+            <input type="date" placeholder="1 July, 2024">
+        </div>
+        <div class="divs_form mg_300px_R">
+            <h4>HASTA</h4>
+            <input type="date" placeholder="8 July, 2024">
+        </div>
+    </div>
+    <div class="row_divs">
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_centros" name="selector_centros">
+                <option value="" selected disabled>SELECCIONE UN CENTRO </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_sectores" name="selector_sectores">
+                <option value="" selected disabled>SELECCIONE UN SECTOR </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_establecimiento" name="selector_establecimiento">
+                <option value="" selected disabled>SELECCIONE UN ESTABLECIMIENTO </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+    </div>
+    <div class="row_divs">
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_categoria" name="selector_categoria">
+                <option value="" selected disabled>SELECCIONE UN CATEGORÍA </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_turno" name="selector_turno">
+                <option value="" selected disabled>SELECCIONE UN TURNO </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+    </div>
+    <div class="row_divs">
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_legajos" name="selector_legajos">
+                <option value="" selected disabled>SELECCIONE UN LEGAJOS </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_edades" name="selector_edades">
+                <option value="" selected disabled>SELECCIONE ENTRE EDADES </option>
+                <option value="0">TODO</option>
+            </select>
+        </div>
+    </div>
+    <div class="row_divs">
+        <div class="divs_form">
+            <select class="input_selectores" id="selector_localidades" name="selector_localidades">
+                <option value="" selected disabled>SELECCIONE UNA LOCALIDAD </option>
+                <option value="0">TODOS</option>
+            </select>
+        </div>
+    </div>
+    <div class="rows_col">
+        <div class="col_divs">
+            <h4>ENFERMEDADES</h4>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_familia_e" name="selector_familia_e">
+                    <option value="" selected disabled>SELECCIONE UNA ENFERMEDAD </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_clasificacion_e" name="selector_clasificacion_e">
+                    <option value="" selected disabled>SELECCIONE UNA CLASIFICACIÓN </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+        </div>
+        <div class="col_divs">
+            <h4>ACCIDENTES</h4>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_accidente" name="selector_accidente">
+                    <option value="" selected disabled>SELECCIONE TIPO ACCIDENTE </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_familia_a" name="selector_familia_a">
+                    <option value="" selected disabled>SELECCIONE UNA ENFERMEDAD </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_clasificacion_a" name="selector_clasificacion_a">
+                    <option value="" selected disabled>SELECCIONE UNA CLASIFICACIÓN </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+        </div>
+        <div class="col_divs">
+            <h4>INCIDENTES</h4>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_incidente" name="selector_incidente">
+                    <option value="" selected disabled>SELECCIONE TIPO INCIDENTE </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_familia_i" name="selector_familia_i">
+                    <option value="" selected disabled>SELECCIONE UNA ENFERMEDAD </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+            <div class="divs_form">
+                <select class="input_selectores" id="selector_clasificacion_i" name="selector_clasificacion_i">
+                    <option value="" selected disabled>SELECCIONE UNA CLASIFICACIÓN </option>
+                    <option value="0">TODO</option>
+                </select>
+            </div>
+        </div>
+        <div class="col_divs"  style="max-width: 300px;">
+            <h4>OTROS</h4>
+            <div>
+                <label class="labels_check">
+                    <input class="checkbox" type="checkbox"> FALTA SIN AVISO</label>
+            </div>
+            <div>
+                <label class="labels_check ">
+                    <input class="checkbox" type="checkbox"> PERMISO GREMIAL</label>
+            </div>
+        </div>
+    </div>
+    <div class="row_divs ">
+        <div class="col_divs_btn magin_lr_200">
+            <button class="btn-submit ">BUSCAR</button>
+        </div>
+    </div>
+</div>
+
+<script src="{%static 'TresAses/js/Librerias/choices.min.js' %}"></script>
+<script src="{%static 'TresAses/js/Librerias/jquery-3.6.0.min.js' %}"></script>
+<script src="{%static 'TresAses/js/RRHH/RankingFaltas.js' %}"></script>
+
+{% endblock %}

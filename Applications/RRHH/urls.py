@@ -44,4 +44,11 @@ urlpatterns = [
 
     path('archivos/descarga-excel-he/', views.CreaExcelISIS, name="archivos_excel_horas"),
 
+
+    #### RANKING DE FALTAS ####
+
+    path('ranking/', views.Ranking, name="ranking"),
+
+    path('ranking/ranking-faltas', views.RankingFaltas, name="ranking_faltas"),
+
 ]
