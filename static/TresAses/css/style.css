@@ -286,7 +286,7 @@ a:hover {
 }
 
 .encabezado {
-  height: 60px;
+  /*height: 60px;*/
   color: #fff;
 }
 
@@ -672,6 +672,7 @@ input[type="checkbox"].input-checkbox {
   padding: 0;
   box-sizing: border-box;
 }
+
 
 
 
@@ -1312,7 +1313,7 @@ input[type="checkbox"].input-checkbox {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 10px 0;
+  margin: 5px 0;
   color: #001327;
 }
 
@@ -1320,7 +1321,7 @@ input[type="checkbox"].input-checkbox {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 10px 0;
+  margin: 5px 0;
 }
 
 .divs_form {
