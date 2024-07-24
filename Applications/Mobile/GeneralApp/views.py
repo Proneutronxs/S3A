@@ -111,43 +111,7 @@ def login_app(request):
         return JsonResponse(response_data)
     
 
-@csrf_exempt
-def sincronizaDatos(request):
-    if request.method == 'GET':
-        
-        try:
-            datos = {'Message': 'Success', 'Centros': Datos_centros_aplicacion(), 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos()}
-            return JsonResponse(datos)
-        except Exception as e:
-            response_data = {
-            'Message': 'No se pudo resolver la petición. ' + str(e)
-            }
-            return JsonResponse(response_data)
 
-    else:
-        response_data = {
-            'Message': 'No se pudo resolver la petición.'
-        }
-        return JsonResponse(response_data)
-    
-@csrf_exempt
-def sincronizaLegajosChacras(request):
-    if request.method == 'GET':
-        
-        try:
-            datos = {'Message': 'Success', 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos()}
-            return JsonResponse(datos)
-        except Exception as e:
-            response_data = {
-            'Message': 'No se pudo resolver la petición. ' + str(e)
-            }
-            return JsonResponse(response_data)
-
-    else:
-        response_data = {
-            'Message': 'No se pudo resolver la petición.'
-        }
-        return JsonResponse(response_data)
 
 # @csrf_exempt
 # def login_app(request):
@@ -693,7 +657,62 @@ def listado_Chacras():
         insertar_registro_error_sql("GeneralApp", "listado_Chacras", "usuario", error)
         return list(listado_chacras) 
 
+@csrf_exempt
+def sincronizaDatos(request):
+    if request.method == 'GET':
+        
+        try:
+            datos = {'Message': 'Success', 'Centros': Datos_centros_aplicacion(), 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos(), 'Usuarios':Datos_usuario_aplicacion(), 'Permisos': Datos_usuario_permisos()}
+            return JsonResponse(datos)
+        except Exception as e:
+            response_data = {
+            'Message': 'No se pudo resolver la petición. ' + str(e)
+            }
+            return JsonResponse(response_data)
 
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
+    
+@csrf_exempt
+def sincronizaLegajosChacras(request):
+    if request.method == 'GET':
+        
+        try:
+            datos = {'Message': 'Success', 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos()}
+            return JsonResponse(datos)
+        except Exception as e:
+            response_data = {
+            'Message': 'No se pudo resolver la petición. ' + str(e)
+            }
+            return JsonResponse(response_data)
+
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
+    
+@csrf_exempt
+def sincronizaUsuariosPermisos(request):
+    if request.method == 'GET':
+        
+        try:
+            datos = {'Message': 'Success', 'Usuarios':Datos_usuario_aplicacion(), 'Permisos': Datos_usuario_permisos()}
+            return JsonResponse(datos)
+        except Exception as e:
+            response_data = {
+            'Message': 'No se pudo resolver la petición. ' + str(e)
+            }
+            return JsonResponse(response_data)
+
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
 
 
 

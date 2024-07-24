@@ -29,4 +29,7 @@ path('sincroniza-datos/', views.sincronizaDatos, name="sincroniza_datos"),
 path('actualiza-legajos-chacras/', views.sincronizaLegajosChacras, name="actualiza_legajos_chacras"),
 
 
+path('actualiza-usuarios-permisos/', views.sincronizaUsuariosPermisos, name="actualiza_usuarios_permisos"),
+
+
 ]
