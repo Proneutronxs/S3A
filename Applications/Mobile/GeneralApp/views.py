@@ -19,8 +19,8 @@ def login_app(request):
         body = request.body.decode('utf-8')
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
-        fechaHora = str(json.loads(body)['actual'])
-        registro = str(json.loads(body)['registro'])
+        #fechaHora = str(json.loads(body)['actual'])
+        #registro = str(json.loads(body)['registro'])
         #print(fechaHora,registro) " \
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -53,7 +53,7 @@ def login_app(request):
                                 FROM TresAses_ISISPayroll.dbo.Empleados  
                                 WHERE TresAses_ISISPayroll.dbo.Empleados.CodEmpleado = USR_PERMISOS_APP.CodEmpleado) ELSE @ParametroUser END AS Nombres, 
                                 USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,   
-                                USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario,USUARIOS.Tipo  
+                                USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario,USUARIOS.Tipo,USUARIOS.Chacras,USUARIOS.Centros  
                             FROM            USUARIOS INNER JOIN  
                                             USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado  
                             WHERE        (USUARIOS.Usuario = @ParametroUser) AND (USUARIOS.Clave = @ParametroPass) 
@@ -64,7 +64,7 @@ def login_app(request):
                 consulta = cursor.fetchone()
                 
                 if consulta:
-                    legajo, nombre, hExtras, asistencia, anticipos, pedidoFlete, crearRemito, reporteBins, chofer, user, tipo = map(str, consulta)
+                    legajo, nombre, hExtras, asistencia, anticipos, pedidoFlete, crearRemito, reporteBins, chofer, user, tipo, chacras, centros = map(str, consulta)
                     response_data = {                        
                         'Legajo': legajo,
                         'Nombre': nombre,
@@ -77,12 +77,14 @@ def login_app(request):
                         'ReporteBins': reporteBins,
                         'Chofer': chofer,
                         'Tipo': tipo,
+                        'Chacras': chacras,
+                        'Centros': centros,
                         'Delete': borraBaseDatosApp()
 
                     }
                     datos = {'Message': 'Success', 'Data': response_data}
                     estado = "E"
-                    insertaRegistro(usuario,fechaHora,registro,estado)
+                    #insertaRegistro(usuario,fechaHora,registro,estado)
                     return JsonResponse(datos)
                 else:
                     response_data = {
@@ -90,7 +92,7 @@ def login_app(request):
                         'Nota': 'Usuario o Contraseña inválidos.'
                     }
                     estado = "F"
-                    insertaRegistro(usuario,fechaHora,registro,estado)
+                    #insertaRegistro(usuario,fechaHora,registro,estado)
                     return JsonResponse(response_data)
         except Exception as e:
             error = str(e)
@@ -102,6 +104,45 @@ def login_app(request):
             return JsonResponse(response_data)
         finally:
             connections['TRESASES_APLICATIVO'].close()
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
+    
+
+@csrf_exempt
+def sincronizaDatos(request):
+    if request.method == 'GET':
+        
+        try:
+            datos = {'Message': 'Success', 'Centros': Datos_centros_aplicacion(), 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos()}
+            return JsonResponse(datos)
+        except Exception as e:
+            response_data = {
+            'Message': 'No se pudo resolver la petición. ' + str(e)
+            }
+            return JsonResponse(response_data)
+
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
+    
+@csrf_exempt
+def sincronizaLegajosChacras(request):
+    if request.method == 'GET':
+        
+        try:
+            datos = {'Message': 'Success', 'Chacras': Datos_Chacras_Aplicacion(), 'Legajos': Datos_legajos()}
+            return JsonResponse(datos)
+        except Exception as e:
+            response_data = {
+            'Message': 'No se pudo resolver la petición. ' + str(e)
+            }
+            return JsonResponse(response_data)
+
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
@@ -338,8 +379,9 @@ def traeMotivos():
 def traeMontoMax():
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "SELECT Monto AS MONTO " \
-                    "FROM MAX_ADELANTO "
+            sql = """
+                    SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-MONTO-MAX'
+                    """
             cursor.execute(sql)
             consulta = cursor.fetchone()
             monto = "0"
@@ -435,6 +477,243 @@ def buscaParametro(request, codigo):
             'Message': 'No se pudo resolver la petición.'
         }
         return JsonResponse(response_data)
+
+
+
+
+
+### ACTUALIZACIÓN DE BASE DE DATOS
+
+def Actualiza_Datos():
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT Numerico
+                    FROM Parametros_Aplicativo
+                    WHERE Codigo = 'APP-ACT-DATOS'
+
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchone() 
+            if consulta:
+                if str(consulta[0]) == '1':
+                    return True
+                else:
+                    return False
+            else: 
+                return False
+    except Exception as e:
+        error = str(e)
+        return False
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def Datos_usuario_aplicacion():
+    listado_usuarios = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT        ID_USR, CodEmpleado, Usuario, Clave, Tipo, Telefono, Productor, Chacras, Centros, IdAndroid
+                    FROM            USUARIOS
+                    --WHERE Tipo = 'EC' AND Tipo = 'G'
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall() 
+            if consulta:
+                for row in consulta:
+                    ID = str(row[0])
+                    CodEmpleado = str(row[1])
+                    Usuario = str(row[2])
+                    Clave = str(row[3])
+                    Tipo = str(row[4])
+                    Telefono = str(row[5])
+                    Productor = str(row[6])
+                    Chacras = str(row[7])
+                    Centros = str(row[8])
+                    IdAndroid = str(row[9])
+                    datos = {'ID': ID, 'CodEmpleado': CodEmpleado, 'Usuario': Usuario, 'Clave': Clave, 'Tipo': Tipo,
+                             'Telefono': Telefono, 'Productor':Productor, 'Chacras': Chacras, 'Centros': Centros, 'IdAndroid':IdAndroid}
+                    listado_usuarios.append(datos)
+                    
+                return listado_usuarios
+            else: 
+                return listado_usuarios
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","Datos_usuario_aplicacion","usuario",error)
+        return listado_usuarios
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def Datos_centros_aplicacion():
+    listado_centros = []
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = """ 
+                    SELECT Regis_CCo AS ID, DescrCtroCosto AS ALIAS
+                    FROM CentrosCostos 
+                    WHERE DescrCtroCosto LIKE 'C%'
+                    ORDER BY DescrCtroCosto
+
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall() 
+            if consulta:
+                for row in consulta:
+                    ID = str(row[0])
+                    centro = str(row[1])
+                    datos = {'ID': ID, 'Centro': centro}
+                    listado_centros.append(datos)
+                    
+                return listado_centros
+            else: 
+                return listado_centros
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","Datos_usuario_aplicacion","usuario",error)
+        return listado_centros
+    finally:
+        connections['ISISPayroll'].close()
+
+def Datos_usuario_permisos():
+    listado_permisos = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT         CodEmpleado, MD_Anticipos, MD_Presentismo, MD_AutoriHorasExt, MD_PedidoFlete, MD_CrearRemito, MD_ReporteBins, MD_Chofer
+                    FROM            USR_PERMISOS_APP
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall() 
+            if consulta:
+                for row in consulta:
+                    CodEmpleado = str(row[0])
+                    Anticipos = str(row[1])
+                    Presentismo = str(row[2])
+                    HorasExtras = str(row[3])
+                    PedidoFlete = str(row[4])
+                    Remito = str(row[5])
+                    ReporteBins = str(row[6])
+                    Chofer = str(row[7])
+                    datos = {'CodEmpleado': CodEmpleado, 'Anticipos': Anticipos, 'Presentismo': Presentismo, 'HorasExtras': HorasExtras,
+                             'PedidoFlete': PedidoFlete, 'Remmito':Remito, 'ReporteBins': ReporteBins, 'Chofer':Chofer}
+                    listado_permisos.append(datos)
+                    
+                return listado_permisos
+            else: 
+                return listado_permisos
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","Datos_usuario_permisos","usuario",error)
+        return listado_permisos
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def Datos_legajos():
+    listado_legajos = []
+    try:
+        with connections['ISISPayroll'].cursor() as cursor:
+            sql = """ 
+                    SELECT        Empleados.CodEmpleado AS LEGAJO, Empleados.Regis_CCo AS CENTRO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBRE
+                    FROM            Empleados INNER JOIN
+                                            CentrosCostos ON Empleados.Regis_CCo = CentrosCostos.Regis_CCo
+                    WHERE        (Empleados.BajaDefinitivaEmple = '2') AND CentrosCostos.DescrCtroCosto LIKE 'C%'
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall() 
+            if consulta:
+                for row in consulta:
+                    CodEmpleado = str(row[0])
+                    Centro = str(row[1])
+                    Nombres = str(row[2])
+                    datos = {'CodEmpleado': CodEmpleado, 'Centro': Centro, 'Nombres': Nombres}
+                    listado_legajos.append(datos)
+                    
+                return listado_legajos
+            else: 
+                return listado_legajos
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","Datos_legajos","usuario",error)
+        return listado_legajos
+    finally:
+        connections['ISISPayroll'].close()
+
+def Datos_Chacras_Aplicacion():
+    listado = listado_Chacras()
+    resultado = ','.join(f"'{chacra}'" for chacra in listado)
+    listado_chacras_dev = []
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = f""" 
+                    SELECT        IdChacra, RTRIM(Nombre)
+                    FROM            Chacra
+                    WHERE IdChacra IN ({resultado})
+                    ORDER BY Nombre
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall() 
+            if consulta:
+                for row in consulta:
+                    IdChacra = str(row[0])
+                    NombreChacra = str(row[1])
+                    datos = {'IdChacra': IdChacra, 'Nombre': NombreChacra}
+                    listado_chacras_dev.append(datos)
+                    
+                return listado_chacras_dev
+            else: 
+                return listado_chacras_dev
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","Datos_Chacras_Aplicacion","usuario",error)
+        return listado_chacras_dev
+    finally:
+        connections['S3A'].close()
+
+def listado_Chacras():
+    listado_chacras = set()  # Usar un conjunto para evitar duplicados
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT Chacras
+                    FROM USUARIOS
+                    --WHERE Tipo = 'EC'
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    if row[0] is not None:
+                        listado = str(row[0]).split(',')
+                        for i in listado:
+                            listado_chacras.add(str(i))  # Agregar al conjunto
+            return list(listado_chacras)  # Convertir el conjunto a lista antes de devolver
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp", "listado_Chacras", "usuario", error)
+        return list(listado_chacras) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

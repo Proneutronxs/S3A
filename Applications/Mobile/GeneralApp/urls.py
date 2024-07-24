@@ -9,6 +9,7 @@ path('subir-aplicacion/recibir_apk/', views.recibir_apk, name='recibir_apk'),
 path('descargar-app/<str:nombre_apk>', views.descargar_apk, name='descargar_apk'),
 
 path('busca-parametro/<str:codigo>', views.buscaParametro, name='buscaParametro'),
+
 ### LOGIN DE LA APLICACION
 path('login_App', views.login_app, name="login_App"),
 
@@ -19,6 +20,13 @@ path('codigo/centro_costos/id=<int:legajo>', views.id_Nombre_Ccostos, name="id_d
 path('personal/centro_costos/asistencia/id=<int:codigo>', views.personal_por_Ccostos_asistencia, name="personal_por_Ccostos_asistencia"),
 
 path('personal/centro_costos/anticipos/id=<int:codigo>', views.personal_por_Ccostos_anticipos, name="personal_por_Ccostos_anticipos"),
+
+
+
+
+path('sincroniza-datos/', views.sincronizaDatos, name="sincroniza_datos"),
+
+path('actualiza-legajos-chacras/', views.sincronizaLegajosChacras, name="actualiza_legajos_chacras"),
 
 
 ]
