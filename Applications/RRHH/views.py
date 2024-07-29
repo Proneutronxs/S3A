@@ -592,7 +592,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: 01/06/2024, Fecha de Cierre: 29/06/2024.'
+                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
                         return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
                     else:
                         texto = ''
@@ -600,7 +600,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: 01/06/2024, Fecha de Cierre: 29/06/2024.'
+                            texto = 'Fecha de Inicio: ' + fechaUno + ', Fecha de Cierre: ' + fechaDos + '.'
                         data = "No se encontraron horas extras."
                         return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
 
@@ -623,7 +623,7 @@ def retornaInicioFinalExcel():
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """
                 SELECT 
-                    CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
+                    CONVERT(VARCHAR, YEAR(DATEADD(MONTH, -1, GETDATE()))) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(DATEADD(MONTH, -1, GETDATE()))), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
                     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
                 FROM 
                     Parametros_Aplicativo
@@ -644,7 +644,13 @@ def retornaInicioFinalExcel():
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
-
+# SELECT 
+#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
+#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
+# FROM 
+#     Parametros_Aplicativo
+# WHERE 
+#     Codigo = 'EXCEL-ISIS-HE';
 
 ##CAMBIAR CONSULTA
 # SELECT 
