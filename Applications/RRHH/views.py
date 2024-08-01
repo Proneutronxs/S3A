@@ -499,8 +499,6 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
             desde = request.POST.get('Inicio')
             hasta = request.POST.get('Final')
             legajos = request.POST.get('Legajo') or '0'
-            desde = '2024-06-30'
-            hasta = '2024-07-28'
             values = [desde,hasta,legajos]
             Horas = []
             Nombres = [{'Legajo': '0', 'Nombre': 'TODOS'}]
@@ -677,8 +675,8 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
             sql = """
                 DECLARE @@Inicio DATE;
                 DECLARE @@Final DATE;
-                SET @@Inicio = '2024-06-01';
-                SET @@Final = '2024-06-29';
+                SET @@Inicio = '2024-06-30';
+                SET @@Final = '2024-07-28';
                 SELECT 
                     IdLegajo AS LEGAJO, 
                     ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
