@@ -716,7 +716,67 @@ def sincronizaUsuariosPermisos(request):
 
 
 
+@csrf_exempt
+def buscaLegajosNuevos(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        usuario = str(json.loads(body)['usuario'])
+        try:
+            with connections['ISISPayroll'].cursor() as cursor:
+                sql = """
+                    SELECT 
+                        CodEmpleado AS LEGAJO, 
+                        Regis_CCo AS CENTRO, 
+                        CONVERT(VARCHAR(25), ApellidoEmple + ' ' + NombresEmple) AS NOMBRE
+                    FROM 
+                        Empleados
+                    WHERE 
+                    BajaDefinitivaEmple = 2 AND
+                        Regis_CCo IN (
+                            SELECT 
+                                valor 
+                            FROM 
+                                dbo.fn_Split((SELECT Centros FROM TRESASES_APLICATIVO.dbo.USUARIOS WHERE Usuario = %s), ',')
+                        )
+                    ORDER BY 
+                        ApellidoEmple + ' ' + NombresEmple
+                    """
 
+                cursor.execute(sql, [usuario])
+                consulta = cursor.fetchall()
+                
+                if consulta:
+                    response_data = []
+                    for row in consulta:
+                        legajo, centros, nombre = map(str, row)
+                        response_data.append({
+                            'Legajos': legajo,
+                            'Centros': centros,
+                            'Nombres': nombre
+                        })
+                    datos = {'Message': 'Success', 'Data': response_data}
+                    estado = "E"
+                    return JsonResponse(datos)
+                else:
+                    response_data = {
+                        'Message': 'Not Found',
+                        'Nota': 'No se encontraron datos.'
+                    }
+                    return JsonResponse(response_data)
+        except Exception as e:
+            error = str(e)
+            response_data = {
+                'Message': 'Error',
+                'Nota': error
+            }
+            return JsonResponse(response_data)
+        finally:
+            connections['ISISPayroll'].close()
+    else:
+        response_data = {
+            'Message': 'No se pudo resolver la petición.'
+        }
+        return JsonResponse(response_data)
 
 
 

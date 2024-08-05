@@ -31,5 +31,7 @@ path('actualiza-legajos-chacras/', views.sincronizaLegajosChacras, name="actuali
 
 path('actualiza-usuarios-permisos/', views.sincronizaUsuariosPermisos, name="actualiza_usuarios_permisos"),
 
+path('busca-nuevos-legajos/', views.buscaLegajosNuevos, name="busca_nuevos_legajos"),
+
 
 ]
