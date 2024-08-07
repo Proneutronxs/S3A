@@ -808,12 +808,14 @@ def insertaAdicionales(request):
                 Usuario = str(item['Usuario'])
                 FechaAlta = str(item['FechaAlta']).replace(' ','T')
                 if qr is None or qr == '' or qr == 'null' or qr == 'NULL':
+                    #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales, str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                     guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
                     if  existeQR(str(qr)):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
+                        #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                         guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
             if listadoFilas:
                 nota = 'Las siguientes filas ya están cargadas: \n \n' + ', \n'.join(listadoFilas) + '.'
