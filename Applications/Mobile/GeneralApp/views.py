@@ -788,33 +788,33 @@ def insertaAdicionales(request):
             datos = json.loads(body)['Data']
             listadoFilas = []
             for item in datos:
-                IdAdicional = item['IdAdicional']
-                IdEncargado = item['IdEncargado']
-                IdLegajo = item['IdLegajo']
-                Centro = item['Centro']
-                Categoria = item['Categoria']
-                Descripcion = item['Descripcion']
-                Tarea = item['Tarea']
-                Jornales = item['Jornales']
+                IdAdicional = str(item['IdAdicional'])
+                IdEncargado = str(item['IdEncargado'])
+                IdLegajo = str(item['IdLegajo'])
+                Centro = str(item['Centro'])
+                Categoria = str(item['Categoria'])
+                Descripcion = str(item['Descripcion'])
+                Tarea = str(item['Tarea'])
+                Jornales = str(item['Jornales'])
                 qr = item['qr']
-                Tipo = item['Tipo']
-                Cantidad = item['Cantidad']
-                NroFila = item['NroFila']
-                Precio = item['Precio']
-                Lote = item['Lote']
-                Cuadro = item['Cuadro']
-                Pago = item['Pago']
-                Observaciones = item['Observaciones']
-                Usuario = item['Usuario']
+                Tipo = str(item['Tipo'])
+                Cantidad = str(item['Cantidad'])
+                NroFila = str(item['NroFila'])
+                Precio = str(item['Precio'])
+                Lote = str(item['Lote'])
+                Cuadro = str(item['Cuadro'])
+                Pago = str(item['Pago'])
+                Observaciones = str(item['Observaciones'])
+                Usuario = str(item['Usuario'])
                 FechaAlta = str(item['FechaAlta']).replace(' ','T')
                 if qr is None or qr == '' or qr == 'null' or qr == 'NULL':
-                    guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,qr,Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+                    guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
                     if  existeQR(str(qr)):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
-                        guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,qr,Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+                        guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
             if listadoFilas:
                 nota = 'Las siguientes filas ya están cargadas: \n \n' + ', \n'.join(listadoFilas) + '.'
                 return JsonResponse({'Message': 'Success', 'Nota': nota})  
