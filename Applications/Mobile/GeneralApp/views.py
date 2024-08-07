@@ -851,7 +851,7 @@ def nombreChacra(idChacra):
     
 def existeQR(qr):
     try:
-        with connections['S3A'].cursor() as cursor:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
                     SELECT DISTINCT QR
                     FROM Planilla_Chacras
