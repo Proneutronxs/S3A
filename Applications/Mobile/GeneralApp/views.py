@@ -807,7 +807,7 @@ def insertaAdicionales(request):
                 Observaciones = item['Observaciones']
                 Usuario = item['Usuario']
                 FechaAlta = str(item['FechaAlta']).replace(' ','T')
-                if qr is None or qr == '' or qr == 'null':
+                if qr is None or qr == '' or qr == 'null' or qr == 'NULL':
                     guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,qr,Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
                     if  existeQR(str(qr)):
