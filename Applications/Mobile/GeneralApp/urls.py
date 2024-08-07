@@ -33,5 +33,7 @@ path('actualiza-usuarios-permisos/', views.sincronizaUsuariosPermisos, name="act
 
 path('busca-nuevos-legajos/', views.buscaLegajosNuevos, name="busca_nuevos_legajos"),
 
+path('guarda-adicionales-pendientes/', views.insertaAdicionales, name="guarda_adicionales_pendientes"),
+
 
 ]

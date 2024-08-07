@@ -779,8 +779,105 @@ def buscaLegajosNuevos(request):
         return JsonResponse(response_data)
 
 
+@csrf_exempt
+def insertaAdicionales(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            usuario = str(json.loads(body)['usuario'])
+            datos = json.loads(body)['Data']
+            listadoFilas = []
+            for item in datos:
+                IdAdicional = item['IdAdicional']
+                IdEncargado = item['IdEncargado']
+                IdLegajo = item['IdLegajo']
+                Centro = item['Centro']
+                Categoria = item['Categoria']
+                Descripcion = item['Descripcion']
+                Tarea = item['Tarea']
+                Jornales = item['Jornales']
+                qr = item['qr']
+                Tipo = item['Tipo']
+                Cantidad = item['Cantidad']
+                NroFila = item['NroFila']
+                Precio = item['Precio']
+                Lote = item['Lote']
+                Cuadro = item['Cuadro']
+                Pago = item['Pago']
+                Observaciones = item['Observaciones']
+                Usuario = item['Usuario']
+                FechaAlta = item['FechaAlta']
+                if qr is None or qr == '' or qr == 'null':
+                    guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,qr,Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+                else:
+                    if  existeQR(str(qr)):
+                        existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
+                        listadoFilas.append(existe)
+                    else:
+                        guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,qr,Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+            if listadoFilas:
+                nota = 'Las siguientes filas ya están cargadas: \n \n' + ', \n'.join(listadoFilas) + '.'
+                return JsonResponse({'Message': 'Success', 'Nota': nota})  
+            else:
+                nota = "Los registros se guardaron exitosamente."
+                return JsonResponse({'Message': 'Success', 'Nota': nota})                  
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("GENERAL","INSERTA ADICIONALES","Aplicacion",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
 
 
+def nombreChacra(idChacra):
+    nombre = ""
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = """ 
+                    SELECT RTRIM(Nombre)
+                    FROM Chacra
+                    WHERE IdChacra = %s
+                """
+            cursor.execute(sql, [idChacra])
+            consulta = cursor.fetchone()
+            if consulta:
+                return str(consulta[0])
+            return nombre  
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp", "NOMBRE CHACRA", "usuario", error)
+        return nombre
+    
+def existeQR(qr):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = """ 
+                    SELECT DISTINCT QR
+                    FROM Planilla_Chacras
+                    WHERE QR = %s
+                """
+            cursor.execute(sql,[qr])
+            consulta = cursor.fetchall()
+            if consulta:
+                return True
+            return False  
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp", "EXISTE QR", "usuario", error)
+        return False
+    
+def guardaAdicional(IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = "INSERT INTO Planilla_Chacras (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta, FechaAlta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())"
+            values = (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta)
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp", "GUARDA ADICIONAL", "usuario", error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 
 
