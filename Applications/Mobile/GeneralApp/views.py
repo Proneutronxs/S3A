@@ -183,7 +183,7 @@ def login_app(request):
 ###  METODO GET PARA TRAER CHACRAS Y ID
 
 def actualizaIDFirebase(usuario,token):
-    values = (usuario, token)
+    values = (token, token, usuario)
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ UPDATE USUARIOS 
