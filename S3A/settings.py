@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'Applications.Mobile.Presentismo',
     'Applications.TareasProgramadas',
     'django_crontab',
+    #'push_notifications',
     'Applications.TresAses',
     'Applications.RRHH',
     'Applications.Reportes',
@@ -143,26 +144,16 @@ DATABASES = {
 
 
 
-
-
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': 'S3A/SQLite/db.SQLite',
 #     },
 # }
-
-
-
-
-
-
-
-
 
 
 ###### LOCAL S3A
+ip = '192.168.0.3'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -172,7 +163,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.239',
+#         'HOST': ip,
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -183,7 +174,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TresAses_ISISPayroll',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.239',
+#         'HOST': ip,
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -194,7 +185,7 @@ DATABASES = {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'S3A',
 #         'USER': 'sa',
-#         'HOST': '192.168.0.239',
+#         'HOST': ip,
 #         'PASSWORD': 'Sideswipe348',
 #         'PORT': '',
 #         'OPTIONS': {
@@ -204,65 +195,10 @@ DATABASES = {
 # }
 
 
-
-
-
-
-
-
-######FORWARDING
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': 'S3A/SQLite/db.SQLite',
-#     },
-#     'TRESASES_APLICATIVO': {
-#         'ENGINE': 'sql_server.pyodbc',
-#         'NAME': 'TRESASES_APLICATIVO',
-#         'USER': 'sa',
-#         'HOST': '186.127.54.205,20',
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     },
-#     'ISISPayroll': {
-#         'ENGINE': 'sql_server.pyodbc',
-#         'NAME': 'TresAses_ISISPayroll',
-#         'USER': 'sa',
-#         'HOST': '186.127.54.205,20',
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     },
-#     'principal': {
-#         'ENGINE': 'sql_server.pyodbc',
-#         'NAME': 'principal',
-#         'USER': 'sa',
-#         'HOST': '186.127.54.205,20',
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     },
-#     'S3A': {
-#         'ENGINE': 'sql_server.pyodbc',
-#         'NAME': 'S3A',
-#         'USER': 'sa',
-#         'HOST': '186.127.54.205,20',
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     }
-# }
-
-
+PUSH_NOTIFICATIONS_SETTINGS = {
+    'FCM_API_KEY': 'AIzaSyD3dFfNPd3HtRbQtBjpza0lpzJNznLwfyo',
+    'FCM_PROXY': 'https://fcm.googleapis.com/fcm/send',
+}
 
 
 # Password validation

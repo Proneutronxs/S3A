@@ -19,9 +19,7 @@ def login_app(request):
         body = request.body.decode('utf-8')
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
-        #fechaHora = str(json.loads(body)['actual'])
-        #registro = str(json.loads(body)['registro'])
-        #print(fechaHora,registro) " \
+        idFireBase = str(json.loads(body)['token'])
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """
@@ -84,7 +82,7 @@ def login_app(request):
                     }
                     datos = {'Message': 'Success', 'Data': response_data}
                     estado = "E"
-                    #insertaRegistro(usuario,fechaHora,registro,estado)
+                    actualizaIDFirebase(usuario,idFireBase)
                     return JsonResponse(datos)
                 else:
                     response_data = {
@@ -183,6 +181,21 @@ def login_app(request):
 #         return JsonResponse(response_data)
 
 ###  METODO GET PARA TRAER CHACRAS Y ID
+
+def actualizaIDFirebase(usuario,token):
+    values = (usuario, token)
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ UPDATE USUARIOS 
+                        SET IdAndroid = %s 
+                        WHERE IdAndroid != %s AND Usuario = %s; """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("GeneralApp","ACTUALIZA ID FIREBASE","usuario",error)
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
 def borraBaseDatosApp():
     try:

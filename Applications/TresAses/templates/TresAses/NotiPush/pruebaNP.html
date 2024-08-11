@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F.Push</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .formulario {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .formulario label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .formulario input[type="text"],
+        .formulario input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .formulario button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .formulario button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="formulario">
+        <label for="usuario">Usuario:</label>
+        <input type="text" id="usuario" name="usuario">
+
+        <label for="texto">Texto:</label>
+        <input type="text" id="texto" name="texto">
+
+        <button onclick="envía_data();">Enviar</button>
+    </div>
+</body>
+<script src="{%static 'TresAses/js/General/Push.js' %}"></script>
+</html>

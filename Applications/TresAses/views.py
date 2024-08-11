@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
@@ -59,4 +60,20 @@ def funcion(request):
 
 
 
+def push(request):
+    return render (request, 'TresAses/NotiPush/pruebaNP.html')
 
+
+@csrf_exempt
+def notiPush(request):
+    if request.method == 'POST':
+            user = str(request.POST.get('User'))
+            texto = str(request.POST.get('Texto'))
+            idUnico = 'MSQlSkNIQU1CSSQlNTgwMTU='
+            print(user)
+
+            print(texto)
+
+            return JsonResponse({'Message': 'NotFound', 'Nota': 'Se ejecutó correctamente.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
