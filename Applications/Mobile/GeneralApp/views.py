@@ -20,7 +20,7 @@ def login_app(request):
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
         try:
-            idFireBase = str(json.loads(body)['actual'])
+            idFireBase = str(json.loads(body)['token'])
         except KeyError:
             idFireBase = "IdAndroid"
         try:
