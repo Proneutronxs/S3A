@@ -19,7 +19,10 @@ def login_app(request):
         body = request.body.decode('utf-8')
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
-        idFireBase = str(json.loads(body)['token'])
+        try:
+            idFireBase = str(json.loads(body)['token'])
+        except KeyError:
+            idFireBase = "IdAndroid"
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """
