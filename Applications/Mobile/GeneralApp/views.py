@@ -39,7 +39,7 @@ def login_app(request):
                         BEGIN 
                             SELECT        USUARIOS.CodEmpleado, (RTRIM(S3A.dbo.Chofer.Apellidos) + ' ' + RTRIM(S3A.dbo.Chofer.Nombres)) AS Nombre, 
                                                 USR_PERMISOS_APP.MD_AutoriHorasExt, USR_PERMISOS_APP.MD_Presentismo, USR_PERMISOS_APP.MD_Anticipos, USR_PERMISOS_APP.MD_PedidoFlete,  
-                                                USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario, USUARIOS.Tipo
+                                                USR_PERMISOS_APP.MD_CrearRemito, USR_PERMISOS_APP.MD_ReporteBins, USR_PERMISOS_APP.MD_Chofer, USUARIOS.Usuario, USUARIOS.Tipo,USUARIOS.Chacras,USUARIOS.Centros
                             FROM            S3A.dbo.Chofer INNER JOIN 
                                                     USUARIOS INNER JOIN 
                                                     USR_PERMISOS_APP ON USUARIOS.CodEmpleado = USR_PERMISOS_APP.CodEmpleado ON S3A.dbo.Chofer.IdChofer = USUARIOS.CodEmpleado 
