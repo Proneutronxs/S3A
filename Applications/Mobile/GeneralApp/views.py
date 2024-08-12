@@ -20,7 +20,7 @@ def login_app(request):
         usuario = str(json.loads(body)['usuario'])
         clave = str(json.loads(body)['contraseña'])
         try:
-            idFireBase = str(json.loads(body)['token'])
+            idFireBase = str(json.loads(body)['actual'])
         except KeyError:
             idFireBase = "IdAndroid"
         try:
@@ -196,9 +196,6 @@ def actualizaIDFirebase(usuario,token):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("GeneralApp","ACTUALIZA ID FIREBASE","usuario",error)
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def borraBaseDatosApp():
     try:
@@ -216,9 +213,6 @@ def borraBaseDatosApp():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","borraBaseDatosApp","usuario",error)
         return dato
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 @csrf_exempt
 def id_Nombre_Ccostos(request, legajo):
