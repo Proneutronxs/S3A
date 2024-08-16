@@ -85,7 +85,8 @@ def login_app(request):
                     }
                     datos = {'Message': 'Success', 'Data': response_data}
                     estado = "E"
-                    actualizaIDFirebase(usuario,idFireBase)
+                    if idFireBase != '0':
+                        actualizaIDFirebase(usuario,idFireBase)
                     return JsonResponse(datos)
                 else:
                     response_data = {
@@ -297,7 +298,6 @@ def personal_por_Ccostos_anticipos(request, codigo):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 
-
 def traePersonal(id):
     try:
         with connections['ISISPayroll'].cursor() as cursor:
@@ -451,8 +451,6 @@ def buscaParametro(request, codigo):
             'Message': 'No se pudo resolver la petición.'
         }
         return JsonResponse(response_data)
-
-
 
 
 

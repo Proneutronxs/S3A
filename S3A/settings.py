@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'Applications.Logistica',
     'Applications.Bascula',
     'Applications.Estadisticas',
+    'Applications.Chacras',
 ]
 
 MIDDLEWARE = [
@@ -153,7 +154,7 @@ DATABASES = {
 
 
 ###### LOCAL S3A
-ip = '192.168.0.3'
+# ip = '192.168.0.116'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',

@@ -41,6 +41,8 @@ urlpatterns = [
     ### URL APLICACIÓN TRES ASES GENERAL
     path('', include('Applications.TresAses.urls')),
 
+    path('chacras/', include('Applications.Chacras.urls')),
+
     path('bascula/', include('Applications.Bascula.urls')),
 
     path('rrhh/', include('Applications.RRHH.urls')),

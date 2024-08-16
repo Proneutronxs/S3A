@@ -272,7 +272,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   color: #444343;
-  min-height: 84%;
+  min-height: 84%; /* estaba en 84 */
 }
 
 .container-tabla-he {
@@ -313,6 +313,23 @@ a:hover {
 
 .selectores option {
   color: black;
+}
+
+.selectores-auto {
+  color: black;
+  background-color: #f0f0f0;
+  border: 1px solid #a72626;
+  border-radius: 10px;
+}
+
+.selectores-auto option {
+  color: black;
+}
+
+.selectores-auto:hover {
+  border-color: #a72626;
+  background-color: #a72626;
+  color: #f0f0f0;
 }
 
 .row_items {
@@ -397,7 +414,7 @@ input[type="checkbox"].input-checkbox {
 
 .pre-hs-ex th,
 .pre-hs-ex td {
-  padding: 8px;
+  padding: 4px;
   border: 1px solid #ccc;
 }
 
@@ -1300,6 +1317,13 @@ input[type="checkbox"].input-checkbox {
 
 
 
+.texto-centro{
+  text-align: center;
+}
+
+.texto-font {
+  font-size: 14px;
+}
 
 
 
@@ -1435,4 +1459,15 @@ input[type="checkbox"].input-checkbox {
   margin-left: 0px;
   margin-right: 0px;
   }
+}
+
+
+.boton-detalles {
+  border: none;
+  cursor: pointer;
+  color: #007bff; /* Blanco */
+}
+
+.boton-detalles:hover {
+  color: #0056b3; /* Azul oscuro */
 }
