@@ -819,7 +819,7 @@ def insertaAdicionales(request):
                     #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales, str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                     guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
-                    if  existeQR(str(qr),Tarea,IdAdicional):
+                    if  existeQR(str(qr),Tarea,IdLegajo):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
