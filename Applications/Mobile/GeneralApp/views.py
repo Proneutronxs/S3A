@@ -815,11 +815,11 @@ def insertaAdicionales(request):
                 Observaciones = str(item['Observaciones'])
                 Usuario = str(item['Usuario'])
                 FechaAlta = str(item['FechaAlta']).replace(' ','T')
-                if qr is None or qr == '' or qr == 'null' or qr == 'NULL':
+                if qr is None or qr == '' or qr == 'null' or qr == 'NULL' or qr =='0':
                     #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales, str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                     guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
-                    if  existeQR(str(qr),Tarea,FechaAlta):
+                    if  existeQR(str(qr),Tarea,str(item['FechaAlta'])):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
@@ -865,7 +865,7 @@ def existeQR(qr,tarea,fechaHora):
             sql = """ 
                     SELECT DISTINCT QR
                     FROM Planilla_Chacras
-                    WHERE QR = %s AND Tarea = %s AND Fecha <> %s
+                    WHERE QR = %s AND Tarea = %s AND YEAR(Fecha) = YEAR(%s)
                 """
             cursor.execute(sql,[qr,tarea,fechaHora])
             consulta = cursor.fetchall()
