@@ -819,7 +819,7 @@ def insertaAdicionales(request):
                     #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales, str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                     guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
                 else:
-                    if  existeQR(str(qr),Tarea,str(item['FechaAlta'])):
+                    if  existeQR(str(qr),Tarea):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
@@ -859,15 +859,15 @@ def nombreChacra(idChacra):
         insertar_registro_error_sql("GeneralApp", "NOMBRE CHACRA", "usuario", error)
         return nombre
     
-def existeQR(qr,tarea,fechaHora):
+def existeQR(qr,tarea):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
                     SELECT DISTINCT QR
                     FROM Planilla_Chacras
-                    WHERE QR = %s AND Tarea = %s AND YEAR(Fecha) = YEAR(%s)
+                    WHERE QR = %s AND Tarea = %s 
                 """
-            cursor.execute(sql,[qr,tarea,fechaHora])
+            cursor.execute(sql,[qr,tarea])
             consulta = cursor.fetchall()
             if consulta:
                 return True
