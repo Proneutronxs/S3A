@@ -9,33 +9,68 @@
     <div class="text" style="font-size: 20px;">CHACRAS - PLANILLAS - GENERAL</div>
 </div>
 
-<div class="contenedor" style="border-radius: 2px; border-color: black;">
+<div class="contenedor">
     <div class="text letras">
         <div class="row">
             <div class="items-row">
-                <label class="letras" for="fechaInicio">Desde</label>
+                <label class="letras" for="fechaInicio">D</label>
                 <input type="date" id="fechaInicio" name="fechaInicio" class="selectores">
             </div>
             <div class="items-row">
-                <label class="letras" for="fechaFinal">Hasta</label>
+                <label class="letras" for="fechaFinal">H</label>
                 <input type="date" id="fechaFinal" name="fechaFinal" class="selectores">
             </div>
-            <div class="items-row" style="width: 320px;">
+            <div class="items-row" style="max-width: 300px; width: 250px;">
                 <select class="selectores" type="checkbox" id="selector_centros" name="selector_centros">
                     <option value="" selected disabled>SELECCIONE UN CENTRO</option>
                     <option value="0">TODOS</option>
                 </select>
             </div>
-            <div class="items-row" style="width: 320px;">
+            <div class="items-row" style="max-width: 300px; width: 250px;">
                 <select class="selectores" type="checkbox" id="selector_legajos" name="selector_legajos">
                     <option value="" selected disabled>SELECCIONE UN LEGAJO</option>
                     <option value="0">TODOS</option>
+                    <option value="0">58015 - CHAMBI JOSUE RUBEN</option>
+                </select>
+            </div>
+            <div class="items-row"" style="max-width: 300px; width: 100px;">
+                <select class="selectores" type="checkbox" id="selector_pagos" name="selector_pagos">
+                    <option value="" selected disabled>F. PAGO</option>
+                    <option value="T">TODO</option>
+                    <option value="A">ADICIONAL</option>
+                    <option value="D">DIFERENCIA</option>
+                    <option value="R">RECIBO</option>
                 </select>
             </div>
             <div class="items-row">
                 <button id="idBuscaAdicional" name="idBuscaAdicional"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">search</button>
+            </div>
+            <div class="items-row" style="margin-left: 10px;">
+                <button id="idExporta" name="idExporta"
+                    class="selectores btn-submit botones"
+                    type="button">EXPORTAR</button>
+            </div>
+            <div class="items-row" style="margin-left: 10px; width: 90px;">
+                <input style="width: 90px;" id="idInput1" name="idInput1"
+                    class="selectores"
+                    ></input>
+            </div>
+            <div class="items-row" style="width: 90px;">
+                <input style="width: 90px;" id="idInput2" name="idInput2"
+                    class="selectores"
+                    ></input>
+            </div>
+            <div class="items-row" style="width: 90px;">
+                <input style="width: 90px;" id="idInput3" name="idInput3"
+                    class="selectores"
+                    ></input>
+            </div>
+            <div class="items-row" style="margin-left: 10px;">
+                <button id="idUpdate" name="idUpdate"
+                    class="selectores btn-submit botones bx material-symbols-outlined icon"
+                    type="button">upload</button>
             </div>
         </div>
     </div>
@@ -72,6 +107,7 @@
                             <th style="width: 180px; min-width: 20px;">Cant.</th>
                             <th style="width: 180px; min-width: 180px;">Lote</th>
                             <th style="width: 180px; min-width: 180px;">Pago</th>
+                            <th style="width: 100px; min-width: 100px;">Importe</th>
                             <th style="width: 180px; min-width: 20px;">Más</th>
                         </tr>
                     </thead>
@@ -90,649 +126,10 @@
                             <td class="texto-centro">1</td>
                             <td class="texto-centro">LOTE 45</td>
                             <td class="texto-centro">ADICIONAL</td>
+                            <td class="texto-centro">$ 12.500,00</td>
                             <td class="texto-centro">
                                 <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>ALDANA FACUNDO ERNESTO</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="texto-centro">
-                                <input class="input-checkbox checkbox" type="checkbox" id="idCheck" name="idCheck"
-                                    value="26243">
-                            </td>
-                            <td class="texto-centro">58652</td>
-                            <td>JOSUE CHAMBI</td>
-                            <td class="texto-centro">CV10VF</td>
-                            <td class="texto-centro">SAB/DOM</td>
-                            <td class="texto-centro">VARIOS</td>
-                            <td class="texto-centro">10</td>
-                            <td class="texto-centro">1</td>
-                            <td class="texto-centro">LOTE 45</td>
-                            <td class="texto-centro">ADICIONAL</td>
-                            <td class="texto-centro">
-                                <button class="boton-detalles">
-                                    <i class='bx material-symbols-outlined icon'>add_circle</i>
+                                    <i class='bx material-symbols-outlined icon'>description</i>
                                 </button>
                             </td>
                         </tr>

@@ -273,6 +273,7 @@ a:hover {
   flex-direction: column;
   color: #444343;
   min-height: 84%; /* estaba en 84 */
+  margin-top: 10px;
 }
 
 .container-tabla-he {
@@ -339,7 +340,7 @@ a:hover {
 }
 
 .items-row {
-  padding: 12px;
+  padding: 2px;
 }
 
 .consola-btn {
@@ -452,7 +453,7 @@ input[type="checkbox"].input-checkbox {
   display: flex;
   align-items: center;
   /* Alinea verticalmente los elementos */
-  gap: 4px;
+  gap: 1px;
   /* Espacio entre los elementos */
 }
 
@@ -992,7 +993,7 @@ input[type="checkbox"].input-checkbox {
 .vista-container-autoriza-viejo {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 150px);
+  height: calc(100vh - 110px);
   width: calc(100vw - 170px);
   overflow: auto;
 }

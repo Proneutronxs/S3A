@@ -19,6 +19,13 @@ const choiceCentros = new Choices('#selector_centros', {
     itemSelectText: ''
 });
 
+const choicePagos = new Choices('#selector_pagos', {
+    allowHTML: true,
+    shouldSort: false,
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
 function fechaActual() {
     var fecha = new Date();
     var mes = fecha.getMonth() + 1;
