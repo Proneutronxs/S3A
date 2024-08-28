@@ -880,7 +880,7 @@ def existeQR(qr,tarea,legajo):
 def guardaAdicional(IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Planilla_Chacras (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta, FechaAlta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE())"
+            sql = "INSERT INTO Planilla_Chacras (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta, FechaAlta,E) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(),'P')"
             values = (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta)
             cursor.execute(sql, values)
     except Exception as e:

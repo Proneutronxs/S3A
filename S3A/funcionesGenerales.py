@@ -1,6 +1,9 @@
 
 from django.utils import timezone
 from django.db import connections
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.http import HttpResponse, Http404
 from Applications.TresAses.models import *
 from datetime import datetime, timedelta
 import calendar
@@ -56,7 +59,6 @@ def insertar_registros_realizados(aplicacion,funcion,usuario,accion,realiza):
     except Exception as e:
         return False
     
-
 def inyectaData(Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector):
     values = [Funcion,Descripcion,Fecha,FechaInicio,FechaFinal,Dia,Sector]
     try:
@@ -128,9 +130,6 @@ def buscaCentroCostosPorUsuario(codigo,usuario):
         error = str(e)
         insertar_registro_error_sql("CODIGO USUARIO","BUSCA DATA TEXTO",usuario,error)
         return data
-
-
-from datetime import datetime
 
 def fecha_hora_actual_texto():
     dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
@@ -215,7 +214,6 @@ def obtener_fechas_entre(fecha_inicio, fecha_fin):
     
     return dias_entre_fechas
 
-
 def formatear_fecha(fecha):
     try:
         fecha_obj = datetime.strptime(fecha, '%Y-%m-%d')
@@ -223,3 +221,91 @@ def formatear_fecha(fecha):
         return fecha_formateada
     except ValueError:
         return "Formato de fecha incorrecto"
+    
+def formatear_moneda(numero):
+    numero = float(numero)
+    return "${:,.2f}".format(numero).replace(",", "#").replace(".", ",").replace("#", ".")
+
+### GET LISTA CENTROS
+def listaCentros(request):
+    if request.method == 'GET':
+        try:
+            with connections['ISISPayroll'].cursor() as cursor:
+                sql = """
+                        SELECT Regis_Cco AS ID, CONVERT(VARCHAR(27),(AbrevCtroCosto + ' - ' + DescrCtroCosto)) AS CENTRO
+                        FROM CentrosCostos
+                        ORDER BY CENTRO
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = [{'Codigo': '0', 'Descripcion': 'TODOS'}]
+                    for row in consulta:
+                        codigo = str(row[0])
+                        descripcion = str(row[1])
+                        datos = {'Codigo': codigo, 'Descripcion': descripcion}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FUNCIONES GENERAL","LISTA CENTROS","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['ISISPayroll'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def listaPersonalPorCentro(request):
+    if request.method == 'POST':
+        centro = request.POST.get('Centro')
+        try:
+            with connections['ISISPayroll'].cursor() as cursor:
+                sql = """
+                        DECLARE @@Centro INT;
+                        SET @@Centro = %s
+                        SELECT CodEmpleado AS LEGAJO, CONVERT(VARCHAR(31), (CONVERT(VARCHAR(15), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + NombresEmple)) AS NOMBRE 
+                        FROM Empleados
+                        WHERE BajaDefinitivaEmple = '2' AND (@@Centro = '0' OR @@Centro = Regis_CCo)
+                        ORDER BY ApellidoEmple
+                    """
+                cursor.execute(sql, [centro])
+                consulta = cursor.fetchall()
+
+                if consulta:
+                    lista_data = [{'Legajo': '0', 'Nombre': 'TODOS'}]
+                    for row in consulta:
+                        codigo = str(row[0])
+                        descripcion = str(row[1])
+                        datos = {'Legajo': codigo, 'Nombre': descripcion}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FUNCIONES GENERAL","LISTA PERSONAL POR CENTRO","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['ISISPayroll'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

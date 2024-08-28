@@ -492,7 +492,7 @@ def eliminaHorasCargadas(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCION
 
 @login_required
 @csrf_exempt
-def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONADAS (REQUIERE PERMISOS delete)
+def mostrarHorasArchivo(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('RRHH.puede_ver')
         if user_has_permission:
@@ -592,7 +592,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '30/06/2024' + ', Fecha de Cierre: ' + '28/07/2024' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/07/2024' + ', Fecha de Cierre: ' + '28/08/2024' + '.'
                         return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
                     else:
                         texto = ''
@@ -600,7 +600,7 @@ def mostrarHorasArchivo(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCIONA
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '30/06/2024' + ', Fecha de Cierre: ' + '28/07/2024' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/07/2024' + ', Fecha de Cierre: ' + '28/08/2024' + '.'
                         data = "No se encontraron horas extras."
                         return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
 
@@ -675,8 +675,8 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
             sql = """
                 DECLARE @@Inicio DATE;
                 DECLARE @@Final DATE;
-                SET @@Inicio = '2024-06-30';
-                SET @@Final = '2024-07-28';
+                SET @@Inicio = '2024-07-29';
+                SET @@Final = '2024-08-28';
                 SELECT 
                     IdLegajo AS LEGAJO, 
                     ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
