@@ -14,5 +14,7 @@ urlpatterns = [
     path('planillas/general/listar-personal/', views.listaPersonalPorCentro, name='planilla_general_lista_personal_centro'),
 
     path('planillas/general/listar-adicionales/', views.listarAdicionales, name='planilla_general_listar_adicionales'),
+
+    path('planillas/general/eliminar-adicionales/', views.eliminaAdicionalTildado, name='planilla_general_eliminar_adicionales'),
     
 ]

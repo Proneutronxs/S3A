@@ -27,7 +27,7 @@ def planillas(request):
 def general(request):
     return render (request, 'Chacras/Planillas/general.html')
 
-@csrf_exempt
+
 @login_required
 @csrf_exempt
 def listarAdicionales(request):
@@ -68,7 +68,10 @@ def listarAdicionales(request):
                                 CASE WHEN SUB_CONSULTA.CONTEO IS NULL THEN '0' ELSE SUB_CONSULTA.CONTEO END AS CONTEO_SUB,
                                 CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN '1' ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_SUB,
                                 CASE WHEN SUB_CONSULTA.IMPORTE IS NULL THEN CONVERT(VARCHAR,Planilla_Chacras.PrecioUnitario) ELSE CONVERT(VARCHAR,SUB_CONSULTA.IMPORTE) END AS IMPORTE_SUB,
-                                CASE WHEN Planilla_Chacras.E IS NULL THEN '#fbbc05' WHEN Planilla_Chacras.E = 'P' THEN '#fbbc05' WHEN Planilla_Chacras.E = 'S' THEN '#34a853' END AS ESTADO
+                                CASE WHEN Planilla_Chacras.E IS NULL THEN '#fbbc05' WHEN Planilla_Chacras.E = 'P' THEN '#fbbc05' WHEN Planilla_Chacras.E = 'S' THEN '#34a853' END AS ESTADO,
+                                CASE WHEN Planilla_Chacras.Descripcion = 'PD' AND Planilla_Chacras.Pago = 'A' THEN 'S' ELSE 'N' END AS EDIT_IMPORTE,
+                                CASE WHEN Planilla_Chacras.Descripcion = 'PT' AND (Planilla_Chacras.Tarea = 'P' OR Planilla_Chacras.Tarea = 'R') THEN 'S' ELSE 'N' END AS EDIT_PREMIO,
+		                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO
                         FROM   Planilla_Chacras INNER JOIN
                                     TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                     TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN
@@ -103,10 +106,14 @@ def listarAdicionales(request):
                             pago = str(row[9])
                             chacra = str(row[10])
                             cantidad = str(row[12])
-                            importe = formatear_moneda(str(row[13]))
+                            importe = str(row[13])#formatear_moneda(str(row[13]))
                             estado = str(row[14])
+                            edit_importe = str(row[15])
+                            edit_premio = str(row[16])
+                            importe_premio = str(row[17])
                             datos = {'Id': idAdiconal, 'Legajo': legajo, 'Nombre': nombre, 'Centro':centro, 'Categoria':cat, 'Descripcion':desc, 'Tarea':tarea, 'Dias':dias,
-                                     'Tipo':tipo, 'Pago':pago, 'Chacra':chacra, 'Cantidad':cantidad, 'Importe':importe, 'Estado':estado}
+                                     'Tipo':tipo, 'Pago':pago, 'Chacra':chacra, 'Cantidad':cantidad, 'Importe':importe, 'Estado':estado, 'Eimporte':edit_importe,'Epremio':edit_premio, 
+                                     'ImportePremio':importe_premio}
                             listado_tabla.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': listado_tabla})
                     else:
@@ -122,3 +129,104 @@ def listarAdicionales(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+
+@login_required
+@csrf_exempt
+def eliminaAdicionalTildado(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Chacras.puede_borrar')
+        if user_has_permission:
+            usuario = str(request.user)
+            adicionales = request.POST.getlist('idCheck')
+            index = 0
+            for ad in adicionales:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                UPDATE Planilla_Chacras SET E = 'E', FechaBaja = GETDATE(), UserBaja = %s WHERE IdPlanilla = %s
+                                
+                            """
+                        cursor.execute(sql, [usuario.upper(), ad])
+                        cursor.commit()
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","ELIMINA ADICIONAL TILDADO",usuario.upper(),error)
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+                index = index + 1
+            if index == len(adicionales):
+                return JsonResponse({'Message': 'Success', 'Nota': 'Se eliminaron los Adicionales.'})
+            else:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Hubo un error al eliminar algunos Adicionales.'})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+@login_required
+@csrf_exempt
+def premioAdicionalTildado(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Chacras.puede_borrar')
+        if user_has_permission:
+            usuario = str(request.user)
+            adicionales = request.POST.getlist('idCheck')
+            index = 0
+            for ad in adicionales:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                UPDATE Planilla_Chacras SET E = 'E', FechaBaja = GETDATE(), UserBaja = %s WHERE IdPlanilla = %s
+                            """
+                        cursor.execute(sql, [usuario.upper(), ad])
+                        cursor.commit()
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","ELIMINA ADICIONAL TILDADO",usuario.upper(),error)
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+                index = index + 1
+            if index == len(adicionales):
+                return JsonResponse({'Message': 'Success', 'Nota': 'Se eliminaron los Adicionales.'})
+            else:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Hubo un error al eliminar algunos Adicionales.'})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@login_required
+@csrf_exempt
+def insertaPremioAdicional(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Chacras.puede_insertar')
+        if user_has_permission:
+            usuario = str(request.user)
+            importe = request.POST.get('Premio')
+            adicionales = request.POST.getlist('idCheck')
+            index = 0
+            for ad in adicionales:
+                print(importe, usuario.upper(), ad)
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """ 
+                                UPDATE Planilla_Chacras SET ImportePremio = %s, FechaMod = GETDATE(), UserMod = %s WHERE IdPlanilla = %s
+                            """
+                        #cursor.execute(sql, [importe, usuario.upper(), ad])
+                        #cursor.commit()
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("EMPAQUE","INSERTA PREMIO TILDADO",usuario.upper(),error)
+                finally:
+                    connections['TRESASES_APLICATIVO'].close()
+                index = index + 1
+            if index == len(adicionales):
+                return JsonResponse({'Message': 'Success', 'Nota': 'Se actualizó el premio de los Adicionales.'})
+            else:
+                return JsonResponse({'Message': 'Success', 'Nota': 'Hubo un error al intentar introducir el premio en algunos Adicionales.'})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})

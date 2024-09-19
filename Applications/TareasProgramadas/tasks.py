@@ -195,8 +195,8 @@ def TrasladoLegajos():
             insertaLegajosTurnos_A(legLegajo)
             insertaLegajosTurnos_B(legLegajo)
             insertaSonidosLegajos(legLegajo)
-            insertaTarjetaPeriodo_A(legLegajo)
-            insertaTarjetaPeriodo_B(legLegajo)
+            #insertaTarjetaPeriodo_A(legLegajo)
+            #insertaTarjetaPeriodo_B(legLegajo)
             actualiza(legLegajo)
 
 

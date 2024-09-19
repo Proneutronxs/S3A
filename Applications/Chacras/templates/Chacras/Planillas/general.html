@@ -55,20 +55,25 @@
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">search</button>
             </div>
-            <div class="items-row">
+            <div class="items-row" style="margin-left: 10px;">
                 <button id="idEliminar" name="idEliminar"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">delete</button>
+            </div>
+            <div class="items-row">
+                <button id="addPremio" name="addPremio"
+                    class="selectores btn-submit botones bx material-symbols-outlined icon"
+                    type="button">trophy</button>
+            </div>
+            <div class="items-row">
+                <button id="idUpdate" name="idUpdate"
+                    class="selectores btn-submit botones bx material-symbols-outlined icon"
+                    type="button">prompt_suggestion</button>
             </div>
             <div class="items-row" style="margin-left: 10px;">
                 <button id="idExporta" name="idExporta" onclick="openExportaPopup();"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">move_group</button>
-            </div>
-            <div class="items-row" style="margin-left: 10px;">
-                <button id="idUpdate" name="idUpdate"
-                    class="selectores btn-submit botones bx material-symbols-outlined icon"
-                    type="button">prompt_suggestion</button>
             </div>
             <!-- <div class="items-row" style="width: 250px;">
                 <div class="scrolling-text-container">
@@ -110,15 +115,16 @@
                             <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox"
                                     id="selectAll"></th>
                             <th style="width: 20px; min-width: 20px;">E</th>
-                            <th style="width: 80px; min-width: 80px;">Legajo</th>
+                            <th style="width: 70px; min-width: 70px;">Legajo</th>
                             <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
-                            <th style="width: 80px; min-width: 80px;">Centro</th>
+                            <th style="width: 70px; min-width: 70px;">Centro</th>
                             <th style="width: 120px; min-width: 120px;">Descripción</th>
                             <th style="width: 100px; min-width: 100px;">Tarea</th>
                             <th style="width: 60px; min-width: 60px;">Días</th>
                             <th style="width: 60px; min-width: 60px;">Cant.</th>
                             <th style="width: 110px; min-width: 110px;">Tipo</th>
-                            <th style=" min-width: 210px;">Lote</th>
+                            <th style=" min-width: 210px;">Chacra</th>
+                            <th style="width: 110px; min-width: 110px;">Premio</th>
                             <th style="width: 110px; min-width: 110px;">Pago</th>
                             <th style="width: 110px; min-width: 110px;">Importe</th>
                             <th style="width: 50px; min-width: 50px;">Más</th>
@@ -201,6 +207,37 @@
     </div>
 </div>
 
+<div class="descarga_excel_HE" id="confirmacion_id">
+    <div class="popup-confirmacion" id="confirmationPopup">
+        <div class="popup-content" id="popup-content">
+            <h4>CONFIRMAR ELIMINACIÓN</h4>
+            <div style="margin-top: 20px;" id="contenido_popup">
+                <p>¿Está seguro que eliminar los items seleccionados?</p>
+            </div>
+            <div class="butons_confirm">
+                <button id="cancelar_id" class="btn-submit-nuevo ">CANCELAR</button>
+                <button id="confirmar_id" class="btn-submit-nuevo " onclick="elimina_adicionales();">ELIMINAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="introducirImporte" id="confirmacion_Premio"></div>
+    <div class="popup-confirmacion" id="confirmationPopupPremio">
+        <div class="popup-content" id="popup-contentPremio">
+            <h4>IMPORTE PREMIO</h4>
+            <div style="margin-top: 20px;" id="contenido_popupPremio">
+                <p>Introduzca el importe del Premio para los seleccionados.</p>
+                <input class="input" id="imput_importe" style=" max-width: 150px; text-align: center;" type="number">
+            </div>
+            <div class="butons_confirm">
+                <button id="cancelar_Premio" class="btn-submit-nuevo ">CANCELAR</button>
+                <button id="confirmar_Premio" class="btn-submit-nuevo " onclick="">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Pop-up Exportar a Archivo -->
 <div id="exporta-planilla-popup" class="exporta-planilla-popup-overlay">
     <div class="exporta-planilla-popup-content">
@@ -218,7 +255,7 @@
                     <option value="pdf">PDF</option>
                 </select>
             </div>
-            <div class="exporta-planilla-rows_date">
+            <!-- <div class="exporta-planilla-rows_date">
                 <div class="exporta-planilla-divs_form">
                     <label for="exporta-planilla-fecha-desde">DESDE</label>
                     <input id="exporta-planilla-fecha-desde" onclick="this.showPicker();" class="exporta-planilla-input"
@@ -229,7 +266,7 @@
                     <input id="exporta-planilla-fecha-hasta" onclick="this.showPicker();" class="exporta-planilla-input"
                         type="date">
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="exporta-planilla-popup-footer">
             <button class="selectores btn-submit botones ">GENERAR</button>

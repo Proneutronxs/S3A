@@ -1288,6 +1288,15 @@ input[type="checkbox"].input-checkbox {
   position: relative;
 }
 
+.introducirImporte {
+  display: none;
+  height: 380px;
+  width: 380px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
 
 .butons_confirm {
   margin-top: 20px;
