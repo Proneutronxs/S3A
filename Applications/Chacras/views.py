@@ -253,7 +253,7 @@ def detalleAdicional(request):
                             CASE Planilla_Chacras.Pago WHEN 'R' THEN 'RECIBO' WHEN 'A' THEN 'ADICIONAL' WHEN 'D' THEN 'DIFERENCIA' END AS PAGO,
                             CONVERT(VARCHAR(20) ,RTRIM(S3A.dbo.Chacra.Nombre)) AS CHACRA,
                             CASE WHEN SUB_CONSULTA.CONTEO IS NULL THEN '0' ELSE SUB_CONSULTA.CONTEO END AS CONTEO_SUB,
-                            CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN '1' ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_SUB,
+                            CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN Planilla_Chacras.Cantidad ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_SUB,
                             CASE WHEN SUB_CONSULTA.IMPORTE IS NULL THEN CONVERT(VARCHAR,Planilla_Chacras.PrecioUnitario) ELSE CONVERT(VARCHAR,SUB_CONSULTA.IMPORTE) END AS IMPORTE_SUB,
                             CASE Planilla_Chacras.Cuadro WHEN '0' THEN '-' ELSE Planilla_Chacras.Cuadro END AS CUADRO,
                             Planilla_Chacras.Usuario AS ENCARGADO, Planilla_Chacras.Observaciones AS OBS
@@ -341,7 +341,7 @@ def crearArchivos(request):
                             CASE Planilla_Chacras.Tarea WHEN 'P' THEN 'PODA' WHEN 'R' THEN 'RALEO' WHEN 'V' THEN 'VARIOS' WHEN 'T' THEN 'TRACTOR' END AS TAREA, Planilla_Chacras.Jornales AS CANT_DIAS,
                             CASE Planilla_Chacras.Tipo WHEN 'F' THEN ('FILA N°: ' + CONVERT(VARCHAR(10),Planilla_Chacras.NroFila)) WHEN 'P' THEN 'PLANTAS' WHEN 'M' THEN 'METROS' WHEN 'O' THEN 'OTROS' END AS TIPO,
                             CASE Planilla_Chacras.Pago WHEN 'R' THEN 'RECIBO' WHEN 'A' THEN 'ADICIONAL' WHEN 'D' THEN 'DIFERENCIA' END AS PAGO,
-                            CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN '1' ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_UNI,
+                            CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN Planilla_Chacras.Cantidad ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_UNI,
                             CASE WHEN SUB_CONSULTA.IMPORTE IS NULL THEN CONVERT(VARCHAR,Planilla_Chacras.PrecioUnitario) ELSE CONVERT(VARCHAR,SUB_CONSULTA.IMPORTE) END AS IMPORTE_UNI,
 	                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
                             CONVERT(VARCHAR(20) ,RTRIM(S3A.dbo.Chacra.Nombre)) AS CHACRA,CASE Planilla_Chacras.Cuadro WHEN '0' THEN '-' ELSE Planilla_Chacras.Cuadro END AS CUADRO, Planilla_Chacras.Observaciones AS OBS,
