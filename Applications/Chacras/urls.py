@@ -16,5 +16,13 @@ urlpatterns = [
     path('planillas/general/listar-adicionales/', views.listarAdicionales, name='planilla_general_listar_adicionales'),
 
     path('planillas/general/eliminar-adicionales/', views.eliminaAdicionalTildado, name='planilla_general_eliminar_adicionales'),
+
+    path('planillas/general/inserta-premio-adicionales/', views.insertaPremioAdicional, name='planilla_general_inserta_premio_adicionales'),
+
+    path('planillas/general/inserta-importe-adicionales/', views.insertaImporteAdicional, name='planilla_general_inserta_importe_adicionales'),
+
+    path('planillas/general/detalle-adicional/', views.detalleAdicional, name='planilla_general_detalle_adicional'),
+
+    path('planillas/general/crear-archivos/', views.crearArchivos, name='planilla_general_crear_archivos'),
     
 ]

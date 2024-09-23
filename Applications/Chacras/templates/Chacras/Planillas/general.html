@@ -66,9 +66,9 @@
                     type="button">trophy</button>
             </div>
             <div class="items-row">
-                <button id="idUpdate" name="idUpdate"
-                    class="selectores btn-submit botones bx material-symbols-outlined icon"
-                    type="button">prompt_suggestion</button>
+                <button id="update_importe" name="update_importe"
+                    class="selectores btn-submit botones bx material-symbols-outlined icon" type="button"
+                    >attach_money</button>
             </div>
             <div class="items-row" style="margin-left: 10px;">
                 <button id="idExporta" name="idExporta" onclick="openExportaPopup();"
@@ -146,63 +146,10 @@
             <h2>DETALLE ADICIONAL</h2>
         </div>
         <div class="popup-body" id="content-detalles-planilla-general">
-            <div class="popup-columns">
-                <div class="popup-column">
-                    <div class="info-item">
-                        <strong>ID ADICIONAL:</strong> 12
-                    </div>
-                    <div class="info-item">
-                        <strong>NOMBRE:</strong> JOSUE CHAMBI
-                    </div>
-                    <div class="info-item">
-                        <strong>CENTRO:</strong> C10V30
-                    </div>
-                    <div class="info-item">
-                        <strong>CATEGORÍA:</strong> P
-                    </div>
-                    <div class="info-item">
-                        <strong>DESCRIPCIÓN:</strong> POR TANTO
-                    </div>
-                    <div class="info-item">
-                        <strong>TAREA:</strong> VARIOS
-                    </div>
-                    <div class="info-item">
-                        <strong>CANT. DÍAS:</strong> 20
-                    </div>
-                </div>
-                <div class="popup-column">
-                    <div class="info-item">
-                        <strong>CANT. UNI.:</strong> 12
-                    </div>
-                    <div class="info-item">
-                        <strong>TIPO:</strong> FILA N° 32
-                    </div>
-                    <div class="info-item">
-                        <strong>LOTE:</strong> LOTE 100
-                    </div>
-                    <div class="info-item">
-                        <strong>CUADRO:</strong> 52
-                    </div>
-                    <div class="info-item">
-                        <strong>F. PAGO:</strong> ADICIONAL
-                    </div>
-                    <div class="info-item">
-                        <strong>IMPORTE:</strong> $ 1.533,33
-                    </div>
-                    <div class="info-item">
-                        <strong>ENCARGADO:</strong> JCHAMBI
-                    </div>
-                </div>
-            </div>
-            <div class="popup-observaciones">
-                <h3>Observaciones</h3>
-                <textarea rows="4" placeholder="Ingrese sus observaciones aquí...">
-                    adicional, cuadro 22, lote 100, por tanto y poda
-                </textarea>
-            </div>
+            
         </div>
         <div class="popup-footer">
-            <button class="selectores btn-submit botones" id="close-popup">CERRAR</button>
+            <button class="btn-submit-nuevo" id="close-popup">CERRAR</button>
         </div>
     </div>
 </div>
@@ -223,19 +170,16 @@
 </div>
 
 <div class="introducirImporte" id="confirmacion_Premio"></div>
-    <div class="popup-confirmacion" id="confirmationPopupPremio">
-        <div class="popup-content" id="popup-contentPremio">
-            <h4>IMPORTE PREMIO</h4>
-            <div style="margin-top: 20px;" id="contenido_popupPremio">
-                <p>Introduzca el importe del Premio para los seleccionados.</p>
-                <input class="input" id="imput_importe" style=" max-width: 150px; text-align: center;" type="number">
-            </div>
-            <div class="butons_confirm">
-                <button id="cancelar_Premio" class="btn-submit-nuevo ">CANCELAR</button>
-                <button id="confirmar_Premio" class="btn-submit-nuevo " onclick="">GUARDAR</button>
-            </div>
+<div class="popup-confirmacion" id="confirmationPopupPremio">
+    <div class="popup-content" id="popup-contentPremio">
+        <div id="conetnido_importes">
+        </div>
+        <div class="butons_confirm">
+            <button id="cancelar_Premio" class="btn-submit-nuevo ">CANCELAR</button>
+            <button id="confirmar_Premio" class="btn-submit-nuevo " onclick="">GUARDAR</button>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Pop-up Exportar a Archivo -->
@@ -248,11 +192,8 @@
             <div class="exporta-planilla-divs_form">
                 <label for="exporta-planilla-tipo-archivo">TIPO ARCHIVO</label>
                 <select id="exporta-planilla-tipo-archivo" class="exporta-planilla-input-selectores">
-                    <option value="" selected disabled>Seleccione un tipo de archivo</option>
-                    <option value="xls">XLS</option>
-                    <option value="xlsx">XLSX</option>
-                    <option value="csv">CSV</option>
-                    <option value="pdf">PDF</option>
+                    <option value="0" selected disabled>Seleccione un tipo de archivo</option>
+                    <option value="xlsx">EXCEL</option>
                 </select>
             </div>
             <!-- <div class="exporta-planilla-rows_date">
@@ -269,7 +210,7 @@
             </div> -->
         </div>
         <div class="exporta-planilla-popup-footer">
-            <button class="selectores btn-submit botones ">GENERAR</button>
+            <button class="btn-submit-nuevo" id="generar_archivo">GENERAR</button>
         </div>
         <div class="exporta-planilla-close-popup">X</div>
     </div>

@@ -1,9 +1,7 @@
 
 
 const desde = document.getElementById('fechaInicio');
-//const expoDesde = document.getElementById('exporta-planilla-fecha-desde');
 const hasta = document.getElementById('fechaFinal');
-//const expoHasta = document.getElementById('exporta-planilla-fecha-hasta');
 const selectAllCheckbox = document.getElementById('selectAll');
 const openPopupBtn = document.getElementById('open-popup');
 const popup = document.getElementById('pop_up_detalles');
@@ -11,6 +9,7 @@ const closePopupBtn = document.getElementById('close-popup');
 const exportaPopup = document.getElementById('exporta-planilla-popup');
 const exportaCloseBtn = exportaPopup.querySelector('.exporta-planilla-close-popup');
 const popUpPremio = document.getElementById('confirmationPopupPremio');
+const archivo = document.getElementById('exporta-planilla-tipo-archivo');
 
 window.addEventListener("load", async () => {
     fechaActual();
@@ -40,17 +39,62 @@ document.getElementById('idBuscaAdicional').addEventListener('click', function (
     completarTablaA();
 });
 
+document.getElementById('generar_archivo').addEventListener('click', function () {
+    if (archivo.value == '0'){
+        var nota = "Debe seleccionar un Tipo de Archivo.";
+        var color = "red";
+        mostrarInfo(nota, color);
+    }else {
+        descargarArchivo();
+    }
+});
+
 document.getElementById('addPremio').addEventListener('click', function () {
-    popUpPremio.style.display = "flex";
+    var tabla = document.getElementById('tabla_adicionales');
+    var checkboxes = tabla.querySelectorAll('input[type="checkbox"]');
+    var mostrarError = true;
+    checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            premio();
+            popUpPremio.style.display = "flex";
+            mostrarError = false;
+        }
+    });
+    if (mostrarError) {
+        var nota = "Debe seleccionar un Item.";
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+});
+
+document.getElementById('update_importe').addEventListener('click', function () {
+    var tabla = document.getElementById('tabla_adicionales');
+    var checkboxes = tabla.querySelectorAll('input[type="checkbox"]');
+    var mostrarError = true;
+    checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            importe();
+            popUpPremio.style.display = "flex";
+            mostrarError = false;
+        }
+    });
+    if (mostrarError) {
+        var nota = "Debe seleccionar un Item.";
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
 });
 
 document.getElementById('cancelar_Premio').addEventListener('click', function () {
-    console.log("HOLA")
     popUpPremio.style.display = "none";
 });
 
 document.getElementById('cancelar_id').addEventListener('click', function () {
     confirmacion_id.style.display = "none";
+});
+
+document.getElementById('confirmar_Premio').addEventListener('click', function () {
+    premio_adicionales();
 });
 
 document.getElementById('idEliminar').addEventListener('click', function () {
@@ -215,9 +259,9 @@ const completarTablaA = async () => {
                                 <td class="texto-centro">${datos.Cantidad}</td>
                                 <td class="texto-centro">${datos.Tipo}</td>
                                 <td class="texto-centro">${datos.Chacra}</td>
-                                <td class="texto-centro"><input class="input" style="width: 90px; text-align: end;" type="number" value="${datos.ImportePremio}" ${datos.Epremio === 'N' ? 'disabled' : ''}></td>
+                                <td class="texto-end">${datos.ImportePremio}</td>
                                 <td class="texto-centro">${datos.Pago}</td>
-                                <td class="texto-centro"><input class="input" style=" max-width: 90px; text-align: end;" type="number" value="${datos.Importe}"  ${datos.Eimporte === 'N' ? 'disabled' : ''}></td>
+                                <td class="texto-end">${datos.Importe}</td>
                                 <td class="texto-centro">
                                     <button class="boton-detalles" onclick="masDetalles(${datos.Id});">
                                         <i class='bx material-symbols-outlined icon'>description</i>
@@ -255,6 +299,96 @@ const completarTablaA = async () => {
         }
     } catch (error) {
         closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const detalleAdicional = async (idAdicional) => {
+    try {
+        const formData = new FormData();
+        formData.append("ID", idAdicional);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("detalle-adicional/", options);
+        const data = await response.json();
+        if (data.Message == "Success") {
+            selectAllCheckbox.checked = false;
+            let datos_he = ``;
+            data.Datos.forEach((datos) => {
+                datos_he += `
+
+                        <div class="popup-columns">
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>ID ADICIONAL:</strong> ${datos.Id}
+                                </div>
+                                <div class="info-item">
+                                    <strong>NOMBRE:</strong> ${datos.Nombre}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CENTRO:</strong> ${datos.Centro}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CATEGORÍA:</strong> ${datos.Categoria}
+                                </div>
+                                <div class="info-item">
+                                    <strong>DESCRIPCIÓN:</strong> ${datos.Descripcion}
+                                </div>
+                                <div class="info-item">
+                                    <strong>TAREA:</strong> ${datos.Tarea}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CANT. DÍAS:</strong> ${datos.Dias}
+                                </div>
+                            </div>
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>CANT. UNI.:</strong> ${datos.Cantidad}
+                                </div>
+                                <div class="info-item">
+                                    <strong>TIPO:</strong> ${datos.Tipo}
+                                </div>
+                                <div class="info-item">
+                                    <strong>LOTE:</strong> ${datos.Chacra}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CUADRO:</strong> ${datos.Cuadro}
+                                </div>
+                                <div class="info-item">
+                                    <strong>F. PAGO:</strong> ${datos.Pago}
+                                </div>
+                                <div class="info-item">
+                                    <strong>IMPORTE:</strong> ${datos.Importe}
+                                </div>
+                                <div class="info-item">
+                                    <strong>ENCARGADO:</strong> ${datos.Encargado}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="popup-observaciones">
+                            <h3>Observaciones</h3>
+                            <textarea rows="4" placeholder="Sin Observaciones ..." disabled>
+                                    ${datos.Obs}
+                            </textarea>
+                        </div>
+                            `
+            });
+            document.getElementById('content-detalles-planilla-general').innerHTML = datos_he;
+            closeProgressBar();
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
         var nota = "Se produjo un error al procesar la solicitud. " + error;
         var color = "red";
         mostrarInfo(nota, color);
@@ -304,16 +438,129 @@ const elimina_adicionales = async () => {
     }
 };
 
+const premio_adicionales = async () => {
+    try {
+        
+        const checkboxes = document.querySelectorAll('.input-checkbox:checked');
+        const imput_premio = document.getElementById('imput_importe').value;
+        const url = document.getElementById('valor-id').value;
+        const formData = new FormData();
+        formData.append("Premio",imput_premio)
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                formData.append('idCheck', checkbox.value);
+            }
+        });
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch(url, options);
+        const data = await response.json();
+        popUpPremio.style.display = "none";
+        if(data.Message=="Success"){
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota,color);
+            completarTablaA();       
+        }else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota,color);
+        }
+    } catch (error) {
+        popUpPremio.style.display = "none";
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota,color);
+    }
+};
+
+const descargarArchivo = async () => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        const Centro = document.getElementById("selector_centros").value;
+        const Legajo = document.getElementById("selector_legajos").value;
+        const Descripcion = document.getElementById("selector_descripcion").value;
+        const Pago = document.getElementById("selector_pagos").value;
+        formData.append("Inicio", desde.value);
+        formData.append("Final", hasta.value);
+        formData.append("Legajo", Legajo);
+        formData.append("Centro", Centro);
+        formData.append("Descripcion", Descripcion);
+        formData.append("Pago", Pago);
+
+        const options = {
+            method: 'POST',
+            headers: {},
+            body: formData
+        };
+
+        const response = await fetch('crear-archivos/', options);
+        const contentType = response.headers.get('content-type');
+        
+        closeProgressBar();
+        exportaPopup.style.display = 'none';
+
+        if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+            const blob = await response.blob();
+            const excelURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = excelURL;
+            a.style.display = 'none';
+            a.download = 'Listado Adicionales_' + obtenerFechaHoraActual() + '.xlsx'; 
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(excelURL);
+        } else {
+            const data = await response.json();
+            var nota = data.Nota;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        popUpPremio.style.display = "none";
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
 
 
+function importe(){
+    document.getElementById('conetnido_importes').innerHTML =  `
+    <h4>MODIFICAR EL IMPORTE</h4>
+    <div style="margin-top: 20px;" id="contenido_popupPremio">
+        <p>Introduzca el importe para los seleccionados.</p>
+        <input class="input" id="imput_importe" style=" max-width: 150px; text-align: center;" type="number">
+    </div>
+    <input type="text" name="valor-id" id="valor-id"  value="inserta-importe-adicionales/" hidden>
+    `;
+}
 
+function premio(){
+    document.getElementById('conetnido_importes').innerHTML =  `
+        <h4>IMPORTE PREMIO</h4>
+        <div style="margin-top: 20px;" id="contenido_popupPremio">
+            <p>Introduzca el importe del Premio para los seleccionados.</p>
+            <input class="input" id="imput_importe" style=" max-width: 150px; text-align: center;" type="number">
+        </div>
+    <input type="text" name="valor-id" id="valor-id"  value="inserta-premio-adicionales/" hidden>
+    `;
+}
 
-// Función para abrir el pop-up
 function openExportaPopup() {
     exportaPopup.style.display = 'flex';
 }
 
-// Cerrar pop-up
 exportaCloseBtn.addEventListener('click', () => {
     exportaPopup.style.display = 'none';
 });
@@ -327,7 +574,6 @@ exportaCloseBtn.addEventListener('click', () => {
 
 
 
-// Abrir pop-up
 if (openPopupBtn) {
     openPopupBtn.addEventListener('click', () => {
         popup.style.display = 'flex';
@@ -335,6 +581,7 @@ if (openPopupBtn) {
 }
 
 function masDetalles(idAdicional){
+    detalleAdicional(idAdicional);
     popup.style.display = 'flex';
 }
 
@@ -350,7 +597,17 @@ closePopupBtn.addEventListener('click', () => {
 //     }
 // });
 
-
+function obtenerFechaHoraActual() {
+    const fecha = new Date();
+    const anio = fecha.getFullYear();
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const hora = fecha.getHours().toString().padStart(2, '0');
+    const minutos = fecha.getMinutes().toString().padStart(2, '0');
+    const segundos = fecha.getSeconds().toString().padStart(2, '0');
+  
+    return `${anio}_${mes}_${dia}_${hora}_${minutos}_${segundos}`;
+  }
 
 
 

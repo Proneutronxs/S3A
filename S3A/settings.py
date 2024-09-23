@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'Applications.Bascula',
     'Applications.Estadisticas',
     'Applications.Chacras',
+    'Applications.Api',
 ]
 
 MIDDLEWARE = [

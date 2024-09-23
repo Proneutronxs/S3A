@@ -1331,6 +1331,10 @@ input[type="checkbox"].input-checkbox {
   text-align: center;
 }
 
+.texto-end{
+  text-align: end;
+}
+
 .texto-font {
   font-size: 14px;
 }

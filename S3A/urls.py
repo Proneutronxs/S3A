@@ -23,6 +23,8 @@ urlpatterns = [
     ### ADMINISTRACION DE PANEL DJANGO
     path('administracion/sistemas/Django', admin.site.urls),
 
+    path('api/prueba-general/', include('Applications.Api.urls')),
+
     ### API GENERAL APPLICATIONS
     path('api/general/', include('Applications.Mobile.GeneralApp.urls')),
 
