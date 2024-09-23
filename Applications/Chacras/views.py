@@ -238,7 +238,7 @@ def insertaPremioAdicional(request):
 @csrf_exempt
 def detalleAdicional(request):
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('Chacra.puede_ver')
+        user_has_permission = request.user.has_perm('Chacras.puede_ver')
         if user_has_permission:
             idAdicional = request.POST.get('ID')
             values = [idAdicional]
