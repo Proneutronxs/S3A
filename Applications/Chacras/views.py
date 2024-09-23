@@ -68,7 +68,7 @@ def listarAdicionales(request):
                                 CASE Planilla_Chacras.Pago WHEN 'R' THEN 'RECIBO' WHEN 'A' THEN 'ADICIONAL' WHEN 'D' THEN 'DIFERENCIA' END AS PAGO,
                                 CONVERT(VARCHAR(20) ,RTRIM(S3A.dbo.Chacra.Nombre)) AS CHACRA,
                                 CASE WHEN SUB_CONSULTA.CONTEO IS NULL THEN '0' ELSE SUB_CONSULTA.CONTEO END AS CONTEO_SUB,
-                                CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN '1' ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_SUB,
+                                CASE WHEN SUB_CONSULTA.CANTIDAD IS NULL THEN Planilla_Chacras.Cantidad ELSE SUB_CONSULTA.CANTIDAD END AS CANTIDAD_SUB,
                                 CASE WHEN SUB_CONSULTA.IMPORTE IS NULL THEN CONVERT(VARCHAR,Planilla_Chacras.PrecioUnitario) ELSE CONVERT(VARCHAR,SUB_CONSULTA.IMPORTE) END AS IMPORTE_SUB,
                                 CASE WHEN Planilla_Chacras.E IS NULL THEN '#fbbc05' WHEN Planilla_Chacras.E = 'P' THEN '#fbbc05' WHEN Planilla_Chacras.E = 'S' THEN '#34a853' END AS ESTADO,
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PD' AND Planilla_Chacras.Pago = 'A' THEN 'S' ELSE 'N' END AS EDIT_IMPORTE,
