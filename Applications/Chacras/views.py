@@ -82,7 +82,7 @@ def listarAdicionales(request):
                                             ROUND(CONVERT(DECIMAL(10, 2), PrecioUnitario / COUNT(*)), 2) AS IMPORTE
                                         FROM Planilla_Chacras
                                         GROUP BY QR, Tarea,PrecioUnitario) AS SUB_CONSULTA ON Planilla_Chacras.QR = SUB_CONSULTA.QR 
-                        WHERE CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
+                        WHERE (Planilla_Chacras.IdPlanilla > 80) AND CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
                             AND (@@Centro = '0' OR Planilla_Chacras.Centro = @@Centro)
                             AND (@@Pago = '0' OR Planilla_Chacras.Pago = @@Pago)
                             AND (@@Legajo = '0' OR Planilla_Chacras.Legajo = @@Legajo)
@@ -265,7 +265,7 @@ def detalleAdicional(request):
                                         ROUND(CONVERT(DECIMAL(10, 2), PrecioUnitario / COUNT(*)), 2) AS IMPORTE
                                     FROM Planilla_Chacras
                                     GROUP BY QR, Tarea,PrecioUnitario) AS SUB_CONSULTA ON Planilla_Chacras.QR = SUB_CONSULTA.QR 
-                            WHERE Planilla_Chacras.IdPlanilla = %s
+                            WHERE (Planilla_Chacras.IdPlanilla > 80) AND Planilla_Chacras.IdPlanilla = %s
                     """
                     cursor.execute(sql, values)
                     results = cursor.fetchone()
@@ -354,7 +354,7 @@ def crearArchivos(request):
                                     ROUND(CONVERT(DECIMAL(10, 2), PrecioUnitario / COUNT(*)), 2) AS IMPORTE
                                 FROM Planilla_Chacras
                                 GROUP BY QR, Tarea,PrecioUnitario) AS SUB_CONSULTA ON Planilla_Chacras.QR = SUB_CONSULTA.QR 
-                        WHERE CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
+                        WHERE (Planilla_Chacras.IdPlanilla > 80) AND CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
                             AND (@@Centro = '0' OR Planilla_Chacras.Centro = @@Centro)
                             AND (@@Pago = '0' OR Planilla_Chacras.Pago = @@Pago)
                             AND (@@Legajo = '0' OR Planilla_Chacras.Legajo = @@Legajo)
