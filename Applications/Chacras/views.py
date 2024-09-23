@@ -309,7 +309,7 @@ def detalleAdicional(request):
 @csrf_exempt
 def crearArchivos(request):
     if request.method == 'POST':
-        user_has_permission = request.user.has_perm('Chacra.puede_ver')
+        user_has_permission = request.user.has_perm('Chacras.puede_ver')
         if user_has_permission:
             desde = request.POST.get('Inicio')
             hasta = request.POST.get('Final')
