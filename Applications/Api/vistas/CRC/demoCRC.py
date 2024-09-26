@@ -71,7 +71,7 @@ def dataConCRC(request):
                     DECLARE @@Mercado VARCHAR(10);
                     DECLARE @@Cliente INT;
                     DECLARE @@Vapor VARCHAR(10);
-                    DECLARE @@Especie INT;personal_por_Ccostos_asistencia
+                    DECLARE @@Especie INT;
                     DECLARE @@Variedad INT;
                     DECLARE @@Envase INT;
                     DECLARE @@Marca INT;
