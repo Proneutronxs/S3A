@@ -226,6 +226,35 @@ def formatear_moneda(numero):
     numero = float(numero)
     return "${:,.2f}".format(numero).replace(",", "#").replace(".", ",").replace("#", ".")
 
+def obtener_calibres(calibres):
+    calibre_map = {
+    "AAAA": 90,
+    "AAA": 80,
+    "AA": 70,
+    "A": 60,
+    "B": 50,
+    "C": 40
+    }
+    calibres_lista = [x.strip() for x in calibres.split("-")]
+    if calibres_lista[0].isalpha():
+        calibres_lista = [calibre_map.get(calibre, 0) for calibre in calibres_lista]
+    else:
+        calibres_lista = [int(calibre) for calibre in calibres_lista]
+    return calibres_lista
+
+def decode_crc(crc, p_calibre, p_segundo):
+    if crc == 0:
+        return 0
+    else:
+        return round((crc * 100 * p_calibre) / (3.1415 * (p_segundo+1)))
+    
+def formato_moneda_usd(valor):
+    return f"U$S {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+
+
+
 ### GET LISTA CENTROS
 def listaCentros(request):
     if request.method == 'GET':
