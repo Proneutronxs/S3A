@@ -58,12 +58,11 @@ def dataConCRC(request):
         hasta = data.get('Final')
         mercado = data.get('Mercado')
         cliente = data.get('Cliente')
-        vapor = data.get('Vapor')
         especie = data.get('Especie')
         variedad = data.get('Variedad')
         envase = data.get('Envase')
         marca = data.get('Marca')
-        values = [desde,hasta,mercado,cliente,vapor,especie,variedad,envase,marca]
+        values = [desde,hasta,mercado,cliente,especie,variedad,envase,marca]
 
         #insertar_registro_error_sql("API","DATA CRC","usuario",str(values))
         try:
