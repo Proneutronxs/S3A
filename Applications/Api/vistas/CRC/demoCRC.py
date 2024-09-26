@@ -94,7 +94,7 @@ def dataConCRC(request):
                         Mercado AS MERCADO, ISNULL(NombreEmbarque, '') AS VAPOR, PaisDestino AS DESTINO, CONVERT(VARCHAR,IdCliente) AS ID_CLIENTE, Cliente AS CLIENTE, CONVERT(VARCHAR(10), FECH_FAC, 103) AS FECHA_FACTURA, 
                         CONVERT(VARCHAR,IdEspecie) AS ID_ESPECIE, Especie AS ESPECIE, IdVariedad AS ID_VARIEDAD, Variedad AS VARIEDAD, IdEnvase AS ID_ENVASE, Envase AS ENVASE, IdEtiqueta AS ID_MARCA, Etiqueta AS MARCA, 
                         Calibres AS CALIBRES, FORMAT(PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(PesoEnvase * Bultos, 'N2') AS TOTAL_KGS, 
-                        FORMAT(Bultos, 'N0') AS CANT_BULTOS, FORMAT(SUM(Precio2), 'N2') AS IMP_UNI, FORMAT(SUM(Total2), 'N2') AS IMP_TOTAL, DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
+                        FORMAT(Bultos, 'N0') AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), SUM(Total2)) AS IMP_TOTAL, DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
                         'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, FECH_FAC)) AS CHAR_SEMANA, ISNULL(NRO_FAC,'-') AS NRO_FAC, CONVERT(VARCHAR,(NroRemito)) AS NRO_REM, CONVERT(VARCHAR, SUM(ISNULL(CRCT01, 0) + ISNULL(CRCT02, 0) + ISNULL(CRCT03, 0) + ISNULL(CRCT04, 0) + 
                         ISNULL(CRCT05, 0) + ISNULL(CRCT06, 0) + ISNULL(CRCT07, 0) + ISNULL(CRCT08, 0) + ISNULL(CRCT09, 0) + ISNULL(CRCT10, 0) + ISNULL(CRCT11, 0))) AS CRC_TOTAL, DATEPART(SECOND, ALTA_REMITO) AS SEGUNDOS,
                         (CONVERT(VARCHAR(5),T01) + '-' + CONVERT(VARCHAR(5),T02) + '-' + CONVERT(VARCHAR(5),T03) + '-' + CONVERT(VARCHAR(5),T04) + '-' + CONVERT(VARCHAR(5),T05) + '-' + CONVERT(VARCHAR(5),T06) + '-' + 
@@ -126,6 +126,7 @@ def dataConCRC(request):
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_data = {}
+                    resumen = {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}
                     for row in consulta:
                         empresa = row[4]
                         segundos = row[25]
@@ -133,11 +134,13 @@ def dataConCRC(request):
                         cantidades = str(row[26])
                         crcs = str(row[27])
                         total, individual = retornaCRC(cantidades,crcs,calibres,segundos)
+                        resumen["SumaImporteTotal"] += float(row[19])
+                        resumen["SumaImporteCRCTotal"] += float(total)
+                        
                         if empresa not in lista_data:
-                            lista_data[empresa] = []
-                        lista_data[empresa].append({
-                            # MERCADO	VAPOR	DESTINO	ID_CLIENTE	CLIENTE	FECHA_FACTURA	ID_ESPECIE	ESPECIE	ID_VARIEDAD	VARIEDAD	ID_ENVASE	ENVASE	ID_MARCA	
-                            # MARCA	CALIBRES	PESO_ENVASE	TOTAL_KGS	CANT_BULTOS	IMP_UNI	IMP_TOTAL	ID_SEMANA	CHAR_SEMANA	NRO_FAC	NRO_REM	CRC_TOTAL	SEGUNDOS (TOTAL 25)
+                            lista_data[empresa] = {"datos": [], "subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
+                        
+                        lista_data[empresa]["datos"].append({
                             "Mercado":str(row[0]),
                             "Vapor": str(row[1]),
                             "Destino":str(row[2]),
@@ -156,7 +159,7 @@ def dataConCRC(request):
                             "PesoEnvase":str(row[15]),
                             "TotalKG":str(row[16]),
                             "CantBultos":str(row[17]),
-                            "ImporteUnitario":str(row[18]),
+                            "ImporteUnitario":formato_moneda_usd(row[18]),
                             "ImporteTotal":str(row[19]),
                             "IdSemana":str(row[20]),
                             "Semana":str(row[21]),
@@ -165,8 +168,23 @@ def dataConCRC(request):
                             "ImporteCRCIndi":str(individual),
                             "ImporteCRCTotal":str(total)
                         })
+                        
+                        lista_data[empresa]["subtotal"]["SumaImporteTotal"] += float(row[19])
+                        lista_data[empresa]["subtotal"]["SumaImporteCRCTotal"] += float(total)
+                    
+                    resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
 
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data}, safe=False)
+                    resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
+                    
+                    for empresa in lista_data:
+                        lista_data[empresa]["subtotal"]["TotalGeneral"] = lista_data[empresa]["subtotal"]["SumaImporteTotal"] + lista_data[empresa]["subtotal"]["SumaImporteCRCTotal"]
+                        lista_data[empresa]["subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in lista_data[empresa]["subtotal"].items()}
+                    
+                    lista_data["Resumen"] = resumen
+
+                    json_datos = json.dumps(lista_data, indent=4)
+                    datos = [json_datos]
+                    return JsonResponse({'Message': 'Success', 'Datos': datos})
                     #return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
@@ -195,7 +213,7 @@ def retornaCRC(principal,crcs,calibres,segundos):
     valores_moneda = [formato_moneda_usd(valor) for valor in listado_Original_CRC]
     original_crc = " - ".join(valores_moneda)
 
-    return(formato_moneda_usd(sum(resultado))), original_crc
+    return sum(resultado), original_crc
 
 
 
