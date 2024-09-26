@@ -120,7 +120,7 @@ def dataConCRC(request):
                     lista_data = []
                     for row in consulta:
                         empresa = row[4]
-                        Calibres = int(row[14])
+                        Calibres = str(row[14])
                         Segundos = str(row[25])
                         CRCTotal = float(row[24])
                         sumaCalibres = sumar_calibres(Calibres.replace(" ", ""))
