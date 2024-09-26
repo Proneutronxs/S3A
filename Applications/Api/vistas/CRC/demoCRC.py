@@ -5,6 +5,7 @@ from django.views.static import serve
 from django.db import connections
 from django.http import JsonResponse
 from django.http import HttpResponse, Http404
+import json
 import os
 
 
@@ -52,18 +53,19 @@ def dataGeneral(request):
 @csrf_exempt
 def dataConCRC(request):
     if request.method == 'POST':
-        desde = request.POST.get('Inicio')
-        hasta = request.POST.get('Final')
-        mercado = request.POST.get('Mercado')
-        cliente = request.POST.get('Cliente')
-        vapor = request.POST.get('Vapor')
-        especie = request.POST.get('Especie')
-        variedad = request.POST.get('Variedad')
-        envase = request.POST.get('Envase')
-        marca = request.POST.get('Marca')
+        data = json.loads(request.body)
+        desde = data.get('Inicio')
+        hasta = data.get('Final')
+        mercado = data.get('Mercado')
+        cliente = data.get('Cliente')
+        vapor = data.get('Vapor')
+        especie = data.get('Especie')
+        variedad = data.get('Variedad')
+        envase = data.get('Envase')
+        marca = data.get('Marca')
         values = [desde,hasta,mercado,cliente,vapor,especie,variedad,envase,marca]
 
-        insertar_registro_error_sql("API","DATA CRC","usuario",str(values))
+        #insertar_registro_error_sql("API","DATA CRC","usuario",str(values))
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = """ 
