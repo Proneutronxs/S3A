@@ -62,6 +62,8 @@ def dataConCRC(request):
         envase = request.POST.get('Envase')
         marca = request.POST.get('Marca')
         values = [desde,hasta,mercado,cliente,vapor,especie,variedad,envase,marca]
+
+        insertar_registro_error_sql("API","DATA CRC","usuario",str(values))
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = """ 
