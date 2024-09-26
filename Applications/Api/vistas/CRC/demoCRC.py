@@ -181,10 +181,8 @@ def dataConCRC(request):
                         lista_data[empresa]["subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in lista_data[empresa]["subtotal"].items()}
                     
                     lista_data["Resumen"] = resumen
-
-                    json_datos = json.dumps(lista_data, indent=4)
-                    datos = [json_datos]
-                    return JsonResponse({'Message': 'Success', 'Datos': datos})
+                    
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                     #return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
