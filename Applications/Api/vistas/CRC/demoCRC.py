@@ -125,7 +125,7 @@ def dataConCRC(request):
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
                 if consulta:
-                    lista_data = []
+                    lista_data = {}
                     for row in consulta:
                         empresa = row[4]
                         segundos = row[25]
