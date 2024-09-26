@@ -74,7 +74,6 @@ def dataConCRC(request):
                     DECLARE @@Final DATE;
                     DECLARE @@Mercado VARCHAR(10);
                     DECLARE @@Cliente INT;
-                    DECLARE @@Vapor VARCHAR(10);
                     DECLARE @@Especie INT;
                     DECLARE @@Variedad INT;
                     DECLARE @@Envase INT;
@@ -84,7 +83,6 @@ def dataConCRC(request):
                     SET @@Final = %s;
                     SET @@Mercado = %s;
                     SET @@Cliente = %s;
-                    SET @@Vapor = %s;
                     SET @@Especie = %s;
                     SET @@Variedad = %s;
                     SET @@Envase = %s;
@@ -109,7 +107,6 @@ def dataConCRC(request):
                         AND CONVERT(DATE, FECH_FAC) <= @@Final 
                         AND (@@Mercado = '0' OR @@Mercado = Mercado)
                         AND (@@Cliente = '0' OR IdCliente = @@Cliente)
-                        AND (@@Vapor = '0' OR NombreEmbarque = @@Vapor)
                         AND (@@Especie = '0' OR IdEspecie = @@Especie)
                         AND (@@Variedad = '0' OR IdVariedad = @@Variedad)
                         AND (@@Envase = '0' OR IdEnvase = @@Envase)
@@ -183,7 +180,6 @@ def dataConCRC(request):
                     lista_data["Resumen"] = resumen
                     
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
-                    #return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
