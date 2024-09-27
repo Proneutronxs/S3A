@@ -121,64 +121,64 @@ def dataConCRC(request):
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
                 if consulta:
-                    lista_data = {}
+                    empresas = []
                     resumen = {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}
                     for row in consulta:
                         empresa = row[4]
+                        datos_empresa = next((e for e in empresas if e["Nombre"] == empresa), None)
+                        
+                        if datos_empresa is None:
+                            datos_empresa = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
+                            empresas.append(datos_empresa)
+                        
                         segundos = row[25]
                         calibres = str(row[14])
                         cantidades = str(row[26])
                         crcs = str(row[27])
-                        total, individual = retornaCRC(cantidades,crcs,calibres,segundos)
-                        resumen["SumaImporteTotal"] += float(row[19])
-                        resumen["SumaImporteCRCTotal"] += float(total)
+                        total, individual = retornaCRC(cantidades, crcs, calibres, segundos)
                         
-                        if empresa not in lista_data:
-                            lista_data[empresa] = {"datos": [], "subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
-                        
-                        lista_data[empresa]["datos"].append({
-                            "Mercado":str(row[0]),
+                        datos_empresa["Datos"].append({
+                            "Mercado": str(row[0]),
                             "Vapor": str(row[1]),
-                            "Destino":str(row[2]),
-                            "IdCliente":str(row[3]),
-                            "Cliente":str(row[4]),
-                            "FechaFac":str(row[5]),
-                            "IdEspecie":str(row[6]),
-                            "Especie":str(row[7]),
-                            "IdVariedad":str(row[8]),
-                            "Variedad":str(row[9]),
-                            "IdEnvase":str(row[10]),
-                            "Envase":str(row[11]),
-                            "IdMarca":str(row[12]),
-                            "Marca":str(row[13]),
-                            "Calibres":str(row[14]),
-                            "PesoEnvase":str(row[15]),
-                            "TotalKG":str(row[16]),
-                            "CantBultos":str(row[17]),
-                            "ImporteUnitario":formato_moneda_usd(row[18]),
-                            "ImporteTotal":str(row[19]),
-                            "IdSemana":str(row[20]),
-                            "Semana":str(row[21]),
-                            "NroFactura":str(row[22]),
-                            "NroRemito":str(row[23]),
-                            "ImporteCRCIndi":str(individual),
-                            "ImporteCRCTotal":str(total)
+                            "Destino": str(row[2]),
+                            "IdCliente": str(row[3]),
+                            "Cliente": str(row[4]),
+                            "FechaFac": str(row[5]),
+                            "IdEspecie": str(row[6]),
+                            "Especie": str(row[7]),
+                            "IdVariedad": str(row[8]),
+                            "Variedad": str(row[9]),
+                            "IdEnvase": str(row[10]),
+                            "Envase": str(row[11]),
+                            "IdMarca": str(row[12]),
+                            "Marca": str(row[13]),
+                            "Calibres": str(row[14]),
+                            "PesoEnvase": str(row[15]),
+                            "TotalKG": str(row[16]),
+                            "CantBultos": str(row[17]),
+                            "ImporteUnitario": formato_moneda_usd(row[18]),
+                            "ImporteTotal": str(row[19]),
+                            "IdSemana": str(row[20]),
+                            "Semana": str(row[21]),
+                            "NroFactura": str(row[22]),
+                            "NroRemito": str(row[23]),
+                            "ImporteCRCIndi": str(individual),
+                            "ImporteCRCTotal": str(total)
                         })
                         
-                        lista_data[empresa]["subtotal"]["SumaImporteTotal"] += float(row[19])
-                        lista_data[empresa]["subtotal"]["SumaImporteCRCTotal"] += float(total)
+                        datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
+                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(total)
+                        resumen["SumaImporteTotal"] += float(row[19])
+                        resumen["SumaImporteCRCTotal"] += float(total)
                     
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
-
                     resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
                     
-                    for empresa in lista_data:
-                        lista_data[empresa]["subtotal"]["TotalGeneral"] = lista_data[empresa]["subtotal"]["SumaImporteTotal"] + lista_data[empresa]["subtotal"]["SumaImporteCRCTotal"]
-                        lista_data[empresa]["subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in lista_data[empresa]["subtotal"].items()}
+                    for empresa in empresas:
+                        empresa["Subtotal"]["TotalGeneral"] = empresa["Subtotal"]["SumaImporteTotal"] + empresa["Subtotal"]["SumaImporteCRCTotal"]
+                        empresa["Subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in empresa["Subtotal"].items()}
                     
-                    lista_data["Resumen"] = resumen
-                    
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                    return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
