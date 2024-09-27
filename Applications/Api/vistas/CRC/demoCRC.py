@@ -88,7 +88,7 @@ def dataConCRC(request):
                     SET @@Marca = %s;
 
                     SELECT 
-                        Mercado AS MERCADO, ISNULL(NombreEmbarque, '') AS VAPOR, PaisDestino AS DESTINO, CONVERT(VARCHAR,IdCliente) AS ID_CLIENTE, Cliente AS CLIENTE, CONVERT(VARCHAR(10), FECH_FAC, 103) AS FECHA_FACTURA, 
+                        Mercado AS MERCADO, ISNULL(NombreEmbarque, '') AS VAPOR, PaisDestino AS DESTINO, IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30),Cliente) AS CLIENTE, CONVERT(VARCHAR(10), FECH_FAC, 103) AS FECHA_FACTURA, 
                         CONVERT(VARCHAR,IdEspecie) AS ID_ESPECIE, Especie AS ESPECIE, IdVariedad AS ID_VARIEDAD, Variedad AS VARIEDAD, IdEnvase AS ID_ENVASE, Envase AS ENVASE, IdEtiqueta AS ID_MARCA, Etiqueta AS MARCA, 
                         Calibres AS CALIBRES, FORMAT(PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(PesoEnvase * Bultos, 'N2') AS TOTAL_KGS, 
                         FORMAT(Bultos, 'N0') AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), SUM(Total2)) AS IMP_TOTAL, DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
