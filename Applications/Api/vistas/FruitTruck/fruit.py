@@ -38,7 +38,9 @@ def listarTransporte(request):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+
+
+@csrf_exempt
 def listarDataTransporte(request):
     if request.method == 'POST':
         body = request.body.decode('utf-8')
