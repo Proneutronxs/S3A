@@ -64,7 +64,7 @@ def dataConCRC(request):
         marca = data.get('Marca')
         calibres = data.get('Calibres')
         listaCalibres = calibres.split(',')
-        calibres_str = ','.join(calibres)
+        calibres_str = ','.join(listaCalibres)
         calibre = "0" if listaCalibres == ['0'] else "1"
         values = [desde,hasta,mercado,cliente,especie,variedad,envase,marca,calibre]
 
