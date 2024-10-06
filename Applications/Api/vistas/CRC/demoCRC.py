@@ -68,7 +68,7 @@ def dataConCRC(request):
         calibre = "0" if listaCalibres == ['0'] else "1"
         values = [desde,hasta,mercado,cliente,especie,variedad,envase,marca,calibre]
 
-        #insertar_registro_error_sql("API","DATA CRC","usuario",str(values))
+        insertar_registro_error_sql("API",str(calibres) + ' - ' + calibres_str,"usuario",str(values))
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = f""" 
