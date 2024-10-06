@@ -125,7 +125,7 @@ def dataConCRC(request):
                         CONVERT(VARCHAR(5),T05) + '-' + CONVERT(VARCHAR(5),T06) + '-' + CONVERT(VARCHAR(5),T07) + '-' + CONVERT(VARCHAR(5),T08) + '-' + CONVERT(VARCHAR(5),T09) + '-' + CONVERT(VARCHAR(5),T10) + '-' + CONVERT(VARCHAR(5),T11)),
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + CONVERT(VARCHAR(20), CRCT06) + '-' + 
                         CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad
-                    ORDER BY CONVERT(VARCHAR(10), FECH_FAC, 103)
+                    ORDER BY CONVERT(VARCHAR(10), FECH_FAC, 103), CONVERT(VARCHAR(30),Cliente), Especie, Variedad, TPC.Tamaño
                     """
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
