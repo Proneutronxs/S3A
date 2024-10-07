@@ -141,7 +141,7 @@ def dataConCRC(request):
                             datos_empresa = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
                             empresas.append(datos_empresa)
                         
-                        crc = decode_crc(float(row[30]),int(row[28]),int(row[25]))
+                        #crc = decode_crc(float(row[30]),int(row[28]),int(row[25]))
                         
                         datos_empresa["Datos"].append({
                         "Mercado": str(row[0]),
@@ -162,7 +162,7 @@ def dataConCRC(request):
                         "PesoEnvase": str(row[15]),
                         "TotalKG": str(row[16]),
                         "CantBultos": str(row[17]),
-                        "ImporteUnitario": str(float(row[18]) + crc), ##sumar el CRC
+                        "ImporteUnitario": str(2), ##sumar el CRC
                         "ImporteTotal": str(row[19]),
                         "IdSemana": str(row[20]),
                         "Semana": str(row[21]),
@@ -172,13 +172,13 @@ def dataConCRC(request):
                         "ImporteCRCTotal": "0",
                         "Calibre":str(row[28]),
                         "Cantidad":str(row[29]),
-                        "CRC": str(crc)   ###str(row[30])
+                        "CRC": str(2)   ###str(row[30])
                         })
                         
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
-                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(crc * int(row[29]))
+                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(2)
                         resumen["SumaImporteTotal"] += float(row[19])
-                        resumen["SumaImporteCRCTotal"] += float(crc * int(row[29]))
+                        resumen["SumaImporteCRCTotal"] += float(2)
                     
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
                     resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
