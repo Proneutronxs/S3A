@@ -131,69 +131,71 @@ def dataConCRC(request):
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
                 if consulta:
-                    empresas = []
+                    empresas = {}
                     resumen = {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}
                     for row in consulta:
                         empresa = row[4]
-                        datos_empresa = next((e for e in empresas if e["Nombre"] == empresa), None)
-                        
-                        if datos_empresa is None:
-                            datos_empresa = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
-                            empresas.append(datos_empresa)
-                        
-                        #crc = decode_crc(float(row[30]),int(row[28]),int(row[25]))
-                        
+
+                        # Usar diccionario en lugar de lista
+                        if empresa not in empresas:
+                            empresas[empresa] = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
+
+                        datos_empresa = empresas[empresa]
+                        crc = decode_crc(float(row[30]), int(row[28]), int(row[25]))
+
                         datos_empresa["Datos"].append({
-                        "Mercado": str(row[0]),
-                        "Vapor": str(row[1]),
-                        "Destino": str(row[2]),
-                        "IdCliente": str(row[3]),
-                        "Cliente": str(row[4]),
-                        "FechaFac": str(row[5]),
-                        "IdEspecie": str(row[6]),
-                        "Especie": str(row[7]),
-                        "IdVariedad": str(row[8]),
-                        "Variedad": str(row[9]),
-                        "IdEnvase": str(row[10]),
-                        "Envase": str(row[11]),
-                        "IdMarca": str(row[12]),
-                        "Marca": str(row[13]),
-                        "Calibres": str(row[14]),
-                        "PesoEnvase": str(row[15]),
-                        "TotalKG": str(row[16]),
-                        "CantBultos": str(row[17]),
-                        "ImporteUnitario": str(2), ##sumar el CRC
-                        "ImporteTotal": str(row[19]),
-                        "IdSemana": str(row[20]),
-                        "Semana": str(row[21]),
-                        "NroFactura": str(row[22]),
-                        "NroRemito": str(row[23]),
-                        "ImporteCRCIndi": "0",
-                        "ImporteCRCTotal": "0",
-                        "Calibre":str(row[28]),
-                        "Cantidad":str(row[29]),
-                        "CRC": str(2)   ###str(row[30])
+                            "Mercado": str(row[0]),
+                            "Vapor": str(row[1]),
+                            "Destino": str(row[2]),
+                            "IdCliente": str(row[3]),
+                            "Cliente": str(row[4]),
+                            "FechaFac": str(row[5]),
+                            "IdEspecie": str(row[6]),
+                            "Especie": str(row[7]),
+                            "IdVariedad": str(row[8]),
+                            "Variedad": str(row[9]),
+                            "IdEnvase": str(row[10]),
+                            "Envase": str(row[11]),
+                            "IdMarca": str(row[12]),
+                            "Marca": str(row[13]),
+                            "Calibres": str(row[14]),
+                            "PesoEnvase": str(row[15]),
+                            "TotalKG": str(row[16]),
+                            "CantBultos": str(row[17]),
+                            "ImporteUnitario": str(float(row[18]) + crc),  # Sumar el CRC
+                            "ImporteTotal": str(row[19]),
+                            "IdSemana": str(row[20]),
+                            "Semana": str(row[21]),
+                            "NroFactura": str(row[22]),
+                            "NroRemito": str(row[23]),
+                            "ImporteCRCIndi": "0",
+                            "ImporteCRCTotal": "0",
+                            "Calibre": str(row[28]),
+                            "Cantidad": str(row[29]),
+                            "CRC": str(crc)
                         })
-                        
+
+                        # Actualizar subtotales
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
-                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(2)
+                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(crc * int(row[29]))
                         resumen["SumaImporteTotal"] += float(row[19])
-                        resumen["SumaImporteCRCTotal"] += float(2)
-                    
+                        resumen["SumaImporteCRCTotal"] += float(crc * int(row[29]))
+
+                    # Convertir empresas en lista y aplicar formato
+                    empresas = list(empresas.values())
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
                     resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
-                    
+
                     for empresa in empresas:
                         empresa["Subtotal"]["TotalGeneral"] = empresa["Subtotal"]["SumaImporteTotal"] + empresa["Subtotal"]["SumaImporteCRCTotal"]
                         empresa["Subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in empresa["Subtotal"].items()}
-                    
-                    return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen})
-                else:
-                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+
+                    return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen}, safe=False)
+
+                return JsonResponse({'Message': 'No data found'}, safe=False)
+        
         except Exception as e:
-            error = str(e)
-            insertar_registro_error_sql("API","DATA CRC","usuario",error)
-            return JsonResponse({'Message': 'Error', 'Nota': error})
+            return JsonResponse({'Error': str(e)}, safe=False)
         finally:
             connections['S3A'].close()
     else:
