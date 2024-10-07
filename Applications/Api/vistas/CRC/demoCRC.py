@@ -104,7 +104,8 @@ def dataConCRC(request):
                         CONVERT(VARCHAR(5),T07) + '-' + CONVERT(VARCHAR(5),T08) + '-' + CONVERT(VARCHAR(5),T09) + '-' + CONVERT(VARCHAR(5),T10) + '-' + CONVERT(VARCHAR(5),T11)) AS LIST_T_CALIBRES,
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + 
                         CONVERT(VARCHAR(20), CRCT06) + '-' + CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + 
-                        CONVERT(VARCHAR(20), CRCT11)) AS LISTA_CRC, TPC.Tamaño AS CALIBRE, TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC
+                        CONVERT(VARCHAR(20), CRCT11)) AS LISTA_CRC, CASE CONVERT(VARCHAR,TPC.Tamaño) WHEN 'AAAA' THEN '90' WHEN 'AAA' THEN '80' WHEN 'AA' THEN '70' WHEN 'A' THEN '60' WHEN 'B' THEN '50' WHEN 'C' THEN '40' ELSE CONVERT(VARCHAR,TPC.Tamaño) END AS CALIBRE, 
+	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC
                     FROM 
                         VistaDemoDLC
                         LEFT OUTER JOIN		
@@ -140,7 +141,7 @@ def dataConCRC(request):
                             datos_empresa = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
                             empresas.append(datos_empresa)
                         
-                        crc = decode_crc(float(row[30]),row[28],int(row[25]))
+                        crc = decode_crc(float(row[30]),int(row[28]),int(row[25]))
                         
                         datos_empresa["Datos"].append({
                         "Mercado": str(row[0]),
@@ -201,24 +202,8 @@ def dataConCRC(request):
 
 
 def decode_crc(p_crc, p_calibre, p_segundo):
-    calibre_map = {
-        "AAAA": 90,
-        "AAA": 80,
-        "AA": 70,
-        "A": 60,
-        "B": 50,
-        "C": 40
-    }
-
-    if p_calibre.isdigit():  # Verificar si es numérico
-        int_calibre = int(p_calibre)
-    else:
-        int_calibre = calibre_map.get(p_calibre.strip().upper(), 10)
-
-    print(p_crc,int_calibre,p_segundo)
-
     if p_crc > 0:
-        return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * int_calibre)
+        return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * p_calibre)
     else:
         return 0
 
