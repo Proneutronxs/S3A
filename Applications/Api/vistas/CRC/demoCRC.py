@@ -218,7 +218,7 @@ def decode_crc(p_crc, p_calibre, p_segundo):
     else: 
         int_calibre = p_calibre
 
-    if p_crc > 0:
+    if float(p_crc) > 0:
         return round((p_crc * 100) / (3.1415 * (p_segundo + 1)) * int_calibre)
     else:
         return 0
