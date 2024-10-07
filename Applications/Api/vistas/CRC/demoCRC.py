@@ -192,10 +192,10 @@ def dataConCRC(request):
 
                     return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen}, safe=False)
 
-                return JsonResponse({'Message': 'No data found'}, safe=False)
+                return JsonResponse({'Message': 'No data found', 'Nota':'No se encontraron datos.'}, safe=False)
         
         except Exception as e:
-            return JsonResponse({'Error': str(e)}, safe=False)
+            return JsonResponse({'Message': 'Error', 'nota': str(e)}, safe=False)
         finally:
             connections['S3A'].close()
     else:
