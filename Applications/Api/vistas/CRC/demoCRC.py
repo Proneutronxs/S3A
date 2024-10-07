@@ -165,7 +165,7 @@ def dataConCRC(request):
                             "PesoEnvase": str(row[15]),
                             "TotalKG": str(row[16]),
                             "CantBultos": str(row[17]),
-                            "ImporteUnitario": formato_moneda_usd(row[18]),
+                            "ImporteUnitario": formato_moneda_usd(row[18]), ##sumar el CRC
                             "ImporteTotal": str(row[19]),
                             "IdSemana": str(row[20]),
                             "Semana": str(row[21]),
@@ -175,13 +175,13 @@ def dataConCRC(request):
                             "ImporteCRCTotal": str(total),
                             "Calibre":str(row[28]),
                             "Cantidad":str(row[29]),
-                            "CRC":str(row[30])
+                            "CRC": decode_crc(row[30],row[28],row[25])###str(row[30])
                         })
                         
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
-                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(total)
+                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(decode_crc(row[30],row[28],row[25]))
                         resumen["SumaImporteTotal"] += float(row[19])
-                        resumen["SumaImporteCRCTotal"] += float(total)
+                        resumen["SumaImporteCRCTotal"] += float(decode_crc(row[30],row[28],row[25]))
                     
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
                     resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
@@ -201,6 +201,27 @@ def dataConCRC(request):
             connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+def decode_crc(p_crc, p_calibre, p_segundo):
+    if isinstance(p_calibre, str):  # Verificar si es cadena
+        calibre_map = {
+            "AAAA": 90,
+            "AAA": 80,
+            "AA": 70,
+            "A": 60,
+            "B": 50,
+            "C": 40
+        }
+        int_calibre = calibre_map.get(p_calibre, 10)
+    else: 
+        int_calibre = p_calibre
+
+    if p_crc > 0:
+        return round((p_crc * 100) / (3.1415 * (p_segundo + 1)) * int_calibre)
+    else:
+        return 0
 
 
 def retornaCRC(principal,crcs,calibres,segundos):
