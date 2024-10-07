@@ -140,11 +140,6 @@ def dataConCRC(request):
                             datos_empresa = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
                             empresas.append(datos_empresa)
                         
-                        segundos = row[25]
-                        calibres = str(row[14])
-                        cantidades = str(row[26])
-                        crcs = str(row[27])
-                        total, individual = retornaCRC(cantidades, crcs, calibres, segundos)
                         crc = decode_crc(float(row[30]),row[28],int(row[25]))
                         
                         datos_empresa["Datos"].append({
@@ -206,21 +201,24 @@ def dataConCRC(request):
 
 
 def decode_crc(p_crc, p_calibre, p_segundo):
-    if isinstance(p_calibre, str):  
-        calibre_map = {
-            "AAAA": 90,
-            "AAA": 80,
-            "AA": 70,
-            "A": 60,
-            "B": 50,
-            "C": 40
-        }
-        int_calibre = calibre_map.get(p_calibre, 10)
-    else: 
-        int_calibre = p_calibre
+    calibre_map = {
+        "AAAA": 90,
+        "AAA": 80,
+        "AA": 70,
+        "A": 60,
+        "B": 50,
+        "C": 40
+    }
+
+    if p_calibre.isdigit():  # Verificar si es numérico
+        int_calibre = int(p_calibre)
+    else:
+        int_calibre = calibre_map.get(p_calibre.strip().upper(), 10)
+
+    print(p_crc,int_calibre,p_segundo)
 
     if p_crc > 0:
-        return round((p_crc * 100) / (3.1415 * (int(p_segundo) + 1)) * int_calibre)
+        return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * int_calibre)
     else:
         return 0
 
