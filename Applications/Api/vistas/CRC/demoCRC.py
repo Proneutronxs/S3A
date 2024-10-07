@@ -68,7 +68,7 @@ def dataConCRC(request):
         calibre = "0" if listaCalibres == ['0'] else "1"
         values = [desde,hasta,mercado,cliente,especie,variedad,envase,marca,calibre]
 
-        insertar_registro_error_sql("API",str(calibres) + ' - ' + calibres_str,"usuario",str(values))
+        #insertar_registro_error_sql("API",str(calibres) + ' - ' + calibres_str,"usuario",str(values))
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = f""" 
@@ -145,43 +145,44 @@ def dataConCRC(request):
                         cantidades = str(row[26])
                         crcs = str(row[27])
                         total, individual = retornaCRC(cantidades, crcs, calibres, segundos)
+                        crc = decode_crc(float(row[30]),row[28],int(row[25]))
                         
                         datos_empresa["Datos"].append({
-                            "Mercado": str(row[0]),
-                            "Vapor": str(row[1]),
-                            "Destino": str(row[2]),
-                            "IdCliente": str(row[3]),
-                            "Cliente": str(row[4]),
-                            "FechaFac": str(row[5]),
-                            "IdEspecie": str(row[6]),
-                            "Especie": str(row[7]),
-                            "IdVariedad": str(row[8]),
-                            "Variedad": str(row[9]),
-                            "IdEnvase": str(row[10]),
-                            "Envase": str(row[11]),
-                            "IdMarca": str(row[12]),
-                            "Marca": str(row[13]),
-                            "Calibres": str(row[14]),
-                            "PesoEnvase": str(row[15]),
-                            "TotalKG": str(row[16]),
-                            "CantBultos": str(row[17]),
-                            "ImporteUnitario": formato_moneda_usd(row[18]), ##sumar el CRC
-                            "ImporteTotal": str(row[19]),
-                            "IdSemana": str(row[20]),
-                            "Semana": str(row[21]),
-                            "NroFactura": str(row[22]),
-                            "NroRemito": str(row[23]),
-                            "ImporteCRCIndi": str(individual),
-                            "ImporteCRCTotal": str(total),
-                            "Calibre":str(row[28]),
-                            "Cantidad":str(row[29]),
-                            "CRC": decode_crc(row[30],row[28],row[25])###str(row[30])
+                        "Mercado": str(row[0]),
+                        "Vapor": str(row[1]),
+                        "Destino": str(row[2]),
+                        "IdCliente": str(row[3]),
+                        "Cliente": str(row[4]),
+                        "FechaFac": str(row[5]),
+                        "IdEspecie": str(row[6]),
+                        "Especie": str(row[7]),
+                        "IdVariedad": str(row[8]),
+                        "Variedad": str(row[9]),
+                        "IdEnvase": str(row[10]),
+                        "Envase": str(row[11]),
+                        "IdMarca": str(row[12]),
+                        "Marca": str(row[13]),
+                        "Calibres": str(row[14]),
+                        "PesoEnvase": str(row[15]),
+                        "TotalKG": str(row[16]),
+                        "CantBultos": str(row[17]),
+                        "ImporteUnitario": str(float(row[18]) + crc), ##sumar el CRC
+                        "ImporteTotal": str(row[19]),
+                        "IdSemana": str(row[20]),
+                        "Semana": str(row[21]),
+                        "NroFactura": str(row[22]),
+                        "NroRemito": str(row[23]),
+                        "ImporteCRCIndi": "0",
+                        "ImporteCRCTotal": "0",
+                        "Calibre":str(row[28]),
+                        "Cantidad":str(row[29]),
+                        "CRC": str(crc)   ###str(row[30])
                         })
                         
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
-                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(decode_crc(row[30],row[28],row[25]))
+                        datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(crc * int(row[29]))
                         resumen["SumaImporteTotal"] += float(row[19])
-                        resumen["SumaImporteCRCTotal"] += float(decode_crc(row[30],row[28],row[25]))
+                        resumen["SumaImporteCRCTotal"] += float(crc * int(row[29]))
                     
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
                     resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
@@ -205,7 +206,7 @@ def dataConCRC(request):
 
 
 def decode_crc(p_crc, p_calibre, p_segundo):
-    if isinstance(p_calibre, str):  # Verificar si es cadena
+    if isinstance(p_calibre, str):  
         calibre_map = {
             "AAAA": 90,
             "AAA": 80,
@@ -218,8 +219,8 @@ def decode_crc(p_crc, p_calibre, p_segundo):
     else: 
         int_calibre = p_calibre
 
-    if float(p_crc) > 0:
-        return round((p_crc * 100) / (3.1415 * (p_segundo + 1)) * int_calibre)
+    if p_crc > 0:
+        return round((p_crc * 100) / (3.1415 * (int(p_segundo) + 1)) * int_calibre)
     else:
         return 0
 
