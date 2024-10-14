@@ -39,6 +39,7 @@ document.getElementById('descargar_excel').addEventListener('click', function ()
 const choiceLegajos = new Choices('#selector_legajos', {
     allowHTML: true,
     shouldSort: false,
+    placeholderValue: 'SELECCIONE LEGAJO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });

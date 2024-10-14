@@ -117,6 +117,7 @@ document.getElementById('idEliminar').addEventListener('click', function () {
 const choiceLegajos = new Choices('#selector_legajos', {
     allowHTML: true,
     shouldSort: false,
+    placeholderValue: 'SELECCIONE LEGAJO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -124,13 +125,17 @@ const choiceLegajos = new Choices('#selector_legajos', {
 const choiceCentros = new Choices('#selector_centros', {
     allowHTML: true,
     shouldSort: false,
+    placeholderValue: 'SELECCIONE CENTRO',
     searchPlaceholderValue: 'Escriba para buscar..',
-    itemSelectText: ''
+    removeItemButton: true,
+    itemSelectText: '',
+    maxItemCount: 4,
 });
 
 const choicePagos = new Choices('#selector_pagos', {
     allowHTML: true,
     shouldSort: false,
+    placeholderValue: 'FORMA DE PAGO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -138,6 +143,7 @@ const choicePagos = new Choices('#selector_pagos', {
 const choiceDescripcion = new Choices('#selector_descripcion', {
     allowHTML: true,
     shouldSort: false,
+    placeholderValue: 'SELEC. DESCRIPCIÓN',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -153,6 +159,21 @@ const listarCentros = async () => {
                 result.push({ value: datos.Codigo, label: datos.Descripcion });
             });
             choiceCentros.setChoices(result, 'value', 'label', true);
+
+
+            let result1 = [];
+            result1.push();
+            data.Descripcion.forEach((datos) => {
+                result1.push({ value: datos.Codigo, label: datos.Descripcion });
+            });
+            choiceDescripcion.setChoices(result1, 'value', 'label', true);
+
+            let result2 = [];
+            result2.push();
+            data.Pagos.forEach((datos) => {
+                result2.push({ value: datos.Codigo, label: datos.Descripcion });
+            });
+            choicePagos.setChoices(result2, 'value', 'label', true);
         } else {
             var nota = data.Nota
             var color = "red";
@@ -249,7 +270,7 @@ const completarTablaA = async () => {
                                     <input class="input-checkbox checkbox" type="checkbox" name="idCheck"
                                         value="${datos.Id}">
                                 </td>
-                                <td class="texto-centro" style="background-color: ${datos.Estado}; padding: 2px;"></td>
+                                <td class="texto-centro">${datos.Semana}</td>
                                 <td class="texto-centro">${datos.Legajo}</td>
                                 <td>${datos.Nombre}</td>
                                 <td class="texto-centro">${datos.Centro}</td>

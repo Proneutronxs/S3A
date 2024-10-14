@@ -9,7 +9,7 @@ urlpatterns = [
 
     path('planillas/general/', views.general, name='planilla_general'),
 
-    path('planillas/general/listar-centros/', views.listaCentros, name='planilla_general_lista_centros'),
+    path('planillas/general/listar-centros/', views.listaAbrevCentros, name='planilla_general_lista_centros'),
 
     path('planillas/general/listar-personal/', views.listaPersonalPorCentro, name='planilla_general_lista_personal_centro'),
 

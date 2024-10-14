@@ -154,7 +154,7 @@ DATABASES = {
 # }
 
 
-###### LOCAL S3A
+# ###### LOCAL S3A
 # ip = '192.168.0.116'
 # DATABASES = {
 #     'default': {

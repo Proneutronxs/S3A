@@ -20,7 +20,6 @@ import os
 def Chacras(request):
     return render (request, 'Chacras/chacras.html')
 
-
 @login_required
 def planillas(request):
     return render (request, 'Chacras/Planillas/planillas.html')
@@ -28,7 +27,6 @@ def planillas(request):
 @login_required
 def general(request):
     return render (request, 'Chacras/Planillas/general.html')
-
 
 @login_required
 @csrf_exempt
@@ -73,7 +71,8 @@ def listarAdicionales(request):
                                 CASE WHEN Planilla_Chacras.E IS NULL THEN '#fbbc05' WHEN Planilla_Chacras.E = 'P' THEN '#fbbc05' WHEN Planilla_Chacras.E = 'S' THEN '#34a853' END AS ESTADO,
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PD' AND Planilla_Chacras.Pago = 'A' THEN 'S' ELSE 'N' END AS EDIT_IMPORTE,
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PT' AND (Planilla_Chacras.Tarea = 'P' OR Planilla_Chacras.Tarea = 'R') THEN 'S' ELSE 'N' END AS EDIT_PREMIO,
-		                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO
+		                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
+                                'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(WK, Planilla_Chacras.Fecha)) AS CHAR_SEMANA
                         FROM   Planilla_Chacras INNER JOIN
                                     TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                     TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN
@@ -113,9 +112,10 @@ def listarAdicionales(request):
                             edit_importe = str(row[15])
                             edit_premio = str(row[16])
                             importe_premio = formatear_moneda(str(row[17]))
+                            semana = str(row[18])
                             datos = {'Id': idAdiconal, 'Legajo': legajo, 'Nombre': nombre, 'Centro':centro, 'Categoria':cat, 'Descripcion':desc, 'Tarea':tarea, 'Dias':dias,
                                      'Tipo':tipo, 'Pago':pago, 'Chacra':chacra, 'Cantidad':cantidad, 'Importe':importe, 'Estado':estado, 'Eimporte':edit_importe,'Epremio':edit_premio, 
-                                     'ImportePremio':importe_premio}
+                                     'ImportePremio':importe_premio,'Semana':semana}
                             listado_tabla.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': listado_tabla})
                     else:
@@ -132,7 +132,6 @@ def listarAdicionales(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
-
 @login_required
 @csrf_exempt
 def eliminaAdicionalTildado(request):
@@ -165,7 +164,6 @@ def eliminaAdicionalTildado(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 @login_required
 @csrf_exempt
@@ -233,7 +231,6 @@ def insertaPremioAdicional(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
 @login_required
 @csrf_exempt
 def detalleAdicional(request):
@@ -431,22 +428,3 @@ def crearArchivos(request):
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
-
-# for row in results:
-#     ID = str(row[0])
-#     LEGAJO = str(row[1])
-#     NOMBRE = str(row[2])
-#     CENTRO = str(row[3])
-#     CATEGORIA = str(row[4])
-#     DESCRIPCION = str(row[5])
-#     TAREA = str(row[6])
-#     CANT_DIAS = str(row[7])
-#     TIPO = str(row[8])
-#     PAGO = str(row[9])
-#     CANTIDAD_UNI = str(row[10])
-#     IMPORTE_UNI = formatear_moneda(str(row[11]))
-#     PREMIO = formatear_moneda(str(row[12]))
-#     CHACRA = str(row[13])
-#     CUADRO = str(row[14])
-#     OBS = str(row[15])
-#     ENCARGADO = str(row[16])

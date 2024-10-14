@@ -254,9 +254,6 @@ def formato_moneda_usd(valor):
     return f"U$S {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
-
-
-
 ### GET LISTA CENTROS
 def listaCentros(request):
     if request.method == 'GET':
@@ -287,6 +284,39 @@ def listaCentros(request):
             connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def listaAbrevCentros(request):
+    if request.method == 'GET':
+        try:
+            with connections['ISISPayroll'].cursor() as cursor:
+                sql = """
+                        SELECT Regis_Cco AS ID, RTRIM(AbrevCtroCosto) AS CENTRO
+                        FROM CentrosCostos
+                        ORDER BY CENTRO
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = [{'Codigo': '0', 'Descripcion': 'TODOS'}]
+                    listado_descripcion = [{'Codigo': '0', 'Descripcion': 'TODO'}, {'Codigo': 'PT', 'Descripcion': 'POR TANTO'},{'Codigo': 'pd', 'Descripcion': 'POR DÍA'}, {'Codigo': 'FE', 'Descripcion': 'FERIADO'},{'Codigo': 'SD', 'Descripcion': 'SAB/DOM'},{'Codigo': 'AR', 'Descripcion': 'ARREGLOS'}]
+                    listado_pagos = [{'Codigo': '0', 'Descripcion': 'TODO'}, {'Codigo': 'A', 'Descripcion': 'ADICIONAL'},{'Codigo': 'R', 'Descripcion': 'RECIBO'}]
+                    for row in consulta:
+                        codigo = str(row[0])
+                        descripcion = str(row[1])
+                        datos = {'Codigo': codigo, 'Descripcion': descripcion}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Descripcion': listado_descripcion, 'Pagos':listado_pagos})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FUNCIONES GENERAL","LISTA CENTROS","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['ISISPayroll'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
     
 @csrf_exempt
 def listaPersonalPorCentro(request):

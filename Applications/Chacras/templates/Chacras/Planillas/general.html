@@ -10,111 +10,71 @@
 </div>
 
 <div class="contenedor">
-    <div class="text letras">
-        <div class="row">
-            <div class="items-row">
-                <label class="letras" for="fechaInicio">D</label>
+    <div class="pl-general">
+        <div class="row-pl-top">
+            <div class="items-row-pl">
+                <label class="letras" for="fechaInicio">Desde:</label>
                 <input type="date" onclick="this.showPicker();" id="fechaInicio" name="fechaInicio" class="selectores">
             </div>
-            <div class="items-row">
-                <label class="letras" for="fechaFinal">H</label>
+            <div class="items-row-pl">
+                <label class="letras" for="fechaFinal">Hasta</label>
                 <input type="date" onclick="this.showPicker();" id="fechaFinal" name="fechaFinal" class="selectores">
             </div>
-            <div class="items-row" style="max-width: 300px; width: 250px;">
-                <select class="selectores" id="selector_centros" name="selector_centros">
-                    <option value="0" selected disabled>SELECCIONE UN CENTRO</option>
+            <div class="items-row-pl" style="max-width: 350px; width: 350px;">
+                <select class="choices_inner vr-select" id="selector_centros"  multiple>
                 </select>
             </div>
-            <div class="items-row" style="max-width: 300px; width: 250px;">
-                <select class="selectores" id="selector_legajos" name="selector_legajos">
-                    <option value="0" selected disabled>SELECCIONE UN LEGAJO</option>
+        </div>
+        <div class="row-pl-bottom">
+            <div class="items-row-pl" style="max-width: 300px; width: 300px;">
+                <select class="choices_inner vr-select" id="selector_legajos" name="selector_legajos">
                 </select>
             </div>
-            <div class="items-row"" style=" max-width: 300px; width: 140px;">
-                <select class="selectores" id="selector_descripcion" name="selector_descripcion">
-                    <option value="0" selected disabled>DESCRIPCIÓN</option>
-                    <option value="0">TODO</option>
-                    <option value="PT">POR TANTO</option>
-                    <option value="PD">POR DÍA</option>
-                    <option value="FE">FERIADO</option>
-                    <option value="SD">SAB/DOM</option>
-                    <option value="AR">ARREGLOS</option>
+            <div class="items-row-pl" style=" max-width: 300px; width: 210px;">
+                <select class="choices_inner vr-select" id="selector_descripcion" >
                 </select>
             </div>
-            <div class="items-row"" style=" max-width: 300px; width: 100px;">
-                <select class="selectores" id="selector_pagos" name="selector_pagos">
-                    <option value="0" selected disabled>F. PAGO</option>
-                    <option value="0">TODO</option>
-                    <option value="A">ADICIONAL</option>
-                    <option value="D">DIFERENCIA</option>
-                    <option value="R">RECIBO</option>
+            <div class="items-row-pl" style=" max-width: 300px; width: 210px;">
+                <select class="choices_inner" id="selector_pagos">
                 </select>
             </div>
-            <div class="items-row">
+            <div class="items-row-pl">
                 <button id="idBuscaAdicional" name="idBuscaAdicional"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">search</button>
             </div>
-            <div class="items-row" style="margin-left: 10px;">
+            <div class="items-row-pl" style="margin-left: 10px;">
                 <button id="idEliminar" name="idEliminar"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">delete</button>
             </div>
-            <div class="items-row">
+            <div class="items-row-pl">
                 <button id="addPremio" name="addPremio"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">trophy</button>
             </div>
-            <div class="items-row">
+            <div class="items-row-pl">
                 <button id="update_importe" name="update_importe"
-                    class="selectores btn-submit botones bx material-symbols-outlined icon" type="button"
-                    >attach_money</button>
+                    class="selectores btn-submit botones bx material-symbols-outlined icon"
+                    type="button">attach_money</button>
             </div>
-            <div class="items-row" style="margin-left: 10px;">
+            <div class="items-row-pl" style="margin-left: 10px;">
                 <button id="idExporta" name="idExporta" onclick="openExportaPopup();"
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">move_group</button>
             </div>
-            <!-- <div class="items-row" style="width: 250px;">
-                <div class="scrolling-text-container">
-                    <div class="scrolling-text">
-                        Este es un texto largo que se moverá hacia la izquierda en un bucle infinito.
-                    </div>
-                </div>
-            </div> -->
-            <!-- <div class="items-row" style="width: 90px;">
-                <input style="width: 90px;" id="idInput2" name="idInput2" class="selectores"></input>
-            </div>
-            <div class="items-row" style="width: 90px;">
-                <input style="width: 90px;" id="idInput3" name="idInput3" class="selectores"></input>
-            </div> -->
         </div>
     </div>
 
     <div class="vista-container">
-        <div class="formularios">
-            <div class="row_items">
-                <div style="display: flex;">
-                    <div class="items-row">
-                        <!-- <button id="restauraFormHorasExtras" class="btn-submit botones"
-                            type="button"><b>Restaurar</b></button> -->
-                    </div>
-                    <!-- <div class="items-row">
-                        <button id="elminaHEAutoriza" class="btn-submit botones" type="button"><b>Eliminar</b></button>
-                      </div> -->
-                </div>
-            </div>
-        </div>
-
-
-        <div class="vista-container-autoriza-viejo">
+        <div class="vista-container-planilla">
             <div class="div-1">
                 <table class="pre-hs-ex">
                     <thead id="encabezado-tabla-hs-ex">
                         <tr>
                             <th style="width: 40px;"><input type="checkbox" class="input-checkbox checkbox"
                                     id="selectAll"></th>
-                            <th style="width: 20px; min-width: 20px;">E</th>
+                            <th style="width: 120px; min-width: 120px;">Semana</th>
                             <th style="width: 70px; min-width: 70px;">Legajo</th>
                             <th style="width: 280px; min-width: 280px;">Nombre y Apellido</th>
                             <th style="width: 70px; min-width: 70px;">Centro</th>
@@ -123,7 +83,7 @@
                             <th style="width: 60px; min-width: 60px;">Días</th>
                             <th style="width: 60px; min-width: 60px;">Cant.</th>
                             <th style="width: 110px; min-width: 110px;">Tipo</th>
-                            <th style=" min-width: 210px;">Chacra</th>
+                            <th style="min-width: 210px;">Chacra</th>
                             <th style="width: 110px; min-width: 110px;">Premio</th>
                             <th style="width: 110px; min-width: 110px;">Pago</th>
                             <th style="width: 110px; min-width: 110px;">Importe</th>
@@ -146,7 +106,7 @@
             <h2>DETALLE ADICIONAL</h2>
         </div>
         <div class="popup-body" id="content-detalles-planilla-general">
-            
+
         </div>
         <div class="popup-footer">
             <button class="btn-submit-nuevo" id="close-popup">CERRAR</button>
@@ -196,18 +156,6 @@
                     <option value="xlsx">EXCEL</option>
                 </select>
             </div>
-            <!-- <div class="exporta-planilla-rows_date">
-                <div class="exporta-planilla-divs_form">
-                    <label for="exporta-planilla-fecha-desde">DESDE</label>
-                    <input id="exporta-planilla-fecha-desde" onclick="this.showPicker();" class="exporta-planilla-input"
-                        type="date">
-                </div>
-                <div class="exporta-planilla-divs_form">
-                    <label for="exporta-planilla-fecha-hasta">HASTA</label>
-                    <input id="exporta-planilla-fecha-hasta" onclick="this.showPicker();" class="exporta-planilla-input"
-                        type="date">
-                </div>
-            </div> -->
         </div>
         <div class="exporta-planilla-popup-footer">
             <button class="btn-submit-nuevo" id="generar_archivo">GENERAR</button>

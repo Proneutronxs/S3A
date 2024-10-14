@@ -25,12 +25,12 @@ h4 {
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #a72626;/* Color del pulgar */
-    border-radius: 4px; 
+    background-color: #a72626;
+    border-radius: 1px; 
 }
 
 
