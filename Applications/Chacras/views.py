@@ -75,7 +75,7 @@ def listarAdicionales(request):
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PD' AND Planilla_Chacras.Pago = 'A' THEN 'S' ELSE 'N' END AS EDIT_IMPORTE,
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PT' AND (Planilla_Chacras.Tarea = 'P' OR Planilla_Chacras.Tarea = 'R') THEN 'S' ELSE 'N' END AS EDIT_PREMIO,
 		                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
-		                        CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
+                                CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) WHEN Planilla_Chacras.Semana = '0' THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
                         FROM   Planilla_Chacras INNER JOIN
                                     TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                     TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN
@@ -350,7 +350,7 @@ def crearArchivos(request):
 	                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
                             CONVERT(VARCHAR(20) ,RTRIM(S3A.dbo.Chacra.Nombre)) AS CHACRA,CASE Planilla_Chacras.Cuadro WHEN '0' THEN '-' ELSE Planilla_Chacras.Cuadro END AS CUADRO, Planilla_Chacras.Observaciones AS OBS,
                             Planilla_Chacras.Usuario AS ENCARGADO,
-                            CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
+                            CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) WHEN Planilla_Chacras.Semana = '0' THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
                         FROM   Planilla_Chacras INNER JOIN
                             TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                             TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN

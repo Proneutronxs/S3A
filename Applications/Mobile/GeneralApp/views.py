@@ -813,18 +813,19 @@ def insertaAdicionales(request):
                 Cuadro = str(item['Cuadro'])
                 Pago = str(item['Pago'])
                 Observaciones = str(item['Observaciones'])
+                Semana = str(item.get('Semana', '0'))
                 Usuario = str(item['Usuario'])
                 FechaAlta = str(item['FechaAlta']).replace(' ','T')
                 if qr is None or qr == '' or qr == 'null' or qr == 'NULL' or qr =='0':
                     #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales, str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
-                    guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+                    guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones, Semana,usuario,FechaAlta,Usuario)
                 else:
                     if  existeQR(str(qr),Tarea,IdLegajo):
                         existe = "Fila: " + NroFila + " " + nombreChacra(Lote)
                         listadoFilas.append(existe)
                     else:
                         #print(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
-                        guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones,usuario,FechaAlta,Usuario)
+                        guardaAdicional(IdAdicional,IdEncargado,IdLegajo,Centro,Categoria,Descripcion,Tarea,Jornales,str(qr),Tipo,Cantidad,NroFila,Precio,Lote,Cuadro,Pago,Observaciones, Semana,usuario,FechaAlta,Usuario)
             if listadoFilas:
                 nota = 'Las siguientes filas ya están cargadas: \n \n' + ', \n'.join(listadoFilas) + '.'
                 return JsonResponse({'Message': 'Success', 'Nota': nota})  
@@ -877,11 +878,11 @@ def existeQR(qr,tarea,legajo):
         insertar_registro_error_sql("GeneralApp", "EXISTE QR", "usuario", error)
         return False
     
-def guardaAdicional(IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta):
+def guardaAdicional(IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Semana, Usuario, Fecha, UserAlta):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = "INSERT INTO Planilla_Chacras (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta, FechaAlta,E) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(),'P')"
-            values = (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Usuario, Fecha, UserAlta)
+            sql = "INSERT INTO Planilla_Chacras (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Semana, Usuario, Fecha, UserAlta, FechaAlta,E) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, GETDATE(),'P')"
+            values = (IdLocal, IdEncargado, Legajo, Centro, Categoria, Descripcion, Tarea, Jornales, QR, Tipo, Cantidad, NroFila, PrecioUnitario, Lote, Cuadro, Pago, Observaciones, Semana, Usuario, Fecha, UserAlta)
             cursor.execute(sql, values)
     except Exception as e:
         error = str(e)
