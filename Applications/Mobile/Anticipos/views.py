@@ -290,9 +290,9 @@ def cargaFechasDeAnticipos(request, mes, usuario):
         User = str(usuario)
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT DISTINCT CONVERT(VARCHAR(10), FechaHora, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), FechaHora, 103) AS FECHAS " \
-                        "FROM Auditoria_Anticipos " \
-                        "WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s) AND (Usuario = %s) "
+                sql = """ SELECT DISTINCT CONVERT(VARCHAR(10), FechaHora, 103) AS ID_FECHA, 'Fecha de Carga: ' + CONVERT(VARCHAR(5), FechaHora, 103) AS FECHAS 
+                        FROM Auditoria_Anticipos 
+                        WHERE (RIGHT('0' + CAST(MONTH(CONVERT(DATE, FechaHora, 103)) AS VARCHAR(2)), 2) = %s) AND (Usuario = %s) AND YEAR(FechaHora) = YEAR(GETDATE()) """
                 cursor.execute(sql, [Mes,User])
                 consulta = cursor.fetchall()
                 if consulta:
