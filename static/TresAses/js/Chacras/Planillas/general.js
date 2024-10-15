@@ -189,8 +189,7 @@ const listarCentros = async () => {
 const listarPersonalCentro = async () => {
     try {
         const formData = new FormData();
-        const centro = document.getElementById("selector_centros").value;
-        formData.append("Centro", centro);
+        formData.append("Centro", getValueCentros());
         const options = {
             method: 'POST',
             headers: {
@@ -201,7 +200,7 @@ const listarPersonalCentro = async () => {
         const response = await fetch("listar-personal/", options);
         const data = await response.json();
         if (data.Message == "Success") {
-            let result = [{ value: '0', label: 'SELECCIONE UN LEGAJO', disabled: true, selected: true }];
+            let result = [];//{ value: '0', label: 'SELECCIONE UN LEGAJO', disabled: true, selected: true }
             result.push();
             data.Datos.forEach((datos) => {
                 result.push({ value: datos.Legajo, label: datos.Nombre });
@@ -240,14 +239,13 @@ const completarTablaA = async () => {
     openProgressBar();
     try {
         const formData = new FormData();
-        const Centro = document.getElementById("selector_centros").value;
         const Legajo = document.getElementById("selector_legajos").value;
         const Descripcion = document.getElementById("selector_descripcion").value;
         const Pago = document.getElementById("selector_pagos").value;
         formData.append("Inicio", desde.value);
         formData.append("Final", hasta.value);
         formData.append("Legajo", Legajo);
-        formData.append("Centro", Centro);
+        formData.append("Centro", getValueCentros());
         formData.append("Descripcion", Descripcion);
         formData.append("Pago", Pago);
 
@@ -506,14 +504,13 @@ const descargarArchivo = async () => {
     openProgressBar();
     try {
         const formData = new FormData();
-        const Centro = document.getElementById("selector_centros").value;
         const Legajo = document.getElementById("selector_legajos").value;
         const Descripcion = document.getElementById("selector_descripcion").value;
         const Pago = document.getElementById("selector_pagos").value;
         formData.append("Inicio", desde.value);
         formData.append("Final", hasta.value);
         formData.append("Legajo", Legajo);
-        formData.append("Centro", Centro);
+        formData.append("Centro", getValueCentros());
         formData.append("Descripcion", Descripcion);
         formData.append("Pago", Pago);
 
@@ -555,6 +552,17 @@ const descargarArchivo = async () => {
     }
 };
 
+function getValueCentros() {
+    const calibres = document.getElementById("selector_centros");
+    const selectedCentros = Array.from(calibres.selectedOptions).map(option => option.value);
+    if (selectedCentros.length === 0) {
+        return [0];
+    }
+    if (selectedCentros.includes("0")) {
+        return [0];
+    }
+    return selectedCentros;
+}
 
 function importe(){
     document.getElementById('conetnido_importes').innerHTML =  `
@@ -586,12 +594,6 @@ exportaCloseBtn.addEventListener('click', () => {
     exportaPopup.style.display = 'none';
 });
 
-// Cerrar pop-up al hacer clic fuera del contenido
-// window.addEventListener('click', (e) => {
-//     if (e.target === exportaPopup) {
-//         exportaPopup.style.display = 'none';
-//     }
-// });
 
 
 

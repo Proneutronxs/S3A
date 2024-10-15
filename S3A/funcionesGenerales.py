@@ -319,17 +319,20 @@ def listaAbrevCentros(request):
     
     
 @csrf_exempt
-def listaPersonalPorCentro(request):
+def listaPersonalPorCentro(request): ###listado de personal por listado de centros
     if request.method == 'POST':
-        centro = request.POST.get('Centro')
+        centros = request.POST.get('Centro')
+        listaCentros = centros.split(',')
+        centros_str = ','.join(listaCentros)
+        centro = "0" if listaCentros == ['0'] else "1"
         try:
             with connections['ISISPayroll'].cursor() as cursor:
-                sql = """
+                sql = f"""
                         DECLARE @@Centro INT;
                         SET @@Centro = %s
                         SELECT CodEmpleado AS LEGAJO, CONVERT(VARCHAR(31), (CONVERT(VARCHAR(15), CodEmpleado) + ' - ' + ApellidoEmple + ' ' + NombresEmple)) AS NOMBRE 
                         FROM Empleados
-                        WHERE BajaDefinitivaEmple = '2' AND (@@Centro = '0' OR @@Centro = Regis_CCo)
+                        WHERE BajaDefinitivaEmple = '2' AND (@@Centro = '0' OR Regis_CCo IN ({centros_str}))
                         ORDER BY ApellidoEmple
                     """
                 cursor.execute(sql, [centro])

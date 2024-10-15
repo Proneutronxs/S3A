@@ -40,10 +40,13 @@ def listarAdicionales(request):
             legajos = request.POST.get('Legajo')
             descripcion = request.POST.get('Descripcion')
             pagos = request.POST.get('Pago')
-            values = [desde,hasta,centros,legajos,descripcion,pagos]
+            listaCentros = centros.split(',')
+            centros_str = ','.join(listaCentros)
+            centro = "0" if listaCentros == ['0'] else "1"
+            values = [desde,hasta,centro,legajos,descripcion,pagos]
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """  
+                    sql = f"""  
                         DECLARE @@Inicio DATE;
                         DECLARE @@Final DATE;
                         DECLARE @@Centro INT;
@@ -72,7 +75,7 @@ def listarAdicionales(request):
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PD' AND Planilla_Chacras.Pago = 'A' THEN 'S' ELSE 'N' END AS EDIT_IMPORTE,
                                 CASE WHEN Planilla_Chacras.Descripcion = 'PT' AND (Planilla_Chacras.Tarea = 'P' OR Planilla_Chacras.Tarea = 'R') THEN 'S' ELSE 'N' END AS EDIT_PREMIO,
 		                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
-                                'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(WK, Planilla_Chacras.Fecha)) AS CHAR_SEMANA
+		                        CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
                         FROM   Planilla_Chacras INNER JOIN
                                     TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                                     TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN
@@ -82,7 +85,7 @@ def listarAdicionales(request):
                                         FROM Planilla_Chacras
                                         GROUP BY QR, Tarea,PrecioUnitario) AS SUB_CONSULTA ON Planilla_Chacras.QR = SUB_CONSULTA.QR 
                         WHERE Planilla_Chacras.IdPlanilla > 80 AND CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
-                            AND (@@Centro = '0' OR Planilla_Chacras.Centro = @@Centro)
+                            AND (@@Centro = '0' OR Planilla_Chacras.Centro IN ({centros_str}))
                             AND (@@Pago = '0' OR Planilla_Chacras.Pago = @@Pago)
                             AND (@@Legajo = '0' OR Planilla_Chacras.Legajo = @@Legajo)
                             AND (@@Descripcion  = '0' OR Planilla_Chacras.Descripcion = @@Descripcion)
@@ -314,10 +317,14 @@ def crearArchivos(request):
             legajos = request.POST.get('Legajo')
             descripcion = request.POST.get('Descripcion')
             pagos = request.POST.get('Pago')
-            values = [desde,hasta,centros,legajos,descripcion,pagos]
+            listaCentros = centros.split(',')
+            centros_str = ','.join(listaCentros)
+            centro = "0" if listaCentros == ['0'] else "1"
+            values = [desde,hasta,centro,legajos,descripcion,pagos]
+
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                    sql = """  
+                    sql = f"""  
                         DECLARE @@Inicio DATE;
                         DECLARE @@Final DATE;
                         DECLARE @@Centro INT;
@@ -342,7 +349,8 @@ def crearArchivos(request):
                             CASE WHEN SUB_CONSULTA.IMPORTE IS NULL THEN CONVERT(VARCHAR,Planilla_Chacras.PrecioUnitario) ELSE CONVERT(VARCHAR,SUB_CONSULTA.IMPORTE) END AS IMPORTE_UNI,
 	                        CASE WHEN Planilla_Chacras.ImportePremio IS NULL THEN CONVERT(VARCHAR,0) ELSE CONVERT(VARCHAR,Planilla_Chacras.ImportePremio) END AS PREMIO,
                             CONVERT(VARCHAR(20) ,RTRIM(S3A.dbo.Chacra.Nombre)) AS CHACRA,CASE Planilla_Chacras.Cuadro WHEN '0' THEN '-' ELSE Planilla_Chacras.Cuadro END AS CUADRO, Planilla_Chacras.Observaciones AS OBS,
-                            Planilla_Chacras.Usuario AS ENCARGADO
+                            Planilla_Chacras.Usuario AS ENCARGADO,
+                            CASE WHEN Planilla_Chacras.Semana IS NULL THEN CONVERT(VARCHAR(10),Planilla_Chacras.Fecha,103) ELSE 'SEMANA: ' + CONVERT(VARCHAR(1), Planilla_Chacras.Semana) END AS SEM
                         FROM   Planilla_Chacras INNER JOIN
                             TresAses_ISISPayroll.dbo.Empleados ON Planilla_Chacras.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado INNER JOIN
                             TresAses_ISISPayroll.dbo.CentrosCostos ON Planilla_Chacras.Centro = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo INNER JOIN
@@ -352,7 +360,7 @@ def crearArchivos(request):
                                 FROM Planilla_Chacras
                                 GROUP BY QR, Tarea,PrecioUnitario) AS SUB_CONSULTA ON Planilla_Chacras.QR = SUB_CONSULTA.QR 
                         WHERE Planilla_Chacras.IdPlanilla > 80 AND CONVERT(DATE, Planilla_Chacras.Fecha) >= @@Inicio AND CONVERT(DATE, Planilla_Chacras.Fecha) <= @@Final
-                            AND (@@Centro = '0' OR Planilla_Chacras.Centro = @@Centro)
+                            AND (@@Centro = '0' OR Planilla_Chacras.Centro IN ({centros_str}))
                             AND (@@Pago = '0' OR Planilla_Chacras.Pago = @@Pago)
                             AND (@@Legajo = '0' OR Planilla_Chacras.Legajo = @@Legajo)
                             AND (@@Descripcion  = '0' OR Planilla_Chacras.Descripcion = @@Descripcion)
@@ -369,8 +377,8 @@ def crearArchivos(request):
                         bold_font = Font(bold=True)
                         center_alignment = Alignment(horizontal="center")
                         encabezados = [
-                            "ID", "LEGAJO", "NOMBRE", "CENTRO", "CATEGORIA", "DESCRIPCION", "TAREA",
-                            "CANT_DIAS", "TIPO", "PAGO", "CANTIDAD_UNI", "IMPORTE_UNI", "CHACRA", 
+                            "ID", "SEMANA", "LEGAJO", "NOMBRE", "CENTRO", "CATEGORIA", "DESCRIPCION", "TAREA",
+                            "CANT_DIAS", "TIPO", "PAGO", "CANTIDAD_UNI", "IMPORTE_UNI", "PREMIO", "CHACRA", 
                             "CUADRO", "OBS", "ENCARGADO"
                         ]
                         for col_num, encabezado in enumerate(encabezados, start=1):
@@ -379,22 +387,23 @@ def crearArchivos(request):
                             celda.alignment = center_alignment
                         for idx, row in enumerate(results, start=2):  # Comienza en la fila 2
                             ws.cell(row=idx, column=1, value=str(row[0]))   # ID
-                            ws.cell(row=idx, column=2, value=str(row[1]))   # LEGAJO
-                            ws.cell(row=idx, column=3, value=str(row[2]))   # NOMBRE
-                            ws.cell(row=idx, column=4, value=str(row[3]))   # CENTRO
-                            ws.cell(row=idx, column=5, value=str(row[4]))   # CATEGORIA
-                            ws.cell(row=idx, column=6, value=str(row[5]))   # DESCRIPCION
-                            ws.cell(row=idx, column=7, value=str(row[6]))   # TAREA
-                            ws.cell(row=idx, column=8, value=str(row[7]))   # CANT_DIAS
-                            ws.cell(row=idx, column=9, value=str(row[8]))   # TIPO
-                            ws.cell(row=idx, column=10, value=str(row[9]))  # PAGO
-                            ws.cell(row=idx, column=11, value=str(row[10])) # CANTIDAD_UNI
-                            ws.cell(row=idx, column=12, value=formatear_moneda(str(row[11]))) # IMPORTE_UNI
-                            ws.cell(row=idx, column=13, value=formatear_moneda(str(row[12])))  # PREMIO
-                            ws.cell(row=idx, column=13, value=str(row[13])) # CHACRA
-                            ws.cell(row=idx, column=14, value=str(row[14])) # CUADRO
-                            ws.cell(row=idx, column=15, value=str(row[15])) # OBS
-                            ws.cell(row=idx, column=16, value=str(row[16])) # ENCARGADO
+                            ws.cell(row=idx, column=2, value=str(row[17])) # SEMANA
+                            ws.cell(row=idx, column=3, value=str(row[1]))   # LEGAJO
+                            ws.cell(row=idx, column=4, value=str(row[2]))   # NOMBRE
+                            ws.cell(row=idx, column=5, value=str(row[3]))   # CENTRO
+                            ws.cell(row=idx, column=6, value=str(row[4]))   # CATEGORIA
+                            ws.cell(row=idx, column=7, value=str(row[5]))   # DESCRIPCION
+                            ws.cell(row=idx, column=8, value=str(row[6]))   # TAREA
+                            ws.cell(row=idx, column=9, value=str(row[7]))   # CANT_DIAS
+                            ws.cell(row=idx, column=10, value=str(row[8]))   # TIPO
+                            ws.cell(row=idx, column=11, value=str(row[9]))  # PAGO
+                            ws.cell(row=idx, column=12, value=str(row[10])) # CANTIDAD_UNI
+                            ws.cell(row=idx, column=13, value=formatear_moneda(str(row[11]))) # IMPORTE_UNI
+                            ws.cell(row=idx, column=14, value=formatear_moneda(str(row[12])))  # PREMIO
+                            ws.cell(row=idx, column=15, value=str(row[13])) # CHACRA
+                            ws.cell(row=idx, column=16, value=str(row[14])) # CUADRO
+                            ws.cell(row=idx, column=17, value=str(row[15])) # OBS
+                            ws.cell(row=idx, column=18, value=str(row[16])) # ENCARGADO
 
                         for column in ws.columns:
                             max_length = 0
@@ -416,7 +425,6 @@ def crearArchivos(request):
                         return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
 
             except Exception as e:
-                print(e)
                 return JsonResponse ({'Message': 'Not Found', 'Nota': 'Hubo un error al intentar resolver la petición. ' + str(e) })
             finally:
                 cursor.close()
