@@ -39,7 +39,6 @@ def listarTransporte(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 @csrf_exempt
 def listarDataTransporte(request):
     if request.method == 'POST':
@@ -112,17 +111,131 @@ def listarDataTransporte(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def guardar_transporte_chofer(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        idTransporte = str(json.loads(body)['IdTransporte'])
+        nombreTransporte = str(json.loads(body)['NombreTransporte'])
+        idChofer = str(json.loads(body)['IdChofer'])
+        nombreChofer = str(json.loads(body)['NombreChofer'])
+        idCamion = str(json.loads(body)['IdCamion'])
+        nombreCamion = str(json.loads(body)['NombreCamion'])
+        idAcoplado = str(json.loads(body)['IdAcoplado'])
+        nombreAcoplado = str(json.loads(body)['NombreAcoplado'])
+        telefono = str(json.loads(body)['Telefono'])
+        idFirebase = str(json.loads(body)['IdFirebase'])
+        values = (idTransporte,nombreTransporte,idChofer,nombreChofer,idCamion,nombreCamion,idAcoplado,nombreAcoplado,telefono,idFirebase)
+        if existe_chofer_alta(idChofer):
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            INSERT INTO Transporte_Chofer_Alta (IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado) VALUES 
+                            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'D',GETDATE(),'S')
+                        """
+                    cursor.execute(sql,values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    info_Alta_chofer = data_chofer(idChofer)
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Chofer se dió de alta Correctamente.', 'Info': info_Alta_chofer})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo dar de alta el Chofer, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","GUARDA CHOFER","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        else:
+            values2 = (idTransporte,nombreTransporte,idCamion,nombreCamion,idAcoplado,nombreAcoplado,telefono,idFirebase,idChofer)
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE Transporte_Chofer_Alta SET IdTransporte = %s, NombreTransporte = %s, IdCamion = %s, NombreCamion = %s, IdAcoplado = %s, NombreAcoplado = %s, NumTelefono = %s, IdFirebase = %s, EstadoCamion = 'D'
+                            WHERE (IdChofer = %s)
+                        """
+                    cursor.execute(sql,values2)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    info_Alta_chofer = data_chofer(idChofer)
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Chofer se actualizó Correctamente.', 'Info': info_Alta_chofer})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Chofer, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","ACTUALIZA CHOFER","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+def existe_chofer_alta(idChofer):
+    values = [idChofer]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT 1
+                    FROM Transporte_Chofer_Alta
+                    WHERE (IdChofer = %s)
+                """
+            cursor.execute(sql,values)
+            consulta = cursor.fetchone()
+            if consulta:
+                return False
+            else:
+                return True
+    except Exception as e:
+        return True
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def data_chofer(idChofer):
+    values = (idChofer)
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT   ID_TC, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
+                    FROM Transporte_Chofer_Alta
+                    WHERE (IdChofer = %s)
+                """
+            cursor.execute(sql,values)
+            consulta = cursor.fetchone()
+            if consulta:
+                info_Alta_chofer = [{'ID_TC': str(consulta[0]), 'IdTransporte': str(consulta[1]), 'NombreTransporte':str(consulta[2]), 'IdChofer':str(consulta[3]), 'NombreChofer':str(consulta[4]),
+                                    'IdCamion':str(consulta[5]), 'NombreCamion':str(consulta[6]), 'IdAcoplado':str(consulta[7]), 'NombreAcoplado':str(consulta[8]), 'NumTelefono':str(consulta[9]),
+                                    'IdFirebase':str(consulta[10]), 'EstadoCamion':str(consulta[11]), 'FechaAlta':str(consulta[12]), 'Estado':str(consulta[13])}]
+                return info_Alta_chofer
+            else:
+                return []
+    except Exception as e:
+        return []
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 
 
 
 
-
-
-
-
-
-
+# CREATE TABLE Transporte_Chofer_Alta
+#    (
+#       ID_TC INT IDENTITY(1,1) PRIMARY KEY,
+# 	  IdTransporte INT,
+# 	  NombreTransporte VARCHAR(255),
+# 	  IdChofer INT,
+# 	  NombreChofer VARCHAR(255),
+# 	  IdCamion INT,
+# 	  NombreCamion VARCHAR(255),
+# 	  IdAcoplado INT,
+# 	  NombreAcoplado VARCHAR(255),
+# 	  NumTelefono VARCHAR(255),
+# 	  IdFirebase VARCHAR(MAX),
+# 	  EstadoCamion VARCHAR(5),
+# 	  FechaAlta DATETIME,
+# 	  Estado VARCHAR(1)
+#    )
 
 
 

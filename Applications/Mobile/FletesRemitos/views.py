@@ -1567,7 +1567,6 @@ def Carga_Inicial_Flete(request):
                 listado_variedades = []
                 
                 listado_idChacras = chacrasUsuario(usuario)
-                print(listado_idChacras)
                 cantValuesChacras = ','.join(['%s'] * len(listado_idChacras))
                 ## CHACRAS ASIGNADAS
                 sql = f"SELECT IdChacra, RTRIM(Nombre) AS NOMBRE FROM Chacra WHERE IdChacra IN ({cantValuesChacras})"

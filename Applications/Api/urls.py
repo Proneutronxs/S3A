@@ -17,7 +17,10 @@ urlpatterns = [
 
 
 
-    path('listar-transporte/', fruit.listarTransporte, name="choferes_listar_transportes"),
+    path('fruit/listar-transporte/', fruit.listarTransporte, name="choferes_listar_transportes"),
 
-    path('listar-transporte/datos-transportes/', fruit.listarDataTransporte, name="choferes_listar_transportes_data_transportes"),
+    path('fruit/listar-transporte/datos-transportes/', fruit.listarDataTransporte, name="choferes_listar_transportes_data_transportes"),
+
+    path('fruit/listar-transporte/insertar-transporte/', fruit.guardar_transporte_chofer, name="guardar_transporte_chofer"),
+
 ]
