@@ -592,7 +592,7 @@ def mostrarHorasArchivo(request):
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '29/08/2024' + ', Fecha de Cierre: ' + '28/09/2024' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/09/2024' + ', Fecha de Cierre: ' + '28/10/2024' + '.'
                         return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
                     else:
                         texto = ''
@@ -600,7 +600,7 @@ def mostrarHorasArchivo(request):
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '29/08/2024' + ', Fecha de Cierre: ' + '28/09/2024' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/09/2024' + ', Fecha de Cierre: ' + '28/10/2024' + '.'
                         data = "No se encontraron horas extras."
                         return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
 
@@ -675,8 +675,8 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
             sql = """
                 DECLARE @@Inicio DATE;
                 DECLARE @@Final DATE;
-                SET @@Inicio = '2024-08-29';
-                SET @@Final = '2024-09-28';
+                SET @@Inicio = '2024-09-29';
+                SET @@Final = '2024-10-28';
                 SELECT 
                     IdLegajo AS LEGAJO, 
                     ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
