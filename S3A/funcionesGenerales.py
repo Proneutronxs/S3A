@@ -251,7 +251,7 @@ def decode_crc(crc, p_calibre, p_segundo):
 def formato_moneda(tipo,valor):
     if isinstance(valor, str):
         valor = valor.replace(",", ".")
-    return tipo + f"U$S {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return tipo + f" {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
 ### GET LISTA CENTROS
