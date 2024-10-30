@@ -173,7 +173,7 @@ def dataConCRC(request):
                             "Calibre": str(row[28]),
                             "Cantidad": str(row[29]),
                             "CRC": str(crc),
-                            "Moneda": str(row[32])
+                            "Moneda": str(row[31])
                         })
 
                         # Actualizar subtotales
