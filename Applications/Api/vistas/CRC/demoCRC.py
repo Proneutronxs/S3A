@@ -135,7 +135,7 @@ def dataConCRC(request):
                     resumen = {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}
                     for row in consulta:
                         empresa = row[4]
-
+                        tipo = str(row[31])
                         # Usar diccionario en lugar de lista
                         if empresa not in empresas:
                             empresas[empresa] = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
@@ -185,11 +185,11 @@ def dataConCRC(request):
                     # Convertir empresas en lista y aplicar formato
                     empresas = list(empresas.values())
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
-                    resumen = {k: formato_moneda_usd(str(v)) for k, v in resumen.items()}
+                    resumen = {k: formato_moneda(tipo,str(v)) for k, v in resumen.items()}
 
                     for empresa in empresas:
                         empresa["Subtotal"]["TotalGeneral"] = empresa["Subtotal"]["SumaImporteTotal"] + empresa["Subtotal"]["SumaImporteCRCTotal"]
-                        empresa["Subtotal"] = {k: formato_moneda_usd(str(v)) for k, v in empresa["Subtotal"].items()}
+                        empresa["Subtotal"] = {k: formato_moneda(tipo,str(v)) for k, v in empresa["Subtotal"].items()}
 
                     return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen}, safe=False)
 
@@ -211,7 +211,7 @@ def decode_crc(p_crc, p_calibre, p_segundo):
         return 0
 
 
-def retornaCRC(principal,crcs,calibres,segundos):
+def retornaCRC(tipo,principal,crcs,calibres,segundos):
     principal_lista = [int(x) for x in principal.split("-")]
     crcs_lista = [float(x) for x in crcs.split("-")]
     lista_principal = [principal for principal in principal_lista if principal != 0]
@@ -223,7 +223,7 @@ def retornaCRC(principal,crcs,calibres,segundos):
         listado_Original_CRC.append(valor)
     resultado = [p * c for p, c in zip(lista_principal, listado_Original_CRC)]
 
-    valores_moneda = [formato_moneda_usd(valor) for valor in listado_Original_CRC]
+    valores_moneda = [formato_moneda(tipo,valor) for valor in listado_Original_CRC]
     original_crc = " - ".join(valores_moneda)
 
     return sum(resultado), original_crc

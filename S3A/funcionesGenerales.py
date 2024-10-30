@@ -248,10 +248,10 @@ def decode_crc(crc, p_calibre, p_segundo):
     else:
         return round((crc * 100 * p_calibre) / (3.1415 * (p_segundo+1)))
     
-def formato_moneda_usd(valor):
+def formato_moneda(tipo,valor):
     if isinstance(valor, str):
         valor = valor.replace(",", ".")
-    return f"U$S {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return tipo + f"U$S {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
 ### GET LISTA CENTROS
