@@ -26,6 +26,6 @@ urlpatterns = [
 
     ### SOLICITUD DE VIAJES ###
 
-    path('fruit/listar-viaje/chofer=<str:usuario>/', fruit.Obtener_Viaje_Chacras, name="obtener_viaes_chacras"),
+    path('fruit/listar-viaje/chofer=<str:ID_CA>/', fruit.Obtener_Viaje_Chacras, name="obtener_viajes_chacras"),
 
 ]
