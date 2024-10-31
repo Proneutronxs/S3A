@@ -238,6 +238,7 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                                                 S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
                                                 Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV
                         WHERE CA.ID_CA = %s 
+	                        AND NOT EXISTS (SELECT 1 FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA)
                             AND VN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'A' AND ID_CA = CA.ID_CA) 
                             AND DCV.Estado = 'A'
                         ORDER BY DCV.ID_CDCV
