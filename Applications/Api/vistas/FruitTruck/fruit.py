@@ -277,9 +277,8 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                     for viaje in viajes:
                         if viaje not in viajes_unicos:
                             viajes_unicos.append(viaje)
-                    json_viajes = json.dumps(viajes_unicos, indent=4)
 
-                    return JsonResponse({'Message': 'Success', 'Info': json_viajes}, safe=False)
+                    return JsonResponse({'Message': 'Success', 'Viaje': viajes_unicos})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': "No existen viajes disponibles."})
 
