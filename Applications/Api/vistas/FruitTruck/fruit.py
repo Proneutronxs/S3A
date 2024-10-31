@@ -217,10 +217,10 @@ def data_chofer(idChofer):
 
 
 ###OBTENER EL VIAJE CON LOS DESTINOS ASIGNADOS
-def Obtener_Viaje_Chacras(request):
+def Obtener_Viaje_Chacras(request,ID_CA):
     if request.method == 'GET':
-        ID_CA = str(request.GET.get('ID_CA'))
-        values = (ID_CA)
+        ID_CA = str(ID_CA)
+        values = [ID_CA]
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
