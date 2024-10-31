@@ -251,29 +251,29 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                         id_viaje = str(row[0])
                         if id_viaje not in viajes:
                             viajes[id_viaje] = {
-                                "idViaje": id_viaje,
-                                "idChoferAlta": str(row[1]),
-                                "nombreChofer": str(row[2]),
-                                "idChofer": str(row[3]),
-                                "cantVacios": str(row[13]),
-                                "idUbiVac": str(row[14]),
-                                "nombreUbiVacios": str(row[15]),
-                                "latVacios": str(row[16]),
-                                "longVacios": str(row[17]),
+                                "IdViaje": id_viaje,
+                                "IdChoferAlta": str(row[1]),
+                                "NombreChofer": str(row[2]),
+                                "IdChofer": str(row[3]),
+                                "CantVacios": str(row[13]),
+                                "IdUbiVac": str(row[14]),
+                                "NombreUbiVacios": str(row[15]),
+                                "LatVacios": str(row[16]),
+                                "LonVacios": str(row[17]),
                                 "DetalleChacras": []
                             }
                         
                         detalle_chacra = {
-                            "idDetalleChacras": str(row[4]),
-                            "idPedidoFlete": str(row[5]),
-                            "idChacra": str(row[6]),
-                            "latChacra": str(row[7]),
-                            "longChacra": str(row[8]),
-                            "nombreChacra": str(row[9]),
-                            "idZona": str(row[10]),
-                            "nombreZona": str(row[11]),
-                            "vacios": str(row[12]),
-                            "cuellos": str(row[18])
+                            "IdDetalleChacras": str(row[4]),
+                            "IdPedidoFlete": str(row[5]),
+                            "IdChacra": str(row[6]),
+                            "LatChacra": str(row[7]),
+                            "LonChacra": str(row[8]),
+                            "MombreChacra": str(row[9]),
+                            "IdZona": str(row[10]),
+                            "NombreZona": str(row[11]),
+                            "Vacios": str(row[12]),
+                            "Cuellos": str(row[18])
                         }
                         viajes[id_viaje]["DetalleChacras"].append(detalle_chacra)
 
