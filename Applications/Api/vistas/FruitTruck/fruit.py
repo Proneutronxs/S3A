@@ -130,7 +130,7 @@ def guardar_transporte_chofer(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            INSERT INTO Transporte_Chofer_Alta (IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado) VALUES 
+                            INSERT INTO Chofer_Alta (IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado) VALUES 
                             (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'D',GETDATE(),'S')
                         """
                     cursor.execute(sql,values)
@@ -152,7 +152,7 @@ def guardar_transporte_chofer(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            UPDATE Transporte_Chofer_Alta SET IdTransporte = %s, NombreTransporte = %s, IdCamion = %s, NombreCamion = %s, IdAcoplado = %s, NombreAcoplado = %s, NumTelefono = %s, IdFirebase = %s, EstadoCamion = 'D'
+                            UPDATE Chofer_Alta SET IdTransporte = %s, NombreTransporte = %s, IdCamion = %s, NombreCamion = %s, IdAcoplado = %s, NombreAcoplado = %s, NumTelefono = %s, IdFirebase = %s, EstadoCamion = 'D'
                             WHERE (IdChofer = %s)
                         """
                     cursor.execute(sql,values2)
@@ -178,7 +178,7 @@ def existe_chofer_alta(idChofer):
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
                     SELECT 1
-                    FROM Transporte_Chofer_Alta
+                    FROM Chofer_Alta
                     WHERE (IdChofer = %s)
                 """
             cursor.execute(sql,values)
@@ -198,7 +198,7 @@ def data_chofer(idChofer):
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
                     SELECT   ID_TC, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
-                    FROM Transporte_Chofer_Alta
+                    FROM Chofer_Alta
                     WHERE (IdChofer = %s)
                 """
             cursor.execute(sql,values)
@@ -216,26 +216,83 @@ def data_chofer(idChofer):
         connections['TRESASES_APLICATIVO'].close()
 
 
+###OBTENER EL VIAJE CON LOS DESTINOS ASIGNADOS
+def Obtener_Viaje_Chacras(request):
+    if request.method == 'GET':
+        ID_CA = str(request.GET.get('ID_CA'))
+        values = (ID_CA)
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT        VN.ID_CVN AS ID_VIAJE_NOTI, CA.ID_CA AS ID_CHOFER_ALTA, CA.NombreChofer AS NOM_CHOFER, CA.IdChofer AS ID_CHOFER, 
+                                    DCV.ID_CDCV AS ID_DETALLES_CHACRAS, DCV.IdPedidoFlete AS ID_PEDIDO_FLETE, 
+                                    DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, RTRIM(CH.Nombre) AS NOM_CHACRA, 
+                                    ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
+                                    ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
+                                    ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS 
+                        FROM            Chofer_Alta AS CA INNER JOIN
+                                                Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA INNER JOIN
+                                                Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN INNER JOIN
+                                                S3A.dbo.Chacra AS CH ON CH.IdChacra = DCV.IdChacra INNER JOIN
+                                                S3A.dbo.Zona AS ZN ON ZN.IdZona = CH.Zona INNER JOIN
+                                                S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
+                                                Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV
+                        WHERE CA.ID_CA = %s 
+                            AND VN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'A' AND ID_CA = CA.ID_CA) 
+                            AND DCV.Estado = 'A'
+                        ORDER BY DCV.ID_CDCV
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    viajes = []
+                    for row in consulta:
+                        viaje = {
+                            "idViaje": str(row[0]),
+                            "idChoferAlta": str(row[1]),
+                            "nombreChofer": str(row[2]),
+                            "idChofer": str(row[3]),
+                            "cantVacios": str(row[13]),
+                            "idUbiVac": str(row[14]),
+                            "nombreUbiVacios": str(row[15]),
+                            "latVacios": str(row[16]),
+                            "longVacios": str(row[17]),
+                            "DetalleChacras": []
+                        }
+                        detalle_chacra = {
+                            "idDetalleChacras": str(row[4]),
+                            "idPedidoFlete": str(row[5]),
+                            "idChacra": str(row[6]),
+                            "latChacra": str(row[7]),
+                            "longChacra": str(row[8]),
+                            "nombreChacra": str(row[9]),
+                            "idZona": str(row[10]),
+                            "nombreZona": str(row[11]),
+                            "vacios": str(row[12]),
+                            "cuellos": str(row[18])
+                        }
+                        viaje["DetalleChacras"].append(detalle_chacra)
+                        viajes.append(viaje)
+                    viajes_unicos = []
+                    for viaje in viajes:
+                        if viaje not in viajes_unicos:
+                            viajes_unicos.append(viaje)
+                    json_viajes = json.dumps(viajes_unicos, indent=4)
+
+                    return JsonResponse({'Message': 'Success', 'Info': json_viajes}, safe=False)
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': "No existen viajes disponibles."})
+
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","OBTIENE VIAJE","GET",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
-# CREATE TABLE Transporte_Chofer_Alta
-#    (
-#       ID_TC INT IDENTITY(1,1) PRIMARY KEY,
-# 	  IdTransporte INT,
-# 	  NombreTransporte VARCHAR(255),
-# 	  IdChofer INT,
-# 	  NombreChofer VARCHAR(255),
-# 	  IdCamion INT,
-# 	  NombreCamion VARCHAR(255),
-# 	  IdAcoplado INT,
-# 	  NombreAcoplado VARCHAR(255),
-# 	  NumTelefono VARCHAR(255),
-# 	  IdFirebase VARCHAR(MAX),
-# 	  EstadoCamion VARCHAR(5),
-# 	  FechaAlta DATETIME,
-# 	  Estado VARCHAR(1)
-#    )
 
 
 

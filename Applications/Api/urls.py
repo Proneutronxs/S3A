@@ -23,4 +23,9 @@ urlpatterns = [
 
     path('fruit/listar-transporte/insertar-transporte/', fruit.guardar_transporte_chofer, name="guardar_transporte_chofer"),
 
+
+    ### SOLICITUD DE VIAJES ###
+
+    path('fruit/listar-viaje/chofer=<str:usuario>/', fruit.Obtener_Viaje_Chacras, name="obtener_viaes_chacras"),
+
 ]
