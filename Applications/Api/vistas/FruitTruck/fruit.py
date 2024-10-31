@@ -245,20 +245,23 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                 cursor.execute(sql,values)
                 consulta = cursor.fetchall()
                 if consulta:
-                    viajes = []
+                    viajes = {}
                     for row in consulta:
-                        viaje = {
-                            "idViaje": str(row[0]),
-                            "idChoferAlta": str(row[1]),
-                            "nombreChofer": str(row[2]),
-                            "idChofer": str(row[3]),
-                            "cantVacios": str(row[13]),
-                            "idUbiVac": str(row[14]),
-                            "nombreUbiVacios": str(row[15]),
-                            "latVacios": str(row[16]),
-                            "longVacios": str(row[17]),
-                            "DetalleChacras": []
-                        }
+                        id_viaje = str(row[0])
+                        if id_viaje not in viajes:
+                            viajes[id_viaje] = {
+                                "idViaje": id_viaje,
+                                "idChoferAlta": str(row[1]),
+                                "nombreChofer": str(row[2]),
+                                "idChofer": str(row[3]),
+                                "cantVacios": str(row[13]),
+                                "idUbiVac": str(row[14]),
+                                "nombreUbiVacios": str(row[15]),
+                                "latVacios": str(row[16]),
+                                "longVacios": str(row[17]),
+                                "DetalleChacras": []
+                            }
+                        
                         detalle_chacra = {
                             "idDetalleChacras": str(row[4]),
                             "idPedidoFlete": str(row[5]),
@@ -271,14 +274,10 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                             "vacios": str(row[12]),
                             "cuellos": str(row[18])
                         }
-                        viaje["DetalleChacras"].append(detalle_chacra)
-                        viajes.append(viaje)
-                    viajes_unicos = []
-                    for viaje in viajes:
-                        if viaje not in viajes_unicos:
-                            viajes_unicos.append(viaje)
+                        viajes[id_viaje]["DetalleChacras"].append(detalle_chacra)
 
-                    return JsonResponse({'Message': 'Success', 'Viaje': viajes_unicos})
+                    viajes_list = list(viajes.values())
+                    return JsonResponse({'Message': 'Success', 'Viaje': viajes_list})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': "No existen viajes disponibles."})
 
