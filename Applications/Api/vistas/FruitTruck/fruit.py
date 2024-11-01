@@ -229,14 +229,16 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                                     DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, RTRIM(CH.Nombre) AS NOM_CHACRA, 
                                     ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
                                     ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
-                                    ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS 
+                                    ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
+			                        PD.Solicitante AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO
                         FROM            Chofer_Alta AS CA INNER JOIN
                                                 Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA INNER JOIN
                                                 Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN INNER JOIN
                                                 S3A.dbo.Chacra AS CH ON CH.IdChacra = DCV.IdChacra INNER JOIN
                                                 S3A.dbo.Zona AS ZN ON ZN.IdZona = CH.Zona INNER JOIN
                                                 S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
-                                                Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV
+                                                Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV LEFT JOIN
+						                        USUARIOS AS US ON US.Usuario = PD.UserID COLLATE Modern_Spanish_CI_AS
                         WHERE CA.ID_CA = %s 
 	                        AND NOT EXISTS (SELECT 1 FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA)
                             AND VN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'A' AND ID_CA = CA.ID_CA) 
@@ -273,7 +275,9 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                             "IdZona": str(row[10]),
                             "NombreZona": str(row[11]),
                             "Vacios": str(row[12]),
-                            "Cuellos": str(row[18])
+                            "Cuellos": str(row[18]),
+                            "Solicita": str(row[19]),
+                            "Telefono": str(row[20])
                         }
                         viajes[id_viaje]["DetalleChacras"].append(detalle_chacra)
 
