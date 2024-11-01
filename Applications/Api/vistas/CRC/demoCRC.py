@@ -207,7 +207,7 @@ def decode_crc(p_crc, p_calibre, p_segundo,estado):
         if estado == "A":
             return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * p_calibre)
         if estado == "D":
-            numero_original = int(((p_crc * 3.1415) - (p_calibre / 1000) - (p_calibre / 1000)) * 100000000)/100
+            numero_original = int(((p_crc * 3.1415) - (p_calibre / 1000) - (p_segundo / 1000)) * 100000000)/100
             numero_original_redondeado = redondear_mas(numero_original, 2)
             return numero_original_redondeado
         return 0
