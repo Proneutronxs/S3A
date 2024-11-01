@@ -230,7 +230,7 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                                     ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
                                     ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
                                     ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
-			                        PD.Solicitante AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO
+			                        RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO
                         FROM            Chofer_Alta AS CA INNER JOIN
                                                 Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA INNER JOIN
                                                 Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN INNER JOIN
