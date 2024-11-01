@@ -242,7 +242,7 @@ def obtener_calibres(calibres):
         calibres_lista = [int(calibre) for calibre in calibres_lista]
     return calibres_lista
 
-def decode_crc(crc, p_calibre, p_segundo):
+def decode_crc_(crc, p_calibre, p_segundo):
     if crc == 0:
         return 0
     else:

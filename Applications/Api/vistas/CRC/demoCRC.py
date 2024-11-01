@@ -6,6 +6,7 @@ from django.db import connections
 from django.http import JsonResponse
 from django.http import HttpResponse, Http404
 import json
+import math
 import os
 
 
@@ -105,7 +106,7 @@ def dataConCRC(request):
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + 
                         CONVERT(VARCHAR(20), CRCT06) + '-' + CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + 
                         CONVERT(VARCHAR(20), CRCT11)) AS LISTA_CRC, CASE CONVERT(VARCHAR,TPC.Tamaño) WHEN 'AAAA' THEN '90' WHEN 'AAA' THEN '80' WHEN 'AA' THEN '70' WHEN 'A' THEN '60' WHEN 'B' THEN '50' WHEN 'C' THEN '40' ELSE CONVERT(VARCHAR,TPC.Tamaño) END AS CALIBRE, 
-	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC, Moneda AS TIPO_MONEDA
+	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC, Moneda AS TIPO_MONEDA, FUNCION AS FUNC
                     FROM 
                         VistaDemoDLC
                         LEFT OUTER JOIN		
@@ -125,7 +126,7 @@ def dataConCRC(request):
                         PesoEnvase, PesoEnvase * Bultos, Bultos, VistaDemoDLC.NroRemito,DATEPART(SECOND, ALTA_REMITO),(CONVERT(VARCHAR(5),T01) + '-' + CONVERT(VARCHAR(5),T02) + '-' + CONVERT(VARCHAR(5),T03) + '-' + CONVERT(VARCHAR(5),T04) + '-' + 
                         CONVERT(VARCHAR(5),T05) + '-' + CONVERT(VARCHAR(5),T06) + '-' + CONVERT(VARCHAR(5),T07) + '-' + CONVERT(VARCHAR(5),T08) + '-' + CONVERT(VARCHAR(5),T09) + '-' + CONVERT(VARCHAR(5),T10) + '-' + CONVERT(VARCHAR(5),T11)),
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + CONVERT(VARCHAR(20), CRCT06) + '-' + 
-                        CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda
+                        CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION
                     ORDER BY CONVERT(VARCHAR(10), FECH_FAC, 103), CONVERT(VARCHAR(30),Cliente), TPC.Tamaño
                     """
                 cursor.execute(sql, values)
@@ -136,12 +137,11 @@ def dataConCRC(request):
                     for row in consulta:
                         empresa = row[4]
                         tipo = str(row[31])
-                        # Usar diccionario en lugar de lista
                         if empresa not in empresas:
                             empresas[empresa] = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
 
                         datos_empresa = empresas[empresa]
-                        crc = decode_crc(float(row[30]), int(row[28]), int(row[25]))
+                        crc = decode_crc(float(row[30]), int(row[28]), int(row[25]),str(row[32]))
 
                         datos_empresa["Datos"].append({
                             "Mercado": str(row[0]),
@@ -176,13 +176,11 @@ def dataConCRC(request):
                             "Moneda": str(row[31])
                         })
 
-                        # Actualizar subtotales
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
                         datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(crc * int(row[29]))
                         resumen["SumaImporteTotal"] += float(row[19])
                         resumen["SumaImporteCRCTotal"] += float(crc * int(row[29]))
 
-                    # Convertir empresas en lista y aplicar formato
                     empresas = list(empresas.values())
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
                     resumen = {k: formato_moneda(tipo,str(v)) for k, v in resumen.items()}
@@ -204,29 +202,25 @@ def dataConCRC(request):
 
 
 
-def decode_crc(p_crc, p_calibre, p_segundo):
+def decode_crc(p_crc, p_calibre, p_segundo,estado):
     if p_crc > 0:
-        return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * p_calibre)
+        if estado == "A":
+            return round((p_crc * 100) / (3.1415 * (p_segundo +1)) * p_calibre)
+        if estado == "D":
+            numero_original = int(((p_crc * 3.1415) - (p_calibre / 1000) - (p_calibre / 1000)) * 100000000)/100
+            numero_original_redondeado = redondear_mas(numero_original, 2)
+            return numero_original_redondeado
+        return 0
     else:
         return 0
 
+def redondear_mas(numero, decimales):
+    factor = 10 ** decimales
+    if numero > 0:
+        return math.ceil(numero * factor) / factor
+    else:
+        return math.floor(numero * factor) / factor
 
-def retornaCRC(tipo,principal,crcs,calibres,segundos):
-    principal_lista = [int(x) for x in principal.split("-")]
-    crcs_lista = [float(x) for x in crcs.split("-")]
-    lista_principal = [principal for principal in principal_lista if principal != 0]
-    lista_crc = [crc for principal, crc in zip(principal_lista, crcs_lista) if principal != 0]
-    lista_calibres = obtener_calibres(calibres)
-    listado_Original_CRC = []
-    for calibre, crc in zip(lista_calibres, lista_crc):
-        valor = decode_crc(crc,calibre,segundos)
-        listado_Original_CRC.append(valor)
-    resultado = [p * c for p, c in zip(lista_principal, listado_Original_CRC)]
-
-    valores_moneda = [formato_moneda(tipo,valor) for valor in listado_Original_CRC]
-    original_crc = " - ".join(valores_moneda)
-
-    return sum(resultado), original_crc
 
 
 
