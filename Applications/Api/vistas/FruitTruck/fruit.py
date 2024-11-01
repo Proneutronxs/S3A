@@ -296,7 +296,72 @@ def Obtener_Viaje_Chacras(request,ID_CA):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+@csrf_exempt
+def acepta_rechaza_viaje(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CVN = str(json.loads(body)['ID_CVN'])
+        Tipo = str(json.loads(body)['Tipo'])
+        values = (ID_CVN)
+        if Tipo == "A":
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE VN SET VN.Estado = 'V', VN.FechaAltaEstado = GETDATE()
+                            FROM Chofer_Viajes_Notificacion AS VN 
+                            WHERE VN.ID_CVN = %s;
+                        """
+                    cursor.execute(sql,values)
+                    sql2 = """ 
+                            UPDATE DCV SET DCV.Estado = 'V'
+                            FROM Chofer_Detalle_Chacras_Viajes AS DCV 
+                            WHERE DCV.ID_CVN = %s;
+                        """
+                    cursor.execute(sql2,values)
 
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Viaje se Aceptó correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Aceptar el viaje, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","ACEPTA VIAJE","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        if Tipo == "R":
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE VN SET VN.Estado = 'R', VN.FechaAltaEstado = GETDATE()
+                            FROM Chofer_Viajes_Notificacion AS VN 
+                            WHERE VN.ID_CVN = %s;
+                        """
+                    cursor.execute(sql,values)
+                    sql2 = """ 
+                            UPDATE DCV SET DCV.Estado = 'R'
+                            FROM Chofer_Detalle_Chacras_Viajes AS DCV 
+                            WHERE DCV.ID_CVN = %s;
+                        """
+                    cursor.execute(sql2,values)
+                    
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Viaje se Rechazó correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo Rechazar el viaje, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","RECHAZA VIAJE","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo resolver la petición.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

@@ -28,4 +28,6 @@ urlpatterns = [
 
     path('fruit/listar-viaje/chofer=<str:ID_CA>/', fruit.Obtener_Viaje_Chacras, name="obtener_viajes_chacras"),
 
+    path('fruit/rechaza-acepta-viaje/', fruit.acepta_rechaza_viaje, name="acepta_rechaza_viaje"),
+
 ]
