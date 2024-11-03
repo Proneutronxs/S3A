@@ -152,7 +152,7 @@ def guardar_transporte_chofer(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            UPDATE Chofer_Alta SET IdTransporte = %s, NombreTransporte = %s, IdCamion = %s, NombreCamion = %s, IdAcoplado = %s, NombreAcoplado = %s, NumTelefono = %s, IdFirebase = %s, EstadoCamion = 'D'
+                            UPDATE Chofer_Alta SET IdTransporte = %s, NombreTransporte = %s, IdCamion = %s, NombreCamion = %s, IdAcoplado = %s, NombreAcoplado = %s, NumTelefono = %s, IdFirebase = %s, EstadoCamion = 'D', FechaActualiza = GETDATE()
                             WHERE (IdChofer = %s)
                         """
                     cursor.execute(sql,values2)
@@ -197,14 +197,14 @@ def data_chofer(idChofer):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    SELECT   ID_TC, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
+                    SELECT   ID_CA, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
                     FROM Chofer_Alta
                     WHERE (IdChofer = %s)
                 """
             cursor.execute(sql,values)
             consulta = cursor.fetchone()
             if consulta:
-                info_Alta_chofer = [{'ID_TC': str(consulta[0]), 'IdTransporte': str(consulta[1]), 'NombreTransporte':str(consulta[2]), 'IdChofer':str(consulta[3]), 'NombreChofer':str(consulta[4]),
+                info_Alta_chofer = [{'ID_CA': str(consulta[0]), 'IdTransporte': str(consulta[1]), 'NombreTransporte':str(consulta[2]), 'IdChofer':str(consulta[3]), 'NombreChofer':str(consulta[4]),
                                     'IdCamion':str(consulta[5]), 'NombreCamion':str(consulta[6]), 'IdAcoplado':str(consulta[7]), 'NombreAcoplado':str(consulta[8]), 'NumTelefono':str(consulta[9]),
                                     'IdFirebase':str(consulta[10]), 'EstadoCamion':str(consulta[11]), 'FechaAlta':str(consulta[12]), 'Estado':str(consulta[13])}]
                 return info_Alta_chofer
