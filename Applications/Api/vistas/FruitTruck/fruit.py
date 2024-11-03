@@ -145,8 +145,6 @@ def guardar_transporte_chofer(request):
                 error = str(e)
                 insertar_registro_error_sql("API","GUARDA CHOFER","POST",error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
-            finally:
-                connections['TRESASES_APLICATIVO'].close()
         else:
             values2 = (idTransporte,nombreTransporte,idCamion,nombreCamion,idAcoplado,nombreAcoplado,telefono,idFirebase,idChofer)
             try:
@@ -167,8 +165,6 @@ def guardar_transporte_chofer(request):
                 error = str(e)
                 insertar_registro_error_sql("API","ACTUALIZA CHOFER","POST",error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
-            finally:
-                connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -188,6 +184,8 @@ def existe_chofer_alta(idChofer):
             else:
                 return True
     except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","EXISTE CHOFER CHOFER","GET",error)
         return True
 
 def data_chofer(idChofer):
@@ -209,6 +207,8 @@ def data_chofer(idChofer):
             else:
                 return []
     except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","DATA CHOFER","GET",error)
         return []
 
 ###OBTENER EL VIAJE CON LOS DESTINOS ASIGNADOS
