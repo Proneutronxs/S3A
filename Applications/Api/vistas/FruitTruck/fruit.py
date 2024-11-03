@@ -195,7 +195,7 @@ def data_chofer(idChofer):
             sql = """ 
                     SELECT   ID_CA, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
                     FROM Chofer_Alta
-                    WHERE (IdChofer = ?)
+                    WHERE (IdChofer = %s)
                 """
             cursor.execute(sql, values)
             consulta = cursor.fetchone()
