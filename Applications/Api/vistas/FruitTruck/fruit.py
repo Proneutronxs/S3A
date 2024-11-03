@@ -189,8 +189,6 @@ def existe_chofer_alta(idChofer):
                 return True
     except Exception as e:
         return True
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def data_chofer(idChofer):
     values = (idChofer)
@@ -199,9 +197,9 @@ def data_chofer(idChofer):
             sql = """ 
                     SELECT   ID_CA, IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado
                     FROM Chofer_Alta
-                    WHERE (IdChofer = %s)
+                    WHERE (IdChofer = ?)
                 """
-            cursor.execute(sql,values)
+            cursor.execute(sql, values)
             consulta = cursor.fetchone()
             if consulta:
                 info_Alta_chofer = [{'ID_CA': str(consulta[0]), 'IdTransporte': str(consulta[1]), 'NombreTransporte':str(consulta[2]), 'IdChofer':str(consulta[3]), 'NombreChofer':str(consulta[4]),
@@ -212,9 +210,6 @@ def data_chofer(idChofer):
                 return []
     except Exception as e:
         return []
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
-
 
 ###OBTENER EL VIAJE CON LOS DESTINOS ASIGNADOS
 def Obtener_Viaje_Chacras(request,ID_CA):
