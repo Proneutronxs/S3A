@@ -189,7 +189,7 @@ def existe_chofer_alta(idChofer):
         return True
 
 def data_chofer(idChofer):
-    values = (idChofer)
+    values = [idChofer]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
