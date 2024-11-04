@@ -1,11 +1,13 @@
 
 from django.views.decorators.csrf import csrf_exempt
 from S3A.funcionesGenerales import *
+from Applications.ModelosPDF.remitoChacra import *
 from django.views.static import serve
 from django.db import connections
 from django.http import JsonResponse
 from django.http import HttpResponse, Http404
 import json
+import io
 
 
 def listarTransporte(request):
@@ -298,7 +300,6 @@ def Obtener_Viaje_Chacras(request,ID_CA):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 @csrf_exempt
 def acepta_rechaza_viaje(request):
     if request.method == 'POST':
@@ -366,7 +367,6 @@ def acepta_rechaza_viaje(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 @csrf_exempt
 def mostrar_remitos_fecha_chofer(request):
     if request.method == 'POST':
@@ -412,7 +412,175 @@ def mostrar_remitos_fecha_chofer(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def descargar_remito_ID(request,ID_REMITO):
+    if request.method == 'GET':
+        ID_REMITO = str(ID_REMITO)
+        values = [ID_REMITO]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT DRM.ID AS ID, FORMAT(DRM.NumeroRemito, '00000000') AS NRO_REMITO, CONVERT(VARCHAR(10),DRM.FechaAlta,103) AS FECHA,
+                            CONVERT(VARCHAR(5),DRM.FechaAlta,108) + ' Hs.' AS HORA, PF.IdPedidoFlete AS ID_PEDIDO_FLETE, RTRIM(PR.RazonSocial) AS PRODUCTOR,
+                            RTRIM(PR.Nombre) AS SEÑOR, RTRIM(PR.Direccion) AS DOMICILIO, RTRIM(CH.Nombre) AS CHACRA, RTRIM(ES.Nombre) AS ESPECIE,
+                            RTRIM(VR.Nombre) AS VARIEDAD, DRM.Renspa AS RENSPA, DRM.UP AS UP, RTRIM(CF.Apellidos) + ' ' + RTRIM(CF.Nombres) AS CHOFER,
+                            RTRIM(CM.Nombre) AS CAMION, RTRIM(CM.Patente) AS PATENTE, DRM.Cantidad AS CANTIDAD, PF.Solicitante AS CAPATAZ, PR.IdProductor AS ID_PRODUCTOR,
+	                        CASE WHEN PR.IdProductor = '5200' THEN '00001' WHEN PR.IdProductor = '5000' THEN '00018' ELSE '00017' END AS ITEM_PRODUCTOR
+                        FROM Datos_Remito_MovBins AS DRM INNER JOIN
+                            S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = DRM.IdAsignacion INNER JOIN
+                            S3A.dbo.Productor AS PR ON PR.IdProductor = PF.IdProductor INNER JOIN
+                            S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra INNER JOIN
+                            S3A.dbo.Especie AS ES ON ES.IdEspecie = DRM.IdEspecie INNER JOIN
+                            S3A.dbo.Variedad AS VR ON VR.IdVariedad = DRM.IdVariedad INNER JOIN
+                            S3A.dbo.Chofer AS CF on CF.IdChofer = PF.IdChofer INNER JOIN
+                            S3A.dbo.Camion AS CM ON CM.IdCamion = PF.IdCamion 
+                        WHERE DRM.ID = %s
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchone()
+                if consulta:
+                    listado_data = []
+                    for row in consulta:
+                        ID = str(row[0])
+                        NRO_REMITO = str(row[1])
+                        FECHA = str(row[2])
+                        HORA = str(row[3])
+                        ID_PEDIDO_FLETE = str(row[4])
+                        PRODUCTOR = str(row[5])
+                        SEÑOR = str(row[6])
+                        DOMICILIO = str(row[7])
+                        CHACRA = str(row[8])
+                        ESPECIE = str(row[9])
+                        VARIEDAD = str(row[10])
+                        RENSPA = str(row[11])
+                        UP = str(row[12])
+                        CHOFER = str(row[13])
+                        CAMION = str(row[14])
+                        PATENTE = str(row[15])
+                        CANTIDAD = str(row[16])
+                        CAPATAZ = str(row[17])
+                        ID_PRODUCTOR = str(row[18])
+                        ITEM_PRODUCTOR = str(row[19])
+                        values = [ID_PRODUCTOR,NRO_REMITO]
+                        if ID_PRODUCTOR == "5000":
+                            pdf = Remito_Abadon_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
+                                                                   CHOFER,CAMION,PATENTE,CANTIDAD,CAPATAZ)
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                            sqldetalle = """ 
+                                SELECT CRM.Cantidad AS CANTIDAD, RTRIM(B.Nombre) AS BIN, RTRIM(M.Nombre) AS MARCA
+                                FROM Contenido_Remito_MovBins AS CRM INNER JOIN
+                                        S3A.dbo.Bins AS B ON B.IdBins = CRM.IdBins INNER JOIN
+                                        S3A.dbo.Marca AS M ON M.IdMarca = CRM.IdMarca
+                                WHERE (CRM.IdProductor = %s) AND (CRM.NumeroRemito = %s) AND (CRM.Modificado IS NULL) 
+                                """
+                            cursor.execute(sqldetalle, values)
+                            consultaDetalle = cursor.fetchall()
+                            if consultaDetalle:
+                                for row in consultaDetalle:
+                                    cantidad = str(row[0])
+                                    tamaño = str(row[1])
+                                    marca = str(row[2])
+                                    if index == 9:
+                                        pdf.alias_nb_pages()
+                                        pdf.add_page()
+                                        index = 0
+                                    pdf.set_font('Arial', '', 8)
+                                    pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                                    pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                                    index = index + 1
+                                buffer = io.BytesIO()
+                                pdf.output(buffer, 'F')
+                                buffer.seek(0)
 
+                                respuesta = HttpResponse(buffer, content_type='application/pdf')
+                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            return respuesta
+                        
+                        elif ID_PRODUCTOR == "5200":
+                            pdf = Remito_Romik_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
+                                                                   CHOFER,CAMION,PATENTE,CANTIDAD,CAPATAZ)
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                            sqldetalle = """ 
+                                SELECT CRM.Cantidad AS CANTIDAD, RTRIM(B.Nombre) AS BIN, RTRIM(M.Nombre) AS MARCA
+                                FROM Contenido_Remito_MovBins AS CRM INNER JOIN
+                                        S3A.dbo.Bins AS B ON B.IdBins = CRM.IdBins INNER JOIN
+                                        S3A.dbo.Marca AS M ON M.IdMarca = CRM.IdMarca
+                                WHERE (CRM.IdProductor = %s) AND (CRM.NumeroRemito = %s) AND (CRM.Modificado IS NULL) 
+                                """
+                            cursor.execute(sqldetalle, values)
+                            consultaDetalle = cursor.fetchall()
+                            if consultaDetalle:
+                                for row in consultaDetalle:
+                                    cantidad = str(row[0])
+                                    tamaño = str(row[1])
+                                    marca = str(row[2])
+                                    if index == 9:
+                                        pdf.alias_nb_pages()
+                                        pdf.add_page()
+                                        index = 0
+                                    pdf.set_font('Arial', '', 8)
+                                    pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                                    pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                                    index = index + 1
+                                buffer = io.BytesIO()
+                                pdf.output(buffer, 'F')
+                                buffer.seek(0)
+
+                                respuesta = HttpResponse(buffer, content_type='application/pdf')
+                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            return respuesta
+                        else:
+                            pdf = Remito_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
+                                                                   CHOFER,CAMION,PATENTE,CANTIDAD,CAPATAZ)
+                            pdf.alias_nb_pages()
+                            pdf.add_page()
+                            index = 0
+                            sqldetalle = """ 
+                                SELECT CRM.Cantidad AS CANTIDAD, RTRIM(B.Nombre) AS BIN, RTRIM(M.Nombre) AS MARCA
+                                FROM Contenido_Remito_MovBins AS CRM INNER JOIN
+                                        S3A.dbo.Bins AS B ON B.IdBins = CRM.IdBins INNER JOIN
+                                        S3A.dbo.Marca AS M ON M.IdMarca = CRM.IdMarca
+                                WHERE (CRM.IdProductor = %s) AND (CRM.NumeroRemito = %s) AND (CRM.Modificado IS NULL) 
+                                """
+                            cursor.execute(sqldetalle, values)
+                            consultaDetalle = cursor.fetchall()
+                            if consultaDetalle:
+                                for row in consultaDetalle:
+                                    cantidad = str(row[0])
+                                    tamaño = str(row[1])
+                                    marca = str(row[2])
+                                    if index == 9:
+                                        pdf.alias_nb_pages()
+                                        pdf.add_page()
+                                        index = 0
+                                    pdf.set_font('Arial', '', 8)
+                                    pdf.cell(w=24, h=5, txt= str(cantidad), border='LBR', align='C', fill=0)
+                                    pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
+                                    pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
+                                    index = index + 1
+                                buffer = io.BytesIO()
+                                pdf.output(buffer, 'F')
+                                buffer.seek(0)
+
+                                respuesta = HttpResponse(buffer, content_type='application/pdf')
+                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            return respuesta
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontró el Remito.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","ACEPTA VIAJE","POST",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

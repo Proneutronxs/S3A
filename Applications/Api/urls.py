@@ -34,4 +34,6 @@ urlpatterns = [
 
     path('fruit/listar-remitos/buscar/', fruit.mostrar_remitos_fecha_chofer, name="mostrar_remitos_fecha_chofer"),
 
+    path('fruit/descarga-remito/remito=<str:ID_REMITO>/', fruit.descargar_remito_ID, name="descargar_remito_ID"),
+
 ]
