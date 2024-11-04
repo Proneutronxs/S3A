@@ -490,12 +490,12 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                                buffer = io.BytesIO()
-                                pdf.output(buffer, 'F')
-                                buffer.seek(0)
+                            buffer = io.BytesIO()
+                            pdf.output(buffer, 'F')
+                            buffer.seek(0)
 
-                                respuesta = HttpResponse(buffer, content_type='application/pdf')
-                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                         
                         elif ID_PRODUCTOR == "5200":
@@ -527,12 +527,12 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                                buffer = io.BytesIO()
-                                pdf.output(buffer, 'F')
-                                buffer.seek(0)
+                            buffer = io.BytesIO()
+                            pdf.output(buffer, 'F')
+                            buffer.seek(0)
 
-                                respuesta = HttpResponse(buffer, content_type='application/pdf')
-                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                         else:
                             pdf = Remito_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
@@ -563,12 +563,12 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                                buffer = io.BytesIO()
-                                pdf.output(buffer, 'F')
-                                buffer.seek(0)
+                            buffer = io.BytesIO()
+                            pdf.output(buffer, 'F')
+                            buffer.seek(0)
 
-                                respuesta = HttpResponse(buffer, content_type='application/pdf')
-                                respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
+                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se encontró el Remito.'})
