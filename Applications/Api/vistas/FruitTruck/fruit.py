@@ -6,6 +6,8 @@ from django.views.static import serve
 from django.db import connections
 from django.http import JsonResponse
 from django.http import HttpResponse, Http404
+from django.http import FileResponse
+from django.shortcuts import render
 import json
 import io
 
@@ -413,7 +415,7 @@ def mostrar_remitos_fecha_chofer(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 @csrf_exempt
-def descargar_remito_ID(request,ID_REMITO):
+def crear_remito_ID(request,ID_REMITO):
     if request.method == 'GET':
         ID_REMITO = str(ID_REMITO)
         values = [ID_REMITO]
@@ -490,15 +492,11 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                            buffer = io.BytesIO()
-                            pdf_output = pdf.output(dest='S').encode('latin1')  # Cambia 'F' por 'S'
-                            buffer.write(pdf_output)
-                            buffer.seek(0)
-
-                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-                            respuesta['Content-Disposition'] = f'attachment; filename="R_{NRO_REMITO}.pdf"'
-                            return respuesta
-                        
+                            fecha = str(FECHA).replace('/', '')
+                            name = 'R_00018_' + str(NRO_REMITO) + '_' + fecha + '.pdf'
+                            nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                            pdf.output(nameDireccion, 'F')
+                            return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se creó correctamente.', 'Nombre':name})
                         elif ID_PRODUCTOR == "5200":
                             pdf = Remito_Romik_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
                                                                    CHOFER,CAMION,PATENTE,CANTIDAD,CAPATAZ)
@@ -528,14 +526,11 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                            buffer = io.BytesIO()
-                            pdf_output = pdf.output(dest='S').encode('latin1')  # Cambia 'F' por 'S'
-                            buffer.write(pdf_output)
-                            buffer.seek(0)
-
-                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-                            respuesta['Content-Disposition'] = f'attachment; filename="R_{NRO_REMITO}.pdf"'
-                            return respuesta
+                            fecha = str(FECHA).replace('/', '')
+                            name = 'R_00001_' + str(NRO_REMITO) + '_' + fecha + '.pdf'
+                            nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                            pdf.output(nameDireccion, 'F')
+                            return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se creó correctamente.', 'Nombre':name})
                         else:
                             pdf = Remito_Movimiento_Chacras(FECHA,HORA,ITEM_PRODUCTOR,NRO_REMITO,PRODUCTOR,SEÑOR,DOMICILIO,CHACRA,ESPECIE,VARIEDAD,RENSPA,UP,
                                                                    CHOFER,CAMION,PATENTE,CANTIDAD,CAPATAZ)
@@ -565,14 +560,11 @@ def descargar_remito_ID(request,ID_REMITO):
                                     pdf.cell(w=86, h=5, txt= str(tamaño), border='BR', align='C', fill=0)
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
-                            buffer = io.BytesIO()
-                            pdf_output = pdf.output(dest='S').encode('latin1')  # Cambia 'F' por 'S'
-                            buffer.write(pdf_output)
-                            buffer.seek(0)
-
-                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-                            respuesta['Content-Disposition'] = f'attachment; filename="R_{NRO_REMITO}.pdf"'
-                            return respuesta
+                            fecha = str(FECHA).replace('/', '')
+                            name = 'R_00001_' + str(NRO_REMITO) + '_' + fecha + '.pdf'
+                            nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
+                            pdf.output(nameDireccion, 'F')
+                            return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se creó correctamente.', 'Nombre':name})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se encontró el Remito.'})
         except Exception as e:
@@ -585,6 +577,19 @@ def descargar_remito_ID(request,ID_REMITO):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+
+def descargar_pdf(request, nombreRemito):
+    filename = 'Applications/ReportesPDF/RemitosChacra/' + nombreRemito
+    return FileResponse(open(filename, 'rb'), content_type='application/pdf', as_attachment=True)
+
+# buffer = io.BytesIO()
+# pdf_output = pdf.output(dest='S').encode('latin1')  # Cambia 'F' por 'S'
+# buffer.write(pdf_output)
+# buffer.seek(0)
+
+# respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+# respuesta['Content-Disposition'] = f'attachment; filename="R_{NRO_REMITO}.pdf"'
+# return respuesta
 
 
 

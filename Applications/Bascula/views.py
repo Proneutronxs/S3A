@@ -271,7 +271,6 @@ def creaDescarga(remito,productor):
                     fecha = str(fecha).replace('/', '')
                     name = 'R_00018_' + str(numero_remito) + '_' + fecha + '.pdf'
                     nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
-                    #actualizaNombrePDF(name,numero_remito)
                     pdf.output(nameDireccion, 'F')
                     return name
             elif productor == '5200':
