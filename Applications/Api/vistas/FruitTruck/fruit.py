@@ -494,7 +494,7 @@ def descargar_remito_ID(request,ID_REMITO):
                             pdf.output(buffer, 'F')
                             buffer.seek(0)
 
-                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
                             respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                         
@@ -531,7 +531,7 @@ def descargar_remito_ID(request,ID_REMITO):
                             pdf.output(buffer, 'F')
                             buffer.seek(0)
 
-                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
                             respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                         else:
@@ -567,7 +567,7 @@ def descargar_remito_ID(request,ID_REMITO):
                             pdf.output(buffer, 'F')
                             buffer.seek(0)
 
-                            respuesta = HttpResponse(buffer.read(), content_type='application/pdf')
+                            respuesta = HttpResponse(buffer.getvalue(), content_type='application/pdf')
                             respuesta['Content-Disposition'] = 'attachment; filename="R_' + NRO_REMITO + '.pdf"'
                             return respuesta
                 else:
