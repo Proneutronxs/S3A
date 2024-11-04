@@ -437,9 +437,8 @@ def descargar_remito_ID(request,ID_REMITO):
                         WHERE DRM.ID = %s
                     """
                 cursor.execute(sql,values)
-                consulta = cursor.fetchone()
+                consulta = cursor.fetchall()
                 if consulta:
-                    listado_data = []
                     for row in consulta:
                         ID = str(row[0])
                         NRO_REMITO = str(row[1])
