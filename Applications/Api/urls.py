@@ -30,4 +30,8 @@ urlpatterns = [
 
     path('fruit/rechaza-acepta-viaje/', fruit.acepta_rechaza_viaje, name="acepta_rechaza_viaje"),
 
+    ### BUSQUEDA Y DESCARGA DE REMITOS###
+
+    path('fruit/listar-remitos/buscar/', fruit.mostrar_remitos_fecha_chofer, name="mostrar_remitos_fecha_chofer"),
+
 ]

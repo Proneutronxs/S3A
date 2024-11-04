@@ -145,6 +145,8 @@ def guardar_transporte_chofer(request):
                 error = str(e)
                 insertar_registro_error_sql("API","GUARDA CHOFER","POST",error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
         else:
             values2 = (idTransporte,nombreTransporte,idCamion,nombreCamion,idAcoplado,nombreAcoplado,telefono,idFirebase,idChofer)
             try:
@@ -165,6 +167,8 @@ def guardar_transporte_chofer(request):
                 error = str(e)
                 insertar_registro_error_sql("API","ACTUALIZA CHOFER","POST",error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -187,6 +191,8 @@ def existe_chofer_alta(idChofer):
         error = str(e)
         insertar_registro_error_sql("API","EXISTE CHOFER CHOFER","GET",error)
         return True
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 def data_chofer(idChofer):
     values = [idChofer]
@@ -210,6 +216,8 @@ def data_chofer(idChofer):
         error = str(e)
         insertar_registro_error_sql("API","DATA CHOFER","GET",error)
         return []
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 ###OBTENER EL VIAJE CON LOS DESTINOS ASIGNADOS
 def Obtener_Viaje_Chacras(request,ID_CA):
@@ -297,7 +305,7 @@ def acepta_rechaza_viaje(request):
         body = request.body.decode('utf-8')
         ID_CVN = str(json.loads(body)['ID_CVN'])
         Tipo = str(json.loads(body)['Tipo'])
-        values = (ID_CVN)
+        values = [ID_CVN]
         if Tipo == "A":
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -359,7 +367,50 @@ def acepta_rechaza_viaje(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
+@csrf_exempt
+def mostrar_remitos_fecha_chofer(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CHOFER = str(json.loads(body)['ID_CHOFER'])
+        FECHA = str(json.loads(body)['FECHA'])
+        values = [FECHA,ID_CHOFER]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT DRM.ID AS ID_REMITO, RTRIM(CH.Nombre) AS CHACRA, RTRIM(EP.Nombre) AS ESPECIE, 
+                                RTRIM(VR.Nombre) AS VARIEDAD, DRm.UP AS UP, DRM.Cantidad AS CANTIDAD
+                        FROM Datos_Remito_MovBins AS DRM INNER JOIN
+                            S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = DRM.IdAsignacion INNER JOIN
+                            S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra INNER JOIN
+                            S3A.dbo.Especie AS EP ON EP.IdEspecie = PF.IdEspecie INNER JOIN
+                            S3A.dbo.Variedad AS VR ON VR.IdVariedad = PF.IdVariedad 
+                        WHERE TRY_CONVERT(DATE, DRM.FechaAlta) = TRY_CONVERT(DATE, %s)
+                            AND PF.IdChofer = %s
+                        ORDER BY DRM.FechaAlta
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    listado_data = []
+                    for row in consulta:
+                        idRemito = str(row[0])
+                        chacra = str(row[1])
+                        especie = str(row[2])
+                        variedad = str(row[3])
+                        up = str(row[4])
+                        cantidad = str(row[5])
+                        listado_data.append({'ID': idRemito,'Chacra':chacra,'Especie':especie,'Variedad':variedad,'UP':up,'Cantidad':cantidad})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Mostrando Remitos...', 'Remitos':listado_data})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron Remitos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","ACEPTA VIAJE","POST",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
