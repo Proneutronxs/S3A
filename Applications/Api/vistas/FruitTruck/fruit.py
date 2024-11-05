@@ -561,7 +561,7 @@ def crear_remito_ID(request,ID_REMITO):
                                     pdf.multi_cell(w=0, h=5, txt= str(marca), border='BR', align='C', fill=0)
                                     index = index + 1
                             fecha = str(FECHA).replace('/', '')
-                            name = 'R_00001_' + str(NRO_REMITO) + '_' + fecha + '.pdf'
+                            name = 'R_00017_' + str(NRO_REMITO) + '_' + fecha + '.pdf'
                             nameDireccion = 'Applications/ReportesPDF/RemitosChacra/' + name
                             pdf.output(nameDireccion, 'F')
                             return JsonResponse({'Message': 'Success', 'Nota': 'El Remito se creó correctamente.', 'Nombre':name})
@@ -580,7 +580,7 @@ def crear_remito_ID(request,ID_REMITO):
 
 def descargar_pdf(request, nombreRemito):
     filename = 'Applications/ReportesPDF/RemitosChacra/' + nombreRemito
-    return FileResponse(open(filename, 'rb'), content_type='application/pdf', as_attachment=True)
+    return FileResponse(open(filename, 'rb'), content_type='application/pdf')
 
 # buffer = io.BytesIO()
 # pdf_output = pdf.output(dest='S').encode('latin1')  # Cambia 'F' por 'S'
