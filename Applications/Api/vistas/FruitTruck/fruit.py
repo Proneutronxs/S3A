@@ -726,14 +726,14 @@ def update_planta(ID_CDCV, LlegaPlanta):
             cursor.execute(sql, values)
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("API","UPDATE CHACRA","FUNCION",error)
+        insertar_registro_error_sql("API","UPDATE PLANTA","FUNCION",error)
 
 def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
     values = [ID_CVN, Latitud, Longitud, FechaAlta]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta) VALUES (%s,%s,%s,%s,)
+                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta) VALUES (%s,%s,%s,%s)
                 """
             cursor.execute(sql, values)
     except Exception as e:
