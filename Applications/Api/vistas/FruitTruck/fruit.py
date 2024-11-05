@@ -576,8 +576,6 @@ def crear_remito_ID(request,ID_REMITO):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
-
 def descargar_pdf(request, nombreRemito):
     filename = 'Applications/ReportesPDF/RemitosChacra/' + nombreRemito
     return FileResponse(open(filename, 'rb'), content_type='application/pdf')
@@ -592,8 +590,163 @@ def descargar_pdf(request, nombreRemito):
 # return respuesta
 
 
+@csrf_exempt
+def cambia_estado_chofer(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CHOFER = str(json.loads(body)['ID_CHOFER'])
+        ESTADO = str(json.loads(body)['ESTADO'])
+        values = [ESTADO,ID_CHOFER]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        UPDATE Chofer_Alta SET EstadoCamion = %s, FechaActualiza = GETDATE() WHERE IdChofer = %s
+                    """
+                cursor.execute(sql,values)
+                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Estado se actualizó correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Estado, intente más tarde.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","ACEPTA VIAJE","POST",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def servicio_finalizacion(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CVN = str(json.loads(body)['ID_CVN'])
+        ID_CA = str(json.loads(body)['ID_CA'])
+        Finaliza = str(json.loads(body)['Finaliza'])
+        LlegaVacios = str(json.loads(body)['LlegaVacios'])
+        LlegaPlanta = str(json.loads(body)['LlegaPlanta'])
+        Listado_Chacras = json.loads(body)['Chacras']
+        Listado_Coordenadas = json.loads(body)['Coordenadas']
+        values = [ID_CVN]
+        values2 = [ID_CA]
+        if Finaliza != '0':
+            if LlegaVacios != '0':
+                update_vacios(ID_CVN,LlegaVacios)
+            if LlegaPlanta != '0':
+                update_planta(ID_CVN,LlegaPlanta)
+            for chacra in Listado_Chacras:
+                ID_CDCV = str(chacra['ID_CDCV'])
+                LlegaChacra = str(chacra['LlegaChacra'])
+                if LlegaChacra != '0':
+                    update_chacra(ID_CDCV,LlegaChacra)
+            for coor in Listado_Coordenadas:
+                Latitud = str(coor['Latitud'])
+                Longitud = str(coor['Longitud'])
+                Fecha = str(coor['Fecha'])
+                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha)
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE Chofer_Viajes_Notificacion SET Finaliza = GETDATE() AND Estado = 'F' WHERE ID_CVN = %s
+                        """
+                    cursor.execute(sql,values)
+                    sql2 = """ 
+                            UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'F' WHERE ID_CVN = %s
+                        """
+                    cursor.execute(sql2,values)
+                    sql3 = """ 
+                            UPDATE Chofer_Alta SET EstadoCamion = 'D', FechaActualiza = GETDATE() WHERE IdChofer = %s
+                        """
+                    cursor.execute(sql3,values2)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Viaje finalizó correctamente.'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo finalizar el Viaje, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","FINALIZA VIAJE VIAJE","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        else:
+            if LlegaVacios != '0':
+                update_vacios(ID_CVN,LlegaVacios)
+            if LlegaPlanta != '0':
+                update_planta(ID_CVN,LlegaPlanta)
+            for chacra in Listado_Chacras:
+                ID_CDCV = str(chacra['ID_CDCV'])
+                LlegaChacra = str(chacra['LlegaChacra'])
+                if LlegaChacra != '0':
+                    update_chacra(ID_CDCV,LlegaChacra)
+            for coor in Listado_Coordenadas:
+                Latitud = str(coor['Latitud'])
+                Longitud = str(coor['Longitud'])
+                Fecha = str(coor['Fecha'])
+                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha)
+            return JsonResponse({'Message': 'Success', 'Nota': 'Se guardaron todos los Registros.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+def update_vacios(ID_CVN, LlegaVacios):
+    values = [LlegaVacios,ID_CVN]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    UPDATE Chofer_Viajes_Notificacion SET LlegaVacios = %s WHERE ID_CVN = %s
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE VACIOS","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
+def update_chacra(ID_CDCV, LlegaChacra):
+    values = [LlegaChacra,ID_CDCV]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    UPDATE Chofer_Detalle_Chacras_Viajes SET LlegaChacra = %s WHERE ID_CDCV = %s
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE CHACRA","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def update_planta(ID_CDCV, LlegaPlanta):
+    values = [LlegaPlanta,ID_CDCV]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    UPDATE Chofer_Detalle_Chacras_Viajes SET LlegaPlanta = %s WHERE ID_CDCV = %s
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE CHACRA","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
+
+def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
+    values = [ID_CVN, Latitud, Longitud, FechaAlta]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta) VALUES (%s,%s,%s,%s,)
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","INSERTA COORDENADAS","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 
 

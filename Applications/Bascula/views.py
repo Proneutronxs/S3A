@@ -779,5 +779,3 @@ def actualizaVariedad(request):
 
 
 
-
-
