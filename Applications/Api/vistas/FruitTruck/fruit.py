@@ -703,8 +703,6 @@ def update_vacios(ID_CVN, LlegaVacios):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("API","UPDATE VACIOS","FUNCION",error)
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def update_chacra(ID_CDCV, LlegaChacra):
     values = [LlegaChacra,ID_CDCV]
@@ -717,8 +715,6 @@ def update_chacra(ID_CDCV, LlegaChacra):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("API","UPDATE CHACRA","FUNCION",error)
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def update_planta(ID_CDCV, LlegaPlanta):
     values = [LlegaPlanta,ID_CDCV]
@@ -731,8 +727,6 @@ def update_planta(ID_CDCV, LlegaPlanta):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("API","UPDATE CHACRA","FUNCION",error)
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
     values = [ID_CVN, Latitud, Longitud, FechaAlta]
@@ -745,8 +739,6 @@ def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("API","INSERTA COORDENADAS","FUNCION",error)
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 
 
