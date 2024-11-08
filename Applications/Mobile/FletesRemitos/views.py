@@ -1779,24 +1779,19 @@ def Inserta_Cambio_Domicilio(request):
             Hora = str(json.loads(body)['Hora'])
             Observaciones = str(json.loads(body)['Observaciones'])
             values = [Origen,Solicita,Destino,Tipo,Hora,Observaciones,Usuario]
-            registroRealizado(Usuario,"CAMBIO DOMICILIO",str(body))
-
             with connections['S3A'].cursor() as cursor:
                 sql = """
-                        INSERT INTO PedidoFlete (IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, IdPlantaDestino, TipoCarga, HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta)
+                        INSERT INTO PedidoFlete (IdPedidoFlete, IdPlanta, Solicitante, FechaPedido, HoraPedido, TipoDestino, IdPlantaDestino, TipoCarga, HoraRequerida, Obs, Estado, FechaRequerida, UserID, FechaAlta)
                         VALUES ((SELECT MAX(IdPedidoFlete) + 1 FROM PedidoFlete WHERE IdPedidoFlete LIKE '10%%'), %s, %s, GETDATE(), CONVERT(VARCHAR(8), GETDATE(), 108), 
-                                    %s, %s, %s, %s, 'U', GETDATE(), %s, GETDATE())
+                                    'U', %s, %s, %s, %s, 'P', GETDATE(), %s, GETDATE())
                         """
                 cursor.execute(sql, values)
-
                 cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                 affected_rows = cursor.fetchone()[0]
-
             if affected_rows > 0:
                 return JsonResponse({'Message': 'Success', 'Nota': 'El Pedido se realizó correctamente.'})
             else:
                 return JsonResponse({'Message': 'Success', 'Nota': 'El Pedido no se pudo realizar, intente nuevamente.'})
-            
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("FLETES REMITOS","CAMBIO DOMICILIO","APLICACION",error)
