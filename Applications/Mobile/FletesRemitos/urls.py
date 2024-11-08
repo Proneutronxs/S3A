@@ -73,5 +73,7 @@ urlpatterns = [
 
    #######################    ORIGENES Y DESTINOS DE PEDIDOS VARIOS ##############################
    path('data-ver/origen-destino/', views.Data_Destinos_Origenes, name="Data_Destinos_Origenes"),
+   
+   path('data-inserta/cambio-domicilio/', views.Inserta_Cambio_Domicilio, name="Inserta_Cambio_Domicilio"),
 
 ]
