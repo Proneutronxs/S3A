@@ -71,4 +71,7 @@ urlpatterns = [
    #### MUESTRA CONTROL DE CALIDAD ENTRE FECHAS
    path('data-ver/cosecha-calidad', views.verReporteCalidad, name="ver_reporte_calidad"),
 
+   #######################    ORIGENES Y DESTINOS DE PEDIDOS VARIOS ##############################
+   path('data-ver/origen-destino', views.Data_Destinos_Origenes, name="Data_Destinos_Origenes"),
+
 ]

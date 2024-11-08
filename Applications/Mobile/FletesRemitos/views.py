@@ -1733,7 +1733,38 @@ def verReporteCalidad(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+####################### PEDIDOS DE FLETE NUEVO #########################
 
+def Data_Destinos_Origenes(request):
+    if request.method == 'GET':
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = """ 
+                        SELECT IdUbicacion AS ID, RTRIM(Descripcion) AS UBICACION
+                        FROM Ubicacion AS UB
+                        WHERE IdUbicacion IN (59,100,102,103,110,120,130,140,200,231,600,866)
+                        ORDER BY Descripcion
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        idUbicacion = str(row[0])
+                        ubicacion = str(row[1])
+                        datos = {'IdUbicacion': idUbicacion, 'Ubicacion': ubicacion}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","LISTAR TRANSPORTES","GET",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
