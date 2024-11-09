@@ -1819,7 +1819,7 @@ def Buscar_Pedidos_Flete(request):
                                 RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), '-') AS HORA_REQUERIDA,
                                 COALESCE(RTRIM(CH.Nombre), '-') AS NOMBRE_CHACRA, COALESCE(RTRIM(VR.Nombre), '-') AS NOMBRE_VARIEDAD,
                                 COALESCE(RTRIM(TR.RazonSocial), '-') AS TRANSPORTE, COALESCE(RTRIM(CM.Nombre), '-') AS CAMION, COALESCE(RTRIM(PF.Chofer), '-') AS CHOFER,
-                                COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES, PF.IdPedidoFlete,
+                                COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES, PF.IdPedidoFlete
                         FROM PedidoFlete AS PF LEFT JOIN
                                 Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
                                 Ubicacion AS UBS ON UBS.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
