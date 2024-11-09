@@ -1802,6 +1802,71 @@ def Inserta_Cambio_Domicilio(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
 
+@csrf_exempt
+def Buscar_Pedidos_Flete(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            Usuario = str(json.loads(body)['Usuario'])
+            Fecha = str(json.loads(body)['Fecha'])
+            values = [Usuario,Fecha]
+            with connections['S3A'].cursor() as cursor:
+                sql = """
+                        SELECT PF.IdPedidoFlete, CASE WHEN PF.Estado = 'P' THEN 'PENDIENTE' WHEN PF.Estado = 'A' THEN 'ASIGNADO' WHEN PF.Estado = 'B' THEN 'BAJA' WHEN PF.Estado = 'D' THEN 'DESPACHADO' ELSE PF.Estado END AS ESTADO,
+                                CASE WHEN PF.Estado = 'P' THEN '#ff8000' WHEN PF.Estado = 'A' THEN '#008f39' WHEN PF.Estado = 'B' THEN '#8A0000' ELSE '#6E6E6E' END AS COLOR_ESTADO,
+                                CASE WHEN PF.TipoCarga = 'VAC' THEN 'BINS VACÍOS' WHEN TipoCarga = 'EMB' THEN 'EMBALADO' WHEN TipoCarga = 'FBI' THEN 'FRUTA EN BINS'
+                                WHEN PF.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PF.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PF.TipoCarga = 'RAU' THEN 'BINS FRUTA - CHACRA' ELSE RTRIM(PF.TipoCarga) END AS TIPO_CARGA,
+                                RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), '-') AS HORA_REQUERIDA,
+                                COALESCE(RTRIM(CH.Nombre), '-') AS NOMBRE_CHACRA, COALESCE(RTRIM(VR.Nombre), '-') AS NOMBRE_VARIEDAD,
+                                COALESCE(RTRIM(TR.RazonSocial), '-') AS TRANSPORTE, COALESCE(RTRIM(CM.Nombre), '-') AS CAMION, COALESCE(RTRIM(PF.Chofer), '-') AS CHOFER,
+                                COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES
+                        FROM PedidoFlete AS PF LEFT JOIN
+                                Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                Ubicacion AS UBS ON UBS.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
+                                Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                Variedad AS VR ON VR.IdVariedad = PF.IdVariedad LEFT JOIN
+                                Transportista AS TR ON TR.IdTransportista = PF.IdTransportista LEFT JOIN
+                                Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
+                                Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer)
+                        WHERE PF.UserID = %s
+                                AND CONVERT(DATE, PF.FechaPedido) = %s
+                                AND PF.Estado <> 'C'
+                                AND PF.IdPedidoFlete NOT IN (1000000,6200000,7000000,7100000,7200000,7300000,7400000,7500000)
+                        """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        Estado = str(row[0])
+                        Hexadecimal = str(row[1])
+                        Tipo = str(row[2])
+                        Origen = str(row[3])
+                        Destino = str(row[4])
+                        Hora = str(row[5])
+                        Chaccra = str(row[6])
+                        Variedad = str(row[7])
+                        Transporte = str(row[8])
+                        Camion = str(row[9])
+                        Chofer = str(row[10])
+                        Telefono = str(row[11])
+                        Obs = str(row[12])
+                        datos = {'Estado': Estado, 'Color': Hexadecimal, 'Tipo':Tipo, 'Origen':Origen, 'Destino':Destino, 'Hora':Hora,
+                            'Chacra':Chaccra, 'Variedad':Variedad, 'Transporte':Transporte, 'Camion':Camion, 'Chofer':Chofer, 'Telefono':Telefono, 'Obs':Obs}
+                        lista_data.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("FLETES REMITOS","BUSCAR PEDIDOS FLETE","APLICACION",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            cursor.close()
+            connections['S3A'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
+
 
 
 

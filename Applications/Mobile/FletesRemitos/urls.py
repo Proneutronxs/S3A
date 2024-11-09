@@ -75,5 +75,7 @@ urlpatterns = [
    path('data-ver/origen-destino/', views.Data_Destinos_Origenes, name="Data_Destinos_Origenes"),
    
    path('data-inserta/cambio-domicilio/', views.Inserta_Cambio_Domicilio, name="Inserta_Cambio_Domicilio"),
+   
+   path('data-busca/pedidos-fletes/', views.Buscar_Pedidos_Flete, name="Buscar_Pedidos_Flete"),
 
 ]
