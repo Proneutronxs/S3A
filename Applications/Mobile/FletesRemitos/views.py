@@ -1812,14 +1812,14 @@ def Buscar_Pedidos_Flete(request):
             values = [Usuario,Fecha]
             with connections['S3A'].cursor() as cursor:
                 sql = """
-                        SELECT PF.IdPedidoFlete, CASE WHEN PF.Estado = 'P' THEN 'PENDIENTE' WHEN PF.Estado = 'A' THEN 'ASIGNADO' WHEN PF.Estado = 'B' THEN 'BAJA' WHEN PF.Estado = 'D' THEN 'DESPACHADO' ELSE PF.Estado END AS ESTADO,
+                        SELECT CASE WHEN PF.Estado = 'P' THEN 'PENDIENTE' WHEN PF.Estado = 'A' THEN 'ASIGNADO' WHEN PF.Estado = 'B' THEN 'BAJA' WHEN PF.Estado = 'D' THEN 'DESPACHADO' ELSE PF.Estado END AS ESTADO,
                                 CASE WHEN PF.Estado = 'P' THEN '#ff8000' WHEN PF.Estado = 'A' THEN '#008f39' WHEN PF.Estado = 'B' THEN '#8A0000' ELSE '#6E6E6E' END AS COLOR_ESTADO,
                                 CASE WHEN PF.TipoCarga = 'VAC' THEN 'BINS VACÍOS' WHEN TipoCarga = 'EMB' THEN 'EMBALADO' WHEN TipoCarga = 'FBI' THEN 'FRUTA EN BINS'
                                 WHEN PF.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PF.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PF.TipoCarga = 'RAU' THEN 'BINS FRUTA - CHACRA' ELSE RTRIM(PF.TipoCarga) END AS TIPO_CARGA,
                                 RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), '-') AS HORA_REQUERIDA,
                                 COALESCE(RTRIM(CH.Nombre), '-') AS NOMBRE_CHACRA, COALESCE(RTRIM(VR.Nombre), '-') AS NOMBRE_VARIEDAD,
                                 COALESCE(RTRIM(TR.RazonSocial), '-') AS TRANSPORTE, COALESCE(RTRIM(CM.Nombre), '-') AS CAMION, COALESCE(RTRIM(PF.Chofer), '-') AS CHOFER,
-                                COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES
+                                COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES, PF.IdPedidoFlete,
                         FROM PedidoFlete AS PF LEFT JOIN
                                 Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
                                 Ubicacion AS UBS ON UBS.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
@@ -1851,8 +1851,9 @@ def Buscar_Pedidos_Flete(request):
                         Chofer = str(row[10])
                         Telefono = str(row[11])
                         Obs = str(row[12])
+                        ID = str(row[13])
                         datos = {'Estado': Estado, 'Color': Hexadecimal, 'Tipo':Tipo, 'Origen':Origen, 'Destino':Destino, 'Hora':Hora,
-                            'Chacra':Chaccra, 'Variedad':Variedad, 'Transporte':Transporte, 'Camion':Camion, 'Chofer':Chofer, 'Telefono':Telefono, 'Obs':Obs}
+                            'Chacra':Chaccra, 'Variedad':Variedad, 'Transporte':Transporte, 'Camion':Camion, 'Chofer':Chofer, 'Telefono':Telefono, 'Obs':Obs, 'ID':ID}
                         lista_data.append(datos)
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
