@@ -1830,8 +1830,11 @@ def Buscar_Pedidos_Flete(request):
                                 Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer)
                         WHERE PF.UserID = %s
                                 AND CONVERT(DATE, PF.FechaPedido) = %s
-                                AND PF.Estado <> 'C'
-                                AND PF.IdPedidoFlete NOT IN (1000000,6200000,7000000,7100000,7200000,7300000,7400000,7500000)
+                                        AND PF.Estado <> 'C'
+                                AND PF.IdPedidoFlete > (1000000)
+                                AND PF.IdPedidoFlete < (2000000)
+                        GROUP BY PF.Estado, PF.TipoCarga, UB.Descripcion, UBS.Descripcion, PF.HoraRequerida, CH.Nombre, VR.Nombre, TR.RazonSocial,
+                                CM.Nombre, PF.Chofer, CF.Telefono, PF.Obs, IdPedidoFlete
                         """
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
