@@ -757,7 +757,7 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                             else:
                                 if Acuerdo_50 != '0.0':
                                     total_horas_50 = round(float(Acuerdo_50) + float(Hora_50), 2)
-                                    datos = {"LEGAJO": Legajo, "HORAS": total_horas_50, "CONCEPTO": Concepto_50}
+                                    datos = {"LEGAJO": Legajo, "HORAS": str(total_horas_50), "CONCEPTO": Concepto_50}
                                     data.append(datos)
                             if Float_100 >= 6:
                                 hora_10_100, hora_90_100 = calcular_porcentajes(Float_100)
@@ -767,7 +767,7 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                             else:
                                 if Acuerdo_100 != '0.0':
                                     total_horas_100 = round(float(Acuerdo_100) + float(Hora_100), 2)
-                                    datos = {"LEGAJO": Legajo, "HORAS": total_horas_100, "CONCEPTO": Concepto_100}
+                                    datos = {"LEGAJO": Legajo, "HORAS": str(total_horas_100), "CONCEPTO": Concepto_100}
                                     data.append(datos)
                             
                         else:
