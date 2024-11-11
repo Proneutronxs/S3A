@@ -1830,7 +1830,7 @@ def Buscar_Pedidos_Flete(request):
                                 Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer)
                         WHERE PF.UserID = %s
                                 AND CONVERT(DATE, PF.FechaPedido) = %s
-                                        AND PF.Estado <> 'C'
+                                AND PF.Estado NOT IN ('C','B')
                                 AND PF.IdPedidoFlete > (1000000)
                                 AND PF.IdPedidoFlete < (2000000)
                         GROUP BY PF.Estado, PF.TipoCarga, UB.Descripcion, UBS.Descripcion, PF.HoraRequerida, CH.Nombre, VR.Nombre, TR.RazonSocial,

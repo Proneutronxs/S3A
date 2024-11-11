@@ -744,23 +744,30 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                         Concepto_50 = '760'
                         Concepto_100 = '765'
 
+                    total_horas_50 = 0.0
+                    total_horas_100 = 0.0
+
                     if Sindicato == 'FRIGORIFICO':
                         if Acuerdo_100 != '0.0' or Acuerdo_50 != '0.0':
                             if Float_50 >= 6:
                                 hora_10_50, hora_90_50 = calcular_porcentajes(Float_50)
-                                datos = {"LEGAJO": Legajo, "HORAS": str(hora_10_50), "CONCEPTO": Concepto_50}
+                                total_horas_50 = round(hora_10_50 + float(Hora_50), 2)
+                                datos = {"LEGAJO": Legajo, "HORAS": str(total_horas_50), "CONCEPTO": Concepto_50}
                                 data.append(datos)
                             else:
                                 if Acuerdo_50 != '0.0':
-                                    datos = {"LEGAJO": Legajo, "HORAS": Acuerdo_50, "CONCEPTO": Concepto_50}
+                                    total_horas_50 = round(float(Acuerdo_50) + float(Hora_50), 2)
+                                    datos = {"LEGAJO": Legajo, "HORAS": total_horas_50, "CONCEPTO": Concepto_50}
                                     data.append(datos)
                             if Float_100 >= 6:
                                 hora_10_100, hora_90_100 = calcular_porcentajes(Float_100)
-                                datos = {"LEGAJO": Legajo, "HORAS": str(hora_10_100), "CONCEPTO": Concepto_100}
+                                total_horas_100 = round(hora_10_50 + float(Hora_100), 2)
+                                datos = {"LEGAJO": Legajo, "HORAS": str(total_horas_100), "CONCEPTO": Concepto_100}
                                 data.append(datos)
                             else:
                                 if Acuerdo_100 != '0.0':
-                                    datos = {"LEGAJO": Legajo, "HORAS": Acuerdo_100, "CONCEPTO": Concepto_100}
+                                    total_horas_100 = round(float(Acuerdo_100) + float(Hora_100), 2)
+                                    datos = {"LEGAJO": Legajo, "HORAS": total_horas_100, "CONCEPTO": Concepto_100}
                                     data.append(datos)
                             
                         else:
