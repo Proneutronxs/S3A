@@ -11,9 +11,9 @@ from django.db import connections
 from django.http import JsonResponse
 
 # Constantes
-RUTA_CREDENCIALES = "S3A/static/TresAses/json/tres-ases.json"
-cred = credentials.Certificate(RUTA_CREDENCIALES)
-firebase_admin.initialize_app(cred)
+#RUTA_CREDENCIALES = "S3A/static/TresAses/json/tres-ases.json"
+#cred = credentials.Certificate(RUTA_CREDENCIALES)
+#firebase_admin.initialize_app(cred)
 
 @login_required
 @csrf_exempt
