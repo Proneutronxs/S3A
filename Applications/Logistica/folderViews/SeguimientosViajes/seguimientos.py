@@ -5,10 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import datetime 
 import json
-
+import firebase_admin
+from firebase_admin import credentials, messaging
 from django.db import connections
 from django.http import JsonResponse
 
+# Constantes
+RUTA_CREDENCIALES = "S3A/static/TresAses/json/tres-ases.json"
+cred = credentials.Certificate(RUTA_CREDENCIALES)
+firebase_admin.initialize_app(cred)
 
 @login_required
 @csrf_exempt
@@ -172,29 +177,29 @@ def listadoAsignados(request):
         if user_has_permission:  
             try:
                 with connections['S3A'].cursor() as cursor:
-                    sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(Transportista.RazonSocial) AS TRANSPORTE, RTRIM(PedidoFlete.Chofer) AS CHOFER, RTRIM(Camion.Nombre) AS CAMION, RTRIM(Productor.RazonSocial) AS PRODUCTOR, RTRIM(Chacra.Nombre) AS CHACRA, 
-                                                    RTRIM(Zona.Nombre) AS ZONA, 
-                                                    CASE WHEN PedidoFlete.CantVacios IS NULL THEN '' ELSE 'NOTIFICADO' END
-                            FROM            Transportista INNER JOIN
-                                                    PedidoFlete ON Transportista.IdTransportista = PedidoFlete.IdTransportista INNER JOIN
-                                                    Camion ON Transportista.IdTransportista = Camion.IdTransportista AND PedidoFlete.IdCamion = Camion.IdCamion INNER JOIN
-                                                    Productor ON PedidoFlete.IdProductor = Productor.IdProductor INNER JOIN
-                                                    Chacra ON Productor.IdProductor = Chacra.IdProductor AND PedidoFlete.IdChacra = Chacra.IdChacra INNER JOIN
-                                                    Zona ON PedidoFlete.IdZona = Zona.IdZona
-                            WHERE        (CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE()))) 
-                                        AND (PedidoFlete.Estado = 'A')
-                                        AND PedidoFlete.IdPedidoFlete LIKE '10%'
-                                        AND NOT EXISTS ( 
-                                                    SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
-                                                    WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
-                                                    AND Estado IN ('S','F','C','R'))
-                            ORDER BY PedidoFlete.FechaAlta """
+                    sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, RTRIM(Transportista.RazonSocial) AS TRANSPORTE, RTRIM(PedidoFlete.Chofer) AS CHOFER, RTRIM(Camion.Nombre) AS CAMION, 
+                                                COALESCE(RTRIM(Productor.RazonSocial),'-') AS PRODUCTOR, COALESCE(RTRIM(Chacra.Nombre),'-') AS CHACRA, COALESCE(RTRIM(Zona.Nombre),'-') AS ZONA, 
+                                                        CASE WHEN PedidoFlete.CantVacios IS NULL THEN '' ELSE 'NOTIFICADO' END, CONVERT(VARCHAR(10), PedidoFlete.FechaAlta, 103) AS ALTA
+                                FROM            Transportista LEFT JOIN
+                                                        PedidoFlete ON Transportista.IdTransportista = PedidoFlete.IdTransportista LEFT JOIN
+                                                        Camion ON Transportista.IdTransportista = Camion.IdTransportista AND PedidoFlete.IdCamion = Camion.IdCamion LEFT JOIN
+                                                        Productor ON PedidoFlete.IdProductor = Productor.IdProductor LEFT JOIN
+                                                        Chacra ON Productor.IdProductor = Chacra.IdProductor AND PedidoFlete.IdChacra = Chacra.IdChacra LEFT JOIN
+                                                        Zona ON PedidoFlete.IdZona = Zona.IdZona
+                                WHERE        (CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE()))) 
+                                            AND (PedidoFlete.Estado = 'A')
+                                            AND PedidoFlete.IdPedidoFlete LIKE '10%'
+                                            AND NOT EXISTS ( 
+                                                        SELECT 1 FROM TRESASES_APLICATIVO.dbo.Logistica_Camiones_Seguimiento 
+                                                        WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
+                                                        AND Estado IN ('S','F','C','R'))
+                                ORDER BY PedidoFlete.FechaAlta """
                     cursor.execute(sql)
                     consulta = cursor.fetchall()
                     if consulta:
                         data = []
                         for row in consulta:
-                            flete = "PEDIDO: " + str(row[0])
+                            flete = "PEDIDO: " + str(row[0]) + " - " + str(row[8])
                             transporte = str(row[1])
                             nombre = str(row[2])
                             camion = str(row[3])
@@ -284,6 +289,11 @@ def asignaViajeActualizaVacios(request):
                 affected_rows = cursor.fetchone()[0]
 
             if affected_rows > 0:
+                ### ENVÍAR NOTIFICACIONES
+                ### CHOFER
+                enviar_notificacion(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
+                ### SOLICITANTE
+                enviar_notificacion(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
                 ### ACA SE VA A ENVIAR EL VIAJE
                 chofer = traeChofer(idPedidoFlete)
                 if chofer != '0':
@@ -338,7 +348,6 @@ def ejecutar_url(Asignacion, Chofer, valor):
         error = str(e)
         insertar_registro_error_sql("SEGUIMIENTO","EJECUTA URL","Aplicacion",error)
         return False
-    
 
 def eliminaRechazado(request, idAsignacion):
     if request.method == 'GET':            
@@ -369,8 +378,52 @@ def eliminaRechazado(request, idAsignacion):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def obtener_id_firebase(Tipo,nAsignacion):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            if Tipo == 'EC':
+                sql = """ SELECT ISNULL(US.IdAndroid,0) AS ID_FIREBASE
+                            FROM PedidoFlete AS PF LEFT JOIN 
+                                TRESASES_APLICATIVO.dbo.Usuarios AS US ON US.Usuario = PF.UserID COLLATE database_default
+                            WHERE PF.IdPedidoFlete = %s """
+            else:
+                sql = """ SELECT ISNULL(US.IdAndroid,0) AS ID_FIREBASE
+                            FROM PedidoFlete AS PF LEFT JOIN 
+                                TRESASES_APLICATIVO.dbo.Usuarios AS US ON US.CodEmpleado = (SELECT IdChofer 
+                                FROM Chofer 
+                                WHERE LTRIM(RTRIM(Apellidos)) + ' ' + LTRIM(RTRIM(Nombres)) = RTRIM(PF.Chofer)
+                                        AND IdTransportista = PF.IdTransportista)
+                            WHERE PF.IdPedidoFlete = %s """
+            cursor.execute(sql, [nAsignacion]) 
+            results = cursor.fetchone()
+            if results:
+                id_firebase = str(results[0])
+                return id_firebase
+            return '0'
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FletesRemitos","OBTENER_ID_FIREBASE","Aplicacion",error)
+        return '0'
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
-
+def enviar_notificacion(token, body, pestaña):
+    if not token or not body or not pestaña:
+        return '0' 
+    try:
+        message = messaging.Message(
+            data={
+                "title": "Tres Ases",
+                "body": body,
+                "Pestaña": pestaña
+            },
+            token=token,
+        )
+        response = messaging.send(message)
+        return '1' if response else '0'
+    except Exception as e:
+        return '0'
 
 
 
