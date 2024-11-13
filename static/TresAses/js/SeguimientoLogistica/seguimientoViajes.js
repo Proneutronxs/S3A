@@ -150,7 +150,6 @@ const listarRechazados = async () => {
     try {
         const response = await fetch("listado-rechazados/")
         const data = await response.json();
-        console.log(data);
         if(data.Message=="Success"){
             let listado = ``;
             data.Data.forEach((datos) => {
