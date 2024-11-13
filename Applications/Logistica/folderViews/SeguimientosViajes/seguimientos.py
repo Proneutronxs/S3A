@@ -291,9 +291,9 @@ def asignaViajeActualizaVacios(request):
             if affected_rows > 0:
                 ### ENVÍAR NOTIFICACIONES
                 ### CHOFER
-                enviar_notificacion(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
+                #enviar_notificacion(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
                 ### SOLICITANTE
-                enviar_notificacion(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
+                #enviar_notificacion(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
                 ### ACA SE VA A ENVIAR EL VIAJE
                 chofer = traeChofer(idPedidoFlete)
                 if chofer != '0':
