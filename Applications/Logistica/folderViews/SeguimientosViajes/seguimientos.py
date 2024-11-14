@@ -376,7 +376,7 @@ def eliminaRechazado(request, idAsignacion):
 
 def obtener_id_firebase(Tipo,nAsignacion):
     try:
-        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+        with connections['S3A'].cursor() as cursor:
             if Tipo == 'EC':
                 sql = """ SELECT ISNULL(US.IdAndroid,0) AS ID_FIREBASE
                             FROM PedidoFlete AS PF LEFT JOIN 
@@ -402,7 +402,7 @@ def obtener_id_firebase(Tipo,nAsignacion):
         return '0'
     finally:
         cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
+        connections['S3A'].close()
 
 
 
