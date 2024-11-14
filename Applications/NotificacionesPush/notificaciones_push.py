@@ -4,8 +4,7 @@ from S3A.firebase_config import inicializar_firebase
 
 
 def enviar_notificacion_chofer_solicita(token, body, pestaña):
-
-    inicio = "inicializar_firebase()"
+    inicio = inicializar_firebase()
     if not token or not body or not pestaña:
         return 'bodys' 
     try:
