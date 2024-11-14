@@ -280,6 +280,7 @@ function closePopup() {
 }
 
 function submitPopup() {
+    closePopup();
     guardaVacios();
 }
 
