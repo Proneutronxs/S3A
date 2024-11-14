@@ -1840,6 +1840,7 @@ def Buscar_Pedidos_Flete(request):
                                 AND PF.IdPedidoFlete < (2000000)
                         GROUP BY PF.Estado, PF.TipoCarga, UB.Descripcion, UBS.Descripcion, PF.HoraRequerida, PF.HoraPedido, PF.FechaPedido, CH.Nombre, VR.Nombre, TR.RazonSocial,
                                 CM.Nombre, PF.Chofer, CF.Telefono, PF.Obs, IdPedidoFlete
+                        ORDER BY PF.FechaPedido DESC
                         """
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
