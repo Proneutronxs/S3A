@@ -182,7 +182,7 @@ def listadoAsignados(request):
                                                         Productor ON PedidoFlete.IdProductor = Productor.IdProductor LEFT JOIN
                                                         Chacra ON Productor.IdProductor = Chacra.IdProductor AND PedidoFlete.IdChacra = Chacra.IdChacra LEFT JOIN
                                                         Zona ON PedidoFlete.IdZona = Zona.IdZona
-                                WHERE        (CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, - 2, CONVERT(DATE, GETDATE()))) 
+                                WHERE        (CONVERT(DATE, PedidoFlete.FechaAlta) >= DATEADD(DAY, - 8, CONVERT(DATE, GETDATE()))) 
                                             AND (PedidoFlete.Estado = 'A')
                                             AND PedidoFlete.IdPedidoFlete LIKE '10%'
                                             AND NOT EXISTS ( 
