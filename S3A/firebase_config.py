@@ -11,6 +11,8 @@ def inicializar_firebase():
             if not firebase_admin._apps:
                 cred = credentials.Certificate(RUTA_CREDENCIALES)
                 firebase_admin.initialize_app(cred)
+                return "inicio"
+            return "ya iniciado"
         except Exception as e:
-            pass
+            return str(e)
 
