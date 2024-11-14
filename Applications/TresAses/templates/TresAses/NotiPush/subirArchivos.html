@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F.Push</title>
+    <title>Archivos</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
             margin-bottom: 10px;
         }
         .formulario input[type="text"],
-        .formulario input[type="email"] {
+        .formulario input[type="file"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -44,14 +44,15 @@
 </head>
 <body>
     <div class="formulario">
-        <label for="usuario">Usuario:</label>
-        <input type="text" id="usuario" name="usuario">
+        <label for="archivo">Seleccione un archivo:</label>
+        <input type="file" id="archivo" name="archivo" accept=".txt, .json, .js, .html">
 
-        <label for="texto">Texto:</label>
-        <input type="text" id="texto" name="texto">
+        <label for="parametro">Ingrese un parámetro:</label>
+        <input type="text" id="parametro" name="parametro">
 
-        <button onclick="envía_data();">Enviar</button>
+        <button onclick="enviaData();">Enviar</button>
     </div>
+
+    <script src="{%static 'TresAses/js/General/Push.js' %}"></script>
 </body>
-<script src="{%static 'TresAses/js/General/Push.js' %}"></script>
 </html>

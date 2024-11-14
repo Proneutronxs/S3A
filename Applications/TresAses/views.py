@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connections
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
+from S3A.firebase_config import inicializar_firebase
+import os
 # Create your views here.
 
 
@@ -63,19 +65,35 @@ def funcion(request):
 
 
 def push(request):
-    return render (request, 'TresAses/NotiPush/pruebaNP.html')
+    return render (request, 'TresAses/NotiPush/subirArchivos.html')
 
 
 @csrf_exempt
-def notiPush(request):
+def recibir_archivos(request):
     if request.method == 'POST':
-            user = str(request.POST.get('User'))
-            texto = str(request.POST.get('Texto'))
-            idUnico = 'MSQlSkNIQU1CSSQlNTgwMTU='
-            print(user)
+        try:
+            archivo = request.FILES['archivo']
+            parametro = request.POST.get('parametro')
+            tipos_permitidos = ['text/plain', 'application/json', 'application/javascript', 'text/html']
+            if archivo.content_type not in tipos_permitidos:
+                return JsonResponse({'Message': 'Error', 'Nota': 'Tipo de archivo no permitido'}, status=400)
 
-            print(texto)
+            if parametro == 'json':
+                ruta_guardado = 'Applications/NotificacionesPush/archivos/'
 
-            return JsonResponse({'Message': 'NotFound', 'Nota': 'Se ejecutó correctamente.'})
+            
+            if not os.path.exists(ruta_guardado):
+                os.makedirs(ruta_guardado)
+            nombre_archivo = os.path.basename(archivo.name)
+            ruta_completa = os.path.join(ruta_guardado, nombre_archivo)
+            with open(ruta_completa, 'wb+') as destino:
+                for chunk in archivo.chunks():
+                    destino.write(chunk)
+
+            inicializar_firebase()
+
+            return JsonResponse({'Message': 'Success', 'Nota': 'Archivo subido correctamente'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)}, status=500)
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 

@@ -1,19 +1,15 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from S3A.funcionesGenerales import *
+from S3A.Applications.NotificacionesPush.notificaciones_push import enviar_notificacion_chofer_solicita
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-import datetime 
-import json
-import firebase_admin
-from firebase_admin import credentials, messaging
 from django.db import connections
 from django.http import JsonResponse
+import datetime 
+import json
 
-# Constantes
-# RUTA_CREDENCIALES = "static/TresAses/json/tres-ases.json"
-# cred = credentials.Certificate(RUTA_CREDENCIALES)
-# firebase_admin.initialize_app(cred)
+
 
 @login_required
 @csrf_exempt
@@ -291,9 +287,9 @@ def asignaViajeActualizaVacios(request):
             if affected_rows > 0:
                 ### ENVÍAR NOTIFICACIONES
                 ### CHOFER
-                #enviar_notificacion(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
+                enviar_notificacion_chofer_solicita(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
                 ### SOLICITANTE
-                #enviar_notificacion(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
+                enviar_notificacion_chofer_solicita(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
                 ### ACA SE VA A ENVIAR EL VIAJE
                 chofer = traeChofer(idPedidoFlete)
                 if chofer != '0':
@@ -408,22 +404,7 @@ def obtener_id_firebase(Tipo,nAsignacion):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
 
-def enviar_notificacion(token, body, pestaña):
-    if not token or not body or not pestaña:
-        return '0' 
-    try:
-        message = messaging.Message(
-            data={
-                "title": "Tres Ases",
-                "body": body,
-                "Pestaña": pestaña
-            },
-            token=token,
-        )
-        response = messaging.send(message)
-        return '1' if response else '0'
-    except Exception as e:
-        return '0'
+
 
 
 

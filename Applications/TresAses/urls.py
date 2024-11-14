@@ -10,8 +10,8 @@ urlpatterns = [
 
 
 
-    path('prueba-envia-notificaciones-push/', views.push, name="noti_push"),
+    path('prueba-subir-archivos/', views.push, name="noti_push"),
 
-    path('prueba-envia-notificaciones-push/envia/', views.notiPush, name="noti_push_envia"),
+    path('prueba-subir-archivos/sube-archivo/', views.recibir_archivos, name="recibir_archivos"),
 
 ] 
