@@ -287,15 +287,15 @@ def asignaViajeActualizaVacios(request):
             if affected_rows > 0:
                 ### ENVÍAR NOTIFICACIONES
                 ### CHOFER
-                enviar_notificacion_chofer_solicita(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
+                ch = enviar_notificacion_chofer_solicita(obtener_id_firebase("CH",idPedidoFlete),"Nuevo viaje asignado: N°: " + str(idPedidoFlete),"VJ")
                 ### SOLICITANTE
-                enviar_notificacion_chofer_solicita(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
+                sl = enviar_notificacion_chofer_solicita(obtener_id_firebase("SL",idPedidoFlete),"Su pedido N°: " + str(idPedidoFlete) + " fué asignado. Vea el estado de los Pedidos.","PF")
                 ### ACA SE VA A ENVIAR EL VIAJE
                 chofer = traeChofer(idPedidoFlete)
                 if chofer != '0':
                     ejecutar_url(str(idPedidoFlete),str(chofer),'S')
                 
-                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado'})
+                return JsonResponse({'Message': 'Success', 'Nota': 'Actualizado ' + str(ch) + ' - ' + str(sl)})
             else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se Actualizó'})
         except Exception as e:
