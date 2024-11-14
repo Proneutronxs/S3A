@@ -1820,7 +1820,8 @@ def Buscar_Pedidos_Flete(request):
                                 CASE WHEN PF.Estado = 'P' THEN '#ff8000' WHEN PF.Estado = 'A' THEN '#008f39' WHEN PF.Estado = 'B' THEN '#8A0000' ELSE '#6E6E6E' END AS COLOR_ESTADO,
                                 CASE WHEN PF.TipoCarga = 'VAC' THEN 'BINS VACÍOS' WHEN TipoCarga = 'EMB' THEN 'EMBALADO' WHEN TipoCarga = 'FBI' THEN 'FRUTA EN BINS'
                                 WHEN PF.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PF.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PF.TipoCarga = 'RAU' THEN 'BINS FRUTA - CHACRA' ELSE RTRIM(PF.TipoCarga) END AS TIPO_CARGA,
-                                RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), '-') AS HORA_REQUERIDA,
+                                RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), RTRIM(CONVERT(VARCHAR(5), PF.HoraPedido, 108) + ' Hs.')) + ' - ' +
+                                CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS HORA_REQUERIDA,
                                 COALESCE(RTRIM(CH.Nombre), '-') AS NOMBRE_CHACRA, COALESCE(RTRIM(VR.Nombre), '-') AS NOMBRE_VARIEDAD,
                                 COALESCE(RTRIM(TR.RazonSocial), '-') AS TRANSPORTE, COALESCE(RTRIM(CM.Nombre), '-') AS CAMION, COALESCE(RTRIM(PF.Chofer), '-') AS CHOFER,
                                 COALESCE(RTRIM(CF.Telefono), '0') AS TELEFONO, COALESCE(RTRIM(PF.Obs), '') AS OBSERVACIONES, PF.IdPedidoFlete
@@ -1837,7 +1838,7 @@ def Buscar_Pedidos_Flete(request):
                                 AND PF.Estado NOT IN ('C','B')
                                 AND PF.IdPedidoFlete > (1000000)
                                 AND PF.IdPedidoFlete < (2000000)
-                        GROUP BY PF.Estado, PF.TipoCarga, UB.Descripcion, UBS.Descripcion, PF.HoraRequerida, CH.Nombre, VR.Nombre, TR.RazonSocial,
+                        GROUP BY PF.Estado, PF.TipoCarga, UB.Descripcion, UBS.Descripcion, PF.HoraRequerida, PF.HoraPedido, PF.FechaPedido, CH.Nombre, VR.Nombre, TR.RazonSocial,
                                 CM.Nombre, PF.Chofer, CF.Telefono, PF.Obs, IdPedidoFlete
                         """
                 cursor.execute(sql, values)
