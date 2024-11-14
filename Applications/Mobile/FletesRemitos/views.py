@@ -1314,24 +1314,24 @@ def datosViajesAceptados(request, chofer):
     if request.method == 'GET':
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ SELECT        Logistica_Camiones_Seguimiento.Orden AS ORDEN, Logistica_Camiones_Seguimiento.IdAsignacion AS ID_ASIGNACION, CASE Logistica_Camiones_Seguimiento.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO,
-                                                    CASE S3A.dbo.PedidoFlete.UbicacionVacios WHEN '0' THEN '-' ELSE CONVERT(VARCHAR, S3A.dbo.PedidoFlete.CantVacios) + ' B. VACIOS - ' + Logistica_Ubicacion_Chacras_Bins.Nombre END AS UBICACION_BINS, RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS SOLICITA, 
-                                                    RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.Zona.Nombre) AS ZONA, CONVERT(VARCHAR(10), S3A.dbo.PedidoFlete.FechaPedido, 103) AS FECHA,  CASE WHEN Logistica_Ubicacion_Chacras_Bins.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
-                                                    CASE WHEN Logistica_Ubicacion_Chacras_Bins_1.Coordenadas IS NULL THEN '-' ELSE Logistica_Ubicacion_Chacras_Bins_1.Coordenadas END AS COORDENADAS_CHACRA--, 
-													--CASE WHEN (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
-													--FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) IS NULL THEN '0'ELSE (SELECT Telefono COLLATE SQL_Latin1_General_CP1_CI_AS
-													--FROM USUARIOS WHERE Usuario COLLATE SQL_Latin1_General_CP1_CI_AS = RTRIM(S3A.dbo.PedidoFlete.UserID) AND Tipo = 'EC' COLLATE SQL_Latin1_General_CP1_CI_AS) END AS TELEFONO
-                            FROM            Logistica_Camiones_Seguimiento INNER JOIN
-                                                    S3A.dbo.PedidoFlete ON Logistica_Camiones_Seguimiento.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete INNER JOIN
-                                                    S3A.dbo.Chacra ON S3A.dbo.PedidoFlete.IdChacra = S3A.dbo.Chacra.IdChacra INNER JOIN
-                                                    S3A.dbo.Zona ON S3A.dbo.PedidoFlete.IdZona = S3A.dbo.Zona.IdZona INNER JOIN
-                                                    Logistica_Ubicacion_Chacras_Bins ON S3A.dbo.PedidoFlete.UbicacionVacios = Logistica_Ubicacion_Chacras_Bins.IdUbicacion LEFT OUTER JOIN
-                                                    Logistica_Ubicacion_Chacras_Bins AS Logistica_Ubicacion_Chacras_Bins_1 ON S3A.dbo.Chacra.IdChacra = Logistica_Ubicacion_Chacras_Bins_1.IdUbicacion
-                            WHERE        (Logistica_Camiones_Seguimiento.Chofer = %s ) AND (Logistica_Camiones_Seguimiento.Estado = 'S') AND (Logistica_Camiones_Seguimiento.Orden =
-                                                        (SELECT        MIN(Orden) AS Expr1
-                                                        FROM            Logistica_Camiones_Seguimiento AS Logistica_Camiones_Seguimiento_1
-                                                        WHERE        (Chofer = %s ) AND (Estado = 'S'))) """
-                cursor.execute(sql, [chofer, chofer]) 
+                sql = """   DECLARE @@Chofer VARCHAR(255);
+                            SET @@Chofer = %s;
+                            SELECT        LCS.Orden AS ORDEN, LCS.IdAsignacion AS ID_ASIGNACION, CASE LCS.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO,
+                                        CASE PF.UbicacionVacios WHEN '0' THEN '-' ELSE CONVERT(VARCHAR, PF.CantVacios) + ' B. VACIOS - ' + LUCB.Nombre END AS UBICACION_BINS, RTRIM(PF.Solicitante) AS SOLICITA, 
+                                        COALESCE(RTRIM(CH.Nombre),'-') AS CHACRA, COALESCE(RTRIM(ZN.Nombre),'-') AS ZONA, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA,  CASE WHEN LUCB.Coordenadas IS NULL THEN '-' ELSE LUCB.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
+                                        CASE WHEN LUCB1.Coordenadas IS NULL THEN '-' ELSE LUCB1.Coordenadas END AS COORDENADAS_CHACRA, COALESCE(US.Telefono,'0') AS TELEFONO
+                            FROM            Logistica_Camiones_Seguimiento AS LCS INNER JOIN
+                                        S3A.dbo.PedidoFlete AS PF ON LCS.IdAsignacion = PF.IdPedidoFlete LEFT JOIN
+                                        S3A.dbo.Chacra AS CH ON PF.IdChacra = CH.IdChacra LEFT JOIN
+                                        S3A.dbo.Zona AS ZN ON PF.IdZona = ZN.IdZona LEFT JOIN
+                                        Logistica_Ubicacion_Chacras_Bins AS LUCB ON PF.UbicacionVacios = LUCB.IdUbicacion LEFT OUTER JOIN
+                                        Logistica_Ubicacion_Chacras_Bins AS LUCB1 ON CH.IdChacra = LUCB1.IdUbicacion LEFT JOIN
+                                        USUARIOS AS US ON US.Usuario = PF.UserID COLLATE database_default
+                            WHERE        (LCS.Chofer = @@Chofer ) AND (LCS.Estado = 'S') AND (LCS.Orden =
+                                            (SELECT        MIN(Orden) AS Expr1
+                                            FROM            Logistica_Camiones_Seguimiento
+                                            WHERE        (Chofer = @@Chofer ) AND (Estado = 'S'))) """
+                cursor.execute(sql, [chofer]) 
                 consulta = cursor.fetchall()
                 if consulta:
                     listado_Viajes_Aceptados = []
@@ -1346,8 +1346,8 @@ def datosViajesAceptados(request, chofer):
                         fecha = str(row[7])
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
-                        #tel = str(row[10])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': "0"}
+                        tel = str(row[10])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': tel}
                         listado_Viajes_Aceptados.append(datos)    
                     
                     if  textUbicacion(chofer) == '-':
@@ -1809,9 +1809,13 @@ def Buscar_Pedidos_Flete(request):
             body = request.body.decode('utf-8')
             Usuario = str(json.loads(body)['Usuario'])
             Fecha = str(json.loads(body)['Fecha'])
-            values = [Usuario,Fecha]
+            values = [Fecha,Usuario]
             with connections['S3A'].cursor() as cursor:
                 sql = """
+                        DECLARE @@Fecha DATE;
+                        DECLARE @@User VARCHAR(10);
+                        SET @@Fecha = %s;
+                        SET @@User = %s;
                         SELECT CASE WHEN PF.Estado = 'P' THEN 'PENDIENTE' WHEN PF.Estado = 'A' THEN 'ASIGNADO' WHEN PF.Estado = 'B' THEN 'BAJA' WHEN PF.Estado = 'D' THEN 'DESPACHADO' ELSE PF.Estado END AS ESTADO,
                                 CASE WHEN PF.Estado = 'P' THEN '#ff8000' WHEN PF.Estado = 'A' THEN '#008f39' WHEN PF.Estado = 'B' THEN '#8A0000' ELSE '#6E6E6E' END AS COLOR_ESTADO,
                                 CASE WHEN PF.TipoCarga = 'VAC' THEN 'BINS VACÍOS' WHEN TipoCarga = 'EMB' THEN 'EMBALADO' WHEN TipoCarga = 'FBI' THEN 'FRUTA EN BINS'
@@ -1828,8 +1832,8 @@ def Buscar_Pedidos_Flete(request):
                                 Transportista AS TR ON TR.IdTransportista = PF.IdTransportista LEFT JOIN
                                 Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
                                 Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer)
-                        WHERE PF.UserID = %s
-                                AND CONVERT(DATE, PF.FechaPedido) = %s
+                        WHERE PF.UserID = @@User
+                                AND ((CONVERT(DATE, PF.FechaPedido) = @@Fecha) OR (@@Fecha = '1900-01-01'))
                                 AND PF.Estado NOT IN ('C','B')
                                 AND PF.IdPedidoFlete > (1000000)
                                 AND PF.IdPedidoFlete < (2000000)
