@@ -1818,8 +1818,8 @@ def Buscar_Pedidos_Flete(request):
                         SET @@User = %s;
                         SELECT CASE WHEN PF.Estado = 'P' THEN 'PENDIENTE' WHEN PF.Estado = 'A' THEN 'ASIGNADO' WHEN PF.Estado = 'B' THEN 'BAJA' WHEN PF.Estado = 'D' THEN 'DESPACHADO' ELSE PF.Estado END AS ESTADO,
                                 CASE WHEN PF.Estado = 'P' THEN '#ff8000' WHEN PF.Estado = 'A' THEN '#008f39' WHEN PF.Estado = 'B' THEN '#8A0000' ELSE '#6E6E6E' END AS COLOR_ESTADO,
-                                CASE WHEN PF.TipoCarga = 'VAC' THEN 'BINS VACÍOS' WHEN TipoCarga = 'EMB' THEN 'EMBALADO' WHEN TipoCarga = 'FBI' THEN 'FRUTA EN BINS'
-                                WHEN PF.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PF.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PF.TipoCarga = 'RAU' THEN 'BINS FRUTA - CHACRA' ELSE RTRIM(PF.TipoCarga) END AS TIPO_CARGA,
+                                CASE WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'BINS VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS'
+                                WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS' WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'BINS FRUTA - CHACRA' ELSE RTRIM(PF.TipoCarga) END AS TIPO_CARGA,
                                 RTRIM(UB.Descripcion) AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion), '-') AS DESTINO, COALESCE(RTRIM(CONVERT(VARCHAR(5), PF.HoraRequerida, 108) + ' Hs.'), RTRIM(CONVERT(VARCHAR(5), PF.HoraPedido, 108) + ' Hs.')) + ' - ' +
                                 CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS HORA_REQUERIDA,
                                 COALESCE(RTRIM(CH.Nombre), '-') AS NOMBRE_CHACRA, COALESCE(RTRIM(VR.Nombre), '-') AS NOMBRE_VARIEDAD,
