@@ -95,7 +95,7 @@ def dataConCRC(request):
                     SET @@Calibre = %s;
 
                     SELECT 
-                        Mercado AS MERCADO, ISNULL(NombreEmbarque, '') AS VAPOR, PaisDestino AS DESTINO, IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30),Cliente) AS CLIENTE, CONVERT(VARCHAR(10), FECH_FAC, 103) AS FECHA_FACTURA, 
+                        Mercado AS MERCADO, ISNULL(NombreEmbarque, '') AS VAPOR, PaisDestino AS DESTINO, IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30),Cliente) AS CLIENTE, CONVERT(VARCHAR(10), DLC.Fecha, 103) AS FECHA_FACTURA, 
                         CONVERT(VARCHAR,IdEspecie) AS ID_ESPECIE, Especie AS ESPECIE, IdVariedad AS ID_VARIEDAD, Variedad AS VARIEDAD, IdEnvase AS ID_ENVASE, Envase AS ENVASE, IdEtiqueta AS ID_MARCA, Etiqueta AS MARCA, 
                         Calibres AS CALIBRES, FORMAT(PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(PesoEnvase * Bultos, 'N2') AS TOTAL_KGS, 
                         FORMAT(Bultos, 'N0') AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), (SUM(Precio2) * TPC.Cantidad)) AS IMP_TOTAL, DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
@@ -128,7 +128,7 @@ def dataConCRC(request):
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + CONVERT(VARCHAR(20), CRCT06) + '-' + 
                         CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION,
                         DLC.Fecha
-                    ORDER BY CONVERT(VARCHAR(10), FECH_FAC, 103), CONVERT(VARCHAR(30),Cliente), TPC.Tamaño
+                    ORDER BY DLC.Fecha, CONVERT(VARCHAR(30),Cliente), TPC.Tamaño
                     """
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
