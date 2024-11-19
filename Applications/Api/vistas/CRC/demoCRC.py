@@ -112,8 +112,8 @@ def dataConCRC(request):
                             LEFT OUTER JOIN		
                                 VistaTamañoPorPC AS TPC ON TPC.NroRemito = DLC.NroRemito AND TPC.NroItem=DLC.NroItem AND TPC.NroSubitem=DLC.NroSubitem
                     WHERE 
-                        CONVERT(DATE, CONVERT(datetime, DLC.Fecha)) >= @@Inicio
-                        AND CONVERT(DATE, CONVERT(datetime, DLC.Fecha)) <= @@Final 
+                        CONVERT(DATE, FECH_FAC) >= @@Inicio
+                        AND CONVERT(DATE, FECH_FAC) <= @@Final 
                         AND (@@Mercado = '0' OR @@Mercado = Mercado)
                         AND (@@Cliente = '0' OR IdCliente = @@Cliente)
                         AND (@@Especie = '0' OR IdEspecie = @@Especie)
