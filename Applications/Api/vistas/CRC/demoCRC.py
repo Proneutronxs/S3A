@@ -108,9 +108,9 @@ def dataConCRC(request):
                         CONVERT(VARCHAR(20), CRCT11)) AS LISTA_CRC, CASE CONVERT(VARCHAR,TPC.Tamaño) WHEN 'AAAA' THEN '90' WHEN 'AAA' THEN '80' WHEN 'AA' THEN '70' WHEN 'A' THEN '60' WHEN 'B' THEN '50' WHEN 'C' THEN '40' ELSE CONVERT(VARCHAR,TPC.Tamaño) END AS CALIBRE, 
 	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC, Moneda AS TIPO_MONEDA, FUNCION AS FUNC, DLC.Fecha AS FECHA
                     FROM 
-                        VistaDemoDLC
-                        LEFT OUTER JOIN		
-                            VistaTamañoPorPC AS TPC on TPC.NroRemito = VistaDemoDLC.NroRemito and TPC.NroItem=VistaDemoDLC.NroItem and TPC.NroSubitem=VistaDemoDLC.NroSubitem
+                        VistaDemoDLC AS DLC
+                            LEFT OUTER JOIN		
+                                VistaTamañoPorPC AS TPC on TPC.NroRemito = VistaDemoDLC.NroRemito and TPC.NroItem=VistaDemoDLC.NroItem and TPC.NroSubitem=VistaDemoDLC.NroSubitem
                     WHERE 
                         CONVERT(DATE, DLC.Fecha) >= @@Inicio
                         AND CONVERT(DATE, DLC.Fecha) <= @@Final 
