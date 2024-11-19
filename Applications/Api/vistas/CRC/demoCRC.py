@@ -106,14 +106,14 @@ def dataConCRC(request):
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + 
                         CONVERT(VARCHAR(20), CRCT06) + '-' + CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + 
                         CONVERT(VARCHAR(20), CRCT11)) AS LISTA_CRC, CASE CONVERT(VARCHAR,TPC.Tamaño) WHEN 'AAAA' THEN '90' WHEN 'AAA' THEN '80' WHEN 'AA' THEN '70' WHEN 'A' THEN '60' WHEN 'B' THEN '50' WHEN 'C' THEN '40' ELSE CONVERT(VARCHAR,TPC.Tamaño) END AS CALIBRE, 
-	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC, Moneda AS TIPO_MONEDA, FUNCION AS FUNC
+	                    TPC.Cantidad AS CANTIDAD, CONVERT(VARCHAR,TPC.crc) AS CRC, Moneda AS TIPO_MONEDA, FUNCION AS FUNC, DLC.Fecha AS FECHA
                     FROM 
                         VistaDemoDLC
                         LEFT OUTER JOIN		
                             VistaTamañoPorPC AS TPC on TPC.NroRemito = VistaDemoDLC.NroRemito and TPC.NroItem=VistaDemoDLC.NroItem and TPC.NroSubitem=VistaDemoDLC.NroSubitem
                     WHERE 
-                        CONVERT(DATE, FECH_FAC) >= @@Inicio
-                        AND CONVERT(DATE, FECH_FAC) <= @@Final 
+                        CONVERT(DATE, DLC.Fecha) >= @@Inicio
+                        AND CONVERT(DATE, DLC.Fecha) <= @@Final 
                         AND (@@Mercado = '0' OR @@Mercado = Mercado)
                         AND (@@Cliente = '0' OR IdCliente = @@Cliente)
                         AND (@@Especie = '0' OR IdEspecie = @@Especie)
@@ -126,7 +126,8 @@ def dataConCRC(request):
                         PesoEnvase, PesoEnvase * Bultos, Bultos, VistaDemoDLC.NroRemito,DATEPART(SECOND, ALTA_REMITO),(CONVERT(VARCHAR(5),T01) + '-' + CONVERT(VARCHAR(5),T02) + '-' + CONVERT(VARCHAR(5),T03) + '-' + CONVERT(VARCHAR(5),T04) + '-' + 
                         CONVERT(VARCHAR(5),T05) + '-' + CONVERT(VARCHAR(5),T06) + '-' + CONVERT(VARCHAR(5),T07) + '-' + CONVERT(VARCHAR(5),T08) + '-' + CONVERT(VARCHAR(5),T09) + '-' + CONVERT(VARCHAR(5),T10) + '-' + CONVERT(VARCHAR(5),T11)),
                         (CONVERT(VARCHAR(20), CRCT01) + '-' + CONVERT(VARCHAR(20), CRCT02) + '-' + CONVERT(VARCHAR(20), CRCT03) + '-' + CONVERT(VARCHAR(20), CRCT04) + '-' + CONVERT(VARCHAR(20), CRCT05) + '-' + CONVERT(VARCHAR(20), CRCT06) + '-' + 
-                        CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION
+                        CONVERT(VARCHAR(20), CRCT07) + '-' + CONVERT(VARCHAR(20), CRCT08) + '-' + CONVERT(VARCHAR(20), CRCT09) + '-' + CONVERT(VARCHAR(20), CRCT10) + '-' + CONVERT(VARCHAR(20), CRCT11)),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION,
+                        DLC.Fecha
                     ORDER BY CONVERT(VARCHAR(10), FECH_FAC, 103), CONVERT(VARCHAR(30),Cliente), TPC.Tamaño
                     """
                 cursor.execute(sql, values)
@@ -138,7 +139,7 @@ def dataConCRC(request):
                         empresa = row[4]
                         tipo = str(row[31])
                         if empresa not in empresas:
-                            empresas[empresa] = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0}}
+                            empresas[empresa] = {"Nombre": empresa, "Datos": [], "Subtotal": {"SumaImporteTotal": 0, "SumaImporteCRCTotal": 0, "Bultos": 0}}
 
                         datos_empresa = empresas[empresa]
                         crc = decode_crc(float(row[30]), int(row[28]), int(row[25]),str(row[32]))
@@ -178,16 +179,18 @@ def dataConCRC(request):
 
                         datos_empresa["Subtotal"]["SumaImporteTotal"] += float(row[19])
                         datos_empresa["Subtotal"]["SumaImporteCRCTotal"] += float(crc * int(row[29]))
+                        datos_empresa["Subtotal"]["Bultos"] += int(row[29])  # Suma bultos
                         resumen["SumaImporteTotal"] += float(row[19])
                         resumen["SumaImporteCRCTotal"] += float(crc * int(row[29]))
+                        resumen["Bultos"] = resumen.get("Bultos", 0) + int(row[29])  # Suma bultos totales
 
                     empresas = list(empresas.values())
                     resumen["TotalGeneral"] = resumen["SumaImporteTotal"] + resumen["SumaImporteCRCTotal"]
-                    resumen = {k: formato_moneda(tipo,str(v)) for k, v in resumen.items()}
+                    resumen = {k: formato_moneda(tipo, str(v)) if k != "Bultos" else v for k, v in resumen.items()}
 
                     for empresa in empresas:
                         empresa["Subtotal"]["TotalGeneral"] = empresa["Subtotal"]["SumaImporteTotal"] + empresa["Subtotal"]["SumaImporteCRCTotal"]
-                        empresa["Subtotal"] = {k: formato_moneda(tipo,str(v)) for k, v in empresa["Subtotal"].items()}
+                        empresa["Subtotal"] = {k: formato_moneda(tipo, str(v)) if k != "Bultos" else v for k, v in empresa["Subtotal"].items()}
 
                     return JsonResponse({'Message': 'Success', 'Empresas': empresas, 'Resumen': resumen}, safe=False)
 
