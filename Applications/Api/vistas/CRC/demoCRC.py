@@ -73,7 +73,7 @@ def dataConCRC(request):
         try:
             with connections['S3A'].cursor() as cursor:
                 sql = f""" 
-                    
+                    SET DATEFORMAT ymd;
                     DECLARE @@Inicio DATE;
                     DECLARE @@Final DATE;
                     DECLARE @@Mercado VARCHAR(10);
@@ -112,8 +112,8 @@ def dataConCRC(request):
                             LEFT OUTER JOIN		
                                 VistaTamañoPorPC AS TPC ON TPC.NroRemito = DLC.NroRemito AND TPC.NroItem=DLC.NroItem AND TPC.NroSubitem=DLC.NroSubitem
                     WHERE 
-                        CONVERT(DATE, FECH_FAC) >= @@Inicio
-                        AND CONVERT(DATE, FECH_FAC) <= @@Final 
+                        CONVERT(DATE, DLC.Fecha) >= @@Inicio
+                        AND CONVERT(DATE, DLC.Fecha) <= @@Final 
                         AND (@@Mercado = '0' OR @@Mercado = Mercado)
                         AND (@@Cliente = '0' OR IdCliente = @@Cliente)
                         AND (@@Especie = '0' OR IdEspecie = @@Especie)
