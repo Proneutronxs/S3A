@@ -133,7 +133,7 @@ def es_posterior_a_actual(datetime_str):
     datetime_str = str(datetime_str).replace('T',' ')
     fecha_hora = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
     fecha_hora_actual = datetime.now()
-    fecha_hora_margen = fecha_hora_actual - timedelta(days=1)
+    fecha_hora_margen = fecha_hora_actual - timedelta(days=30)
     return fecha_hora > fecha_hora_margen
 
 ### RETORNA HH:MM DE UN DATE TIME
