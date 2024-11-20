@@ -43,4 +43,10 @@ urlpatterns = [
     ### SERVICIO Y FINALIZACIÓN ###
 
     path('fruit/servicio-finaliza/', fruit.servicio_finalizacion, name="fruit_servicio_finalizacion"),
+
+    ### SERVICIO NOTIFICACIÓN RECIBIDA ###
+
+    path('fruit/notificacion-recibida/', fruit.actualiza_notificacion_recibida, name="fruit_actualiza_notificacion_recibida"),
+
+
 ]
