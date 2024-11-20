@@ -757,7 +757,7 @@ def actualiza_notificacion_recibida(request):
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
-                        UPDATE Chofer_Viajes_Notificacion SET EstadoNotificacion = 'E' WHERE ID_CVN =  %s
+                        UPDATE Chofer_Viajes_Notificacion SET EstadoNotificacion = 'R' WHERE ID_CVN =  %s
                     """
                 cursor.execute(sql,values)
                 cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
