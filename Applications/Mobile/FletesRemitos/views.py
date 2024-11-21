@@ -1318,15 +1318,19 @@ def datosViajesAceptados(request, chofer):
                             SET @@Chofer = %s;
                             SELECT        LCS.Orden AS ORDEN, LCS.IdAsignacion AS ID_ASIGNACION, CASE LCS.Acepta WHEN 'S' THEN 'ACEPTADO' ELSE '-' END AS ACEPTADO,
                                         CASE PF.UbicacionVacios WHEN '0' THEN '-' ELSE CONVERT(VARCHAR, PF.CantVacios) + ' B. VACIOS - ' + LUCB.Nombre END AS UBICACION_BINS, RTRIM(PF.Solicitante) AS SOLICITA, 
-                                        COALESCE(RTRIM(CH.Nombre),'-') AS CHACRA, COALESCE(RTRIM(ZN.Nombre),'-') AS ZONA, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA,  CASE WHEN LUCB.Coordenadas IS NULL THEN '-' ELSE LUCB.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
-                                        CASE WHEN LUCB1.Coordenadas IS NULL THEN '-' ELSE LUCB1.Coordenadas END AS COORDENADAS_CHACRA, COALESCE(US.Telefono,'0') AS TELEFONO
+                                        COALESCE(RTRIM(CH.Nombre),'-') AS CHACRA, COALESCE(RTRIM(ZN.Nombre),'-') AS ZONA, CONVERT(VARCHAR(10), PF.FechaPedido, 103) + ' - ' + CONVERT(VARCHAR(5), PF.HoraPedido, 108) +' Hs.' AS FECHA,  
+                                        CASE WHEN LUCB.Coordenadas IS NULL THEN '-' ELSE LUCB.Coordenadas END AS COORDENADAS_RETIRA_BINS, 
+                                        CASE WHEN LUCB1.Coordenadas IS NULL THEN '-' ELSE LUCB1.Coordenadas END AS COORDENADAS_CHACRA, COALESCE(US.Telefono,'0') AS TELEFONO,
+                                        CASE WHEN PF.IdChacra IS NULL THEN 'CD' ELSE 'PC' END AS TIPO, COALESCE(RTRIM(UB.Descripcion),'-') AS ORIGEN, COALESCE(RTRIM(UBS.Descripcion),'-') AS DESTINO, COALESCE(RTRIM(PF.Obs),'-') AS OBS
                             FROM            Logistica_Camiones_Seguimiento AS LCS INNER JOIN
                                         S3A.dbo.PedidoFlete AS PF ON LCS.IdAsignacion = PF.IdPedidoFlete LEFT JOIN
                                         S3A.dbo.Chacra AS CH ON PF.IdChacra = CH.IdChacra LEFT JOIN
                                         S3A.dbo.Zona AS ZN ON PF.IdZona = ZN.IdZona LEFT JOIN
                                         Logistica_Ubicacion_Chacras_Bins AS LUCB ON PF.UbicacionVacios = LUCB.IdUbicacion LEFT OUTER JOIN
                                         Logistica_Ubicacion_Chacras_Bins AS LUCB1 ON CH.IdChacra = LUCB1.IdUbicacion LEFT JOIN
-                                        USUARIOS AS US ON US.Usuario = PF.UserID COLLATE database_default
+                                        USUARIOS AS US ON US.Usuario = PF.UserID COLLATE database_default LEFT JOIN
+                                        S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                        S3A.dbo.Ubicacion AS UBS ON UBS.IdUbicacion = PF.IdPlantaDestino
                             WHERE        (LCS.Chofer = @@Chofer ) AND (LCS.Estado = 'S') AND (LCS.Orden =
                                             (SELECT        MIN(Orden) AS Expr1
                                             FROM            Logistica_Camiones_Seguimiento
@@ -1347,7 +1351,13 @@ def datosViajesAceptados(request, chofer):
                         coorBins = str(row[8])
                         coorChacra = str(row[9])
                         tel = str(row[10])
-                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 'CoordenadasChacra': coorChacra, 'Tel': tel}
+                        tipo = str(row[11])
+                        origen = str(row[12])
+                        destino = str(row[13])
+                        obs = str(row[14])
+                        datos = {'IdAsignacion': idAsignacion, 'Aceptado': aceptado, 'Fecha': fecha, 'Chacra': chacra, 'Zona': zona, 
+                                 'UbicacionBins': ubicacionBins, 'Solicita': solicita, 'Orden': orden, 'CoordenadasBins': coorBins, 
+                                 'CoordenadasChacra': coorChacra, 'Tel': tel, 'Tipo': tipo, 'Origen': origen, 'Destino': destino, 'Obs': obs}
                         listado_Viajes_Aceptados.append(datos)    
                     
                     if  textUbicacion(chofer) == '-':
