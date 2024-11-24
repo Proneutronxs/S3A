@@ -796,7 +796,81 @@ def actualiza_notificacion_recibida(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def Obtener_Nuevos_destinos(request,ID_CA):
+    if request.method == 'GET':
+        ID_CA = str(ID_CA)
+        values = [ID_CA]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT        VN.ID_CVN AS ID_VIAJE_NOTI, CA.ID_CA AS ID_CHOFER_ALTA, CA.NombreChofer AS NOM_CHOFER, CA.IdChofer AS ID_CHOFER, 
+                                    DCV.ID_CDCV AS ID_DETALLES_CHACRAS, DCV.IdPedidoFlete AS ID_PEDIDO_FLETE, 
+                                    DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, RTRIM(CH.Nombre) AS NOM_CHACRA, 
+                                    ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
+                                    ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
+                                    ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
+                                    RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO
+                        FROM            Chofer_Alta AS CA LEFT JOIN
+                                                Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA LEFT JOIN
+                                                Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN LEFT JOIN
+                                                S3A.dbo.Chacra AS CH ON CH.IdChacra = DCV.IdChacra LEFT JOIN
+                                                S3A.dbo.Zona AS ZN ON ZN.IdZona = CH.Zona LEFT JOIN
+                                                S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
+                                                Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV LEFT JOIN
+                                                USUARIOS AS US ON US.Usuario = PD.UserID COLLATE Modern_Spanish_CI_AS
+                        WHERE CA.ID_CA = %s
+                                AND VN.Estado = 'V'
+                                AND DCV.Estado <> 'E'
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    viajes = {}
+                    for row in consulta:
+                        id_viaje = str(row[0])
+                        if id_viaje not in viajes:
+                            viajes[id_viaje] = {
+                                "IdViaje": id_viaje,
+                                "IdChoferAlta": str(row[1]),
+                                "NombreChofer": str(row[2]),
+                                "IdChofer": str(row[3]),
+                                "CantVacios": str(row[13]),
+                                "IdUbiVac": str(row[14]),
+                                "NombreUbiVacios": str(row[15]),
+                                "LatVacios": str(row[16]),
+                                "LonVacios": str(row[17]),
+                                "DetalleChacras": []
+                            }
+                        
+                        detalle_chacra = {
+                            "IdDetalleChacras": str(row[4]),
+                            "IdPedidoFlete": str(row[5]),
+                            "IdChacra": str(row[6]),
+                            "LatChacra": str(row[7]),
+                            "LonChacra": str(row[8]),
+                            "MombreChacra": str(row[9]),
+                            "IdZona": str(row[10]),
+                            "NombreZona": str(row[11]),
+                            "Vacios": str(row[12]),
+                            "Cuellos": str(row[18]),
+                            "Solicita": str(row[19]),
+                            "Telefono": str(row[20])
+                        }
+                        viajes[id_viaje]["DetalleChacras"].append(detalle_chacra)
 
+                    viajes_list = list(viajes.values())
+                    return JsonResponse({'Message': 'Success', 'Viaje': viajes_list})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': "No existen viajes disponibles."})
+
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","OBTIENE VIAJE","GET",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
