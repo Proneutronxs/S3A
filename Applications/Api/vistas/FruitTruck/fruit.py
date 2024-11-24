@@ -752,26 +752,47 @@ def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
 def actualiza_notificacion_recibida(request):
     if request.method == 'POST':
         body = request.body.decode('utf-8')
+        Tipo = str(json.loads(body)['Tipo'])
         ID_CVN = str(json.loads(body)['ID_CVN'])
         values = [ID_CVN]
-        try:
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ 
-                        UPDATE Chofer_Viajes_Notificacion SET EstadoNotificacion = 'R' WHERE ID_CVN =  %s
-                    """
-                cursor.execute(sql,values)
-                cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
-                affected_rows = cursor.fetchone()[0]
-                if affected_rows > 0:
-                    return JsonResponse({'Message': 'Success', 'Nota': 'El Estado de lla notificación se actualizó correctamente.'})
-                else:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Estado de la notificación, intente más tarde.'})
-        except Exception as e:
-            error = str(e)
-            insertar_registro_error_sql("API","RECIBE NOTIFICACION","POST",error)
-            return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
+        if Tipo == 'N':
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE Chofer_Notificacion_Destinos_Actualizados SET EstadoNotificacion = 'R' WHERE ID_CVN = %s
+                        """
+                    cursor.execute(sql,values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Estado de la notificación se actualizó correctamente.'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Estado de la notificación, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","RECIBE NOTIFICACION DESTINOS","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+        else:
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE Chofer_Viajes_Notificacion SET EstadoNotificacion = 'R' WHERE ID_CVN =  %s
+                        """
+                    cursor.execute(sql,values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Estado de la notificación se actualizó correctamente.'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Estado de la notificación, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","RECIBE NOTIFICACION","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
