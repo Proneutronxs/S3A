@@ -843,6 +843,7 @@ def Obtener_Nuevos_destinos(request,ID_CA):
                             }
                         
                         detalle_chacra = {
+                            "IdViaje": id_viaje,
                             "IdDetalleChacras": str(row[4]),
                             "IdPedidoFlete": str(row[5]),
                             "IdChacra": str(row[6]),
