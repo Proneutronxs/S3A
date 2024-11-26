@@ -725,7 +725,7 @@ def update_planta(ID_CDCV, LlegaPlanta):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    UPDATE Chofer_Detalle_Chacras_Viajes SET LlegaPlanta = %s WHERE ID_CDCV = %s
+                    UPDATE Chofer_Viajes_Notificacion SET LlegaPlanta = %s WHERE ID_CDCV = %s
                 """
             cursor.execute(sql, values)
     except Exception as e:
