@@ -873,7 +873,7 @@ def Obtener_Nuevos_destinos(request,ID_CA):
                                         ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
                                         ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
                                         ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
-                                        RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, UBIO.Descripcion AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
+                                        RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, RTRIM(UBIO.Descripcion) AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
                                         CASE WHEN PD.TipoCarga = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN PD.TipoCarga = 'VAC' THEN 'BIN VACÍOS' WHEN PD.TipoCarga = 'EMB' THEN 'EMBALADO'
                                         WHEN PD.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PD.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PD.TipoCarga = 'FBI' THEN 'FRUTA EN BINS' ELSE PD.TipoCarga END AS TIPO_CARGA,
                                         PD.TipoDestino AS TIPO_DESTINO
@@ -900,7 +900,7 @@ def Obtener_Nuevos_destinos(request,ID_CA):
                                             ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
                                             ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
                                             ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
-                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, UBIO.Descripcion AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
+                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, RTRIM(UBIO.Descripcion) AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
                                             CASE WHEN PD.TipoCarga = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN PD.TipoCarga = 'VAC' THEN 'BIN VACÍOS' WHEN PD.TipoCarga = 'EMB' THEN 'EMBALADO'
                                             WHEN PD.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PD.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PD.TipoCarga = 'FBI' THEN 'FRUTA EN BINS' ELSE PD.TipoCarga END AS TIPO_CARGA,
                                             PD.TipoDestino AS TIPO_DESTINO
