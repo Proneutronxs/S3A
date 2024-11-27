@@ -1844,7 +1844,7 @@ def Buscar_Pedidos_Flete(request):
                                 Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
                                 Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer) AND PF.IdTransportista = CF.IdTransportista
                         WHERE PF.UserID = @@User
-                                AND ((CONVERT(DATE, PF.FechaPedido) = @@Fecha) OR (@@Fecha = '1900-01-01'))
+                                AND ((CONVERT(DATE, PF.FechaPedido) = @@Fecha) OR (@@Fecha = '1900-01-01' AND CONVERT(DATE, PF.FechaPedido) >= DATEADD(DAY, -5, CONVERT(DATE, GETDATE()))))
                                 AND PF.Estado NOT IN ('C','B')
                                 AND PF.IdPedidoFlete > (1000000)
                                 AND PF.IdPedidoFlete < (2000000)
