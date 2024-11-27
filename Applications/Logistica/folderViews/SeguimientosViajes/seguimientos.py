@@ -383,13 +383,13 @@ def obtener_id_firebase(Tipo,nAsignacion):
                                 TRESASES_APLICATIVO.dbo.Usuarios AS US ON US.Usuario = PF.UserID COLLATE database_default
                             WHERE PF.IdPedidoFlete = %s """
             else:
-                sql = """ SELECT ISNULL(US.IdAndroid,0) AS ID_FIREBASE
-                            FROM PedidoFlete AS PF LEFT JOIN 
-                                TRESASES_APLICATIVO.dbo.Usuarios AS US ON US.CodEmpleado = (SELECT IdChofer 
-                                FROM Chofer 
-                                WHERE LTRIM(RTRIM(Apellidos)) + ' ' + LTRIM(RTRIM(Nombres)) = RTRIM(PF.Chofer)
-                                        AND IdTransportista = PF.IdTransportista)
-                            WHERE PF.IdPedidoFlete = %s """
+                sql = """ SELECT TOP 1 US.IdAndroid AS ID_FIREBASE
+                            FROM TRESASES_APLICATIVO.dbo.USUARIOS AS US
+                            WHERE CodEmpleado IN (SELECT IdChofer
+                                                    FROM Chofer
+                                                    WHERE LTRIM(RTRIM(Apellidos)) + ' ' + LTRIM(RTRIM(Nombres)) = (SELECT PF.Chofer
+                                                                                            FROM PedidoFlete AS PF
+                                                                                            WHERE PF.IdPedidoFlete = %s)) """
             cursor.execute(sql, [nAsignacion]) 
             results = cursor.fetchone()
             if results:
