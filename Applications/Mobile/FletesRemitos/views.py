@@ -1842,7 +1842,7 @@ def Buscar_Pedidos_Flete(request):
                                 Variedad AS VR ON VR.IdVariedad = PF.IdVariedad LEFT JOIN
                                 Transportista AS TR ON TR.IdTransportista = PF.IdTransportista LEFT JOIN
                                 Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
-                                Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer)
+                                Chofer AS CF ON CONCAT(RTRIM(CF.Apellidos), ' ', RTRIM(CF.Nombres)) = RTRIM(PF.Chofer) AND PF.IdTransportista = CF.IdTransportista
                         WHERE PF.UserID = @@User
                                 AND ((CONVERT(DATE, PF.FechaPedido) = @@Fecha) OR (@@Fecha = '1900-01-01'))
                                 AND PF.Estado NOT IN ('C','B')
