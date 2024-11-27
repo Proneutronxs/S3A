@@ -251,9 +251,9 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                                             COALESCE(ZN.IdZona,'0') AS ID_ZONA, COALESCE(RTRIM(ZN.Nombre),'-') AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE '-' END AS VACIOS, 
                                             ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
                                             ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE '-' END AS CUELLOS,
-                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, UBIO.Descripcion AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
-                                            CASE WHEN PD.TipoCarga = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN PD.TipoCarga = 'VAC' THEN 'BIN VACÍOS' WHEN PD.TipoCarga = 'EMB' THEN 'EMBALADO'
-                                            WHEN PD.TipoCarga = 'VAR' THEN 'VARIOS' WHEN PD.TipoCarga = 'MAT' THEN 'MATERIALES' WHEN PD.TipoCarga = 'FBI' THEN 'FRUTA EN BINS' ELSE PD.TipoCarga END AS TIPO_CARGA,
+                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, RTRIM(UBIO.Descripcion) AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
+                                            CASE WHEN RTRIM(PD.TipoCarga) = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN RTRIM(PD.TipoCarga) = 'VAC' THEN 'BIN VACÍOS' WHEN RTRIM(PD.TipoCarga) = 'EMB' THEN 'EMBALADO'
+                                            WHEN RTRIM(PD.TipoCarga) = 'VAR' THEN 'VARIOS' WHEN RTRIM(PD.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PD.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' ELSE RTRIM(PD.TipoCarga) END AS TIPO_CARGA,
                                             PD.TipoDestino AS TIPO_DESTINO
                                 FROM            Chofer_Alta AS CA LEFT JOIN
                                                         Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA LEFT JOIN
