@@ -700,7 +700,7 @@ def servicio_finalizacion(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            UPDATE Chofer_Viajes_Notificacion SET Finaliza = GETDATE(), AND Estado = 'F' WHERE ID_CVN = %s
+                            UPDATE Chofer_Viajes_Notificacion SET Finaliza = GETDATE(), Estado = 'F' WHERE ID_CVN = %s
                         """
                     cursor.execute(sql,values)
                     sql2 = """ 
