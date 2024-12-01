@@ -48,4 +48,18 @@ urlpatterns = [
     path('horas-extras/ver/exportar-excel', views.creaExcelHorasMostradas, name='exporta_excel_horas_logistica'),
 
 
+    ############### PEDIDOS DE FLETE ################
+
+
+    path('pedidos-flete/', views.pedidos_flete, name='pedidos_flete'),
+
+    path('pedidos-flete/asignacion/', views.asignacion_pedidos_flete, name='asignacion_pedidos_flete'),
+
+    path('pedidos-flete/asignacion/listar-pendientes/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete'),
+
+    path('pedidos-flete/asignacion/listar-asignados/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete'),
+
+    path('pedidos-flete/baja-pedidos/', views.baja_pedidos_flete, name='baja_pedidos_flete'),
+
+
 ]

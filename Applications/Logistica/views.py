@@ -35,6 +35,18 @@ def verHorasExtras(request):
     return render (request, 'Logistica/HorasExtras/verHorasExtrasLogistica.html')
 
 @login_required
+def pedidos_flete(request):
+    return render (request, 'Logistica/PedidosFlete/pedidosFlete.html')
+
+@login_required
+def asignacion_pedidos_flete(request):
+    return render (request, 'Logistica/PedidosFlete/verPedidos.html')
+
+@login_required
+def baja_pedidos_flete(request):
+    return render (request, 'Logistica/PedidosFlete/bajaPedidos.html')
+
+@login_required
 @csrf_exempt
 def cargaCentrosEmpaque(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':
@@ -495,3 +507,97 @@ def restauraHoraL(request):
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
+    
+@login_required
+@csrf_exempt
+def mostrar_pedidos_flete(request): ### MUESTRA LA TABLA DE HORAS
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            Tipo = request.POST.get('Tipo')
+            Estado = request.POST.get('Estado')
+            values = [Tipo,Estado]
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql =   """ 
+                            DECLARE @@Tipo VARCHAR(5);
+                            DECLARE @@Estado VARCHAR(2);
+                            SET @@Tipo = %s;
+                            SET @@Estado = %s;
+
+                            SELECT PF.IdPedidoFlete AS ID_PF, CASE WHEN PF.TipoDestino = 'P' THEN 'PLANTA' WHEN PF.TipoDestino = 'U' THEN 'CAMBIO DOM.' END AS TIPO, CONVERT(VARCHAR(20),RTRIM(PF.Solicitante)) AS SOLICITA,  
+                                    CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
+                                    WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
+                                    CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), 
+                                    PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN RTRIM(CH.Nombre) IS NULL THEN '0' ELSE RTRIM(CH.Nombre) END AS DESTINO,
+                                    CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '0' ELSE RTRIM(VR.Nombre) END AS VARIEDAD,
+                                    CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIm(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' END AS CUELLOS,
+                                    CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
+                                    COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
+		                            COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN
+                            FROM PedidoFlete AS PF LEFT JOIN
+                                    Zona AS ZN ON ZN.IdZona = PF.IdZona LEFT JOIN
+                                    Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                    Especie AS ES ON ES.IdEspecie = PF.IdEspecie LEFT JOIN 
+                                    Variedad AS VR ON VR.IdVariedad = PF.IdVariedad LEFT JOIN
+                                    Transportista AS TR ON TR.IdTransportista = PF.IdTransportista LEFT JOIN
+                                    Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
+                                    Acoplado AS AC ON AC.IdAcoplado = PF.IdAcoplado LEFT JOIN
+                                    Chofer AS CF ON CF.IdChofer = PF.IdChofer LEFT JOIN
+                                    Ubicacion AS UB1 ON UB1.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
+                                    Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta
+                            WHERE PF.Estado = @@Estado
+                                    AND (@@Tipo = '0' OR @@Tipo = PF.TipoDestino)
+                            """
+                    cursor.execute(sql, values)
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        data = []
+                        for i in consulta:
+                            ID_PF = str(i[0])
+                            TIPO = str(i[1])
+                            SOLICITA = str(i[2])
+                            TIPO_DESTINO = str(i[3])
+                            FECHA_PEDIDO = str(i[4])
+                            HORA_PEDIDO = str(i[5])
+                            FECHA_REQUERIDO = str(i[6])
+                            HORA_REQUERIDO = str(i[7])
+                            ZONA = str(i[8])
+                            DESTINO = str(i[9])
+                            BINS = str(i[10])
+                            ESPECIE = str(i[11])
+                            VARIEDAD = str(i[12])
+                            VACIOS = str(i[13]) + ' - ' + str(i[14])
+                            CUELLOS = str(i[15])
+                            OBSERVACIONES = str(i[16])
+                            ID_TRANSPORTISTA = str(i[17])
+                            NOMBRE_TRANSPORTISTA = str(i[18])
+                            ID_CAMION = str(i[19])
+                            NOMBRE_CAMION = str(i[20])
+                            ID_ACOPLADO = str(i[21])
+                            NOMBRE_ACOPLADO = str(i[22])
+                            ID_CHOFER = str(i[23])
+                            NOMBRE_CHOFER = str(i[24])
+                            DESTINO2 = str(i[25])
+                            ORIGEN = str(i[26])
+                            datos = {'ID':ID_PF,'Tipo':TIPO, 'Solicita':SOLICITA, 'TipoDestino':TIPO_DESTINO, 'FechaPedido':FECHA_PEDIDO, 'HoraPedido':HORA_PEDIDO, 'FechaRequerido':FECHA_REQUERIDO, 'HoraRequerido':HORA_REQUERIDO, 
+                                     'Zona':ZONA , 'Destino': DESTINO, 'Bins': BINS, 'Especie':ESPECIE, 'Variedad':VARIEDAD, 'Vacios':VACIOS, 'Cuellos':CUELLOS, 'Obs':OBSERVACIONES, 'IdTransportista':ID_TRANSPORTISTA,
+                                     'Transportista':NOMBRE_TRANSPORTISTA, 'IdCamion':ID_CAMION, 'Camion':NOMBRE_CAMION, 'IdAcoplado':ID_ACOPLADO, 'Acoplado':NOMBRE_ACOPLADO, 'IdChofer':ID_CHOFER, 'Chofer':NOMBRE_CHOFER,
+                                     'Origen':ORIGEN, 'Destino2':DESTINO2}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No existen Pedidos de Flete pendientes de Asignación."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['S3A'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})

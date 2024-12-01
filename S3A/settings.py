@@ -148,7 +148,7 @@ DATABASES = {
 
 
 # ###### LOCAL S3A
-# ip = '192.168.0.116'
+# ip = '192.168.0.126'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
