@@ -1,12 +1,14 @@
-
+let map;
 const refresh = document.getElementById("pfa-refresh");
 const cambiosDomicilio = document.getElementById("pfa-cambio-domicilio");
 const pedidosChacra = document.getElementById("pfa-pedido-chacra");
 const asignacionMultiple = document.getElementById("pfa-multiple");
 
+
 window.addEventListener("load", async () => {
     busca_pendientes();
     busca_asignados();
+    listar_choferes();
 });
 
 
@@ -23,6 +25,10 @@ pedidosChacra.addEventListener('change', function () {
 document.getElementById('pfa-refresh').addEventListener('click', function () {
     busca_pendientes();
     busca_asignados();
+});
+
+document.getElementById('pfa-refresh-choferes').addEventListener('click', function () {
+    listar_choferes();
 });
 
 let dataTablePendientes, dataTableAsignados, dataTableRechazados;
@@ -93,7 +99,7 @@ const busca_pendientes = async () => {
                                         name="idCheck" value="${datos.ID}"></td>
                                 <td class="pfa-tabla-celda">${datos.ID}</td>
                                 <td class="pfa-tabla-celda">${datos.Tipo}</td>
-                                <td class="pfa-tabla-celda">${datos.Origen === '0' ? 'PLANTA': datos.Origen}</td>
+                                <td class="pfa-tabla-celda">${datos.Origen === '0' ? 'PLANTA' : datos.Origen}</td>
                                 <td class="pfa-tabla-celda">${datos.Solicita}</td>
                                 <td class="pfa-tabla-celda">${datos.TipoDestino}</td>
                                 <td class="pfa-tabla-celda">${datos.FechaPedido}</td>
@@ -128,12 +134,12 @@ const busca_pendientes = async () => {
                 "searching": true,
                 "autoWidth": true,
                 "language": {
-                    "search": "Buscar: ", 
+                    "search": "Buscar: ",
                     "searchPlaceholder": "Escriba para buscar..."
                 },
                 "columnDefs": [
                     {
-                        "targets": [10, 11, 12, 13, 14], 
+                        "targets": [10, 11, 12, 13, 14],
                         "width": "3%",
                         "className": "dt-center"
                     }
@@ -208,12 +214,12 @@ const busca_asignados = async () => {
                 "searching": true,
                 "autoWidth": true,
                 "language": {
-                    "search": "Buscar: ", 
+                    "search": "Buscar: ",
                     "searchPlaceholder": "Escriba para buscar..."
                 },
                 "columnDefs": [
                     {
-                        "targets": [9, 10], 
+                        "targets": [9, 10],
                         "width": "3%",
                         "className": "dt-center"
                     }
@@ -233,18 +239,100 @@ const busca_asignados = async () => {
     }
 };
 
+const listar_choferes = async () => {
+    openProgressBar();
+    try {
+        const response = await fetch("listar-choferes/");
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message === "Success") {
+            let datos_he = ``;
+            data.Datos.forEach((datos) => {
+                console.log(datos.IdCA);
+                datos_he += `
+                            <div class="pfs-card">
+                                <div class="pfs-card-header">
+                                    <div class="pfs-card-icon">
+                                        <i class="material-symbols-outlined">person</i>
+                                    </div>
+                                    <div class="pfs-card-info">
+                                        <h3 class="pfs-card-title">${datos.Chofer}</h3>
+                                        <p class="pfs-card-details">${datos.Transporte} - ${datos.Camion}</p>
+                                    </div>
+                                </div>
+                                <div class="pfs-card-actions">
+                                    <button class="pfs-card-button">
+                                        <i class="material-symbols-outlined pfa-btn-submit">description</i>
+                                    </button>
+                                    <button class="pfs-card-button" onclick="mapeo_ultima_ubicacion(${datos.IdCA})";>
+                                        <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
+                                    </button>
+                                </div>
+                            </div>
+                            `
+            });
+            document.getElementById('pfa-contenedor-choferes').innerHTML = datos_he;
+        } else {
+            document.getElementById('pfa-contenedor-choferes').innerHTML = ``;
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+}
+
+const mapeo_ultima_ubicacion = async (ID_CA) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("Chofer", ID_CA);
+
+        const options = {
+            method: 'POST',
+            headers: {},
+            body: formData
+        };
+
+        const response = await fetch("mapeo-ultima-ubicacion/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            abrirUltimaUbicacion();
+            const lat = parseFloat(data.Datos.Latitud);
+            const lng = parseFloat(data.Datos.Longitud);
+            const mapContainer = document.getElementById('pfa_mapeo_actual');
+            if (map) {
+                map.remove();
+            }
+            map = L.map(mapContainer).setView([lat, lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(`<strong>${data.Datos.Chofer}</strong><br>${data.Datos.Hace}`)
+                .openPopup();
+        } else {
+            var nota = data.Nota;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
 
 
 
 
-
-
-
-
-
-
-
-
+function abrirUltimaUbicacion() {
+    document.getElementById('pfa-lu-popup').style.display = 'flex';
+}
+document.getElementById('pfa-lu-popup-cerrar').addEventListener('click', function () {
+    document.getElementById('pfa-lu-popup').style.display = 'none';
+});
 
 
 

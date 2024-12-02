@@ -2058,6 +2058,7 @@ input[type="checkbox"].input-checkbox {
   flex-direction: column;
   gap: 16px;
   font-family: Arial, sans-serif;
+  margin-right: 4px;
 }
 
 .pfs-card-header {
@@ -2117,4 +2118,57 @@ input[type="checkbox"].input-checkbox {
 
 .pfs-card-button i {
   font-size: 18px;
+}
+
+.pfa-lu-popup {
+  position: fixed;
+  top: 0;
+  left: 85;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.pfa-lu-popup-contenido {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  height: 80%;
+  overflow-y: auto;
+}
+
+.pfa-lu-popup-cerrar {
+  position: absolute;
+  top: 10px;
+  right: 150px;
+  color: #020202;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.pfa-lu-popup-texto {
+  font-size: 18px;
+  color: #333;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.pfa-lu-popup-texto {
+  font-size: 18px;
+  color: #333;
+  padding: 20px;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
 }

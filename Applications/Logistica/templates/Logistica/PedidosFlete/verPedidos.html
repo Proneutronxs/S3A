@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 <div class="encabezado" style="background-color: #a72626">
     <div class="text" style="font-size: 20px;">LOGÍSTICA - PEDIDOS DE FLETE - ASIGNACIÓN</div>
 </div>
@@ -124,332 +126,19 @@
                     <i class='bx material-symbols-outlined pfa-btn-submit'>refresh</i>
                 </button>
             </div>
-            <div class="pfa-contenedor-cards">
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
-                <div class="pfs-card">
-                    <div class="pfs-card-header">
-                        <div class="pfs-card-icon">
-                            <i class="material-symbols-outlined">person</i>
-                        </div>
-                        <div class="pfs-card-info">
-                            <h3 class="pfs-card-title">Nombre del Usuario</h3>
-                            <p class="pfs-card-details">Detalles adicionales del usuario o descripción breve.</p>
-                        </div>
-                    </div>
-                    <div class="pfs-card-actions">
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                        </button>
-                        <button class="pfs-card-button">
-                            <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
-                        </button>
-                    </div>
-                </div>
+            <div class="pfa-contenedor-cards" id="pfa-contenedor-choferes">
 
             </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="pfa-lu-popup" id="pfa-lu-popup">
+    <div class="pfa-lu-popup-contenido">
+        <button class="pfa-lu-popup-cerrar btn-submit" id="pfa-lu-popup-cerrar">Cerrar</button>
+        <div class="pfa-lu-popup-texto" id="pfa_mapeo_actual" style="width: 100%; height: 400px;">
+            <!-- Aquí se renderizará el mapa -->
         </div>
     </div>
 </div>
@@ -479,6 +168,7 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery-3.5.1.js' %}"></script>
 <script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery.dataTables.min.js' %}"></script>
 <script src="{%static 'TresAses/js/Logistica/PedidosFlete/asignacionPedidos.js' %}"></script>

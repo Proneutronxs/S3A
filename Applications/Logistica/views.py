@@ -510,7 +510,7 @@ def restauraHoraL(request):
     
 @login_required
 @csrf_exempt
-def mostrar_pedidos_flete(request): ### MUESTRA LA TABLA DE HORAS
+def mostrar_pedidos_flete(request):
     if request.method == 'POST':
         user_has_permission = request.user.has_perm('Logistica.puede_ver')
         if user_has_permission:
@@ -601,3 +601,96 @@ def mostrar_pedidos_flete(request): ### MUESTRA LA TABLA DE HORAS
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
+@csrf_exempt
+def mostrar_choferes(request):
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        usuario = str(request.user)
+        if user_has_permission:
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            SELECT CA.ID_CA AS ID, CA.NombreChofer AS CHOFER, CA.NombreTransporte AS TRANSPORTE,
+                                    CA.NombreCamion AS CAMION, CVN.ID_CVN AS ID_VIAJE
+                            FROM Chofer_Alta AS CA LEFT JOIN
+                                    Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA
+                            WHERE CA.Estado = 'A' AND CVN.Estado = 'V'
+                        """
+                    cursor.execute(sql)
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            ID_CA = str(row[0])
+                            CHOFER = str(row[1])
+                            TRASNPORTE = str(row[2])
+                            CAMION = str(row[3])
+                            ID_VIAJE = str(row[4])
+                            datos = {'IdCA':ID_CA, 'Chofer':CHOFER, 'Transporte':TRASNPORTE, 'Camion':CAMION, 'IdViaje':ID_VIAJE}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No existen Choferes en viaje."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                data = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR CHOFERES",usuario,data)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})   
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
+@csrf_exempt
+def mapeo_Ultima_Ubicacion(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            IdChofer = request.POST.get('Chofer')
+            usuario = str(request.user)
+            values = [IdChofer]
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            SELECT TOP 1 CDVC.ID_CDVC, CDVC.Latitud AS LATITUD, CDVC.Longitud AS LONGITUD, CA.NombreChofer AS CHOFER, 
+                            CASE 
+                                WHEN DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE()) = 0 THEN 
+                                    'Hace: ' + CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                                ELSE 
+                                    'Hace: ' + CONVERT(VARCHAR, DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE())) + ' Horas y ' + 
+                                    CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                            END AS HACE
+                            FROM Chofer_Alta AS CA LEFT JOIN
+                                Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN 
+                                Chofer_Detalle_Viajes_Coordenadas AS CDVC ON CDVC.ID_CVN = CVN.ID_CVN
+                            WHERE CA.ID_CA = %s AND CVN.Estado = 'V'
+                            ORDER BY CDVC.ID_CDVC DESC  
+                        """
+                    cursor.execute(sql, values)
+                    results = cursor.fetchone()
+                    if results:
+                        ID_CDVC = str(results[0])
+                        LATITUD = str(results[1])
+                        LONGITUD = str(results[2])
+                        CHOFER = str(results[3])
+                        HACE = str(results[4])
+                        datos = {'IdCdvc':ID_CDVC,'Latitud':LATITUD,'Longitud':LONGITUD,'Chofer':CHOFER,'Hace':HACE}
+                        return JsonResponse({'Message': 'Success', 'Datos': datos})
+                    else:
+                        data = "No existen Coordenadas del viaje."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                data = str(e)
+                print("ERROR: " + data)
+                insertar_registro_error_sql("LOGISTICA","CREAR UBICACION",usuario,data)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})   
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
