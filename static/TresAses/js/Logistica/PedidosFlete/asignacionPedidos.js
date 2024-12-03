@@ -251,9 +251,6 @@ const listar_choferes = async () => {
                 datos_he += `
                             <div class="pfs-card">
                                 <div class="pfs-card-header">
-                                    <div class="pfs-card-icon">
-                                        <i class="material-symbols-outlined">person</i>
-                                    </div>
                                     <div class="pfs-card-info">
                                         <h3 class="pfs-card-title">${datos.Chofer}</h3>
                                         <p class="pfs-card-details">${datos.Transporte} - ${datos.Camion}</p>
@@ -282,6 +279,9 @@ const listar_choferes = async () => {
     }
 }
 
+// {/* <div class="pfs-card-icon">
+// <i class="material-symbols-outlined">person</i>
+// </div> */}
 const mapeo_ultima_ubicacion = async (ID_CA) => {
     openProgressBar();
     try {
