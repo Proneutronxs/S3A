@@ -366,6 +366,12 @@ const detalles_pedidos = async (IdPedidoFlete) => {
                                 <div class="info-item">
                                     <strong>HORA REQUERIDO:</strong> ${datos.HoraRequerido}
                                 </div>
+                                <div class="info-item">
+                                    <strong>TRANSPORTE:</strong> ${datos.Transportista}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CHOFER:</strong> ${datos.Chofer}
+                                </div>
                             </div>
                             <div class="popup-column">
                                 <div class="info-item">
@@ -388,6 +394,12 @@ const detalles_pedidos = async (IdPedidoFlete) => {
                                 </div>
                                 <div class="info-item">
                                     <strong>CUELLO:</strong> ${datos.Cuellos}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CAMION:</strong> ${datos.Camion}
+                                </div>
+                                <div class="info-item">
+                                    <strong>ACOPLADO:</strong> ${datos.Acoplado}
                                 </div>
                             </div>
                         </div>

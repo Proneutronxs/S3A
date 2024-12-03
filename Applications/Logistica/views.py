@@ -783,7 +783,6 @@ def mostrar_detalles_pedido_flete(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
-
 @login_required
 @csrf_exempt
 def detalles_de_viajes_activos(request):
