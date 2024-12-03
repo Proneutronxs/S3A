@@ -693,4 +693,182 @@ def mapeo_Ultima_Ubicacion(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+
+@login_required
+@csrf_exempt
+def mostrar_detalles_pedido_flete(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            IdPedidoFlete = request.POST.get('IdPedidoFlete')
+            values = [IdPedidoFlete]
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql =   """ 
+                            DECLARE @@IdPedidoFlete INT;
+                            SET @@IdPedidoFlete = %s;
+
+                            SELECT PF.IdPedidoFlete AS ID_PF, CASE WHEN PF.TipoDestino = 'P' THEN 'PLANTA' WHEN PF.TipoDestino = 'U' THEN 'CAMBIO DOM.' END AS TIPO, CONVERT(VARCHAR(20), RTRIM(PF.Solicitante)) AS SOLICITA,  
+                                    CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
+                                    WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
+                                    CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), 
+                                    PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN PF.TipoDestino = 'U' THEN COALESCE(RTRIM(UB1.Descripcion),'0') ELSE RTRIM(CH.Nombre) END AS DESTINO,
+                                    CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '-' ELSE RTRIM(VR.Nombre) END AS VARIEDAD,
+                                    CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIm(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' END AS CUELLOS,
+                                    CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
+                                    COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
+                                    COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN
+                            FROM PedidoFlete AS PF LEFT JOIN
+                                    Zona AS ZN ON ZN.IdZona = PF.IdZona LEFT JOIN
+                                    Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                    Especie AS ES ON ES.IdEspecie = PF.IdEspecie LEFT JOIN 
+                                    Variedad AS VR ON VR.IdVariedad = PF.IdVariedad LEFT JOIN
+                                    Transportista AS TR ON TR.IdTransportista = PF.IdTransportista LEFT JOIN
+                                    Camion AS CM ON CM.IdCamion = PF.IdCamion LEFT JOIN
+                                    Acoplado AS AC ON AC.IdAcoplado = PF.IdAcoplado LEFT JOIN
+                                    Chofer AS CF ON CF.IdChofer = PF.IdChofer LEFT JOIN
+                                    Ubicacion AS UB1 ON UB1.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
+                                    Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta
+                            WHERE PF.IdPedidoFlete = @@IdPedidoFlete
+                            """
+                    cursor.execute(sql, values)
+                    consulta = cursor.fetchone()
+                    if consulta:
+                        data = []
+                        ID_PF = str(consulta[0])
+                        TIPO = str(consulta[1])
+                        SOLICITA = str(consulta[2])
+                        TIPO_DESTINO = str(consulta[3])
+                        FECHA_PEDIDO = str(consulta[4])
+                        HORA_PEDIDO = str(consulta[5])
+                        FECHA_REQUERIDO = str(consulta[6])
+                        HORA_REQUERIDO = str(consulta[7])
+                        ZONA = str(consulta[8])
+                        DESTINO = str(consulta[9])
+                        BINS = str(consulta[10])
+                        ESPECIE = str(consulta[11])
+                        VARIEDAD = str(consulta[12])
+                        VACIOS = str(consulta[13]) + ' - ' + str(consulta[14])
+                        CUELLOS = str(consulta[15])
+                        OBSERVACIONES = str(consulta[16])
+                        ID_TRANSPORTISTA = str(consulta[17])
+                        NOMBRE_TRANSPORTISTA = str(consulta[18])
+                        ID_CAMION = str(consulta[19])
+                        NOMBRE_CAMION = str(consulta[20])
+                        ID_ACOPLADO = str(consulta[21])
+                        NOMBRE_ACOPLADO = str(consulta[22])
+                        ID_CHOFER = str(consulta[23])
+                        NOMBRE_CHOFER = str(consulta[24])
+                        DESTINO2 = str(consulta[25])
+                        ORIGEN = str(consulta[26])
+                        datos = {'ID':ID_PF,'Tipo':TIPO, 'Solicita':SOLICITA, 'TipoDestino':TIPO_DESTINO, 'FechaPedido':FECHA_PEDIDO, 'HoraPedido':HORA_PEDIDO, 'FechaRequerido':FECHA_REQUERIDO, 'HoraRequerido':HORA_REQUERIDO, 
+                                    'Zona':ZONA , 'Destino': DESTINO, 'Bins': BINS, 'Especie':ESPECIE, 'Variedad':VARIEDAD, 'Vacios':VACIOS, 'Cuellos':CUELLOS, 'Obs':OBSERVACIONES, 'IdTransportista':ID_TRANSPORTISTA,
+                                    'Transportista':NOMBRE_TRANSPORTISTA, 'IdCamion':ID_CAMION, 'Camion':NOMBRE_CAMION, 'IdAcoplado':ID_ACOPLADO, 'Acoplado':NOMBRE_ACOPLADO, 'IdChofer':ID_CHOFER, 'Chofer':NOMBRE_CHOFER,
+                                    'Origen':ORIGEN, 'Destino2':DESTINO2}
+                        data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No existen Pedidos de Flete pendientes de Asignación."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['S3A'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
     
+
+@login_required
+@csrf_exempt
+def detalles_de_viajes_activos(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            ID_CA = request.POST.get('ID_CA')
+            values = [ID_CA]
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql =   """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+                            SELECT CDCV.IdPedidoFlete AS ID_PEDIDO, RTRIM(UB.Descripcion) AS ORIGEN, CASE WHEN PF.TipoDestino = 'U' THEN RTRIM(UB2.Descripcion) ELSE RTRIM(CH.Nombre) END AS DESTINO,
+                                CASE WHEN CDCV.LlegaChacra IS NULL THEN '--/-- --:--' ELSE (CONVERT(VARCHAR(5), CDCV.LlegaChacra, 103) + ' ' + CONVERT(VARCHAR(5), CDCV.LlegaChacra, 108) + ' Hs.') END AS HORA_LLEGADA,
+                                COALESCE(CUV.Nombre,'-') AS LUGAR_VACIOS, CASE WHEN CVN.LlegaVacios IS NULL THEN '--/-- --:--' ELSE (CONVERT(VARCHAR(5), CVN.LlegaVacios, 103) + ' ' + CONVERT(VARCHAR(5), CVN.LlegaVacios, 108) + ' Hs.') END AS LLEGA_VACIOS
+                            FROM Chofer_Alta AS CA LEFT JOIN
+                                Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN
+                                Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN LEFT JOIN
+                                Chofer_Ubicacion_Vacios AS CUV ON CUV.ID_CUV = CVN.ID_CUV LEFT JOIN
+                                S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
+                                S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlantaDestino
+                            WHERE CA.ID_CA = @@ID_CA AND CVN.Estado = 'V' AND CDCV.Estado = 'V'
+                            """
+                    cursor.execute(sql, values)
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            ID_PF = str(row[0])
+                            ORIGEN = str(row[1])
+                            DESTINO = str(row[2])
+                            HORA_LLEGADA = str(row[3])
+                            VACIOS_LUGAR = str(row[4])
+                            HORA_VACIOS = str(row[5])
+                            datos = {'IdPF':ID_PF,'Origen':ORIGEN,'Destino':DESTINO,'HoraLlegada':HORA_LLEGADA}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'LugarVacios': VACIOS_LUGAR, 'HoraVacios': HORA_VACIOS, 'Datos': data})
+                    else:
+                        data = "No existen Destinos para ese Chofer."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

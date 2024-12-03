@@ -3,6 +3,7 @@ const refresh = document.getElementById("pfa-refresh");
 const cambiosDomicilio = document.getElementById("pfa-cambio-domicilio");
 const pedidosChacra = document.getElementById("pfa-pedido-chacra");
 const asignacionMultiple = document.getElementById("pfa-multiple");
+const popup = document.getElementById('pop_up_detalles');
 
 
 window.addEventListener("load", async () => {
@@ -72,7 +73,6 @@ $(document).ready(function () {
     });
 });
 
-
 const busca_pendientes = async () => {
     openProgressBar();
     try {
@@ -116,7 +116,7 @@ const busca_pendientes = async () => {
                                     </button>
                                 </td>
                                 <td class="pfa-tabla-celda">
-                                    <button class="boton-detalles" onclick="">
+                                    <button class="boton-detalles" onclick="detalles_pedidos(${datos.ID});">
                                         <i class='bx material-symbols-outlined icon'>description</i>
                                     </button>
                                 </td>
@@ -196,7 +196,7 @@ const busca_asignados = async () => {
                                     </button>
                                 </td>
                                 <td class="pfa-tabla-celda">
-                                    <button class="boton-detalles" onclick="">
+                                    <button class="boton-detalles" onclick="detalles_pedidos(${datos.ID});">
                                         <i class='bx material-symbols-outlined icon'>description</i>
                                     </button>
                                 </td>
@@ -248,7 +248,6 @@ const listar_choferes = async () => {
         if (data.Message === "Success") {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
-                console.log(datos.IdCA);
                 datos_he += `
                             <div class="pfs-card">
                                 <div class="pfs-card-header">
@@ -261,10 +260,10 @@ const listar_choferes = async () => {
                                     </div>
                                 </div>
                                 <div class="pfs-card-actions">
-                                    <button class="pfs-card-button">
+                                    <button class="pfs-card-button" onclick="detalle_destinos(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">description</i>
                                     </button>
-                                    <button class="pfs-card-button" onclick="mapeo_ultima_ubicacion(${datos.IdCA})";>
+                                    <button class="pfs-card-button" onclick="mapeo_ultima_ubicacion(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
                                     </button>
                                 </div>
@@ -324,8 +323,162 @@ const mapeo_ultima_ubicacion = async (ID_CA) => {
     }
 };
 
+const detalles_pedidos = async (IdPedidoFlete) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("IdPedidoFlete", IdPedidoFlete);
 
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
 
+        const response = await fetch("mostrar-detalles/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            let datos_he = ``;
+            data.Datos.forEach((datos) => {
+                datos_he += `
+                        <div class="popup-columns">
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>ID PEDIDO:</strong> ${datos.ID}
+                                </div>
+                                <div class="info-item">
+                                    <strong>SOLICITA:</strong> ${datos.Solicita}
+                                </div>
+                                <div class="info-item">
+                                    <strong>ORIGEN:</strong> ${datos.Origen}
+                                </div>
+                                <div class="info-item">
+                                    <strong>DESTINO:</strong> ${datos.Destino}
+                                </div>
+                                <div class="info-item">
+                                    <strong>FECHA:</strong> ${datos.FechaPedido}
+                                </div>
+                                <div class="info-item">
+                                    <strong>HORA:</strong> ${datos.HoraPedido}
+                                </div>
+                                <div class="info-item">
+                                    <strong>HORA REQUERIDO:</strong> ${datos.HoraRequerido}
+                                </div>
+                            </div>
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>TIPO:</strong> ${datos.Tipo}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CARGA:</strong> ${datos.TipoDestino}
+                                </div>
+                                <div class="info-item">
+                                    <strong>ESPECIE:</strong> ${datos.Especie}
+                                </div>
+                                <div class="info-item">
+                                    <strong>VARIEDAD:</strong> ${datos.Variedad}
+                                </div>
+                                <div class="info-item">
+                                    <strong>BINS:</strong> ${datos.Bins}
+                                </div>
+                                <div class="info-item">
+                                    <strong>VACÍOS:</strong> ${datos.Vacios}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CUELLO:</strong> ${datos.Cuellos}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="popup-observaciones">
+                            <h3>Observaciones</h3>
+                            <textarea rows="4" placeholder="Sin Observaciones ..." disabled>
+                                    ${datos.Obs}
+                            </textarea>
+                        </div>
+                        `
+            });
+            document.getElementById('pfa-titulo-popup').innerHTML = `<h2>DETALLE PEDIDO FLETE</h2>`;
+            document.getElementById('content-detalles-pedidos').innerHTML = datos_he;
+            masDetalles();
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const detalle_destinos = async (ID_CA) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("ID_CA", ID_CA);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("viaje-detalles/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            let datos_he = `
+              <div style="text-align: center;">
+                <Strong>RETIRA VACÍOS EN ${data.LugarVacios}: </Strong> ${data.HoraVacios}
+              </div>
+              <table class="pfa-detalle-destinos-tabla">
+                <thead>
+                  <tr>
+                    <th>ID PEDIDO</th>
+                    <th>ORIGEN</th>
+                    <th>DESTINO</th>
+                    <th>HORA LLEGADA</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+
+            data.Datos.forEach((datos) => {
+                datos_he += `
+                <tr>
+                  <td>${datos.IdPF}</td>
+                  <td>${datos.Origen}</td>
+                  <td>${datos.Destino}</td>
+                  <td>${datos.HoraLlegada}</td>
+                </tr>
+              `;
+            });
+
+            datos_he += `
+                </tbody>
+              </table>
+            `;
+
+            document.getElementById('pfa-titulo-popup').innerHTML = `<h2>DETALLES DEL VIAJE</h2>`;
+            document.getElementById('content-detalles-pedidos').innerHTML = datos_he;
+            masDetalles();
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
 
 function abrirUltimaUbicacion() {
     document.getElementById('pfa-lu-popup').style.display = 'flex';
@@ -334,7 +487,13 @@ document.getElementById('pfa-lu-popup-cerrar').addEventListener('click', functio
     document.getElementById('pfa-lu-popup').style.display = 'none';
 });
 
+function masDetalles() {
+    popup.style.display = 'flex';
+}
 
+closePopupBtn.addEventListener('click', () => {
+    popup.style.display = 'none';
+});
 
 const modalOverlay = document.querySelector('.modal-overlay');
 function openProgressBar() {

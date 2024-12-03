@@ -55,9 +55,13 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/', views.asignacion_pedidos_flete, name='asignacion_pedidos_flete'),
 
-    path('pedidos-flete/asignacion/listar-pendientes/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete'),
+    path('pedidos-flete/asignacion/listar-pendientes/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete_pendientes'),
 
-    path('pedidos-flete/asignacion/listar-asignados/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete'),
+    path('pedidos-flete/asignacion/listar-asignados/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete_asignados'),
+
+    path('pedidos-flete/asignacion/mostrar-detalles/', views.mostrar_detalles_pedido_flete, name='mostrar_detalles_pedido_flete'),
+
+    path('pedidos-flete/asignacion/viaje-detalles/', views.detalles_de_viajes_activos, name='detalles_de_viajes_activos'),
 
     path('pedidos-flete/asignacion/listar-choferes/', views.mostrar_choferes, name='mostrar_choferes'),
 
