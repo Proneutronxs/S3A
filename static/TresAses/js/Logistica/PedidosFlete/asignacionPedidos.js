@@ -1,9 +1,20 @@
 let map;
+let IdTransporte;
+let IdCamion;
+let IdAcoplado;
+let dataCamiones = [];
+let dataAcoplados = [];
 const refresh = document.getElementById("pfa-refresh");
 const cambiosDomicilio = document.getElementById("pfa-cambio-domicilio");
 const pedidosChacra = document.getElementById("pfa-pedido-chacra");
 const asignacionMultiple = document.getElementById("pfa-multiple");
 const popup = document.getElementById('pop_up_detalles');
+const cancelAsig = document.getElementById('btn-cancel-asig');
+const openAsig = document.getElementById('popup-container-pfa-asig');
+const modalOverlay = document.querySelector('.modal-overlay');
+const inputVacios = document.getElementById('input-cantidad-vacios');
+
+let dataTablePendientes, dataTableAsignados, dataTableRechazados;
 
 
 window.addEventListener("load", async () => {
@@ -11,7 +22,6 @@ window.addEventListener("load", async () => {
     busca_asignados();
     listar_choferes();
 });
-
 
 cambiosDomicilio.addEventListener('change', function () {
     busca_pendientes();
@@ -32,10 +42,74 @@ document.getElementById('pfa-refresh-choferes').addEventListener('click', functi
     listar_choferes();
 });
 
-let dataTablePendientes, dataTableAsignados, dataTableRechazados;
+document.getElementById('pfa-multiple').addEventListener('click', function () {
+    multiple_viaje();
+});
+
+selector_choferes.addEventListener("change", (event) => {
+    const parsedCustomProperties = JSON.parse(event.currentTarget.selectedOptions[0].dataset.customProperties);
+    IdTransporte = parsedCustomProperties.IdTransporte;
+    choiceTransportes.setChoiceByValue(IdTransporte);
+    choiceCamiones.disable();
+    choiceTransportes.disable();
+    choiceCamiones.clearChoices(); 
+    choiceCamiones.removeActiveItems();
+    choiceAcoplados.clearChoices(); 
+    choiceAcoplados.removeActiveItems();
+    cargarCamiones(IdTransporte);
+    IdCamion = parsedCustomProperties.IdCamion;
+    choiceCamiones.setChoiceByValue(IdCamion);
+    cargarAcoplados(IdTransporte);
+    IdAcoplado = parsedCustomProperties.IdAcoplado;
+    choiceAcoplados.setChoiceByValue(IdAcoplado);
+});
+
+selector_camiones.addEventListener("change", (event) => {
+    choiceTransportes.setChoiceByValue(IdTransporte);
+    cargarCamiones(IdTransporte);
+});
+
+const choiceVacios = new Choices('#selector_vacios', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE UBICACIÓN VACÍOS',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const choiceChoferes = new Choices('#selector_choferes', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE CHOFER',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const choiceTransportes = new Choices('#selector_transportes', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE TRANSPORTE',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const choiceCamiones = new Choices('#selector_camiones', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE CAMIÓN',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const choiceAcoplados = new Choices('#selector_acoplados', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE ACOPLADO',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
 
 $(document).ready(function () {
-    // Inicializa DataTable para cada tabla individualmente
     $('#miTablaPendientes').DataTable({
         "paging": false,
         "info": false,
@@ -279,9 +353,6 @@ const listar_choferes = async () => {
     }
 }
 
-// {/* <div class="pfs-card-icon">
-// <i class="material-symbols-outlined">person</i>
-// </div> */}
 const mapeo_ultima_ubicacion = async (ID_CA) => {
     openProgressBar();
     try {
@@ -303,6 +374,7 @@ const mapeo_ultima_ubicacion = async (ID_CA) => {
             const lng = parseFloat(data.Datos.Longitud);
             const mapContainer = document.getElementById('pfa_mapeo_actual');
             if (map) {
+                map.off();
                 map.remove();
             }
             map = L.map(mapContainer).setView([lat, lng], 13);
@@ -492,9 +564,155 @@ const detalle_destinos = async (ID_CA) => {
     }
 };
 
+const multiple_viaje = async () => {
+    if (verificarCheckbox()) {
+        openProgressBar();
+        try {
+            const checkboxes = document.querySelectorAll('.input-checkbox:checked');
+            const formData = new FormData();
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    formData.append('IdPedidoFlete', checkbox.value);
+                }
+            });
+
+            const options = {
+                method: 'POST',
+                headers: {
+                },
+                body: formData
+            };
+
+            const response = await fetch("verificacion-carga-combox/", options);
+            const data = await response.json();
+            closeProgressBar();
+            if (data.Message == "Success") {
+                limpiar_choices_input();
+                let datos_he = ``;
+                data.Destinos.forEach((datos) => {
+                    datos_he += `   
+                    <tr>
+                        <td>${datos.IdPF}</td>
+                        <td>${datos.Destino}</td>
+                    </tr>
+                    `
+                });
+                document.getElementById('pfa-asig-destinos-tabla').innerHTML = datos_he;
+
+                let result = [];
+                result.push();
+                data.Choferes.forEach((datos) => {
+                    result.push({
+                        value: datos.IdChofer,
+                        label: datos.Chofer,
+                        customProperties: JSON.stringify({ IdTransporte: datos.IdTransporte, IdCamion: datos.IdCamion, IdAcoplado: datos.IdAcoplado })
+                    });
+                });
+                choiceChoferes.setChoices(result, 'value', 'label', true);
+
+                let result1 = [];
+                result1.push();
+                data.Vacios.forEach((datos) => {
+                    result1.push({ value: datos.IdVacios, label: datos.Nombre });
+                });
+                choiceVacios.setChoices(result1, 'value', 'label', true);
+
+                let result2 = [];
+                result2.push();
+                data.Transportes.forEach((datos) => {
+                    result2.push({ value: datos.IdTransporte, label: datos.Transporte });
+                });
+                choiceTransportes.setChoices(result2, 'value', 'label', true);
+
+                dataCamiones.splice(0, dataCamiones.length);
+                dataAcoplados.splice(0, dataAcoplados.length);
+                dataCamiones = data.Camiones;
+                dataAcoplados = data.Acoplados;
+
+                asignar();
+            } else {
+                document.getElementById('pfa-asig-destinos-tabla').innerHTML = ``;
+                var nota = data.Nota
+                var color = "red";
+                mostrarInfo(nota, color);
+            }
+        } catch (error) {
+            closeProgressBar();
+            var nota = "Se produjo un error al procesar la solicitud. " + error;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+
+    } else {
+        mostrarInfo("Debe seleccionar al menos 2 Pedidos de Flete y menos de 5.", "red")
+    }
+
+};
+
+function limpiar_choices_input() {
+    choiceVacios.clearChoices(); 
+    choiceVacios.removeActiveItems();
+    choiceChoferes.clearChoices(); 
+    choiceChoferes.removeActiveItems();
+    choiceTransportes.clearChoices(); 
+    choiceTransportes.removeActiveItems();
+    choiceCamiones.clearChoices(); 
+    choiceCamiones.removeActiveItems();
+    choiceAcoplados.clearChoices(); 
+    choiceAcoplados.removeActiveItems();
+    inputVacios.value = '';
+}
+
+function cargarCamiones(idTransporte) {
+    choiceCamiones.clearChoices();
+    choiceCamiones.removeActiveItems();
+    const camiones = dataCamiones.find((camion) => camion.IdTransporte === idTransporte);
+    if (camiones) {
+        const opciones = camiones.Items.map((item) => ({
+            value: item.IdCamion,
+            label: item.Descripcion,
+        }));
+        choiceCamiones.setChoices(opciones);
+    }
+}
+
+function cargarAcoplados(idTransporte) {
+    choiceAcoplados.clearChoices();
+    choiceAcoplados.removeActiveItems();
+    const acoplados = dataAcoplados.find((camion) => camion.IdTransporte === idTransporte);
+    if (acoplados) {
+        const opciones = acoplados.Items.map((item) => ({
+            value: item.IdAcoplado,
+            label: item.Descripcion,
+        }));
+        choiceAcoplados.setChoices(opciones);
+    }
+}
+
+function verificarCheckbox() {
+    const checkboxes = document.querySelectorAll('#miTablaPendientes input[type="checkbox"]');
+    const seleccionados = Array.prototype.filter.call(checkboxes, (checkbox) => checkbox.checked);
+
+    if (seleccionados.length > 1 && seleccionados.length < 5) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function asignar() {
+    openAsig.style.display = 'flex'
+}
+
+cancelAsig.addEventListener('click', () => {
+    openAsig.style.display = 'none';
+});
+
 function abrirUltimaUbicacion() {
     document.getElementById('pfa-lu-popup').style.display = 'flex';
 }
+
 document.getElementById('pfa-lu-popup-cerrar').addEventListener('click', function () {
     document.getElementById('pfa-lu-popup').style.display = 'none';
 });
@@ -507,7 +725,6 @@ closePopupBtn.addEventListener('click', () => {
     popup.style.display = 'none';
 });
 
-const modalOverlay = document.querySelector('.modal-overlay');
 function openProgressBar() {
     modalOverlay.style.display = 'block';
 }

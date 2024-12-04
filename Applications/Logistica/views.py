@@ -567,7 +567,7 @@ def mostrar_pedidos_flete(request):
                             BINS = str(i[10])
                             ESPECIE = str(i[11])
                             VARIEDAD = str(i[12])
-                            VACIOS = str(i[13]) + ' - ' + str(i[14])
+                            VACIOS = str(i[13])
                             CUELLOS = str(i[15])
                             OBSERVACIONES = str(i[16])
                             ID_TRANSPORTISTA = str(i[17])
@@ -839,9 +839,248 @@ def detalles_de_viajes_activos(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
+@login_required
+@csrf_exempt
+def verifica_pedidos_completa_combox(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            listado_id_pedidos = request.POST.getlist('IdPedidoFlete')
+            listado_sql = ','.join(listado_id_pedidos)
+            if verifica_mismo_tipo_destino(listado_id_pedidos):                
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql =   f""" 
+                                SELECT PF.IdPedidoFlete AS ID_PEDIDO, CASE WHEN PF.TipoDestino = 'P' THEN RTRIM(CH.Nombre) ELSE RTRIM(UB.Descripcion) END AS DESTINO
+                                FROM S3A.dbo.PedidoFlete AS PF LEFT JOIN 
+                                        S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                        S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlantaDestino
+                                WHERE PF.IdPedidoFlete IN ({listado_sql})
+                                """
+                        cursor.execute(sql)
+                        results = cursor.fetchall()
+                        if results:
+                            destinos = []
+                            for row in results:
+                                ID_PF = str(row[0])
+                                DESTINO = str(row[1])
+                                datos = {'IdPF':ID_PF, 'Destino':DESTINO}
+                                destinos.append(datos)
 
+                        sql2 =   """ 
+                                SELECT CA.IdChofer AS ID_CHOFER, CA.NombreChofer AS CHOFER, CA.IdTransporte AS ID_TRANSPORTE,
+                                        CA.IdCamion AS ID_CAMION, CA.IdAcoplado AS ID_ACOPLADO
+                                FROM Chofer_Alta AS CA
+                                WHERE CA.Estado = 'A'
+                                ORDER BY CA.NombreChofer
+                                """
+                        cursor.execute(sql2)
+                        results2 = cursor.fetchall()
+                        if results2:
+                            choferes = []
+                            for row in results2:
+                                ID_CHOFER = str(row[0])
+                                CHOFER = str(row[1])
+                                ID_TRANSPORTE = str(row[2])
+                                ID_CAMION = str(row[3])
+                                ID_ACOPLADO = str(row[4])
+                                datos2 = {'IdChofer':ID_CHOFER, 'Chofer':CHOFER, 'IdTransporte':ID_TRANSPORTE,'IdCamion':ID_CAMION,'IdAcoplado':ID_ACOPLADO}
+                                choferes.append(datos2)
 
+                        sql3 =   """ 
+                                SELECT CUV.ID_CUV AS ID_VACIOS, CUV.Nombre AS NOMBRE
+                                FROM Chofer_Ubicacion_Vacios AS CUV
+                                WHERE CUV.Estado = 'A'
+                                ORDER BY CUV.Nombre
+                                """
+                        cursor.execute(sql3)
+                        results3 = cursor.fetchall()
+                        if results3:
+                            vacios = []
+                            for row in results3:
+                                ID_VACIOS = str(row[0])
+                                NOMBRE_VACIOS = str(row[1])
+                                datos3 = {'IdVacios':ID_VACIOS, 'Nombre':NOMBRE_VACIOS}
+                                vacios.append(datos3)
 
+                        sql4 =   """ 
+                                SELECT IdTransportista, RTRIM(CONVERT(VARCHAR(23), RazonSocial)) AS RAZON_SOCIAL
+                                FROM S3A.dbo.Transportista 
+                                WHERE Activo ='S' 
+                                ORDER BY RazonSocial
+                                """
+                        cursor.execute(sql4)
+                        results4 = cursor.fetchall()
+                        if results4:
+                            transportes = []
+                            for row in results4:
+                                ID_TRANSPORTE = str(row[0])
+                                NOMBRE_TRANSPORTE = str(row[1])
+                                datos4 = {'IdTransporte':ID_TRANSPORTE, 'Transporte':NOMBRE_TRANSPORTE}
+                                transportes.append(datos4)
+
+                        camiones, acoplados = crea_listado_datos()
+
+                        if destinos and choferes:
+                            return JsonResponse({'Message': 'Success', 'Destinos': destinos, 'Choferes': choferes, 'Vacios':vacios, 'Transportes':transportes, 'Camiones':camiones, 'Acoplados':acoplados})
+                        else:
+                            data = "No existen Destinos para ese Chofer."
+                            return JsonResponse({'Message': 'Error', 'Nota': data})
+                        
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES",request.user,error)
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    cursor.close()
+                    connections['TRESASES_APLICATIVO'].close()
+            
+            return JsonResponse({'Message': 'Error', 'Nota': 'La agrupación de Pedidos debe ser siempre de un mismo Tipo. (PLANTA ó CAMBIO DOM.)'})
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+def verifica_mismo_tipo_destino(listado_id):
+    try:
+        listado_sql = ','.join(listado_id)
+        with connections['S3A'].cursor() as cursor:
+            sql = f"""SELECT 
+                    CASE 
+                        WHEN MIN(PF.TipoDestino) = MAX(PF.TipoDestino) THEN 0
+                        ELSE 1
+                    END AS Resultado
+                    FROM PedidoFlete AS PF
+                    WHERE PF.IdPedidoFlete IN ({listado_sql})"""
+            cursor.execute(sql)
+            results = cursor.fetchone()
+            if results:
+                diferentes = str(results[0])
+                if diferentes == '0':
+                    return True
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","VERIFICA MISMO TIPO DESTINO","usuario",error)
+        return False
+    finally:
+        cursor.close()
+        connections['S3A'].close()
+
+def crea_listado_datos():
+    listado_camion = []
+    listado_acoplado = []
+    listado_chofer = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT TR.IdTransportista AS ID_TRANSPORTE, CM.IdCamion AS ID_CAMION, UPPER(RTRIM(CM.Nombre) + ' - ' + RTRIM(CM.Patente)) AS NOMBRE_CAMION
+                    FROM S3A.dbo.Transportista AS TR LEFT JOIN
+                            S3A.dbo.Camion AS CM ON CM.IdTransportista = TR.IdTransportista
+                    WHERE TR.IdTransportista IN (SELECT IdTransportista
+                                                    FROM S3A.dbo.Transportista 
+                                                    WHERE Activo ='S')
+                    ORDER BY TR.IdTransportista
+                 """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            if results:
+                for row in results:
+                    IdTransporte = str(row[0])
+                    Id = str(row[1])
+                    Descripcion = str(row[2])
+                    transporte = next((t for t in listado_camion if t['IdTransporte'] == IdTransporte), None)
+                    if transporte is None:
+                        transporte = {'IdTransporte': IdTransporte, 'Items': []}
+                        listado_camion.append(transporte)
+                    transporte['Items'].append({'IdCamion': Id, 'Descripcion': Descripcion})
+
+            sql = """ 
+                    SELECT TR.IdTransportista AS ID_TRANSPORTE, AC.IdAcoplado AS ID_CHOFER, UPPER(RTRIM(AC.Nombre) + ' - ' + RTRIM(AC.Patente)) AS NOMBRE_ACOPLADO
+                    FROM S3A.dbo.Transportista AS TR LEFT JOIN
+                            S3A.dbo.Acoplado AS AC ON AC.IdTransportista = TR.IdTransportista
+                    WHERE TR.IdTransportista IN (SELECT IdTransportista
+                                                    FROM S3A.dbo.Transportista 
+                                                    WHERE Activo ='S')
+                    ORDER BY TR.IdTransportista
+                 """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            if results:
+                for row in results:
+                    IdTransporte = str(row[0])
+                    Id = str(row[1])
+                    Descripcion = str(row[2])
+                    transporte = next((t for t in listado_acoplado if t['IdTransporte'] == IdTransporte), None)
+                    if transporte is None:
+                        transporte = {'IdTransporte': IdTransporte, 'Items': []}
+                        listado_acoplado.append(transporte)
+                    transporte['Items'].append({'IdAcoplado': Id, 'Descripcion': Descripcion})
+        return listado_camion, listado_acoplado
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","VERIFICA MISMO TIPO DESTINO","usuario",error)
+        return listado_camion, listado_acoplado
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+@login_required
+@csrf_exempt
+def multiple_asignacion(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            ID_CA = request.POST.get('ID_CA')
+            values = [ID_CA]
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql =   """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+                            SELECT CDCV.IdPedidoFlete AS ID_PEDIDO, RTRIM(UB.Descripcion) AS ORIGEN, CASE WHEN PF.TipoDestino = 'U' THEN RTRIM(UB2.Descripcion) ELSE RTRIM(CH.Nombre) END AS DESTINO,
+                                CASE WHEN CDCV.LlegaChacra IS NULL THEN '--/-- --:--' ELSE (CONVERT(VARCHAR(5), CDCV.LlegaChacra, 103) + ' ' + CONVERT(VARCHAR(5), CDCV.LlegaChacra, 108) + ' Hs.') END AS HORA_LLEGADA,
+                                COALESCE(CUV.Nombre,'-') AS LUGAR_VACIOS, CASE WHEN CVN.LlegaVacios IS NULL THEN '--/-- --:--' ELSE (CONVERT(VARCHAR(5), CVN.LlegaVacios, 103) + ' ' + CONVERT(VARCHAR(5), CVN.LlegaVacios, 108) + ' Hs.') END AS LLEGA_VACIOS
+                            FROM Chofer_Alta AS CA LEFT JOIN
+                                Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN
+                                Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN LEFT JOIN
+                                Chofer_Ubicacion_Vacios AS CUV ON CUV.ID_CUV = CVN.ID_CUV LEFT JOIN
+                                S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
+                                S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlantaDestino
+                            WHERE CA.ID_CA = @@ID_CA AND CVN.Estado = 'V' AND CDCV.Estado = 'V'
+                            """
+                    cursor.execute(sql, values)
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            ID_PF = str(row[0])
+                            ORIGEN = str(row[1])
+                            DESTINO = str(row[2])
+                            HORA_LLEGADA = str(row[3])
+                            VACIOS_LUGAR = str(row[4])
+                            HORA_VACIOS = str(row[5])
+                            datos = {'IdPF':ID_PF,'Origen':ORIGEN,'Destino':DESTINO,'HoraLlegada':HORA_LLEGADA}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'LugarVacios': VACIOS_LUGAR, 'HoraVacios': HORA_VACIOS, 'Datos': data})
+                    else:
+                        data = "No existen Destinos para ese Chofer."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 

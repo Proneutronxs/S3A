@@ -406,6 +406,7 @@ input[type="checkbox"].input-checkbox {
   border-color: #a72626;
   background-color: #a72626;
   color: #f0f0f0;
+  cursor: pointer;
 }
 
 
@@ -2192,4 +2193,105 @@ input[type="checkbox"].input-checkbox {
 
 .pfa-detalle-destinos-tabla tr:nth-child(even) {
   background-color: #f9f9f9;
+}
+
+.pfa-checkbox-label {
+  cursor: pointer;
+}
+
+#popup-container-pfa-asig {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.pfa-asig-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 998;
+}
+
+.pfa-asig-popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  min-width: 360px;
+}
+
+.pfa-asig-popup-contenido {
+  width: 100%;
+}
+
+.pfa-asig-popup-titulo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.pfa-asig-popup-tabla {
+  width: 100%;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+}
+
+.pfa-asig-popup-tabla th,
+.pfa-asig-popup-tabla td {
+  padding: 10px;
+  font-size: 11px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.pfa-asig-popup-tabla th {
+  background-color: #f4f4f4;
+}
+
+.pfa-asig-popup-separador {
+  width: 100%;
+  height: 1px;
+  background-color: #ddd;
+  margin: 20px 0;
+}
+
+.pfa-asig-popup-selector {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.pfa-asig-popup-select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.pfa-asig-popup-botones {
+  margin-top: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pfa-asig-popup-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
 }

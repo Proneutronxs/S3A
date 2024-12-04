@@ -15,12 +15,12 @@
         <div class="pfs-rectangulo-rojo">
             <div class="pf-menu">
                 <div class="pfa-checkbox-container btn-submit">
-                    <input type="checkbox" id="pfa-pedido-chacra" checked>
-                    <label for="pfa-pedido-chacra">Pedidos de chacra</label>
+                    <input type="checkbox" id="pfa-pedido-chacra" class="pfa-checkbox-label" checked>
+                    <label for="pfa-pedido-chacra" class="pfa-checkbox-label">Pedidos de chacra</label>
                 </div>
                 <div class="pfa-checkbox-container btn-submit">
-                    <input type="checkbox" id="pfa-cambio-domicilio" checked>
-                    <label for="pfa-cambio-domicilio">Cambios de domicilio</label>
+                    <input type="checkbox" id="pfa-cambio-domicilio" class="pfa-checkbox-label" checked>
+                    <label for="pfa-cambio-domicilio" class="pfa-checkbox-label">Cambios de domicilio</label>
                 </div>
                 <div class="pfa-boton-container">
                     <button class="boton-detalles" id="pfa-refresh">
@@ -28,7 +28,7 @@
                     </button>
                 </div>
                 <div class="pfa-boton-container">
-                    <button class="btn-submit" id="pfa-multiple">MULTIPLE ASIGNACIÓN</button>
+                    <button class="btn-submit" id="pfa-multiple">MULTIPLES DESTINOS</button>
                 </div>
             </div>
         </div>
@@ -131,8 +131,57 @@
             </div>
         </div>
     </div>
-
 </div>
+
+<div id="popup-container-pfa-asig" style="display: none;">
+    <div class="pfa-asig-overlay"></div>
+    <div class="pfa-asig-popup" id="pfa-asig-popup">
+        <div class="pfa-asig-popup-titulo">
+            CREACIÓN DE VIAJE
+        </div>
+        <div class="pfa-asig-popup-contenido">
+            <table class="pfa-asig-popup-tabla">
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Destino</th>
+                    </tr>
+                </thead>
+                <tbody id="pfa-asig-destinos-tabla">
+                </tbody>
+            </table>
+            <div class="pfa-asig-popup-selector">
+                <input type="number" class="pfa-asig-popup-select" id="input-cantidad-vacios" placeholder="CANTIDAD VACIOS">
+            </div>
+            <div class="pfa-asig-popup-selector">
+                <select class="pfa-asig-popup-select" id="selector_vacios">
+                </select>
+            </div>
+            <div class="pfa-asig-popup-separador"></div>
+            <div class="pfa-asig-popup-selector">
+                <select class="pfa-asig-popup-select" id="selector_choferes">
+                </select>
+            </div>
+            <div class="pfa-asig-popup-selector">
+                <select class="pfa-asig-popup-select" id="selector_transportes">
+                </select>
+            </div>
+            <div class="pfa-asig-popup-selector">
+                <select class="pfa-asig-popup-select" id="selector_camiones">
+                </select>
+            </div>
+            <div class="pfa-asig-popup-selector">
+                <select class="pfa-asig-popup-select" id="selector_acoplados">
+                </select>
+            </div>
+        </div>
+        <div class="pfa-asig-popup-botones">
+            <button class="pfa-asig-popup-btn btn-submit" id="btn-cancel-asig">Cancelar</button>
+            <button class="pfa-asig-popup-btn btn-submit">Aceptar</button>
+        </div>
+    </div>
+</div>
+
 
 <div class="pfa-lu-popup" id="pfa-lu-popup">
     <div class="pfa-lu-popup-contenido">
@@ -148,7 +197,7 @@
 
         </div>
         <div class="popup-body" id="content-detalles-pedidos">
-            
+
         </div>
         <div class="popup-footer">
             <button class="btn-submit-nuevo" id="closePopupBtn">CERRAR</button>
@@ -182,6 +231,8 @@
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{%static 'TresAses/js/Librerias/choices.min.js' %}"></script>
+<script src="{%static 'TresAses/js/Librerias/jquery-3.6.0.min.js' %}"></script>
 <script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery-3.5.1.js' %}"></script>
 <script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery.dataTables.min.js' %}"></script>
 <script src="{%static 'TresAses/js/Logistica/PedidosFlete/asignacionPedidos.js' %}"></script>

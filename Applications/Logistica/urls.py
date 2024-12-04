@@ -67,6 +67,8 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/mapeo-ultima-ubicacion/', views.mapeo_Ultima_Ubicacion, name='mapeo_Ultima_Ubicacion'),
 
+    path('pedidos-flete/asignacion/verificacion-carga-combox/', views.verifica_pedidos_completa_combox, name='verifica_pedidos_completa_combox'),
+
     path('pedidos-flete/baja-pedidos/', views.baja_pedidos_flete, name='baja_pedidos_flete'),
 
 
