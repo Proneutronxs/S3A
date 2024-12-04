@@ -1427,6 +1427,7 @@ input[type="checkbox"].input-checkbox {
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+  font-size: 14px;
 }
 
 /* Pop-up Footer */
