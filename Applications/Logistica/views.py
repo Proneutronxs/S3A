@@ -12,6 +12,7 @@ from openpyxl.styles import Alignment, PatternFill, Border, Side, Font
 from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
 from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos
+from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck
 import datetime 
 
 # Create your views here.
@@ -656,14 +657,26 @@ def mapeo_Ultima_Ubicacion(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            SELECT TOP 1 CDVC.ID_CDVC, CDVC.Latitud AS LATITUD, CDVC.Longitud AS LONGITUD, CA.NombreChofer AS CHOFER, 
-                            CASE 
-                                WHEN DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE()) = 0 THEN 
-                                    'Hace: ' + CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
-                                ELSE 
-                                    'Hace: ' + CONVERT(VARCHAR, DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE())) + ' Horas y ' + 
-                                    CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
-                            END AS HACE
+                            SELECT TOP 1 ISNULL(CDVC.ID_CDVC,0) AS ID_CDVC, CASE WHEN CDVC.Latitud IS NULL THEN '-38.942632' ELSE CDVC.Latitud END AS LATITUD, 
+                                        CASE WHEN CDVC.Longitud IS NULL THEN '-68.003042' ELSE CDVC.Longitud END AS LONGITUD, CA.NombreChofer AS CHOFER, 
+                                CASE WHEN 
+                                    CASE 
+                                        WHEN DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE()) = 0 THEN 
+                                            'Hace: ' + CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                                        ELSE 
+                                            'Hace: ' + CONVERT(VARCHAR, DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE())) + ' Horas y ' + 
+                                            CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                                    END IS NULL
+                                THEN 'Hace 0 Minutos'
+                                ELSE
+                                    CASE 
+                                        WHEN DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE()) = 0 THEN 
+                                            'Hace: ' + CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                                        ELSE 
+                                            'Hace: ' + CONVERT(VARCHAR, DATEDIFF(HOUR, CDVC.FechaAlta, GETDATE())) + ' Horas y ' + 
+                                            CONVERT(VARCHAR, (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) - (DATEDIFF(MINUTE, CDVC.FechaAlta, GETDATE()) / 60) * 60)) + ' Minutos.'
+                                    END
+                                END AS HACE 
                             FROM Chofer_Alta AS CA LEFT JOIN
                                 Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN 
                                 Chofer_Detalle_Viajes_Coordenadas AS CDVC ON CDVC.ID_CVN = CVN.ID_CVN
@@ -806,7 +819,7 @@ def detalles_de_viajes_activos(request):
                                 S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
                                 S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
                                 S3A.dbo.Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlantaDestino
-                            WHERE CA.ID_CA = @@ID_CA AND CVN.Estado = 'V' AND CDCV.Estado = 'V'
+                            WHERE CA.ID_CA = @@ID_CA AND CVN.Estado = 'V' --AND CDCV.Estado = 'V'
                             """
                     cursor.execute(sql, values)
                     results = cursor.fetchall()
@@ -1158,6 +1171,10 @@ def asiganciones_multiples(request):
                             affected_rows3 = cursor.fetchone()[0]
                             if affected_rows3 == 0:
                                 raise Exception(f"No se insertó detalle para IdPedidoFlete {IdPedidoFlete}.")
+                        if Existe_Viaje_Antes(IdChofer,ID_CVN):
+                            Token = Obtener_Token(IdChofer)
+                            if Token != '0':
+                                notificaciones_Fruit_Truck(Token,"TE ASIGNARON UN NUEVO VIAJE! Entrá a la Aplicación para ver los destinos.","V","A",str(ID_CVN),"N")
                     return JsonResponse({'Message': 'Success', 'Nota': 'El viaje se creó correctamente.'})
             except Exception as e:
                 return JsonResponse({'Message': 'Error', 'Nota': 'ERROR: ' + str(e)})
@@ -1245,6 +1262,10 @@ def asiganciones_individuales(request):
                         affected_rows3 = cursor.fetchone()[0]
                         if affected_rows3 == 0:
                             raise Exception(f"No se insertó detalle para IdPedidoFlete {IdPedidoFlete}.")
+                        if Existe_Viaje_Antes(IdChofer,ID_CVN):
+                            Token = Obtener_Token(IdChofer)
+                            if Token != '0':
+                                notificaciones_Fruit_Truck(Token,"TE ASIGNARON UN NUEVO VIAJE! Entrá a la Aplicación para ver los destinos.","V","A",str(ID_CVN),"N")  #notificaciones_Fruit_Truck(Token, Body, Tipo, Habilitado, ID_CVN, Destinos):
                     return JsonResponse({'Message': 'Success', 'Nota': 'El viaje se creó correctamente.'})
             except Exception as e:
                 return JsonResponse({'Message': 'Error', 'Nota': 'ERROR: ' + str(e)})
@@ -1256,8 +1277,62 @@ def asiganciones_individuales(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
+def Obtener_Token(ID_CA):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                    SELECT COALESCE((SELECT IdFirebase FROM Chofer_Alta WHERE IdChofer = %s), '0') AS ID_FIREBASE
+                    """
+            cursor.execute(sql,[ID_CA])
+            results = cursor.fetchone()
+            if results:
+                token = str(results[0])
+                return token
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","OBTENER EL TOKEN","usuario",error)
+        return '0'
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
+def Existe_Viaje_Antes(IdChofer,ID_CVN):
+    values = [ID_CVN,IdChofer]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
 
+                    DECLARE @@ID_CVN INT;
+                    DECLARE @@IdChofer INT;
+                    SET @@ID_CVN = %s;
+                    SET @@IdChofer = %s;
+                    SELECT CASE 
+                            WHEN EXISTS (
+                                SELECT 1 
+                                FROM Chofer_Viajes_Notificacion 
+                                WHERE ID_CA = (SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = @@IdChofer) 
+                                    AND (Estado = 'V' OR ID_CVN < @@ID_CVN)
+                            ) THEN 1 
+                            ELSE 0 
+                        END AS EXISTE_REGISTRO;
+
+                    """
+            cursor.execute(sql, values)
+            results = cursor.fetchone()
+            if results:
+                existe = str(results[0])
+                if existe == '0':
+                    return True
+                else:
+                    return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","VERIFICA AL ENVÍAR NOTIFICACION","usuario",error)
+        return True
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+   
 
 
 

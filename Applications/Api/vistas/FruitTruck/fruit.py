@@ -135,7 +135,7 @@ def guardar_transporte_chofer(request):
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
                             INSERT INTO Chofer_Alta (IdTransporte, NombreTransporte, IdChofer, NombreChofer, IdCamion, NombreCamion, IdAcoplado, NombreAcoplado, NumTelefono, IdFirebase, EstadoCamion, FechaAlta, Estado) VALUES 
-                            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'D',GETDATE(),'S')
+                            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'D',GETDATE(),'A')
                         """
                     cursor.execute(sql,values)
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")

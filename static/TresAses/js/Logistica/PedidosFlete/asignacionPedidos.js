@@ -61,7 +61,6 @@ selector_choferes.addEventListener("change", (event) => {
     const parsedCustomProperties = JSON.parse(event.currentTarget.selectedOptions[0].dataset.customProperties);
     IdTransporte = parsedCustomProperties.IdTransporte;
     choiceTransportes.setChoiceByValue(IdTransporte);
-    choiceCamiones.disable();
     choiceTransportes.disable();
     choiceCamiones.clearChoices();
     choiceCamiones.removeActiveItems();
