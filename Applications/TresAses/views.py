@@ -90,7 +90,7 @@ def recibir_archivos(request):
                 for chunk in archivo.chunks():
                     destino.write(chunk)
 
-            inicializar_firebase()
+            #inicializar_firebase()
 
             return JsonResponse({'Message': 'Success', 'Nota': 'Archivo subido correctamente'})
         except Exception as e:
