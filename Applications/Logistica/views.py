@@ -4,6 +4,7 @@ from S3A.funcionesGenerales import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.db import connections, transaction
 from openpyxl import Workbook
 from openpyxl.styles import Alignment
 from openpyxl.drawing.image import Image
@@ -135,7 +136,7 @@ def mostrarHorasCargadasPorCC(request): ### MUESTRA LA TABLA DE HORAS
                             centro = str(i[12])
                             solicita = str(i[13])
                             datos = {'ID':idHoras,'tipo':tipo, 'legajo':legajo, 'nombres':nombres, 'desde':desde, 'hasta':hasta, 'motivo':motivo, 'descripcion':descripcion, 'horas':horas , 'centro': centro, 'solicita': solicita}
-                            #print(datos)
+                            
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -464,7 +465,6 @@ def creaExcelHorasMostradas(request):
                         return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron horas.'})
             except Exception as e:
                 error = str(e)
-                print(error)
                 insertar_registro_error_sql("EMPAQUE","LISTA HORAS PROCESADAS",str(request.user),error)
                 return JsonResponse({'Message': 'Error', 'Nota': error})
         else:
@@ -587,7 +587,7 @@ def mostrar_pedidos_flete(request):
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
-                        data = "No existen Pedidos de Flete pendientes de Asignación."
+                        data = "No existen Pedidos de Flete Asignados y/o Pendientes."
                         return JsonResponse({'Message': 'Error', 'Nota': data})
             except Exception as e:
                 error = str(e)
@@ -685,7 +685,6 @@ def mapeo_Ultima_Ubicacion(request):
                         return JsonResponse({'Message': 'Error', 'Nota': data})
             except Exception as e:
                 data = str(e)
-                print("ERROR: " + data)
                 insertar_registro_error_sql("LOGISTICA","CREAR UBICACION",usuario,data)
                 return JsonResponse({'Message': 'Error', 'Nota': data})
         else:
@@ -1081,6 +1080,209 @@ def multiple_asignacion(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+
+@login_required
+@csrf_exempt
+def asiganciones_multiples(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_insertar')
+        if user_has_permission:
+            Usuario = str(request.user).upper()
+            listado_id_pedidos = request.POST.getlist('IdPedidosFletes')
+            IdChofer = request.POST.get('IdChofer')
+            nombreChofer = request.POST.get('NombreChofer')
+            IdTransporte = request.POST.get('IdTransporte')
+            IdCamion = request.POST.get('IdCamion')
+            IdAcoplado = request.POST.get('IdAcoplado') or None
+            CantVacios = request.POST.get('CantVacios') or None
+            IdUbiVacios = request.POST.get('IdUbiVacios') or None
+            listado_sql = ','.join(listado_id_pedidos)
+            valuesPedidoFlete = [IdTransporte,IdCamion,IdAcoplado,nombreChofer,IdChofer]
+            valuesNotificacion = [IdChofer,IdUbiVacios,CantVacios,Usuario]
+            try:
+                with transaction.atomic():  
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql_update = f"""
+                            UPDATE S3A.dbo.PedidoFlete
+                            SET Prioridad = NULL, IdTransportista = %s, IdCamion = %s, IdAcoplado = %s, Chofer = %s, 
+                            Estado = 'A', IdChofer = %s
+                            WHERE IdPedidoFlete IN ({listado_sql})
+                        """
+                        cursor.execute(sql_update, valuesPedidoFlete)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
+
+                        if affected_rows == 0:
+                            raise Exception("No se actualizaron los datos de PedidosFletes.")
+
+                        sql_insert = """
+                            INSERT INTO Chofer_Viajes_Notificacion (ID_CA, EstadoNotificacion, ID_CUV, CantidadVac, Estado, FechaAlta, UserAlta)
+                            OUTPUT INSERTED.ID_CVN
+                            VALUES ((SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = %s), 'P', %s, %s, 'A', GETDATE(), %s)
+                        """
+                        cursor.execute(sql_insert, valuesNotificacion)
+                        ID_CVN = cursor.fetchone()[0]
+
+                        if ID_CVN is None:
+                            raise Exception("No se generó ID_CVN en Chofer_Viajes_Notificacion.")
+                        
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+                        if affected_rows2 == 0:
+                            raise Exception("No se insertaron filas en Chofer_Viajes_Notificacion.")
+
+                        for IdPedidoFlete in listado_id_pedidos:
+                            sql_detalle = f"""
+                                DECLARE @@ID_CVN INT;
+                                DECLARE @@IdPedidoFlete INT;
+                                SET @@ID_CVN = %s;
+                                SET @@IdPedidoFlete = %s;
+
+                                IF (SELECT DISTINCT PF.TipoDestino
+                                    FROM S3A.dbo.PedidoFlete AS PF
+                                    WHERE PF.IdPedidoFlete IN ({listado_sql})) = 'P'
+                                BEGIN
+                                    INSERT INTO Chofer_Detalle_Chacras_Viajes (ID_CVN, IdPedidoFlete, IdChacra, FechaAlta, Estado)
+                                    VALUES (@@ID_CVN, @@IdPedidoFlete, (SELECT CASE WHEN IdChacra IS NULL THEN '0' ELSE IdChacra END 
+                                    FROM S3A.dbo.PedidoFlete WHERE IdPedidoFlete = @@IdPedidoFlete), GETDATE(), 'A')
+                                END
+                                ELSE
+                                BEGIN
+                                    INSERT INTO Chofer_Detalle_Chacras_Viajes (ID_CVN, IdPedidoFlete, IdChacra, FechaAlta, Estado)
+                                    VALUES (@@ID_CVN, @@IdPedidoFlete, (SELECT CASE WHEN IdPlantaDestino IS NULL THEN '0' ELSE IdPlantaDestino END 
+                                    FROM S3A.dbo.PedidoFlete WHERE IdPedidoFlete = @@IdPedidoFlete), GETDATE(), 'A')
+                                END
+                            """
+                            cursor.execute(sql_detalle, [ID_CVN, IdPedidoFlete])
+                            cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                            affected_rows3 = cursor.fetchone()[0]
+                            if affected_rows3 == 0:
+                                raise Exception(f"No se insertó detalle para IdPedidoFlete {IdPedidoFlete}.")
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El viaje se creó correctamente.'})
+            except Exception as e:
+                return JsonResponse({'Message': 'Error', 'Nota': 'ERROR: ' + str(e)})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
+@csrf_exempt
+def asiganciones_individuales(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_insertar')
+        if user_has_permission:
+            Usuario = str(request.user).upper()
+            IdPedidoFlete = request.POST.get('IdPedidoFlete')
+            IdChofer = request.POST.get('IdChofer')
+            nombreChofer = request.POST.get('NombreChofer')
+            IdTransporte = request.POST.get('IdTransporte')
+            IdCamion = request.POST.get('IdCamion')
+            IdAcoplado = request.POST.get('IdAcoplado') or None
+            CantVacios = request.POST.get('CantVacios') or None
+            IdUbiVacios = request.POST.get('IdUbiVacios') or None
+            valuesPedidoFlete = [IdTransporte,IdCamion,IdAcoplado,nombreChofer,IdChofer,IdPedidoFlete]
+            valuesNotificacion = [IdChofer,IdUbiVacios,CantVacios,Usuario]
+            try:
+                with transaction.atomic():  
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql_update = """
+                            UPDATE S3A.dbo.PedidoFlete
+                            SET Prioridad = NULL, IdTransportista = %s, IdCamion = %s, IdAcoplado = %s, Chofer = %s, 
+                            Estado = 'A', IdChofer = %s
+                            WHERE IdPedidoFlete = %s
+                        """
+                        cursor.execute(sql_update, valuesPedidoFlete)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
+
+                        if affected_rows == 0:
+                            raise Exception("No se actualizaron los datos de PedidosFletes.")
+
+                        sql_insert = """
+                            INSERT INTO Chofer_Viajes_Notificacion (ID_CA, EstadoNotificacion, ID_CUV, CantidadVac, Estado, FechaAlta, UserAlta)
+                            OUTPUT INSERTED.ID_CVN
+                            VALUES ((SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = %s), 'P', %s, %s, 'A', GETDATE(), %s)
+                        """
+                        cursor.execute(sql_insert, valuesNotificacion)
+                        ID_CVN = cursor.fetchone()[0]
+                        
+                        if ID_CVN is None:
+                            raise Exception("No se generó ID_CVN en Chofer_Viajes_Notificacion.")
+                        
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+                        if affected_rows2 == 0:
+                            raise Exception("No se insertaron filas en Chofer_Viajes_Notificacion.")
+
+                        
+                        sql_detalle = """
+                            DECLARE @@ID_CVN INT;
+                            DECLARE @@IdPedidoFlete INT;
+                            SET @@ID_CVN = %s;
+                            SET @@IdPedidoFlete = %s;
+
+                            IF (SELECT DISTINCT PF.TipoDestino
+                                FROM S3A.dbo.PedidoFlete AS PF
+                                WHERE PF.IdPedidoFlete = @@IdPedidoFlete) = 'P'
+                            BEGIN
+                                INSERT INTO Chofer_Detalle_Chacras_Viajes (ID_CVN, IdPedidoFlete, IdChacra, FechaAlta, Estado)
+                                VALUES (@@ID_CVN, @@IdPedidoFlete, (SELECT CASE WHEN IdChacra IS NULL THEN '0' ELSE IdChacra END 
+                                FROM S3A.dbo.PedidoFlete WHERE IdPedidoFlete = @@IdPedidoFlete), GETDATE(), 'A')
+                            END
+                            ELSE
+                            BEGIN
+                                INSERT INTO Chofer_Detalle_Chacras_Viajes (ID_CVN, IdPedidoFlete, IdChacra, FechaAlta, Estado)
+                                VALUES (@@ID_CVN, @@IdPedidoFlete, (SELECT CASE WHEN IdPlantaDestino IS NULL THEN '0' ELSE IdPlantaDestino END 
+                                FROM S3A.dbo.PedidoFlete WHERE IdPedidoFlete = @@IdPedidoFlete), GETDATE(), 'A')
+                            END
+                        """
+                        cursor.execute(sql_detalle, [ID_CVN, IdPedidoFlete])
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows3 = cursor.fetchone()[0]
+                        if affected_rows3 == 0:
+                            raise Exception(f"No se insertó detalle para IdPedidoFlete {IdPedidoFlete}.")
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El viaje se creó correctamente.'})
+            except Exception as e:
+                return JsonResponse({'Message': 'Error', 'Nota': 'ERROR: ' + str(e)})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -69,6 +69,10 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/verificacion-carga-combox/', views.verifica_pedidos_completa_combox, name='verifica_pedidos_completa_combox'),
 
+    path('pedidos-flete/asignacion/asignaciones-multiples/', views.asiganciones_multiples, name='asiganciones_multiples'),
+
+    path('pedidos-flete/asignacion/asignaciones-individuales/', views.asiganciones_individuales, name='asiganciones_individuales'),
+
     path('pedidos-flete/baja-pedidos/', views.baja_pedidos_flete, name='baja_pedidos_flete'),
 
 

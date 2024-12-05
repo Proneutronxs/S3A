@@ -13,6 +13,7 @@ const cancelAsig = document.getElementById('btn-cancel-asig');
 const openAsig = document.getElementById('popup-container-pfa-asig');
 const modalOverlay = document.querySelector('.modal-overlay');
 const inputVacios = document.getElementById('input-cantidad-vacios');
+const tituloAsignacion = document.getElementById('titulo-asignaciones');
 
 let dataTablePendientes, dataTableAsignados, dataTableRechazados;
 
@@ -43,7 +44,17 @@ document.getElementById('pfa-refresh-choferes').addEventListener('click', functi
 });
 
 document.getElementById('pfa-multiple').addEventListener('click', function () {
+
     multiple_viaje();
+});
+
+document.getElementById('btn-acept-asig').addEventListener('click', function () {
+    const valorAsignacion = document.getElementById('valueAsignacion').value;
+    if (valorAsignacion === 'MV'){
+        guardar_asignacion_multiple();
+    } else if (valorAsignacion === 'SV'){
+        guardar_asignacion_individual();
+    }
 });
 
 selector_choferes.addEventListener("change", (event) => {
@@ -52,9 +63,9 @@ selector_choferes.addEventListener("change", (event) => {
     choiceTransportes.setChoiceByValue(IdTransporte);
     choiceCamiones.disable();
     choiceTransportes.disable();
-    choiceCamiones.clearChoices(); 
+    choiceCamiones.clearChoices();
     choiceCamiones.removeActiveItems();
-    choiceAcoplados.clearChoices(); 
+    choiceAcoplados.clearChoices();
     choiceAcoplados.removeActiveItems();
     cargarCamiones(IdTransporte);
     IdCamion = parsedCustomProperties.IdCamion;
@@ -185,7 +196,7 @@ const busca_pendientes = async () => {
                                 <td class="pfa-tabla-celda">${datos.Vacios}</td>
                                 <td class="pfa-tabla-celda">${datos.Cuellos}</td>
                                 <td class="pfa-tabla-celda">
-                                    <button class="boton-detalles" onclick="">
+                                    <button class="boton-detalles" onclick="simple_viaje(${datos.ID})">
                                         <i class='bx material-symbols-outlined icon'>local_shipping</i>
                                     </button>
                                 </td>
@@ -321,7 +332,7 @@ const listar_choferes = async () => {
         closeProgressBar();
         if (data.Message === "Success") {
             let datos_he = ``;
-            data.Datos.forEach((datos) => {
+            data.Datos.forEach((datos) => {///(${datos.IdViaje});
                 datos_he += `
                             <div class="pfs-card">
                                 <div class="pfs-card-header">
@@ -333,6 +344,9 @@ const listar_choferes = async () => {
                                 <div class="pfs-card-actions">
                                     <button class="pfs-card-button" onclick="detalle_destinos(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">description</i>
+                                    </button>
+                                    <button class="pfs-card-button" onclick="">
+                                        <i class="material-symbols-outlined pfa-btn-submit">contrast_square</i>
                                     </button>
                                     <button class="pfs-card-button" onclick="mapeo_ultima_ubicacion(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
@@ -629,7 +643,10 @@ const multiple_viaje = async () => {
                 dataAcoplados.splice(0, dataAcoplados.length);
                 dataCamiones = data.Camiones;
                 dataAcoplados = data.Acoplados;
-
+                tituloAsignacion.innerHTML = `
+                    ASIGNACION MULTIPLE
+                    <input type="hidden" id="valueAsignacion" name="miInputOculto" value="MV">                
+                `;
                 asignar();
             } else {
                 document.getElementById('pfa-asig-destinos-tabla').innerHTML = ``;
@@ -650,16 +667,222 @@ const multiple_viaje = async () => {
 
 };
 
+const simple_viaje = async (IdPedidoFlete) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append('IdPedidoFlete', IdPedidoFlete);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("verificacion-carga-combox/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            limpiar_choices_input();
+            let datos_he = ``;
+            data.Destinos.forEach((datos) => {
+                datos_he += `   
+                    <tr>
+                        <td>${datos.IdPF}</td>
+                        <td>${datos.Destino}</td>
+                    </tr>
+                    <input type="hidden" id="simpleID" name="miInputOculto" value="${datos.IdPF}">
+                    `
+            });
+            document.getElementById('pfa-asig-destinos-tabla').innerHTML = datos_he;
+
+            let result = [];
+            result.push();
+            data.Choferes.forEach((datos) => {
+                result.push({
+                    value: datos.IdChofer,
+                    label: datos.Chofer,
+                    customProperties: JSON.stringify({ IdTransporte: datos.IdTransporte, IdCamion: datos.IdCamion, IdAcoplado: datos.IdAcoplado })
+                });
+            });
+            choiceChoferes.setChoices(result, 'value', 'label', true);
+
+            let result1 = [];
+            result1.push();
+            data.Vacios.forEach((datos) => {
+                result1.push({ value: datos.IdVacios, label: datos.Nombre });
+            });
+            choiceVacios.setChoices(result1, 'value', 'label', true);
+
+            let result2 = [];
+            result2.push();
+            data.Transportes.forEach((datos) => {
+                result2.push({ value: datos.IdTransporte, label: datos.Transporte });
+            });
+            choiceTransportes.setChoices(result2, 'value', 'label', true);
+
+            dataCamiones.splice(0, dataCamiones.length);
+            dataAcoplados.splice(0, dataAcoplados.length);
+            dataCamiones = data.Camiones;
+            dataAcoplados = data.Acoplados;
+            tituloAsignacion.innerHTML = `
+            ASIGNACION SIMPLE
+            <input type="hidden" id="valueAsignacion" name="miInputOculto" value="SV">                
+            `;
+            asignar();
+        } else {
+            document.getElementById('pfa-asig-destinos-tabla').innerHTML = ``;
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+
+};
+
+const guardar_asignacion_multiple = async () => {
+    openProgressBar();
+    try {
+        const checkboxes = document.querySelectorAll('.input-checkbox:checked');
+        const formData = new FormData();
+        formData.append("IdChofer", choiceChoferes.getValue().value);
+        formData.append("NombreChofer", choiceChoferes.getValue().label);
+        formData.append("IdTransporte", choiceTransportes.getValue().value);
+        formData.append("IdCamion", choiceCamiones.getValue().value);
+        formData.append("IdAcoplado", getValueAcoplados());
+        formData.append("CantVacios", getValueCantidadVacios());
+        formData.append("IdUbiVacios", getValueVacios());
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                formData.append('IdPedidosFletes', checkbox.value);
+            }
+        });
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("asignaciones-multiples/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            busca_pendientes();
+            busca_asignados();
+            openAsig.style.display = 'none';
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota, color);
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+
+};
+
+const guardar_asignacion_individual = async () => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        const simpleID = document.getElementById('simpleID').value;
+        formData.append("IdChofer", choiceChoferes.getValue().value);
+        formData.append("NombreChofer", choiceChoferes.getValue().label);
+        formData.append("IdTransporte", choiceTransportes.getValue().value);
+        formData.append("IdCamion", choiceCamiones.getValue().value);
+        formData.append("IdAcoplado", getValueAcoplados());
+        formData.append("CantVacios", getValueCantidadVacios());
+        formData.append("IdUbiVacios", getValueVacios());
+        formData.append("IdPedidoFlete", simpleID);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("asignaciones-individuales/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            busca_pendientes();
+            busca_asignados();
+            openAsig.style.display = 'none';
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota, color);
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+
+};
+
+function condicionales_asignaciones_multiples() {
+
+}
+
+function getValueAcoplados() {
+    return choiceAcoplados.getValue() ? choiceAcoplados.getValue().value : '';
+}
+
+function getValueVacios() {
+    return choiceVacios.getValue() ? choiceVacios.getValue().value : '';
+}
+
+function getValueCantidadVacios() {
+    const valor = inputVacios.value;
+    if (isNaN(valor) || valor === '') {
+        return '';
+    } else {
+        return valor;
+    }
+}
+
+function validarCantidad() {
+    const valor = inputVacios.value;
+    if (valor < 1 || valor > 65) {
+        inputVacios.style.border = '4px solid red';
+    } else {
+        inputVacios.style.border = '';
+    }
+}
+
+inputVacios.addEventListener('input', validarCantidad);
+
 function limpiar_choices_input() {
-    choiceVacios.clearChoices(); 
+    choiceVacios.clearChoices();
     choiceVacios.removeActiveItems();
-    choiceChoferes.clearChoices(); 
+    choiceChoferes.clearChoices();
     choiceChoferes.removeActiveItems();
-    choiceTransportes.clearChoices(); 
+    choiceTransportes.clearChoices();
     choiceTransportes.removeActiveItems();
-    choiceCamiones.clearChoices(); 
+    choiceCamiones.clearChoices();
     choiceCamiones.removeActiveItems();
-    choiceAcoplados.clearChoices(); 
+    choiceAcoplados.clearChoices();
     choiceAcoplados.removeActiveItems();
     inputVacios.value = '';
 }
@@ -706,6 +929,11 @@ function asignar() {
 }
 
 cancelAsig.addEventListener('click', () => {
+    const checkboxes = document.querySelectorAll('.input-checkbox:checked');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
     openAsig.style.display = 'none';
 });
 
