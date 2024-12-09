@@ -436,7 +436,7 @@ const listar_choferes = async () => {
     }
 }
 
-const mapeo_ultima_ubicacion = async () => {
+const mapeo_ultima_ubicacion = async (ID_CA) => {
     openProgressBar();
     try {
 
