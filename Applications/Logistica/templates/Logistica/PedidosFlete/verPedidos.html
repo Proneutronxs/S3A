@@ -94,30 +94,24 @@
             <div class="pfa-titulo-fondo">
                 <h5>VIAJES RECHAZADOS</h5>
             </div>
-            <table id="miTablaRechazados" class="pfa-tabla display" style="width:100%">
+            <table id="miTablaRechazados" class="pfa-tabla display" style="width:100%;">
                 <thead class="pfa-tabla-encabezado">
                     <tr>
-                        <th class="pfa-tabla-encabezado-celda">Nombre</th>
-                        <th class="pfa-tabla-encabezado-celda">Apellido</th>
-                        <th class="pfa-tabla-encabezado-celda">Edad</th>
+                        <th class="pfa-tabla-encabezado-celda">N°</th>
+                        <th class="pfa-tabla-encabezado-celda">CHOFER</th>
+                        <th class="pfa-tabla-encabezado-celda">FECHA</th>
+                        <th class="pfa-tabla-encabezado-celda">CANT. DESTINOS</th>
+                        <th class="pfa-tabla-encabezado-celda">DETALLES</th>
+                        <th class="pfa-tabla-encabezado-celda">MOVER</th>
                     </tr>
                 </thead>
-                <tbody class="pfa-tabla-cuerpo">
-                    <tr class="pfa-tabla-fila">
-                        <td class="pfa-tabla-celda">Juan</td>
-                        <td class="pfa-tabla-celda">Pérez</td>
-                        <td class="pfa-tabla-celda">25</td>
-                    </tr>
-                    <tr class="pfa-tabla-fila">
-                        <td class="pfa-tabla-celda">Maria</td>
-                        <td class="pfa-tabla-celda">Gómez</td>
-                        <td class="pfa-tabla-celda">31</td>
-                    </tr>
+                <tbody class="pfa-tabla-cuerpo" id="listado_rechazados">
+                    
                 </tbody>
             </table>
         </div>
     </div>
-    <!-- Columna derecha -->
+
     <div class="pfs-columna-derecha">
         <div class="pfa-destalles-viajes">
             <div class="pfa-boton-container pfa-titulo-fondo">
@@ -150,7 +144,8 @@
                 </tbody>
             </table>
             <div class="pfa-asig-popup-selector">
-                <input type="number" class="pfa-asig-popup-select" id="input-cantidad-vacios" placeholder="CANTIDAD VACIOS">
+                <input type="number" class="pfa-asig-popup-select" id="input-cantidad-vacios"
+                    placeholder="CANTIDAD VACIOS">
             </div>
             <div class="pfa-asig-popup-selector">
                 <select class="pfa-asig-popup-select" id="selector_vacios">
@@ -180,7 +175,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="pfa-lu-popup" id="pfa-lu-popup">
     <div class="pfa-lu-popup-contenido">
@@ -215,10 +209,11 @@
 </div>
 
 <div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
+    <div id="number_cvn"></div>
     <div class="popup-content">
-        <p>¿Estás seguro de que deseas restaurar los items seleccionados?</p> <br>
-        <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
+        <p>¿Estás seguro que quieres mover los Pedidos del Viaje a PEDIDOS PENDIENTES?</p> <br>
         <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+        <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
     </div>
 </div>
 

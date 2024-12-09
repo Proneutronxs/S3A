@@ -17,26 +17,29 @@ const tituloAsignacion = document.getElementById('titulo-asignaciones');
 
 let dataTablePendientes, dataTableAsignados, dataTableRechazados;
 
-
 window.addEventListener("load", async () => {
     busca_pendientes();
     busca_asignados();
     listar_choferes();
+    busca_rechazados();
 });
 
 cambiosDomicilio.addEventListener('change', function () {
     busca_pendientes();
     busca_asignados();
+    busca_rechazados();
 });
 
 pedidosChacra.addEventListener('change', function () {
     busca_pendientes();
     busca_asignados();
+    busca_rechazados();
 });
 
 document.getElementById('pfa-refresh').addEventListener('click', function () {
     busca_pendientes();
     busca_asignados();
+    busca_rechazados();
 });
 
 document.getElementById('pfa-refresh-choferes').addEventListener('click', function () {
@@ -44,16 +47,27 @@ document.getElementById('pfa-refresh-choferes').addEventListener('click', functi
 });
 
 document.getElementById('pfa-multiple').addEventListener('click', function () {
-
     multiple_viaje();
+});
+
+document.getElementById('confirmBtn').addEventListener('click', function () {
+    mover_rechazados_pendientes();
+});
+
+document.getElementById('cancelBtn').addEventListener('click', function () {
+    ocultarPopupMover();
 });
 
 document.getElementById('btn-acept-asig').addEventListener('click', function () {
     const valorAsignacion = document.getElementById('valueAsignacion').value;
-    if (valorAsignacion === 'MV'){
-        guardar_asignacion_multiple();
-    } else if (valorAsignacion === 'SV'){
-        guardar_asignacion_individual();
+    if (valorAsignacion === 'MV') {
+        if (condicionales_asignaciones()) {
+            guardar_asignacion_multiple();
+        }
+    } else if (valorAsignacion === 'SV') {
+        if (condicionales_asignaciones()) {
+            guardar_asignacion_individual();
+        }
     }
 });
 
@@ -186,20 +200,20 @@ const busca_pendientes = async () => {
                                 <td class="pfa-tabla-celda">${datos.Origen === '0' ? 'PLANTA' : datos.Origen}</td>
                                 <td class="pfa-tabla-celda">${datos.Solicita}</td>
                                 <td class="pfa-tabla-celda">${datos.TipoDestino}</td>
-                                <td class="pfa-tabla-celda">${datos.FechaPedido}</td>
-                                <td class="pfa-tabla-celda">${datos.HoraPedido}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.FechaPedido}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.HoraPedido}</td>
                                 <td class="pfa-tabla-celda">${datos.Zona === '0' ? '-' : datos.Zona}</td>
                                 <td class="pfa-tabla-celda">${datos.Destino2 === '0' ? datos.Destino : datos.Destino2}</td>
                                 <td class="pfa-tabla-celda">${datos.Especie}</td>
-                                <td class="pfa-tabla-celda">${datos.Bins}</td>
-                                <td class="pfa-tabla-celda">${datos.Vacios}</td>
-                                <td class="pfa-tabla-celda">${datos.Cuellos}</td>
-                                <td class="pfa-tabla-celda">
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.Bins}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.Vacios}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.Cuellos}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">
                                     <button class="boton-detalles" onclick="simple_viaje(${datos.ID})">
                                         <i class='bx material-symbols-outlined icon'>local_shipping</i>
                                     </button>
                                 </td>
-                                <td class="pfa-tabla-celda">
+                                <td class="pfa-tabla-celda" style="text-align: center;">
                                     <button class="boton-detalles" onclick="detalles_pedidos(${datos.ID});">
                                         <i class='bx material-symbols-outlined icon'>description</i>
                                     </button>
@@ -265,11 +279,11 @@ const busca_asignados = async () => {
             data.Datos.forEach((datos) => {
                 datos_he += `
                             <tr class="pfa-tabla-fila">
-                                <td class="pfa-tabla-celda">${datos.ID}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.ID}</td>
                                 <td class="pfa-tabla-celda">${datos.Tipo}</td>
                                 <td class="pfa-tabla-celda">${datos.Solicita}</td>
                                 <td class="pfa-tabla-celda">${datos.TipoDestino}</td>
-                                <td class="pfa-tabla-celda">${datos.FechaPedido}</td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.FechaPedido}</td>
                                 <td class="pfa-tabla-celda">${datos.Destino2 === '0' ? datos.Destino : datos.Destino2}</td>
                                 <td class="pfa-tabla-celda">${datos.Chofer}</td>
                                 <td class="pfa-tabla-celda">${datos.Transportista}</td>
@@ -323,15 +337,72 @@ const busca_asignados = async () => {
     }
 };
 
+const busca_rechazados = async () => {
+    try {
+        const response = await fetch("listar-rechazados/");
+        const data = await response.json();
+        if (data.Message === "Success") {
+            let datos_he = ``;
+            data.Datos.forEach((datos) => {
+                datos_he += `
+                <tr class="pfa-tabla-fila">
+                    <td class="pfa-tabla-celda" style="text-align: center;">${datos.ID_CVN}</td>
+                    <td class="pfa-tabla-celda" style="text-align: center;">${datos.Chofer}</td>
+                    <td class="pfa-tabla-celda" style="text-align: center;">${datos.Fecha}</td>
+                    <td class="pfa-tabla-celda" style="text-align: center;">${datos.Cantidad}</td>
+                    <td class="pfa-tabla-celda" style="text-align: center;">
+                        <button class="boton-detalles" onclick="detalles_rechazados(${datos.ID_CVN});">
+                            <i class='bx material-symbols-outlined icon'>description</i>
+                        </button>
+                    </td>
+                    <td class="pfa-tabla-celda" style="text-align: center;">
+                        <button class="boton-detalles" onclick="mostrarPopupMover(${datos.ID_CVN});">
+                            <i class='bx material-symbols-outlined icon'>arrow_upward</i>
+                        </button>
+                    </td>
+                </tr>
+                `
+            });
+
+            if ($.fn.dataTable.isDataTable('#miTablaRechazados')) {
+                $('#miTablaRechazados').DataTable().clear().destroy();
+            }
+            document.getElementById('listado_rechazados').innerHTML = datos_he;
+            dataTableAsignados = $('#miTablaRechazados').DataTable({
+                "paging": false,
+                "info": false,
+                "ordering": true,
+                "searching": true,
+                "autoWidth": true,
+                "language": {
+                    "search": "Buscar: ",
+                    "searchPlaceholder": "Escriba para buscar..."
+                },
+                "columnDefs": [
+                    {
+                        "targets": [4, 5],
+                        "width": "10%",
+                        "className": "dt-center"
+                    }
+                ]
+            });
+        } else {
+            document.getElementById('listado_rechazados').innerHTML = ``;
+        }
+    } catch (error) {
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
 const listar_choferes = async () => {
-    openProgressBar();
     try {
         const response = await fetch("listar-choferes/");
         const data = await response.json();
-        closeProgressBar();
         if (data.Message === "Success") {
             let datos_he = ``;
-            data.Datos.forEach((datos) => {///(${datos.IdViaje});
+            data.Datos.forEach((datos) => {
                 datos_he += `
                             <div class="pfs-card">
                                 <div class="pfs-card-header">
@@ -359,16 +430,16 @@ const listar_choferes = async () => {
             document.getElementById('pfa-contenedor-choferes').innerHTML = ``;
         }
     } catch (error) {
-        closeProgressBar();
         var nota = "Se produjo un error al procesar la solicitud. " + error;
         var color = "red";
         mostrarInfo(nota, color);
     }
 }
 
-const mapeo_ultima_ubicacion = async (ID_CA) => {
+const mapeo_ultima_ubicacion = async () => {
     openProgressBar();
     try {
+
         const formData = new FormData();
         formData.append("Chofer", ID_CA);
 
@@ -500,6 +571,92 @@ const detalles_pedidos = async (IdPedidoFlete) => {
             document.getElementById('content-detalles-pedidos').innerHTML = datos_he;
             masDetalles();
         } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const detalles_rechazados = async (ID_CVN) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("ID_CVN", ID_CVN);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("mostrar-detalles-rechazados/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            document.getElementById('pfa-titulo-popup').innerHTML = `<h2 style="color: red;">DETALLE VIAJE RECHAZADO</h2>`;
+
+            const datos = data.Datos;
+            document.getElementById('content-detalles-pedidos').innerHTML = `
+                        <div class="popup-columns">
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>ID VIAJE:</strong> ${datos.ID_CVN}
+                                </div>
+                                <div class="info-item">
+                                    <strong>CHOFER:</strong> ${datos.Chofer}
+                                </div>
+                            </div>
+                            <div class="popup-column">
+                                <div class="info-item">
+                                    <strong>FECHA:</strong> ${datos.Fecha}
+                                </div>
+                                <div class="info-item">
+                                    <strong></strong> 
+                                </div>
+                            </div>
+                        </div>
+                        `;
+
+            let tabla = `
+                        <table class="pfa-detalle-destinos-tabla">
+                            <thead>
+                                <tr>
+                                    <th>ID PEDIDO</th>
+                                    <th>ORIGEN</th>
+                                    <th>DESTINO</th>
+                                    <th>SOLICITA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            data.Tabla.forEach((fila) => {
+                tabla += `
+                            <tr>
+                                <td>${fila.IdPedidoFlete}</td>
+                                <td>${fila.Origen}</td>
+                                <td>${fila.Destino}</td>
+                                <td>${fila.Solicita}</td>
+                            </tr>
+              `;
+            });
+
+            tabla += `
+                            </tbody>
+                        </table>
+            `;
+
+            document.getElementById('content-detalles-pedidos').innerHTML += tabla;
+            masDetalles();
+        }
+        else {
             var nota = data.Nota
             var color = "red";
             mostrarInfo(nota, color);
@@ -840,8 +997,50 @@ const guardar_asignacion_individual = async () => {
 
 };
 
-function condicionales_asignaciones_multiples() {
+const mover_rechazados_pendientes = async () => {
+    openProgressBar();
+    try {
+        const id_cvn = document.getElementById('id_cvn_mover');
+        const formData = new FormData();
+        formData.append("ID_CVN", id_cvn.value);
 
+        const options = {
+            method: 'POST',
+            headers: {},
+            body: formData
+        };
+
+        const response = await fetch("liberar-rechazados/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            busca_rechazados();
+            busca_pendientes();
+            ocultarPopupMover();
+            var nota = data.Nota;
+            var color = "green";
+            mostrarInfo(nota, color);
+        } else {
+            var nota = data.Nota;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+function condicionales_asignaciones() {
+    if (!choiceAcoplados.getValue()) {
+        var nota = 'Debe seleccionar el chofer.';
+        var color = "red";
+        mostrarInfo(nota, color);
+        return false;
+    }
+    return true;
 }
 
 function getValueAcoplados() {
@@ -974,6 +1173,17 @@ function mostrarInfo(Message, Color) {
     }, 5000);
 }
 
+function mostrarPopupMover(ID_CVN) {
+    document.getElementById('number_cvn').innerHTML = `
+        <input type="hidden" id="id_cvn_mover" name="dataOculta" value="${ID_CVN}">
+    `;
+    document.getElementById('confirmationPopup').style.display = 'flex';
+}
+
+function ocultarPopupMover() {
+    document.getElementById('confirmationPopup').style.display = 'none';
+}
+
 function getValueCheckBox() {
     if (cambiosDomicilio.checked && pedidosChacra.checked) {
         return '0';
@@ -982,6 +1192,6 @@ function getValueCheckBox() {
     } else if (pedidosChacra.checked) {
         return 'P';
     } else {
-        return '0';
+        return 'T';
     }
 }

@@ -49,6 +49,10 @@ def baja_pedidos_flete(request):
     return render (request, 'Logistica/PedidosFlete/bajaPedidos.html')
 
 @login_required
+def ultima_ubicacion_choferes(request):
+    return render (request, 'Logistica/PedidosFlete/ubicacionChoferes.html')
+
+@login_required
 @csrf_exempt
 def cargaCentrosEmpaque(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':
@@ -509,6 +513,12 @@ def restauraHoraL(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})   
     
+
+
+
+
+
+
 @login_required
 @csrf_exempt
 def mostrar_pedidos_flete(request):
@@ -795,6 +805,65 @@ def mostrar_detalles_pedido_flete(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
     
+@login_required
+@csrf_exempt
+def mostrar_detalles_viaje_rechazado(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            ID_CVN = request.POST.get('ID_CVN')
+            values = [ID_CVN]
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql =   """ 
+                            SELECT CVN.ID_CVN AS ID_CVN, CA.NombreChofer AS CHOFER, CONVERT(VARCHAR(5), CVN.FechaAlta,103) + ' ' + CONVERT(VARCHAR(5), CVN.FechaAlta,108) + ' Hs.' AS FECHA,
+                                CDCV.IdPedidoFlete AS ID_PEDIDO_FLETE, RTRIM(UB.Descripcion) AS ORIGEN, CASE WHEN RTRIM(PF.TipoDestino) = 'P' THEN RTRIM(CH.Nombre) ELSE RTRIM(UB2.Descripcion) END AS DESTINO,
+	                            RTRIM(PF.Solicitante) AS SOLICITA
+                            FROM Chofer_Viajes_Notificacion AS CVN LEFT JOIN
+                                Chofer_Alta AS CA ON CA.ID_CA = CVN.ID_CA LEFT JOIN
+                                Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN LEFT JOIN
+                                S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
+                                S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                S3A.dbo.Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlantaDestino
+                            WHERE CVN.ID_CVN = %s
+                            """
+                    cursor.execute(sql, values)
+                    consulta = cursor.fetchall()
+                    if consulta:
+                        datos_unicos = {}
+                        datos_repetidos = []
+                        for row in consulta:
+                            if not datos_unicos:
+                                datos_unicos = {
+                                    'ID_CVN': str(row[0]),
+                                    'Chofer': str(row[1]),
+                                    'Fecha': str(row[2])
+                                }
+                            
+                            datos_repetidos.append({
+                                'IdPedidoFlete': str(row[3]),
+                                'Origen': str(row[4]),
+                                'Destino': str(row[5]),
+                                'Solicita': str(row[6])
+                            })
+                        return JsonResponse({'Message': 'Success', 'Datos': datos_unicos, 'Tabla':datos_repetidos})
+                    else:
+                        data = "No existen datos para el viaje rechazado."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS RECHZADOS",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
 @login_required
 @csrf_exempt
 def detalles_de_viajes_activos(request):
@@ -1333,8 +1402,213 @@ def Existe_Viaje_Antes(IdChofer,ID_CVN):
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
    
+@login_required
+@csrf_exempt
+def mostrar_viajes_rechazados(request):
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        usuario = str(request.user)
+        if user_has_permission:
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            SELECT CVN.ID_CVN AS ID_CVN, CA.NombreChofer AS CHOFER, CONVERT(VARCHAR(5), CVN.FechaAlta,103) + ' ' + CONVERT(VARCHAR(5), CVN.FechaAlta,108) + ' Hs.' AS FECHA,
+                                    (SELECT COUNT(*) FROM Chofer_Detalle_Chacras_Viajes WHERE ID_CVN = CVN.ID_CVN AND Estado = 'R') AS CANTIDAD
+                            FROM Chofer_Viajes_Notificacion AS CVN INNER JOIN
+                                Chofer_Alta AS CA ON CA.ID_CA = CVN.ID_CA
+                            WHERE CVN.Estado = 'R' AND CVN.FechaAlta >= DATEADD(day, -4, GETDATE());
+                        """
+                    cursor.execute(sql)
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            ID_CVN = str(row[0])
+                            CHOFER = str(row[1])
+                            FECHA = str(row[2])
+                            CANTIDAD = str(row[3])
+                            datos = {'ID_CVN':ID_CVN, 'Chofer':CHOFER, 'Fecha':FECHA, 'Cantidad':CANTIDAD}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No existen Choferes en viaje."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                data = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR VIAJE RECHAZADOS",usuario,data)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})   
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+
+@login_required
+@csrf_exempt
+def llevar_pendientes_rechazados(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_modificar')
+        if user_has_permission:
+            ID_CVN = request.POST.get('ID_CVN')
+            values = [ID_CVN]
+            try:
+                 with transaction.atomic():
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql = """
+                            DECLARE @ID_CVN INT;
+                            SET @ID_CVN = %s; 
+
+                            UPDATE S3A.dbo.PedidoFlete
+                            SET Estado = 'P', IdTransportista = NULL, IdCamion = NULL, IdAcoplado = NULL, IdChofer = NULL, Chofer = NULL
+                            WHERE IdPedidoFlete IN (
+                                SELECT CDCV.IdPedidoFlete
+                                FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                                WHERE CDCV.ID_CVN = @ID_CVN AND CDCV.Estado = 'R'
+                            );
+                        """
+                        cursor.execute(sql, values)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+                        if affected_rows2 == 0:
+                            raise Exception("No se actualizaron los Estados de PF.")
+
+                        sql = """
+                            DECLARE @ID_CVN INT;
+                            SET @ID_CVN = %s; 
+
+                            UPDATE Chofer_Detalle_Chacras_Viajes
+                            SET Estado = 'E'
+                            WHERE IdPedidoFlete IN (
+                                SELECT CDCV.IdPedidoFlete
+                                FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                                WHERE CDCV.ID_CVN = @ID_CVN);
+                        """
+                        cursor.execute(sql, values)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows = cursor.fetchone()[0]
+                        if affected_rows == 0:
+                            raise Exception("No se actualizaron los Estados de CDCV.")
+                        
+                        sql = """
+                            DECLARE @ID_CVN INT;
+                            SET @ID_CVN = %s; 
+                            
+                            UPDATE Chofer_Viajes_Notificacion
+                            SET Estado = 'E'
+                            WHERE ID_CVN = @ID_CVN;
+                        """
+                        cursor.execute(sql, values)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+                        if affected_rows2 == 0:
+                            raise Exception("No se actualizaron los Estados de CVN.")
+
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Los pedidos se movieron a PENDIENTES correctamente.'})
+            except Exception as e:
+                error = str(e)
+                print(error)
+                insertar_registro_error_sql("LOGISTICA","MOVER PEDIDOS RECHZADOS",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+############ UBICACION DE LOS CHOFERES
 
 
+
+@login_required
+@csrf_exempt
+def listado_choferes_activos(request):
+    if request.method == 'GET':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        usuario = str(request.user)
+        if user_has_permission:
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            SELECT ID_CA AS ID_CA, NombreChofer AS CHOFER
+                            FROM Chofer_Alta
+                            WHERE Estado = 'A'
+                            ORDER BY CHOFER
+                        """
+                    cursor.execute(sql)
+                    results = cursor.fetchall()
+                    if results:
+                        data = [{'IdCA':'0', 'Chofer':'TODOS'}]
+                        for row in results:
+                            ID_CA = str(row[0])
+                            CHOFER = str(row[1])
+                            datos = {'IdCA':ID_CA, 'Chofer':CHOFER}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Choferes': data})
+                    else:
+                        data = "No existen Choferes habilitados."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                data = str(e)
+                insertar_registro_error_sql("LOGISTICA","MOSTRAR UBICACION CHOFERES",usuario,data)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+        else:
+            return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})   
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+@login_required
+@csrf_exempt
+def detalle_ultima_ubicacion_choferes(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_ver')
+        if user_has_permission:
+            ID_CA = request.POST.get('ID_CA')
+            values = [ID_CA]
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql =   """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+                            SELECT CDVC.ID_CDVC AS ID_CDVC, CDVC.Latitud AS LATITUD, CDVC.Longitud AS LONGITUD, CA.NombreChofer AS CHOFER,
+                                    CONVERT(VARCHAR(5), CDVC.FechaAlta, 103) + ' ' + CONVERT(VARCHAR(5), CDVC.FechaAlta, 108) AS FECHA_HORA
+                            FROM Chofer_Detalle_Viajes_Coordenadas AS CDVC INNER JOIN
+                                    Chofer_Alta AS CA ON CA.ID_CA = CDVC.ID_CA
+                            WHERE (CDVC.ID_CA =	@@ID_CA OR @@ID_CA ='0') AND
+                                    CDVC.ID_CDVC = (SELECT MAX(ID_CDVC)
+                                                    FROM Chofer_Detalle_Viajes_Coordenadas
+                                                    WHERE ID_CA = CA.ID_CA)
+                            """
+                    cursor.execute(sql, values)
+                    results = cursor.fetchall()
+                    if results:
+                        data = []
+                        for row in results:
+                            ID_CDVC = str(row[0])
+                            LATITUD = str(row[1])
+                            LONGITUD = str(row[2])
+                            CHOFER = str(row[3])
+                            FECHA_HORA = str(row[4])
+                            datos = {'ID':ID_CDVC,'Latitud':LATITUD,'Longitud':LONGITUD,'Chofer':CHOFER, 'Fecha':FECHA_HORA}
+                            data.append(datos)
+                        return JsonResponse({'Message': 'Success', 'Datos': data})
+                    else:
+                        data = "No existen coordenada para ese Chofer."
+                        return JsonResponse({'Message': 'Error', 'Nota': data})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","DETALLE UBICACION CHOFERES",request.user,error)
+                data = str(e)
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            finally:
+                cursor.close()
+                connections['TRESASES_APLICATIVO'].close()
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 

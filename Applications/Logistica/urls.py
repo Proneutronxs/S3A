@@ -59,6 +59,10 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/listar-asignados/', views.mostrar_pedidos_flete, name='mostrar_pedidos_flete_asignados'),
 
+    path('pedidos-flete/asignacion/listar-rechazados/', views.mostrar_viajes_rechazados, name='mostrar_viajes_rechazados'),
+
+    path('pedidos-flete/asignacion/mostrar-detalles-rechazados/', views.mostrar_detalles_viaje_rechazado, name='mostrar_detalles_pedido_flete'),
+
     path('pedidos-flete/asignacion/mostrar-detalles/', views.mostrar_detalles_pedido_flete, name='mostrar_detalles_pedido_flete'),
 
     path('pedidos-flete/asignacion/viaje-detalles/', views.detalles_de_viajes_activos, name='detalles_de_viajes_activos'),
@@ -73,7 +77,15 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/asignaciones-individuales/', views.asiganciones_individuales, name='asiganciones_individuales'),
 
+    path('pedidos-flete/asignacion/liberar-rechazados/', views.llevar_pendientes_rechazados, name='llevar_pendientes_rechazados'),
+
     path('pedidos-flete/baja-pedidos/', views.baja_pedidos_flete, name='baja_pedidos_flete'),
+
+    path('pedidos-flete/ubicacion-choferes/', views.ultima_ubicacion_choferes, name='ultima_ubicacion_choferes'),
+
+    path('pedidos-flete/ubicacion-choferes/listar-choferes-activos/', views.listado_choferes_activos, name='listado_choferes_activos'),
+
+    path('pedidos-flete/ubicacion-choferes/ubicacion-choferes-activos/', views.detalle_ultima_ubicacion_choferes, name='detalle_ultima_ubicacion_choferes'),
 
 
 ]

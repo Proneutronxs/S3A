@@ -391,6 +391,19 @@ def acepta_rechaza_viaje(request):
         if Tipo == "R":
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql3 = """ 
+                            DECLARE @ID_CVN INT;
+                            SET @ID_CVN = %s; 
+
+                            UPDATE S3A.dbo.PedidoFlete
+                            SET Estado = 'R'
+                            WHERE IdPedidoFlete IN (
+                                SELECT CDCV.IdPedidoFlete
+                                FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                                WHERE CDCV.ID_CVN = @ID_CVN
+                            );
+                        """
+                    cursor.execute(sql3,values)
                     sql = """ 
                             UPDATE VN SET VN.Estado = 'R', VN.FechaAltaEstado = GETDATE()
                             FROM Chofer_Viajes_Notificacion AS VN 
@@ -696,7 +709,7 @@ def servicio_finalizacion(request):
                 Latitud = str(coor['Latitud'])
                 Longitud = str(coor['Longitud'])
                 Fecha = str(coor['Fecha'])
-                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha)
+                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha,ID_CA)
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
@@ -785,12 +798,12 @@ def update_planta(ID_CDCV, LlegaPlanta):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
-def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta):
-    values = [ID_CVN, Latitud, Longitud, FechaAlta]
+def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta,ID_CA):
+    values = [ID_CVN, Latitud, Longitud, FechaAlta,ID_CA]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta) VALUES (%s,%s,%s,%s)
+                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta, ID_CA) VALUES (%s,%s,%s,%s,%s)
                 """
             cursor.execute(sql, values)
     except Exception as e:

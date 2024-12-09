@@ -58,7 +58,6 @@ body {
 .sidebar .icon {
   min-width: 60px;
   border-radius: 6px;
-
 }
 
 .sidebar .icon {
@@ -1649,7 +1648,7 @@ input[type="checkbox"].input-checkbox {
   cursor: pointer;
 }
 
-.choices__list--dropdown {
+/* .choices__list--dropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -1662,7 +1661,7 @@ input[type="checkbox"].input-checkbox {
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-}
+} */
 
 .choices__list--dropdown .choices__item--choice {
   padding: 10px;
@@ -1715,8 +1714,8 @@ input[type="checkbox"].input-checkbox {
   border-bottom-right-radius: 2.5px;
   font-size: 12px;
   overflow: auto;
-  z-index: 999;
-  will-change: visibility;
+  z-index: 9999 !important;
+  will-change: visibility !important;
   visibility: hidden;
   opacity: 0;
   transition: visibility 0s, opacity 0.3s ease;
@@ -1726,7 +1725,7 @@ input[type="checkbox"].input-checkbox {
   visibility: visible;
   opacity: 1;
   transition-delay: 0s;
-  z-index: 999;
+  z-index: 9999 !important;
 }
 
 .choices__input--cloned {
@@ -1881,12 +1880,12 @@ input[type="checkbox"].input-checkbox {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
   box-sizing: border-box;
 }
 
 .pfs-rectangulo-rojo {
-  height: 60px;
+  height: 40px;
   flex-shrink: 0;
   border-radius: 10px;
   background-color: #ffffff;
@@ -1921,6 +1920,7 @@ input[type="checkbox"].input-checkbox {
   transition: transform 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
+  overflow-y: auto;
 }
 
 
@@ -1936,7 +1936,6 @@ input[type="checkbox"].input-checkbox {
   padding-left: 8px;
   padding-right: 8px;
   max-width: 220px;
-
 }
 
 .pf-menu {
@@ -2296,3 +2295,72 @@ input[type="checkbox"].input-checkbox {
   cursor: pointer;
   border-radius: 5px;
 }
+
+.pfs-container-choferes {
+  display: flex;
+  flex: 1;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.479);
+  padding: 10px; 
+}
+
+/* #pfa_mapeo_actual_todos {
+  z-index: 1 !important;
+} */
+
+.pfa-ver-choferes {
+  width: 25%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
