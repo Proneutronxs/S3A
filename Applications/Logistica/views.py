@@ -1595,7 +1595,7 @@ def detalle_ultima_ubicacion_choferes(request):
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
-                        data = "No existen coordenada para ese Chofer."
+                        data = "No existen coordenadas para el Chofer seleccionado."
                         return JsonResponse({'Message': 'Error', 'Nota': data})
             except Exception as e:
                 error = str(e)
