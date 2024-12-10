@@ -1376,15 +1376,14 @@ def Existe_Viaje_Antes(IdChofer,ID_CVN):
                     SET @@ID_CVN = %s;
                     SET @@IdChofer = %s;
                     SELECT CASE 
-                            WHEN EXISTS (
-                                SELECT 1 
-                                FROM Chofer_Viajes_Notificacion 
-                                WHERE ID_CA = (SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = @@IdChofer) 
-                                    AND (Estado = 'V' OR ID_CVN < @@ID_CVN)
-                            ) THEN 1 
-                            ELSE 0 
-                        END AS EXISTE_REGISTRO;
-
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM Chofer_Viajes_Notificacion 
+                            WHERE ID_CA = (SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = @@IdChofer) 
+                                AND (Estado = 'V' OR (ID_CVN < @@ID_CVN AND Estado = 'P'))
+                        ) THEN 1 
+                        ELSE 0 
+                    END AS EXISTE_REGISTRO;
                     """
             cursor.execute(sql, values)
             results = cursor.fetchone()
