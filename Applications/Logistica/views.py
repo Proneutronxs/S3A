@@ -1380,7 +1380,7 @@ def Existe_Viaje_Antes(IdChofer,ID_CVN):
                             SELECT 1 
                             FROM Chofer_Viajes_Notificacion 
                             WHERE ID_CA = (SELECT ID_CA FROM Chofer_Alta WHERE IdChofer = @@IdChofer) 
-                                AND (Estado = 'V' OR (ID_CVN < @@ID_CVN AND Estado = 'P'))
+                                AND (Estado = 'V' OR (ID_CVN < @@ID_CVN AND Estado = 'A'))
                         ) THEN 1 
                         ELSE 0 
                     END AS EXISTE_REGISTRO;
