@@ -1914,6 +1914,7 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfs-rectangulo-verde-rechazados {
+  flex: 0.5;
   max-height: 180px;
   border-radius: 10px;
   background-color: #ffffff;
