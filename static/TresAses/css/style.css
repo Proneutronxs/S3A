@@ -2038,10 +2038,11 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfs-contenedor-completo {
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
   gap: 8px;
   flex-direction: column;
+  flex: 1;
 }
 
 .pfa-tabla thead {
