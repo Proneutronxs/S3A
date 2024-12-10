@@ -1906,7 +1906,6 @@ input[type="checkbox"].input-checkbox {
   transition: transform 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
-  max-height: 40vh;
 }
 
 .pfa-titulo-fondo {
@@ -1914,7 +1913,7 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfs-rectangulo-verde-rechazados {
-  height: 180px;
+  max-height: 180px;
   border-radius: 10px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
