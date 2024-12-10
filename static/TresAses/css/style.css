@@ -1905,6 +1905,7 @@ input[type="checkbox"].input-checkbox {
   transition: transform 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
+  max-height: 40vh;
 }
 
 .pfa-titulo-fondo {
@@ -2006,9 +2007,10 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfa-contenedor-table {
-  max-height: 95%;
+  max-height: 96%;
   overflow-y: auto;
-  height: 95%;
+  height: 96%;
+  padding: 2px;
 }
 
 .pfa-btn-submit {
@@ -2035,6 +2037,12 @@ input[type="checkbox"].input-checkbox {
   padding: 2px;
 }
 
+.pfs-contenedor-completo {
+  height: 100vh;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
 
 .pfa-tabla thead {
   position: sticky;
