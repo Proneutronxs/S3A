@@ -2006,8 +2006,9 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfa-contenedor-table {
-  max-height: 300px;
+  max-height: 95%;
   overflow-y: auto;
+  height: 95%;
 }
 
 .pfa-btn-submit {
