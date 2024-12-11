@@ -279,6 +279,8 @@ const busca_asignados = async () => {
             data.Datos.forEach((datos) => {
                 datos_he += `
                             <tr class="pfa-tabla-fila">
+                                <td class="pfa-tabla-celda" style="text-align: center; background-color:${datos.Color};"></td>
+                                <td class="pfa-tabla-celda" style="text-align: center;">${datos.IdViaje}</td>
                                 <td class="pfa-tabla-celda" style="text-align: center;">${datos.ID}</td>
                                 <td class="pfa-tabla-celda">${datos.Tipo}</td>
                                 <td class="pfa-tabla-celda">${datos.Solicita}</td>
@@ -288,12 +290,12 @@ const busca_asignados = async () => {
                                 <td class="pfa-tabla-celda">${datos.Chofer}</td>
                                 <td class="pfa-tabla-celda">${datos.Transportista}</td>
                                 <td class="pfa-tabla-celda">${datos.Camion}</td>
-                                <td class="pfa-tabla-celda">
-                                    <button class="boton-detalles" onclick="">
-                                        <i class='bx material-symbols-outlined icon'>local_shipping</i>
+                                <td class="pfa-tabla-celda" style="text-align: center;">
+                                    <button class="boton-detalles ${datos.Estado === 'V' ? 'deshabilitado_close_asig' : ''}" onclick="mensaje_elimina_destinos(${datos.ID})">
+                                        <i class='bx material-symbols-outlined icon'>close</i>
                                     </button>
                                 </td>
-                                <td class="pfa-tabla-celda">
+                                <td class="pfa-tabla-celda" style="text-align: center;">
                                     <button class="boton-detalles" onclick="detalles_pedidos(${datos.ID});">
                                         <i class='bx material-symbols-outlined icon'>description</i>
                                     </button>
@@ -317,7 +319,7 @@ const busca_asignados = async () => {
                 },
                 "columnDefs": [
                     {
-                        "targets": [9, 10],
+                        "targets": [11, 12],
                         "width": "3%",
                         "className": "dt-center"
                     }
@@ -414,9 +416,6 @@ const listar_choferes = async () => {
                                 <div class="pfs-card-actions">
                                     <button class="pfs-card-button" onclick="detalle_destinos(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">description</i>
-                                    </button>
-                                    <button class="pfs-card-button" onclick="">
-                                        <i class="material-symbols-outlined pfa-btn-submit">contrast_square</i>
                                     </button>
                                     <button class="pfs-card-button" onclick="mapeo_ultima_ubicacion(${datos.IdCA});">
                                         <i class="material-symbols-outlined pfa-btn-submit">location_on</i>
@@ -657,6 +656,117 @@ const detalles_rechazados = async (ID_CVN) => {
             masDetalles();
         }
         else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const mensaje_elimina_destinos = async (ID_PF) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("ID_PEDIDO", ID_PF);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("mensaje-elimina-destinos/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            document.getElementById('pfa-titulo-popup').innerHTML = `<h2 style="color: red;">${data.Titulo}</h2>`;
+
+            const datos = data.Datos;
+            document.getElementById('content-detalles-pedidos').innerHTML = `
+                            <p>${data.Mensaje}</p>
+                        `;
+            document.getElementById('btn_mensajedestinos').innerHTML = `
+                            <div class="btn_mensaje_mover">
+                                <button class="btn-submit botones" onclick="cancela_eliminacion_destino();">CANCELAR</button>
+                                <button class="btn-submit botones" onclick="elimina_destinos_a_pendientes(${ID_PF},${data.Cantidad},${data.IdCVN});">CONFIRMAR</button>
+                            </div>
+                        `;
+
+
+            let tabla = `
+                        <table class="pfa-detalle-destinos-tabla">
+                            <thead>
+                                <tr>
+                                    <th>ID PEDIDO</th>
+                                    <th>DESTINO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            data.Tabla.forEach((fila) => {
+                tabla += `
+                            <tr>
+                                <td class="${parseInt(ID_PF) === parseInt(fila.IdPedidoFlete) ? 'fila_a_eliminar_pendientes' : ''}">${fila.IdPedidoFlete}</td>
+                                <td class="${parseInt(ID_PF) === parseInt(fila.IdPedidoFlete) ? 'fila_a_eliminar_pendientes' : ''}">${fila.Destino}</td>
+                            </tr>
+              `;
+            });
+
+            tabla += `
+                            </tbody>
+                        </table>
+            `;
+
+            document.getElementById('content-detalles-pedidos').innerHTML += tabla;
+            masDetalles();
+        }
+        else {
+            busca_asignados();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const elimina_destinos_a_pendientes = async (ID_PF, CANTIDAD,ID_CVN) => {
+    openProgressBar();
+    try {
+        const formData = new FormData();
+        formData.append("ID_PEDIDO", ID_PF);
+        formData.append("CANTIDAD", CANTIDAD);
+        formData.append("ID_CVN", ID_CVN);
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("elimina-destinos/", options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Success") {
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota, color);
+            busca_asignados();
+            busca_pendientes();
+            cancela_eliminacion_destino();
+        } else {
             var nota = data.Nota
             var color = "red";
             mostrarInfo(nota, color);
@@ -1034,7 +1144,7 @@ const mover_rechazados_pendientes = async () => {
 };
 
 function condicionales_asignaciones() {
-    if (!choiceAcoplados.getValue()) {
+    if (!choiceChoferes.getValue()) {
         var nota = 'Debe seleccionar el chofer.';
         var color = "red";
         mostrarInfo(nota, color);
@@ -1151,6 +1261,14 @@ closePopupBtn.addEventListener('click', () => {
     popup.style.display = 'none';
 });
 
+function cancela_eliminacion_destino() {
+    popup.style.display = 'none';
+}
+
+function confirma_eliminacion_destino(ID_PEDIDO, CANTIDAD) {
+    alert("ID pedido: " + ID_PEDIDO + ", CANTIDAD: " + CANTIDAD)
+}
+
 function openProgressBar() {
     modalOverlay.style.display = 'block';
 }
@@ -1194,4 +1312,9 @@ function getValueCheckBox() {
     } else {
         return 'T';
     }
+}
+
+
+function mover_a_pendientes(ID_PF) {
+    alert(ID_PF);
 }

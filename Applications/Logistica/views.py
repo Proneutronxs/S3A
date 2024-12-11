@@ -537,15 +537,17 @@ def mostrar_pedidos_flete(request):
                             SET @@Estado = %s;
 
                             SELECT PF.IdPedidoFlete AS ID_PF, CASE WHEN PF.TipoDestino = 'P' THEN 'PLANTA' WHEN PF.TipoDestino = 'U' THEN 'CAMBIO DOM.' END AS TIPO, CONVERT(VARCHAR(20),RTRIM(PF.Solicitante)) AS SOLICITA,  
-                                    CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
-                                    WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
-                                    CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), 
-                                    PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN RTRIM(CH.Nombre) IS NULL THEN '0' ELSE RTRIM(CH.Nombre) END AS DESTINO,
-                                    CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '0' ELSE RTRIM(VR.Nombre) END AS VARIEDAD,
-                                    CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' ELSE '' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIM(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' ELSE '' END AS CUELLOS,
-                                    CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
-                                    COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
-		                            COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN
+                                CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
+                                WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
+                                CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), 
+                                PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN RTRIM(CH.Nombre) IS NULL THEN '0' ELSE RTRIM(CH.Nombre) END AS DESTINO,
+                                CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '0' ELSE RTRIM(VR.Nombre) END AS VARIEDAD,
+                                CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' ELSE '' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIM(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' ELSE '' END AS CUELLOS,
+                                CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
+                                COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
+                                COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN, CASE WHEN (SELECT Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'V' THEN '#008f39' WHEN
+                                (SELECT Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'A' THEN '#ff8000' ELSE '#000000' END AS COLOR, CASE WHEN (SELECT ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V'))
+                                IS NULL THEN '0' ELSE (SELECT ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) END AS NUMERO_VIAJE, (SELECT Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) AS ESTADO
                             FROM PedidoFlete AS PF LEFT JOIN
                                     Zona AS ZN ON ZN.IdZona = PF.IdZona LEFT JOIN
                                     Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
@@ -591,10 +593,13 @@ def mostrar_pedidos_flete(request):
                             NOMBRE_CHOFER = str(i[24])
                             DESTINO2 = str(i[25])
                             ORIGEN = str(i[26])
+                            COLOR = str(i[27])
+                            ID_VIAJE = str(i[28])
+                            ESTADO = str(i[29])
                             datos = {'ID':ID_PF,'Tipo':TIPO, 'Solicita':SOLICITA, 'TipoDestino':TIPO_DESTINO, 'FechaPedido':FECHA_PEDIDO, 'HoraPedido':HORA_PEDIDO, 'FechaRequerido':FECHA_REQUERIDO, 'HoraRequerido':HORA_REQUERIDO, 
                                      'Zona':ZONA , 'Destino': DESTINO, 'Bins': BINS, 'Especie':ESPECIE, 'Variedad':VARIEDAD, 'Vacios':VACIOS, 'Cuellos':CUELLOS, 'Obs':OBSERVACIONES, 'IdTransportista':ID_TRANSPORTISTA,
                                      'Transportista':NOMBRE_TRANSPORTISTA, 'IdCamion':ID_CAMION, 'Camion':NOMBRE_CAMION, 'IdAcoplado':ID_ACOPLADO, 'Acoplado':NOMBRE_ACOPLADO, 'IdChofer':ID_CHOFER, 'Chofer':NOMBRE_CHOFER,
-                                     'Origen':ORIGEN, 'Destino2':DESTINO2}
+                                     'Origen':ORIGEN, 'Destino2':DESTINO2, 'Color':COLOR, 'IdViaje':ID_VIAJE, 'Estado':ESTADO}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -1609,10 +1614,209 @@ def detalle_ultima_ubicacion_choferes(request):
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
+def cantidad_destinos(ID_PEDIDO):
+    values = [ID_PEDIDO]
+    cantidad = 0
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                    SELECT COUNT(*) AS CANTIDAD
+                    FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                    WHERE CDCV.ID_CVN = (SELECT ID_CVN 
+                                            FROM Chofer_Detalle_Chacras_Viajes 
+                                            WHERE IdPedidoFlete = %s) AND Estado = 'A'
+                    """
+            cursor.execute(sql, values)
+            results = cursor.fetchone()
+            if results:
+                cantidad = int(results[0])
+                return cantidad
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","CANT DESTINOS","usuario",error)
+        return cantidad
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
+def idPedido_esta_viaje(ID_PEDIDO):
+    values = [ID_PEDIDO]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                    SELECT ID_CDCV
+                    FROM Chofer_Detalle_Chacras_Viajes
+                    WHERE IdPedidoFlete = %s AND Estado = 'V'
+                    """
+            cursor.execute(sql, values)
+            results = cursor.fetchone()
+            if results:
+                return True
+            return False
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","ESTA EN VIAJE","usuario",error)
+        return False
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
 
+@login_required
+@csrf_exempt
+def mensaje_elimina_destino_viaje(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_borrar')
+        if user_has_permission:
+            ID_PEDIDO = request.POST.get('ID_PEDIDO')
+            values = [ID_PEDIDO]
+            if idPedido_esta_viaje(ID_PEDIDO):
+                data = "El pedido ya se encuentra en viaje y no se puede mover."
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+            else:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql =   """ 
+                                DECLARE @@IdPedidoFlete INT;
+                                SET @@IdPedidoFlete = %s;
 
+                                SELECT CDCV.IdPedidoFlete AS ID_PEDIDO, CASE WHEN PF.TipoDestino = 'U' THEN RTRIM(UB.Descripcion) WHEN PF.TipoDestino = 'P' THEN RTRIM(CH.Nombre) END AS DESTINO, 
+                                        (SELECT COUNT(*) AS CANTIDAD
+                                                    FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                                                    WHERE CDCV.ID_CVN = (SELECT ID_CVN 
+                                                                            FROM Chofer_Detalle_Chacras_Viajes 
+                                                                            WHERE IdPedidoFlete = @@IdPedidoFlete AND Estado = 'A') AND Estado = 'A') AS CANTIDAD, CDCV.ID_CVN AS ID_CVN
+                                FROM Chofer_Detalle_Chacras_Viajes AS CDCV LEFT JOIN
+                                        S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
+                                        S3A.dbo.Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
+                                        S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = PF.IdPlantaDestino
+                                WHERE CDCV.ID_CVN = (SELECT ID_CVN 
+                                                        FROM Chofer_Detalle_Chacras_Viajes 
+                                                        WHERE IdPedidoFlete = @@IdPedidoFlete AND Estado = 'A') AND CDCV.Estado = 'A'
+                                """
+                        cursor.execute(sql, values)
+                        results = cursor.fetchall()
+                        if results:
+                            data = []
+                            for row in results:
+                                CANTIDAD = int(row[2])
+                                ID_PEDIDO = str(row[0])
+                                DESTINO = str(row[1])
+                                ID_CVN = str(row[3])
+                                datos = {'IdPedidoFlete':ID_PEDIDO,'Destino':DESTINO}
+                                data.append(datos)
+                            mensaje = ""
+                            titulo = ""
+                            if CANTIDAD > 1:
+                                titulo = "ELIMINACIÓN DE DESTINO"
+                                mensaje = "Se MOVERÁ el pedido N°: " + str(ID_PEDIDO) + " a PENDIENTES para ser ASIGNADO nuevamente. Desea continuar?"
+                            else:
+                                titulo = "ELIMINACION DE VIAJE"
+                                mensaje = "Se MOVERÁ el pedido N°: " + str(ID_PEDIDO) + " a PENDIENTES para ser ASIGNADO nuevamente y se ELIMINARÁ el VIAJE que lo contiene ya que es el único destino. Desea continuar?"
+                            return JsonResponse({'Message': 'Success', 'Tabla': data, 'Cantidad':CANTIDAD, 'Titulo':titulo, 'Mensaje':mensaje, 'IdCVN':ID_CVN})
+                        else:
+                            data = "No existen viajes para el pedido seleccionado."
+                            return JsonResponse({'Message': 'Error', 'Nota': data})
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("LOGISTICA","DETALLE UBICACION CHOFERES",request.user,error)
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    cursor.close()
+                    connections['TRESASES_APLICATIVO'].close()
+                
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
+@login_required
+@csrf_exempt
+def mueve_destinos_a_pendientes(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_borrar')
+        if user_has_permission:
+            Id_pedido = request.POST.get('ID_PEDIDO')
+            Cantidad = int(request.POST.get('CANTIDAD'))
+            Id_cvn = request.POST.get('ID_CVN')
+            Usuario = str(request.user).upper()
+            values1 = [Id_pedido,Id_cvn]
+            values2 = [Id_pedido]
+            values3 = [Usuario,Id_cvn]
+            
+            if Cantidad > 1:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql =   """ 
+                                UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'E', FechaBaja = GETDATE()
+                                WHERE IdPedidoFlete = %s AND ID_CVN = %s
+                                """
+                        cursor.execute(sql, values1)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows1 = cursor.fetchone()[0]
+                        sql2 =   """ 
+                                UPDATE S3A.dbo.PedidoFlete
+                                SET Estado = 'P', IdTransportista = NULL, IdCamion = NULL, IdAcoplado = NULL, IdChofer = NULL, Chofer = NULL
+                                WHERE IdPedidoFlete = %s
+                                """
+                        cursor.execute(sql2, values2)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+
+                        if (affected_rows1 > 0 and affected_rows2 > 0):
+                            return JsonResponse({'Message': 'Success', 'Nota': 'El Pedido N°: ' + str(Id_pedido) + ' se movió a PENDIENTES correctamente.'})
+                        else:
+                            return JsonResponse({'Message': 'Error', 'Nota': 'El Pedido N°: ' + str(Id_pedido) + ' NO se PUDO a PENDIENTES correctamente.'})
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("LOGISTICA","ELIMINA DESTINO",request.user,error)
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    cursor.close()
+                    connections['TRESASES_APLICATIVO'].close()
+            else:
+                try:
+                    with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                        sql =   """ 
+                                UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'E', FechaBaja = GETDATE()
+                                WHERE IdPedidoFlete = %s AND ID_CVN = %s
+                                """
+                        cursor.execute(sql, values1)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows1 = cursor.fetchone()[0]
+                        sql2 =   """ 
+                                UPDATE S3A.dbo.PedidoFlete
+                                SET Estado = 'P', IdTransportista = NULL, IdCamion = NULL, IdAcoplado = NULL, IdChofer = NULL, Chofer = NULL
+                                WHERE IdPedidoFlete = %s
+                                """
+                        cursor.execute(sql2, values2)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows2 = cursor.fetchone()[0]
+                        sql3 =   """ 
+                                UPDATE Chofer_Viajes_Notificacion SET Estado = 'E', FechaElimina = GETDATE(), UserElimina = %s
+                                WHERE ID_CVN = %s
+                                """
+                        cursor.execute(sql3, values3)
+                        cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                        affected_rows3 = cursor.fetchone()[0]
+
+                        if (affected_rows1 > 0 and affected_rows2 > 0 and affected_rows3 > 0):
+                            return JsonResponse({'Message': 'Success', 'Nota': 'El Pedido: ' + str(Id_pedido) + ' se movió a PENDIENTES correctamente.'})   
+                        else:
+                            return JsonResponse({'Message': 'Error', 'Nota': 'El Pedido N°: ' + str(Id_pedido) + ' NO se PUDO mover a PENDIENTES correctamente.'})
+                except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("LOGISTICA","ELIMINA VIAJE / DESTINOS",request.user,error)
+                    data = str(e)
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                finally:
+                    cursor.close()
+                    connections['TRESASES_APLICATIVO'].close()             
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
 

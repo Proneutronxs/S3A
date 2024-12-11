@@ -2324,8 +2324,24 @@ input[type="checkbox"].input-checkbox {
   width: 25%;
 }
 
+.deshabilitado_close_asig {
+  color: #ccc;
+  pointer-events: none; 
+  cursor: not-allowed; 
+}
 
+.btn_mensaje_mover {
+  display: flex;
+  background-color: white;
+  text-align: center;
+  gap: 40px;
+}
 
+.fila_a_eliminar_pendientes {
+  font-weight: bold;
+  background-color: #cc0000;
+  color: white;
+}
 
 
 
