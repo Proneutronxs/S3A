@@ -291,7 +291,7 @@ const busca_asignados = async () => {
                                 <td class="pfa-tabla-celda">${datos.Transportista}</td>
                                 <td class="pfa-tabla-celda">${datos.Camion}</td>
                                 <td class="pfa-tabla-celda" style="text-align: center;">
-                                    <button class="boton-detalles ${datos.Estado === 'V' ? 'deshabilitado_close_asig' : ''}" onclick="mensaje_elimina_destinos(${datos.ID})">
+                                    <button class="boton-detalles ${datos.Estado === 'V' || datos.IdViaje === '0' ? 'deshabilitado_close_asig' : ''}" onclick="mensaje_elimina_destinos(${datos.ID})">
                                         <i class='bx material-symbols-outlined icon'>close</i>
                                     </button>
                                 </td>
