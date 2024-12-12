@@ -721,7 +721,7 @@ def servicio_finalizacion(request):
                         """
                     cursor.execute(sql2,values)
                     sql3 = """ 
-                            UPDATE Chofer_Alta SET EstadoCamion = 'D', FechaActualiza = GETDATE() WHERE IdChofer = %s
+                            UPDATE Chofer_Alta SET EstadoCamion = 'D', FechaActualiza = GETDATE() WHERE ID_CA = %s
                         """
                     cursor.execute(sql3,values2)
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
