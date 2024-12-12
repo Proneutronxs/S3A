@@ -750,7 +750,7 @@ def servicio_finalizacion(request):
                 Latitud = str(coor['Latitud'])
                 Longitud = str(coor['Longitud'])
                 Fecha = str(coor['Fecha'])
-                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha)
+                inserta_coordenadas(ID_CVN,Latitud,Longitud,Fecha,ID_CA)
             return JsonResponse({'Message': 'Success', 'Nota': 'Se guardaron todos los Registros.'})
     else:
         data = "No se pudo resolver la Petición"

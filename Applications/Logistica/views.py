@@ -1535,7 +1535,7 @@ def listado_choferes_activos(request):
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                     sql = """ 
-                            SELECT IdChofer AS ID_CA, NombreChofer AS CHOFER
+                            SELECT ID_CA AS ID_CA, NombreChofer AS CHOFER
                             FROM Chofer_Alta
                             WHERE Estado = 'A'
                             ORDER BY CHOFER
