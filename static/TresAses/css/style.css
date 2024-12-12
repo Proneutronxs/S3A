@@ -1915,7 +1915,8 @@ input[type="checkbox"].input-checkbox {
 
 .pfs-rectangulo-verde-rechazados {
   flex: 0.5;
-  max-height: 180px;
+  max-height: 280px;
+  min-height: 200px;
   border-radius: 10px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -2040,11 +2041,13 @@ input[type="checkbox"].input-checkbox {
 }
 
 .pfs-contenedor-completo {
-  /* height: 100vh; */
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   gap: 8px;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
 }
 
 .pfa-tabla thead {
