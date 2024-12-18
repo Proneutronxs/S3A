@@ -52,5 +52,9 @@ urlpatterns = [
 
     path('fruit/listar-nuevos-destinos/chofer=<str:ID_CA>/', fruit.Obtener_Nuevos_destinos, name="fruit_obtener_viajes_chacras"),
 
+    ### LISTADO DE VIAJES
+
+    path('fruit/listar-viajes/', fruit.listado_asignados, name="fruit_listado_asignados"),
+
 
 ]
