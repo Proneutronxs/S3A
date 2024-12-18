@@ -1025,6 +1025,7 @@ def listado_asignados(request):
                         num_viaje = str(row[0])
                         if num_viaje not in viajes:
                             viajes[num_viaje] = {
+                                "NumViaje":num_viaje,
                                 "DetalleDestinos": []
                             }
                         
