@@ -990,8 +990,8 @@ def Obtener_Nuevos_destinos(request,ID_CA):
 def listado_asignados(request):
     if request.method == 'POST':
         body = request.body.decode('utf-8')
-        ID_CHOFER = str(json.loads(body)['ID_CHOFER'])
-        values = [ID_CHOFER]
+        ID_CA = str(json.loads(body)['ID_CA'])
+        values = [ID_CA]
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
