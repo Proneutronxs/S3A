@@ -986,6 +986,72 @@ def Obtener_Nuevos_destinos(request,ID_CA):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def listado_asignados(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CHOFER = str(json.loads(body)['ID_CHOFER'])
+        values = [ID_CHOFER]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT CVN.ID_CVN AS ID_VIAJE, 'DESTINO N°: ' + CONVERT(VARCHAR, ROW_NUMBER() OVER (PARTITION BY CVN.ID_CVN ORDER BY CVN.ID_CVN)) AS NUM_DESTINO,
+                            PF.IdPedidoFlete AS NUM_PEDIDO, CONVERT(VARCHAR(20), RTRIM(PF.Solicitante)) AS SOLICITA, RTRIM(PF.Obs) AS OBSERVACIONES,
+                            CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDA, 
+                            CASE 
+                                WHEN PF.HoraRequerida IS NULL THEN CONVERT(VARCHAR(10), PF.HoraPedido, 108) 
+                                ELSE CONVERT(VARCHAR(10), PF.HoraRequerida, 108) 		
+                            END AS HORA_REQUERIDA,
+                            CASE
+                                WHEN PF.TipoDestino = 'P' THEN RTRIM(CH.Nombre)
+                                WHEN PF.TipoDestino = 'U' THEN RTRIM(UB.Descripcion)
+                            END AS DESTINO,
+                            US.Telefono AS TELEFONO
+                        FROM Chofer_Alta AS CA LEFT JOIN 
+                            Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN 
+                            Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN LEFT JOIN
+                            S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
+                            S3A.dbo.Chacra AS CH ON CH.IdChacra = CDCV.IdChacra LEFT JOIN
+                            S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = CDCV.IdChacra LEFT JOIN 
+                            USUARIOS AS US ON US.Usuario = PF.UserID COLLATE Modern_Spanish_CI_AS
+                        WHERE CVN.ID_CA = %s AND CVN.Estado = 'A' AND CDCV.Estado = 'A'
+                        ORDER BY CVN.ID_CVN
+                    """
+                cursor.execute(sql,values)
+                results = cursor.fetchall()
+                if results:
+                    viajes = {}
+                    for row in results:
+                        num_viaje = str(row[0])
+                        if num_viaje not in viajes:
+                            viajes[num_viaje] = {
+                                "DetalleDestinos": []
+                            }
+                        
+                        DetalleDestinos = {
+                            "NumDestino":str(row[1]),
+                            "IdPedidoFlete":str(row[2]),
+                            "Solicita":str(row[3]),
+                            "Obs":str(row[4]),
+                            "Fecha":str(row[5]),
+                            "Hora":str(row[6]),
+                            "Destinos":str(row[7]),
+                            "Telefono":str(row[8])
+                        }
+                        viajes[num_viaje]["DetalleDestinos"].append(DetalleDestinos)
+
+                    viajes_list = list(viajes.values())
+                    return JsonResponse({'Message': 'Success', 'Viajes': viajes_list})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron más viajes.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","ACEPTA VIAJE","POST",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
