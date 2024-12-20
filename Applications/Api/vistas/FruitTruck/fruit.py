@@ -437,7 +437,7 @@ def acepta_rechaza_viaje(request):
                             SET @ID_CVN = %s; 
 
                             UPDATE S3A.dbo.PedidoFlete
-                            SET Estado = 'C'
+                            SET Estado = 'R'
                             WHERE IdPedidoFlete IN (
                                 SELECT CDCV.IdPedidoFlete
                                 FROM Chofer_Detalle_Chacras_Viajes AS CDCV
@@ -446,13 +446,13 @@ def acepta_rechaza_viaje(request):
                         """
                     cursor.execute(sql3,values)
                     sql = """ 
-                            UPDATE VN SET VN.Estado = 'C', VN.FechaCancela = GETDATE()
+                            UPDATE VN SET VN.Estado = 'R', VN.FechaCancela = GETDATE()
                             FROM Chofer_Viajes_Notificacion AS VN 
                             WHERE VN.ID_CVN = %s;
                         """
                     cursor.execute(sql,values)
                     sql2 = """ 
-                            UPDATE DCV SET DCV.Estado = 'C'
+                            UPDATE DCV SET DCV.Estado = 'R'
                             FROM Chofer_Detalle_Chacras_Viajes AS DCV 
                             WHERE DCV.ID_CVN = %s;
                         """
