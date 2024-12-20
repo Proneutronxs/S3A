@@ -461,7 +461,7 @@ def acepta_rechaza_viaje(request):
                     cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
                     affected_rows = cursor.fetchone()[0]
                 if affected_rows > 0:
-                    return JsonResponse({'Message': 'Error', 'Nota': 'El Viaje se CANCELÓ correctamente.'})
+                    return JsonResponse({'Message': 'Success', 'Nota': 'El Viaje se CANCELÓ correctamente.'})
                 else:
                     return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo cancelar el viaje, intente más tarde.'})
             except Exception as e:
