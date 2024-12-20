@@ -825,12 +825,12 @@ def update_chacra(ID_CDCV, LlegaChacra):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
-def update_planta(ID_CDCV, LlegaPlanta):
-    values = [LlegaPlanta,ID_CDCV]
+def update_planta(ID_CVN, LlegaPlanta):
+    values = [LlegaPlanta,ID_CVN]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    UPDATE Chofer_Viajes_Notificacion SET LlegaPlanta = %s WHERE ID_CDCV = %s
+                    UPDATE Chofer_Viajes_Notificacion SET LlegaPlanta = %s WHERE ID_CVN = %s
                 """
             cursor.execute(sql, values)
     except Exception as e:
