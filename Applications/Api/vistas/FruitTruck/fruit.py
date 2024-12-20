@@ -429,6 +429,47 @@ def acepta_rechaza_viaje(request):
                 return JsonResponse({'Message': 'Error', 'Nota': error})
             finally:
                 connections['TRESASES_APLICATIVO'].close()
+        if Tipo == "C":
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql3 = """ 
+                            DECLARE @ID_CVN INT;
+                            SET @ID_CVN = %s; 
+
+                            UPDATE S3A.dbo.PedidoFlete
+                            SET Estado = 'C'
+                            WHERE IdPedidoFlete IN (
+                                SELECT CDCV.IdPedidoFlete
+                                FROM Chofer_Detalle_Chacras_Viajes AS CDCV
+                                WHERE CDCV.ID_CVN = @ID_CVN
+                            );
+                        """
+                    cursor.execute(sql3,values)
+                    sql = """ 
+                            UPDATE VN SET VN.Estado = 'C', VN.FechaCancela = GETDATE()
+                            FROM Chofer_Viajes_Notificacion AS VN 
+                            WHERE VN.ID_CVN = %s;
+                        """
+                    cursor.execute(sql,values)
+                    sql2 = """ 
+                            UPDATE DCV SET DCV.Estado = 'C'
+                            FROM Chofer_Detalle_Chacras_Viajes AS DCV 
+                            WHERE DCV.ID_CVN = %s;
+                        """
+                    cursor.execute(sql2,values)
+                    
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                if affected_rows > 0:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'El Viaje se CANCELÓ correctamente.'})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo cancelar el viaje, intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","CANCELA VIAJE","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
