@@ -275,7 +275,7 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                         -- CONSULTA PARA SOLICITUD DE FLETE CHACRA
                         (SELECT        VN.ID_CVN AS ID_VIAJE_NOTI, CA.ID_CA AS ID_CHOFER_ALTA, CA.NombreChofer AS NOM_CHOFER, CA.IdChofer AS ID_CHOFER, 
                                             DCV.ID_CDCV AS ID_DETALLES_CHACRAS, DCV.IdPedidoFlete AS ID_PEDIDO_FLETE, 
-                                            DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, RTRIM(CH.Nombre) AS NOM_CHACRA, 
+                                            DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, CONVERT(VARCHAR(19),RTRIM(PR.RazonSocial)) +'-'+ RTRIM(CH.Nombre) AS NOM_CHACRA, 
                                             ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
                                             ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
                                             ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
@@ -291,6 +291,7 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                                                         S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
                                                         S3A.dbo.Ubicacion AS UBID ON UBID.IdUbicacion = PD.IdPlantaDestino LEFT JOIN
                                                         S3A.dbo.Ubicacion AS UBIO ON UBIO.IdUbicacion = PD.IdPlanta LEFT JOIN
+								                        S3A.dbo.Productor AS PR ON PR.IdProductor = PD.IdProductor LEFT JOIN
                                                         Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV LEFT JOIN
                                                         USUARIOS AS US ON US.Usuario = PD.UserID COLLATE Modern_Spanish_CI_AS
                                 WHERE CA.ID_CA = @@ID_CA 
@@ -326,7 +327,7 @@ def Obtener_Viaje_Chacras(request,ID_CA):
                             "IdChacra": str(row[6]),
                             "LatChacra": str(row[7]),
                             "LonChacra": str(row[8]),
-                            "MombreChacra": str(row[9]),
+                            "MombreChacra": str(row[9]).replace("-","\n"),
                             "IdZona": str(row[10]),
                             "NombreZona": str(row[11]),
                             "Vacios": str(row[12]),
@@ -839,7 +840,7 @@ def update_planta(ID_CVN, LlegaPlanta):
     finally:
         connections['TRESASES_APLICATIVO'].close()
 
-def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta,ID_CA):
+def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta, ID_CA):
     values = [ID_CVN, Latitud, Longitud, FechaAlta,ID_CA]
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -1044,7 +1045,7 @@ def listado_asignados(request):
                                 ELSE CONVERT(VARCHAR(10), PF.HoraRequerida, 108) 		
                             END AS HORA_REQUERIDA,
                             CASE
-                                WHEN PF.TipoDestino = 'P' THEN RTRIM(CH.Nombre)
+                                WHEN PF.TipoDestino = 'P' THEN CONVERT(VARCHAR(19),RTRIM(PR.RazonSocial)) +'\n'+ RTRIM(CH.Nombre)
                                 WHEN PF.TipoDestino = 'U' THEN RTRIM(UB.Descripcion)
                             END AS DESTINO,
                             US.Telefono AS TELEFONO
@@ -1054,6 +1055,7 @@ def listado_asignados(request):
                             S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
                             S3A.dbo.Chacra AS CH ON CH.IdChacra = CDCV.IdChacra LEFT JOIN
                             S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = CDCV.IdChacra LEFT JOIN 
+		                    S3A.dbo.Productor AS PR ON PR.IdProductor = PF.IdProductor LEFT JOIN
                             USUARIOS AS US ON US.Usuario = PF.UserID COLLATE Modern_Spanish_CI_AS
                         WHERE CVN.ID_CA = %s AND CVN.Estado = 'A' AND CDCV.Estado = 'A'
                         ORDER BY CVN.ID_CVN
