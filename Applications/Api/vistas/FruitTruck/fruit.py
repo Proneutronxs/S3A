@@ -1048,14 +1048,15 @@ def listado_asignados(request):
                                 WHEN PF.TipoDestino = 'P' THEN CONVERT(VARCHAR(19),RTRIM(PR.RazonSocial)) +'\n'+ RTRIM(CH.Nombre)
                                 WHEN PF.TipoDestino = 'U' THEN RTRIM(UB.Descripcion)
                             END AS DESTINO,
-                            US.Telefono AS TELEFONO
+                            US.Telefono AS TELEFONO, RTRIM(OUB.Descripcion) AS ORIGEN
                         FROM Chofer_Alta AS CA LEFT JOIN 
                             Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA LEFT JOIN 
                             Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN LEFT JOIN
                             S3A.dbo.PedidoFlete AS PF ON PF.IdPedidoFlete = CDCV.IdPedidoFlete LEFT JOIN
                             S3A.dbo.Chacra AS CH ON CH.IdChacra = CDCV.IdChacra LEFT JOIN
                             S3A.dbo.Ubicacion AS UB ON UB.IdUbicacion = CDCV.IdChacra LEFT JOIN 
-		                    S3A.dbo.Productor AS PR ON PR.IdProductor = PF.IdProductor LEFT JOIN
+                            S3A.dbo.Ubicacion AS OUB ON OUB.IdUbicacion = PF.IdPlanta LEFT JOIN 
+                            S3A.dbo.Productor AS PR ON PR.IdProductor = PF.IdProductor LEFT JOIN
                             USUARIOS AS US ON US.Usuario = PF.UserID COLLATE Modern_Spanish_CI_AS
                         WHERE CVN.ID_CA = %s AND CVN.Estado = 'A' AND CDCV.Estado = 'A'
                         ORDER BY CVN.ID_CVN
@@ -1080,7 +1081,8 @@ def listado_asignados(request):
                             "Fecha":str(row[5]),
                             "Hora":str(row[6]),
                             "Destinos":str(row[7]),
-                            "Telefono":str(row[8])
+                            "Telefono":str(row[8]),
+                            "Origen":str(row[9])
                         }
                         viajes[num_viaje]["DetalleDestinos"].append(DetalleDestinos)
 
