@@ -10,9 +10,10 @@ def enviar_notificacion_chofer_solicita(token, body, pestaña):
     try:
         message = messaging.Message(
             data={
-                "title": "Tres Ases",
-                "body": body,
-                "Pestaña": pestaña
+                "Title": "Tres Ases",
+                "Body": body,
+                "Pestaña": pestaña,
+                "ID_CNG": "0"
             },
             token=token,
         )
@@ -42,3 +43,22 @@ def notificaciones_Fruit_Truck(Token, Body, Tipo, Habilitado, ID_CVN, Destinos):
         return '1' if response else '0'
     except Exception as e:
         return 'excepcion ' 
+    
+def enviar_notificacion_Tres_Ases(token, body, pestaña,ID_CNG):
+    inicio = inicializar_firebase()
+    if not token or not body or not pestaña:
+        return 'bodys' 
+    try:
+        message = messaging.Message(
+            data={
+                "Title": "Tres Ases",
+                "Body": body,
+                "Pestaña": pestaña,
+                "ID_CNG": ID_CNG
+            },
+            token=token,
+        )
+        response = messaging.send(message)
+        return '1' if response else '0'
+    except Exception as e:
+        return 'excepcion ' + str(inicio)
