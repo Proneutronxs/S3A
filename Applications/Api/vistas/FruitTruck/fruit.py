@@ -471,6 +471,17 @@ def acepta_rechaza_viaje(request):
                 return JsonResponse({'Message': 'Error', 'Nota': error})
             finally:
                 connections['TRESASES_APLICATIVO'].close()
+        if Tipo == "S3A":
+            return JsonResponse({'Message': 'Success', 'Nota': 'Se recibió.'})
+            # try:
+            #     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            #         return JsonResponse({'Message': 'Success', 'Nota': 'Se recibió.'})
+            # except Exception as e:
+            #     error = str(e)
+            #     insertar_registro_error_sql("API","CANCELA VIAJE","POST",error)
+            #     return JsonResponse({'Message': 'Error', 'Nota': error})
+            # finally:
+            #     connections['TRESASES_APLICATIVO'].close()
         return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo resolver la petición.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
