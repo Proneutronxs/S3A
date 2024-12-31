@@ -561,6 +561,7 @@ def mostrar_pedidos_flete(request):
                                     Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta
                             WHERE PF.Estado = @@Estado
                                     AND (@@Tipo = '0' OR @@Tipo = PF.TipoDestino)
+                            ORDER BY NUMERO_VIAJE DESC
                             """
                     cursor.execute(sql, values)
                     consulta = cursor.fetchall()
