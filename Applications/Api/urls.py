@@ -26,6 +26,8 @@ urlpatterns = [
 
     path('fruit/listar-viaje/chofer=<str:ID_CA>/', fruit.Obtener_Viaje_Chacras, name="fruit_obtener_viajes_chacras"),
 
+    path('fruit/listar-viaje-aceptado/chofer=<str:ID_CA>/', fruit.Obtener_Viaje_Aceptado, name="fruit_obtener_viajes_aceptado"),
+
     path('fruit/rechaza-acepta-viaje/', fruit.acepta_rechaza_viaje, name="fruit_acepta_rechaza_viaje"),
 
     ### CAMBIA ESTADOS DE CHOFER ###

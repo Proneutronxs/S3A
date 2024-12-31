@@ -486,6 +486,135 @@ def acepta_rechaza_viaje(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def Obtener_Viaje_Aceptado(request,ID_CA):
+    if request.method == 'GET':
+        ID_CA = str(ID_CA)
+        values = [ID_CA]
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        DECLARE @@ID_CA INT;
+                        SET @@ID_CA = %s;
+
+                        IF (SELECT TipoDestino FROM S3A.dbo.PedidoFlete WHERE IdPedidoFlete = 
+                            (SELECT TOP 1 CDCV.IdPedidoFlete
+                            FROM Chofer_Alta AS CA 
+                            LEFT JOIN Chofer_Viajes_Notificacion AS CVN ON CVN.ID_CA = CA.ID_CA 
+                            LEFT JOIN Chofer_Detalle_Chacras_Viajes AS CDCV ON CDCV.ID_CVN = CVN.ID_CVN
+                            WHERE CA.ID_CA = @@ID_CA
+                            --AND NOT EXISTS (SELECT 1 FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA)
+                            AND CVN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA) 
+                            AND CDCV.Estado = 'V')) = 'U'
+                        BEGIN
+                        -- CONSULTA PARA CAMBIOS DE DOMICILIO
+                        (SELECT        VN.ID_CVN AS ID_VIAJE_NOTI, CA.ID_CA AS ID_CHOFER_ALTA, CA.NombreChofer AS NOM_CHOFER, CA.IdChofer AS ID_CHOFER, 
+                                            DCV.ID_CDCV AS ID_DETALLES_CHACRAS, DCV.IdPedidoFlete AS ID_PEDIDO_FLETE, 
+                                            DCV.IdChacra AS ID_CHACRA, ISNULL(UBID.Latitud,0) AS LATITUD, ISNULL(UBID.Longitud,0) AS LONGITUD, RTRIM(UBID.Descripcion) AS NOM_CHACRA, 
+                                            COALESCE(ZN.IdZona,'0') AS ID_ZONA, COALESCE(RTRIM(ZN.Nombre),'-') AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE '-' END AS VACIOS, 
+                                            ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
+                                            ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE '-' END AS CUELLOS,
+                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, RTRIM(UBIO.Descripcion) AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
+                                            CASE WHEN RTRIM(PD.TipoCarga) = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN RTRIM(PD.TipoCarga) = 'VAC' THEN 'BIN VACÍOS' WHEN RTRIM(PD.TipoCarga) = 'EMB' THEN 'EMBALADO'
+                                            WHEN RTRIM(PD.TipoCarga) = 'VAR' THEN 'VARIOS' WHEN RTRIM(PD.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PD.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' ELSE RTRIM(PD.TipoCarga) END AS TIPO_CARGA,
+                                            PD.TipoDestino AS TIPO_DESTINO
+                                FROM            Chofer_Alta AS CA LEFT JOIN
+                                                        Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA LEFT JOIN
+                                                        Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN LEFT JOIN
+                                                        S3A.dbo.Chacra AS CH ON CH.IdChacra = DCV.IdChacra LEFT JOIN
+                                                        S3A.dbo.Zona AS ZN ON ZN.IdZona = CH.Zona LEFT JOIN
+                                                        S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
+                                                        S3A.dbo.Ubicacion AS UBID ON UBID.IdUbicacion = PD.IdPlantaDestino LEFT JOIN
+                                                        S3A.dbo.Ubicacion AS UBIO ON UBIO.IdUbicacion = PD.IdPlanta LEFT JOIN
+                                                        Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV LEFT JOIN
+                                                        USUARIOS AS US ON US.Usuario = PD.UserID COLLATE Modern_Spanish_CI_AS
+                                WHERE CA.ID_CA = @@ID_CA 
+                                    --AND NOT EXISTS (SELECT 1 FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA)
+                                    AND VN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA) 
+                                    AND DCV.Estado = 'V')
+                        END
+                        ELSE 
+                        BEGIN
+                        -- CONSULTA PARA SOLICITUD DE FLETE CHACRA
+                        (SELECT        VN.ID_CVN AS ID_VIAJE_NOTI, CA.ID_CA AS ID_CHOFER_ALTA, CA.NombreChofer AS NOM_CHOFER, CA.IdChofer AS ID_CHOFER, 
+                                            DCV.ID_CDCV AS ID_DETALLES_CHACRAS, DCV.IdPedidoFlete AS ID_PEDIDO_FLETE, 
+                                            DCV.IdChacra AS ID_CHACRA, ISNULL(CH.Latitud,0) AS LATITUD, ISNULL(CH.Longitud,0) AS LONGITUD, RTRIM(CH.Nombre) AS NOM_CHACRA, 
+                                            ZN.IdZona AS ID_ZONA, RTRIM(ZN.Nombre) AS NOM_ZONA, CASE PD.Vacios WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Vacios END AS VACIOS, 
+                                            ISNULL(VN.CantidadVac, 0) AS CANT_VACIOS, ISNULL(VN.ID_CUV,0) AS ID_UBI_VAC, CASE WHEN UV.Nombre IS NULL THEN '0' ELSE UV.Nombre END AS NOM_UBI_VAC,
+                                            ISNULL(UV.Latitud,0) AS LAT_VAC, ISNULL(UV.Longitud,0) AS LONG_VAC, CASE PD.Cuellos WHEN 'N' THEN 'NO' WHEN 'S' THEN 'SI' ELSE PD.Cuellos END AS CUELLOS,
+                                            RTRIM(PD.Solicitante) AS SOLICITA, ISNULL(US.Telefono,0) AS TELEFONO, RTRIM(UBIO.Descripcion) AS ORIGEN, RTRIM(PD.Obs) AS OBSERVACIONES,
+                                            CASE WHEN RTRIM(PD.TipoCarga) = 'RAU' THEN 'BINS FRUTA CHACRA' WHEN RTRIM(PD.TipoCarga) = 'VAC' THEN 'BIN VACÍOS' WHEN RTRIM(PD.TipoCarga) = 'EMB' THEN 'EMBALADO'
+                                            WHEN RTRIM(PD.TipoCarga) = 'VAR' THEN 'VARIOS' WHEN RTRIM(PD.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PD.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' ELSE RTRIM(PD.TipoCarga) END AS TIPO_CARGA,
+                                            PD.TipoDestino AS TIPO_DESTINO
+                                FROM            Chofer_Alta AS CA LEFT JOIN
+                                                        Chofer_Viajes_Notificacion AS VN ON CA.ID_CA = VN.ID_CA LEFT JOIN
+                                                        Chofer_Detalle_Chacras_Viajes AS DCV ON VN.ID_CVN = DCV.ID_CVN LEFT JOIN
+                                                        S3A.dbo.Chacra AS CH ON CH.IdChacra = DCV.IdChacra LEFT JOIN
+                                                        S3A.dbo.Zona AS ZN ON ZN.IdZona = CH.Zona LEFT JOIN
+                                                        S3A.dbo.PedidoFlete AS PD ON PD.IdPedidoFlete = DCV.IdPedidoFlete LEFT JOIN
+                                                        S3A.dbo.Ubicacion AS UBID ON UBID.IdUbicacion = PD.IdPlantaDestino LEFT JOIN
+                                                        S3A.dbo.Ubicacion AS UBIO ON UBIO.IdUbicacion = PD.IdPlanta LEFT JOIN
+                                                        Chofer_Ubicacion_Vacios AS UV ON UV.ID_CUV = VN.ID_CUV LEFT JOIN
+                                                        USUARIOS AS US ON US.Usuario = PD.UserID COLLATE Modern_Spanish_CI_AS
+                                WHERE CA.ID_CA = @@ID_CA 
+                                    --AND NOT EXISTS (SELECT 1 FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA)
+                                    AND VN.ID_CVN = (SELECT MIN(ID_CVN) FROM Chofer_Viajes_Notificacion WHERE Estado = 'V' AND ID_CA = CA.ID_CA) 
+                                    AND DCV.Estado = 'V')
+                        END
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    viajes = {}
+                    for row in consulta:
+                        id_viaje = str(row[0])
+                        if id_viaje not in viajes:
+                            viajes[id_viaje] = {
+                                "IdViaje": id_viaje,
+                                "IdChoferAlta": str(row[1]),
+                                "NombreChofer": str(row[2]),
+                                "IdChofer": str(row[3]),
+                                "CantVacios": str(row[13]),
+                                "IdUbiVac": str(row[14]),
+                                "NombreUbiVacios": str(row[15]),
+                                "LatVacios": str(row[16]),
+                                "LonVacios": str(row[17]),
+                                "TipoDestino": str(row[24]),
+                                "DetalleChacras": []
+                            }
+                        
+                        detalle_chacra = {
+                            "IdDetalleChacras": str(row[4]),
+                            "IdPedidoFlete": str(row[5]),
+                            "IdChacra": str(row[6]),
+                            "LatChacra": str(row[7]),
+                            "LonChacra": str(row[8]),
+                            "MombreChacra": str(row[9]).replace("-","\n"),
+                            "IdZona": str(row[10]),
+                            "NombreZona": str(row[11]),
+                            "Vacios": str(row[12]),
+                            "Cuellos": str(row[18]),
+                            "Solicita": str(row[19]),
+                            "Telefono": str(row[20]),
+                            "Origen": str(row[21]),
+                            "Observaciones": str(row[22]),
+                            "TipoCarga": str(row[23])
+                        }
+                        viajes[id_viaje]["DetalleChacras"].append(detalle_chacra)
+
+                    viajes_list = list(viajes.values())
+                    return JsonResponse({'Message': 'Success', 'Viaje': viajes_list})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': "No existen viajes disponibles."})
+
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("API","OBTIENE VIAJE","GET",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+        finally:
+            connections['TRESASES_APLICATIVO'].close()
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
 @csrf_exempt
 def mostrar_remitos_fecha_chofer(request):
     if request.method == 'POST':
