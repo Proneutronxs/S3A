@@ -127,8 +127,8 @@ class Remito_Movimiento_Chacras(FPDF):
         self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
-        self.text(x=110, y=133, txt= 'C.A.I.: 49523204816019')
-        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 29/12/2024')
+        self.text(x=110, y=133, txt= 'C.A.I.: 50513210619512')
+        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 16/12/2025')
         self.ln(138)
 
 ### REMITO ROMIK
@@ -259,8 +259,8 @@ class Remito_Romik_Movimiento_Chacras(FPDF):
         #self.image(barcode_filename, x=22, y=129, w=65, h=12)
         #### CAI
         self.set_font('Arial', 'B', 10)
-        self.text(x=110, y=133, txt= 'C.A.I.: 50016204851055')
-        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 02/01/2025')
+        self.text(x=110, y=133, txt= 'C.A.I.: 505116210619582')
+        self.text(x=110, y=138, txt= 'FECHA VENCIMIENTO: 16/12/2025')
         self.ln(138)
 
 ### REMITO ABADON
