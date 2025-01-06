@@ -1442,7 +1442,7 @@ def finalizaRemito(request, idAsignacion):
     if request.method == 'GET':
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ UPDATE Datos_Remito_MovBins SET AsigCerrada = 'C' WHERE IdAsignacion = %s """
+                sql = """ UPDATE Datos_Remito_MovBins SET AsigCerrada = 'P' WHERE IdAsignacion = %s """
                 cursor.execute(sql, [idAsignacion]) 
 
                 cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
