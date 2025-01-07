@@ -380,7 +380,7 @@ def llamaAsignacionesPendientes(request, usuario):
                                         AND (PedidoFlete.Estado = 'A') 
                                         AND ((SELECT DISTINCT AsigCerrada
                                                             FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins
-                                                            WHERE        (IdAsignacion = PedidoFlete.IdPedidoFlete)) IS NULL)
+                                                            WHERE        (IdAsignacion = PedidoFlete.IdPedidoFlete) AND DATEPART(YEAR, FechaAlta) = DATEPART(YEAR, GETDATE())) IS NULL)
                             ORDER BY PedidoFlete.IdPedidoFlete """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
