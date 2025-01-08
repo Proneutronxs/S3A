@@ -1020,6 +1020,25 @@ def actualiza_notificacion_recibida(request):
                 return JsonResponse({'Message': 'Error', 'Nota': error})
             finally:
                 connections['TRESASES_APLICATIVO'].close()
+        elif Tipo == 'S3A':
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            UPDATE Canal_Notificaciones_Generales SET Estado = 'R', FechaRecibo = GETDATE() WHERE ID_CNG = %s
+                        """
+                    cursor.execute(sql,values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Estado de la notificación (S3A) se actualizó correctamente.'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo actualizar el Estado de la notificación (S3A), intente más tarde.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","RECIBE NOTIFICACION DESTINOS","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
         else:
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
