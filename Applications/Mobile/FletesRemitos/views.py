@@ -1922,8 +1922,8 @@ def ver_remitos_por_usuario(request):
                                                 S3A.dbo.Especie.IdEspecie = Datos_Remito_MovBins.IdEspecie ON S3A.dbo.Variedad.IdVariedad = Datos_Remito_MovBins.IdVariedad ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON 
                                                 S3A.dbo.Camion.IdCamion = S3A.dbo.PedidoFlete.IdCamion
                         WHERE (Datos_Remito_MovBins.USUARIO = @@Usuario)
-                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) >= @@Inicio)
-                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) <= @@Final)
+                                AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) >= @@Inicio)
+                                AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) <= @@Final)
                     """
                 cursor.execute(sql,values)
                 results = cursor.fetchall()
