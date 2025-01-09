@@ -1902,9 +1902,9 @@ def ver_remitos_por_usuario(request):
                         DECLARE @@Final DATE;
                         DECLARE @@Usuario VARCHAR(20);
 
+                        SET @@Usuario = %s;
                         SET @@Inicio = %s;
                         SET @@Final = %s;
-                        SET @@Usuario = %s;
 
                         SELECT        FORMAT(Datos_Remito_MovBins.NumeroRemito, '00000000') AS NRO_REMITO, RTRIM(S3A.dbo.Productor.RazonSocial) AS RAZON_SOCIAL, RTRIM(S3A.dbo.Productor.Nombre) AS NOMBRE, 
                                                 RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
@@ -1922,8 +1922,8 @@ def ver_remitos_por_usuario(request):
                                                 S3A.dbo.Especie.IdEspecie = Datos_Remito_MovBins.IdEspecie ON S3A.dbo.Variedad.IdVariedad = Datos_Remito_MovBins.IdVariedad ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON 
                                                 S3A.dbo.Camion.IdCamion = S3A.dbo.PedidoFlete.IdCamion
                         WHERE (Datos_Remito_MovBins.USUARIO = @@Usuario)
-                                AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) >= @@Inicio)
-                                AND (TRY_CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) <= @@Final)
+                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) >= @@Inicio)
+                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) <= @@Final)
                     """
                 cursor.execute(sql,values)
                 results = cursor.fetchall()
