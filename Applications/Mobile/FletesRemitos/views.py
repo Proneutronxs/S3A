@@ -1887,6 +1887,120 @@ def Buscar_Pedidos_Flete(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})    
 
+@csrf_exempt
+def ver_remitos_por_usuario(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            inicio = str(json.loads(body)['Inicio'])
+            final = str(json.loads(body)['Final'])
+            usuario = str(json.loads(body)['Usuario'])
+            values = [usuario,inicio,final]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                        DECLARE @@Inicio DATE;
+                        DECLARE @@Final DATE;
+                        DECLARE @@Usuario VARCHAR(20);
+
+                        SET @@Inicio = %s;
+                        SET @@Final = %s;
+                        SET @@Usuario = %s;
+
+                        SELECT        FORMAT(Datos_Remito_MovBins.NumeroRemito, '00000000') AS NRO_REMITO, RTRIM(S3A.dbo.Productor.RazonSocial) AS RAZON_SOCIAL, RTRIM(S3A.dbo.Productor.Nombre) AS NOMBRE, 
+                                                RTRIM(S3A.dbo.Productor.Direccion) AS DIRECCION, Datos_Remito_MovBins.Renspa AS RENSPA, Datos_Remito_MovBins.UP, Datos_Remito_MovBins.Cantidad AS CANT_TOTAL, Datos_Remito_MovBins.IdAsignacion AS ID, 
+                                                RTRIM(S3A.dbo.PedidoFlete.Solicitante) AS CAPATAZ, RTRIM(S3A.dbo.Especie.Nombre) AS ESPECIE, RTRIM(S3A.dbo.Variedad.Nombre) AS VARIEDAD, RTRIM(S3A.dbo.Chacra.Nombre) AS CHACRA, RTRIM(S3A.dbo.PedidoFlete.Chofer) AS CHOFER, RTRIM(S3A.dbo.Camion.Nombre) AS CAMION, 
+                                                RTRIM(S3A.dbo.Camion.Patente) AS PATENTE, CONVERT(VARCHAR(10), Datos_Remito_MovBins.FechaAlta, 103) AS FECHA, CONVERT(VARCHAR(5), Datos_Remito_MovBins.FechaAlta, 108) + ' Hs.' AS HORA, Datos_Remito_MovBins.NumeroRemito, 
+                                                CASE WHEN Datos_Remito_MovBins.Observaciones IS NULL THEN '' ELSE Datos_Remito_MovBins.Observaciones END AS OBS, S3A.dbo.Productor.IdProductor, Datos_Remito_MovBins.NombrePdf,
+                                                Datos_Remito_MovBins.NumeroRemito, Datos_Remito_MovBins.IdProductor AS IDPR
+                        FROM            S3A.dbo.Camion INNER JOIN
+                                                S3A.dbo.Chacra INNER JOIN
+                                                S3A.dbo.Variedad INNER JOIN
+                                                S3A.dbo.Especie INNER JOIN
+                                                S3A.dbo.Productor INNER JOIN
+                                                Datos_Remito_MovBins INNER JOIN
+                                                S3A.dbo.PedidoFlete ON Datos_Remito_MovBins.IdAsignacion = S3A.dbo.PedidoFlete.IdPedidoFlete ON S3A.dbo.Productor.IdProductor = S3A.dbo.PedidoFlete.IdProductor ON 
+                                                S3A.dbo.Especie.IdEspecie = Datos_Remito_MovBins.IdEspecie ON S3A.dbo.Variedad.IdVariedad = Datos_Remito_MovBins.IdVariedad ON S3A.dbo.Chacra.IdChacra = S3A.dbo.PedidoFlete.IdChacra ON 
+                                                S3A.dbo.Camion.IdCamion = S3A.dbo.PedidoFlete.IdCamion
+                        WHERE (Datos_Remito_MovBins.USUARIO = @@Usuario)
+                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) >= @@Inicio)
+                                AND (CONVERT(DATE, Datos_Remito_MovBins.FechaAlta) <= @@Final)
+                    """
+                cursor.execute(sql,values)
+                results = cursor.fetchall()
+                if results:
+                    listado = []
+                    for i in results:
+                        numero_remito = str(i[0])
+                        razon_social = str(i[1])
+                        señor = str(i[2])
+                        direccion = str(i[3])
+                        renspa = str(i[4])
+                        up = str(i[5])
+                        cant_total = str(i[6])
+                        idPedido = str(i[7])
+                        capataz = str(i[8])
+                        especie = str(i[9])
+                        variedad =str(i[10])
+                        chacra = str(i[11])
+                        chofer = str(i[12])
+                        camion = str(i[13])
+                        patente = str(i[14])
+                        fecha = str(i[15])
+                        hora = str(i[16])
+                        idRemito = str(i[17])
+                        observaciones = str(i[18])
+                        IdProductor = str(i[19])
+                        nombre_pdf = str(i[20])
+                        rmt = str(i[21])
+                        pr = str(i[22])
+
+                        datos = {'Remito':numero_remito, 'RSocial':razon_social, 'Señor':señor, 'Direccion':direccion, 'Respa':renspa, 'Up':up, 'Cantidad':cant_total,
+                                 'Capataz':capataz, 'Especie':especie, 'Variedad':variedad, 'Chacra':chacra, 'Chofer':chofer, 'Camion':camion, 'Patente':patente,
+                                 'Fecha':fecha, 'Hora':hora, 'Contenido':busca_cantidad_bins(pr,rmt)}
+                        listado.append(datos)
+                    return JsonResponse({'Message': 'Success', 'Datos': listado})
+                else:
+                    return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+                    error = str(e)
+                    insertar_registro_error_sql("FLETES REMITOS","VER REPORTE DIARIO","usuario",error)
+                    return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+def busca_cantidad_bins(IdProductor,NroRemito):
+    values = [NroRemito,IdProductor]
+    listado = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT        Contenido_Remito_MovBins.Cantidad AS CANTIDAD, RTRIM(S3A.dbo.Bins.Nombre) AS BIN, RTRIM(S3A.dbo.Marca.Nombre) AS MARCA				
+                    FROM            S3A.dbo.Bins INNER JOIN
+                                            S3A.dbo.Marca INNER JOIN
+                                            Contenido_Remito_MovBins ON S3A.dbo.Marca.IdMarca = Contenido_Remito_MovBins.IdMarca ON S3A.dbo.Bins.IdBins = Contenido_Remito_MovBins.IdBins
+                    WHERE        (Contenido_Remito_MovBins.NumeroRemito = %s) AND (Contenido_Remito_MovBins.IdProductor = %s) AND (Contenido_Remito_MovBins.Modificado IS NULL)
+                """
+            cursor.execute(sql, values)
+            consulta = cursor.fetchall()
+            if consulta:
+                for i in consulta:
+                    cantidad = str(i[0])
+                    bins = str(i[1])
+                    marca = str(i[2])
+                    data = {'Cantidad':cantidad, 'Bins':bins, 'Marca':marca}
+                    listado.append(data)
+                return listado
+            else:
+                data = {'Cantidad':'-', 'Bins':'-', 'Marca':'-'}
+                listado.append(data)
+                return listado
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("FLETES REMITO","BUSCA CONTENIDO REMITOS","usuario",error)
+        data = {'Cantidad':'-', 'Bins':'-', 'Marca':'-'}
+        listado.append(data)
+        return listado
 
 
 

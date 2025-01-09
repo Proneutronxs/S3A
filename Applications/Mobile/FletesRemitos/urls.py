@@ -30,6 +30,9 @@ urlpatterns = [
    ### METODO POST DE CRACIÓN DE REMITOS
    path('data-inserta-crea/remitos', views.insertCreaciónRemitos, name="inserta_Crea_Remitos"),
 
+
+   path('data-ver-remitos/usuario/', views.ver_remitos_por_usuario, name="ver_remitos_por_usuario"),
+
    ### DATA MUESTRA LISTADO DE REMITOS
    path('data-listado-remitos/chofer=<str:chofer>', views.mostrarListadoRemitos, name="motrar_listado_remitos"),
 

@@ -560,9 +560,10 @@ def eliminaBins(user,num_productor,num_remito):
     try:    
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                UPDATE Contenido_Remito_MovBins SET Modificado = 'S',FechaModificado = GETDATE(), UserModificado = '%s, NumeroRemito = CONVERT(VARCHAR,RIGHT(YEAR(GETDATE()), LEN(YEAR(GETDATE())) - 2)) + CONVERT(VARCHAR,NumeroRemito)
-                WHERE IdProductor = %s AND NumeroRemito = %s
+                    UPDATE Contenido_Remito_MovBins SET Modificado = 'S', FechaModificado = GETDATE(), UserModificado = %s WHERE IdProductor = %s AND NumeroRemito = %s
                     """
+            # UPDATE Contenido_Remito_MovBins SET Modificado = 'S',FechaModificado = GETDATE(), UserModificado = %s, NumeroRemito = CONVERT(VARCHAR,RIGHT(YEAR(GETDATE()), LEN(YEAR(GETDATE())) - 2)) + CONVERT(VARCHAR,NumeroRemito)
+            # WHERE IdProductor = %s AND NumeroRemito = %s
             cursor.execute(sql, values)
             
             cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
