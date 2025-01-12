@@ -1258,16 +1258,166 @@ def listado_asignados(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def servicio_fcs_online(request):
+    if request.method == 'POST':
+        body = request.body.decode('utf-8')
+        ID_CA = str(json.loads(body)['ID_CA'])
+        Tipo = str(json.loads(body)['Tipo'])
+        Listado_Coordenadas = json.loads(body)['Coordenadas']
+
+        values = [ID_CA]
+
+        if Tipo == 'F':
+            for coor in Listado_Coordenadas:
+                Latitud = str(coor['Latitud'])
+                Longitud = str(coor['Longitud'])
+                Fecha = str(coor['Fecha'])
+                inserta_coordenadas_online(Latitud,Longitud,Fecha,ID_CA)
+
+            try:
+                with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql = """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+
+                            UPDATE Chofer_Viajes_Notificacion SET Finaliza = GETDATE(), Estado = 'F' 
+                            WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                    FROM Chofer_Viajes_Notificacion AS CVN
+                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                        """
+                    cursor.execute(sql,values)
+                    sql2 = """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+                            UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'F' 
+                            WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                    FROM Chofer_Viajes_Notificacion AS CVN
+                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                        """
+                    cursor.execute(sql2,values)
+                    sql3 = """ 
+                            UPDATE Chofer_Alta SET EstadoCamion = 'D', FechaActualiza = GETDATE() WHERE ID_CA = %s
+                        """
+                    cursor.execute(sql3,values)
+                    cursor.execute("SELECT @@ROWCOUNT AS AffectedRows")
+                    affected_rows = cursor.fetchone()[0]
+                    if affected_rows > 0:
+                        return JsonResponse({'Message': 'Success', 'Nota': 'El Viaje finalizó correctamente.'})
+                    else:
+                        return JsonResponse({'Message': 'Error', 'Nota': 'No se pudo finalizar el Viaje, intente más tarde.'})
+                    
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("API","FINALIZA VIAJE ONLINE","POST",error)
+                return JsonResponse({'Message': 'Error', 'Nota': error})
+            finally:
+                connections['TRESASES_APLICATIVO'].close()
+
+        if Tipo == 'S':
+            for coor in Listado_Coordenadas:
+                Latitud = str(coor['Latitud'])
+                Longitud = str(coor['Longitud'])
+                Fecha = str(coor['Fecha'])
+                inserta_coordenadas_online(Latitud,Longitud,Fecha,ID_CA)
+
+            return JsonResponse({'Message': 'Success', 'Nota': 'Se guardaron todos los Registros.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
 
 
+def update_vacios_online(ID_CA, LlegaVacios):
+    values = [ID_CA,LlegaVacios]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    DECLARE @@ID_CA INT;
+                    SET @@ID_CA = %s;
 
+                    UPDATE Chofer_Viajes_Notificacion 
+                    SET LlegaVacios = %s 
+                    WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                    FROM Chofer_Viajes_Notificacion AS CVN
+                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE VACIOS ONLINE","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
+def update_planta_online(ID_CA, LlegaPlanta):
+    values = [ID_CA,LlegaPlanta]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    DECLARE @@ID_CA INT;
+                    SET @@ID_CA = %s;
 
+                    UPDATE Chofer_Viajes_Notificacion 
+                    SET LlegaPlanta = %s 
+                    WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                    FROM Chofer_Viajes_Notificacion AS CVN
+                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE PLANTA ONLINE","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
+def inserta_coordenadas_online(Latitud, Longitud, FechaAlta, ID_CA):
+    values = [ID_CA,Latitud, Longitud, FechaAlta]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    DECLARE @@ID_CA INT;
+                    DECLARE @@Latitud VARCHAR(255);
+                    DECLARE @@Longitud VARCHAR(255);
+                    DECLARE @@FechaAlta DATETIME;
+                    SET @@ID_CA = %s;
+                    SET @@Latitud = %s;
+                    SET @@Longitud = %s;
+                    SET @@FechaAlta = %s;
 
+                    IF NOT EXISTS (
+                    SELECT 1
+                    FROM Chofer_Detalle_Viajes_Coordenadas
+                    WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                        FROM Chofer_Viajes_Notificacion AS CVN
+                                        WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                    AND FechaAlta = @@FechaAlta
+                    )
+                    BEGIN
+                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta, ID_CA) 
+                    VALUES ((SELECT TOP 1 CVN.ID_CVN 
+                            FROM Chofer_Viajes_Notificacion AS CVN
+                            WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V'),@@Latitud,@@Longitud,@@FechaAlta,@@ID_CA)
+                    END
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","INSERTA COORDENADAS ONLINE","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
-
-
+def update_chacra_online(ID_CDCV, LlegaChacra):
+    values = [LlegaChacra,ID_CDCV]
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    UPDATE Chofer_Detalle_Chacras_Viajes SET LlegaChacra = %s WHERE ID_CDCV = %s
+                """
+            cursor.execute(sql, values)
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("API","UPDATE CHACRA ONLINE","FUNCION",error)
+    finally:
+        connections['TRESASES_APLICATIVO'].close()
 
 
 

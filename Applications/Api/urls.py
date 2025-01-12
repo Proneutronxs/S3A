@@ -58,5 +58,10 @@ urlpatterns = [
 
     path('fruit/listar-viajes/', fruit.listado_asignados, name="fruit_listado_asignados"),
 
+    path('fruit/servicio-fcs/', fruit.servicio_fcs_online, name="servicio_fcs_online"),  
+
+
+    ############ ON LINE ###################
+
 
 ]
