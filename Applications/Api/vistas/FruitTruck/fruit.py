@@ -985,7 +985,24 @@ def inserta_coordenadas(ID_CVN, Latitud, Longitud, FechaAlta, ID_CA):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta, ID_CA) VALUES (%s,%s,%s,%s,%s)
+                    DECLARE @@ID_CVN INT;
+                    DECLARE @@Latitud VARCHAR(255);
+                    DECLARE @@Longitud VARCHAR(255);
+                    DECLARE @@FechaAlta DATETIME;
+                    DECLARE @@ID_CA INT;
+
+                    SET @@ID_CVN = %s;
+                    SET @@Latitud = %s;
+                    SET @@Longitud = %s;
+                    SET @@FechaAlta = %s;
+                    SET @@ID_CA = %s;
+
+                    IF NOT EXISTS (SELECT 1 FROM Chofer_Detalle_Viajes_Coordenadas 
+                                    WHERE ID_CVN = @@ID_CVN AND FechaAlta = @@FechaAlta)
+                    BEGIN
+                    INSERT INTO Chofer_Detalle_Viajes_Coordenadas (ID_CVN, Latitud, Longitud, FechaAlta, ID_CA) 
+                    VALUES (@@ID_CVN,@@Latitud,@@Longitud,@@FechaAlta,@@ID_CA)
+END
                 """
             cursor.execute(sql, values)
     except Exception as e:
@@ -1277,6 +1294,15 @@ def servicio_fcs_online(request):
 
             try:
                 with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                    sql2 = """ 
+                            DECLARE @@ID_CA INT;
+                            SET @@ID_CA = %s;
+                            UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'F' 
+                            WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
+                                    FROM Chofer_Viajes_Notificacion AS CVN
+                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
+                        """
+                    cursor.execute(sql2,values)
                     sql = """ 
                             DECLARE @@ID_CA INT;
                             SET @@ID_CA = %s;
@@ -1287,15 +1313,6 @@ def servicio_fcs_online(request):
                                     WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
                         """
                     cursor.execute(sql,values)
-                    sql2 = """ 
-                            DECLARE @@ID_CA INT;
-                            SET @@ID_CA = %s;
-                            UPDATE Chofer_Detalle_Chacras_Viajes SET Estado = 'F' 
-                            WHERE ID_CVN = (SELECT TOP 1 CVN.ID_CVN 
-                                    FROM Chofer_Viajes_Notificacion AS CVN
-                                    WHERE ID_CA = @@ID_CA AND CVN.Estado = 'V')
-                        """
-                    cursor.execute(sql2,values)
                     sql3 = """ 
                             UPDATE Chofer_Alta SET EstadoCamion = 'D', FechaActualiza = GETDATE() WHERE ID_CA = %s
                         """
