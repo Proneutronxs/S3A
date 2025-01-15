@@ -14,6 +14,7 @@ const openAsig = document.getElementById('popup-container-pfa-asig');
 const modalOverlay = document.querySelector('.modal-overlay');
 const inputVacios = document.getElementById('input-cantidad-vacios');
 const tituloAsignacion = document.getElementById('titulo-asignaciones');
+const inputDias = document.getElementById('pfa-dias-atras');
 
 let dataTablePendientes, dataTableAsignados, dataTableRechazados;
 
@@ -177,6 +178,7 @@ const busca_pendientes = async () => {
         const formData = new FormData();
         formData.append("Tipo", getValueCheckBox());
         formData.append("Estado", 'P');
+        formData.append("Dias", getValueDias());
 
         const options = {
             method: 'POST',
@@ -263,6 +265,7 @@ const busca_asignados = async () => {
         const formData = new FormData();
         formData.append("Tipo", getValueCheckBox());
         formData.append("Estado", 'A');
+        formData.append("Dias", getValueDias());
 
         const options = {
             method: 'POST',
@@ -1313,6 +1316,17 @@ function getValueCheckBox() {
         return 'T';
     }
 }
+
+function getValueDias() {
+    const valor = parseInt(inputDias.value);
+    if (valor < 0 || valor >= 100) {
+      inputDias.value = 3;
+      return 3;
+    } else {
+      return valor;
+    }
+  }
+
 
 
 function mover_a_pendientes(ID_PF) {
