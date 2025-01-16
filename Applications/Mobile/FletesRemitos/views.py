@@ -380,12 +380,12 @@ def llamaAsignacionesPendientes(request, usuario):
                     WHERE        (PedidoFlete.UserID = %s) 
                                 AND (PedidoFlete.TipoCarga = 'RAU')
                                 AND (PedidoFlete.Estado = 'A') 
-                                AND EXISTS (
-                                SELECT 1 
-                                FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins 
-                                WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
-                                    AND AsigCerrada IS NULL
-            )
+                                --AND EXISTS (
+                                --SELECT 1 
+                                --FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins 
+                                --WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
+                                --    AND AsigCerrada IS NULL
+                                --)
                  """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
