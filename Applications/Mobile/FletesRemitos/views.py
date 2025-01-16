@@ -372,16 +372,21 @@ def llamaAsignacionesPendientes(request, usuario):
     if request.method == 'GET':
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = """ SELECT        PedidoFlete.IdPedidoFlete AS ID, CONVERT(VARCHAR,PedidoFlete.IdPedidoFlete) + ' - ' + RTRIM(Chacra.Nombre) AS ASIGNACION
-                            FROM            PedidoFlete INNER JOIN
-                                                    Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra
-                            WHERE        (PedidoFlete.UserID = %s) 
-                                        AND (PedidoFlete.TipoCarga = 'RAU')
-                                        AND (PedidoFlete.Estado = 'A') 
-                                        AND ((SELECT DISTINCT AsigCerrada
-                                                            FROM            TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins
-                                                            WHERE        (IdAsignacion = PedidoFlete.IdPedidoFlete) AND Modificado IS NULL AND AsigCerrada <> 'C' AND ID > 4200) IS NULL)
-                            ORDER BY PedidoFlete.IdPedidoFlete """
+                sql = """ 
+                    SELECT        PedidoFlete.IdPedidoFlete AS ID, 
+                                CONVERT(VARCHAR,PedidoFlete.IdPedidoFlete) + ' - ' + RTRIM(Chacra.Nombre) AS ASIGNACION
+                    FROM            PedidoFlete 
+                    INNER JOIN      Chacra ON PedidoFlete.IdChacra = Chacra.IdChacra
+                    WHERE        (PedidoFlete.UserID = %s) 
+                                AND (PedidoFlete.TipoCarga = 'RAU')
+                                AND (PedidoFlete.Estado = 'A') 
+                                AND EXISTS (
+                                SELECT 1 
+                                FROM TRESASES_APLICATIVO.dbo.Datos_Remito_MovBins 
+                                WHERE IdAsignacion = PedidoFlete.IdPedidoFlete 
+                                    AND AsigCerrada IS NULL
+            )
+                 """
                 cursor.execute(sql, [usuario])
                 consulta = cursor.fetchall()
                 if consulta:
