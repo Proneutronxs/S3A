@@ -13,4 +13,5 @@ class Logistica(models.Model):
             ("puede_autorizar", "Puede Autorizar HE"),
             ("puede_denegar", "Puede Denegar HE"),
             ("puede_restaurar", "Puede Restaurar HE"),
+            ("puede_dar_baja", "Puede Dar de Baja PF"),
         ]

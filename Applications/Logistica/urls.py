@@ -85,6 +85,10 @@ urlpatterns = [
 
     path('pedidos-flete/baja-pedidos/', views.baja_pedidos_flete, name='baja_pedidos_flete'),
 
+    path('pedidos-flete/baja-pedidos/listar-pedidos/', views.mostrar_pedidos_flete_para_baja, name='mostrar_pedidos_flete_para_baja'),
+
+    path('pedidos-flete/baja-pedidos/baja-pedido/', views.baja_pedido_flete, name='mostrar_pedidos_flete_para_baja'),
+
     path('pedidos-flete/ubicacion-choferes/', views.ultima_ubicacion_choferes, name='ultima_ubicacion_choferes'),
 
     path('pedidos-flete/ubicacion-choferes/listar-choferes-activos/', views.listado_choferes_activos, name='listado_choferes_activos'),

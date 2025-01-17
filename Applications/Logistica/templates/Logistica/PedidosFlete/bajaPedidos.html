@@ -8,12 +8,52 @@
     <div class="text" style="font-size: 20px;">LOGÍSTICA - PEDIDOS DE FLETE - BAJA DE PEDIDOS</div>
 </div>
 
-<div class="contenedor">
-    <div class="pf-menu">
-
-    </div>
-    <div class="vista-container">
-
+<div class="pfs-contenedor">
+    <div class="pfb-columna">
+        <div class="pfb-encabezado">
+            <div class="items-row-pl">
+                <label class="letras" for="fechaInicio">Desde:</label>
+                <input type="date" onclick="this.showPicker();" id="fechaInicio" name="fechaInicio" class="selectores">
+            </div>
+            <div class="items-row-pl">
+                <label class="letras" for="fechaFinal">Hasta</label>
+                <input type="date" onclick="this.showPicker();" id="fechaFinal" name="fechaFinal" class="selectores">
+            </div>
+            <div style="width: 300px;">
+                <select class="pfa-asig-popup-select" id="selector_pedidos">
+                </select>
+            </div>
+            <div>
+                <button class="boton-detalles" id="pfa-refresh">
+                    <i class='bx material-symbols-outlined pfa-btn-submit'>refresh</i>
+                </button>
+            </div>
+        </div>
+        <div class="pfb-contenido">
+            <table id="miTablaPedidos" class="pfa-tabla display" style="width:100%">
+                <thead class="pfa-tabla-encabezado">
+                    <tr>
+                        <th class="pfa-tabla-encabezado-celda">N°</th>
+                        <th class="pfa-tabla-encabezado-celda">TIPO</th>
+                        <th class="pfa-tabla-encabezado-celda">ORIGEN</th>
+                        <th class="pfa-tabla-encabezado-celda">SOLICITA</th>
+                        <th class="pfa-tabla-encabezado-celda">CARGA</th>
+                        <th class="pfa-tabla-encabezado-celda">FECHA</th>
+                        <th class="pfa-tabla-encabezado-celda">HORA</th>
+                        <th class="pfa-tabla-encabezado-celda">ZONA</th>
+                        <th class="pfa-tabla-encabezado-celda">DESTINO</th>
+                        <th class="pfa-tabla-encabezado-celda">ESPECIE</th>
+                        <th class="pfa-tabla-encabezado-celda">BINS</th>
+                        <th class="pfa-tabla-encabezado-celda">VACÍOS</th>
+                        <th class="pfa-tabla-encabezado-celda">CUELLOS</th>
+                        <th class="pfa-tabla-encabezado-celda">ESTADO</th>
+                        <th class="pfa-tabla-encabezado-celda">BAJA</th>
+                    </tr>
+                </thead>
+                <tbody class="pfa-tabla-cuerpo" id="pfa-tabla-pendientes">
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -29,9 +69,12 @@
 
 <div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
     <div class="popup-content">
-        <p>¿Estás seguro de que deseas restaurar los items seleccionados?</p> <br>
-        <button id="confirmBtn" class="btn-submit botones">Confirmar</button>
-        <button id="cancelBtn" class="btn-submit botones">Cancelar</button>
+        <div id="content_pedido">
+            
+        </div>
+        <p>¿Estás seguro de que quieres dar de baja el pedido seleccionado?</p> <br>
+        <button id="cancelBtn" class="btn-submit botones" style="width: 130px;" onclick="closeEliminar();">CANCELAR</button>
+        <button id="confirmBtn" class="btn-submit botones" style="width: 130px;">CONFIRMAR</button>
     </div>
 </div>
 
@@ -43,6 +86,10 @@
 </div>
 
 
-<!-- <script src="{%static 'TresAses/js/Logistica/HorasExtras/verHorasExtras.js' %}"></script> -->
+<script src="{%static 'TresAses/js/Librerias/choices.min.js' %}"></script>
+<script src="{%static 'TresAses/js/Librerias/jquery-3.6.0.min.js' %}"></script>
+<script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery-3.5.1.js' %}"></script>
+<script type="text/javascript" src="{%static 'TresAses/js/Librerias/jquery.dataTables.min.js' %}"></script>
+<script src="{%static 'TresAses/js/Logistica/PedidosFlete/bajaPedidos.js' %}"></script>
 
 {% endblock %}

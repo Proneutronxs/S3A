@@ -231,8 +231,6 @@ function fechaActual() {
     const formattedDateDesde = `${ano}-${mes}-${'01'}`;
     desde.value = formattedDateDesde;
     hasta.value = formattedDate;
-    // expoDesde.value = formattedDateDesde;
-    // expoHasta.value = formattedDate;
 }
 
 const completarTablaA = async () => {
