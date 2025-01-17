@@ -107,7 +107,7 @@ const busca_pedidos_flete = async () => {
                 },
                 "columnDefs": [
                     {
-                        "targets": [10],
+                        "targets": [10, 11, 12, 13, 14],
                         "width": "3%",
                         "className": "dt-center"
                     }
