@@ -572,7 +572,7 @@ def mostrar_pedidos_flete(request):
                             WHERE PF.Estado IN ({Estado_str})
                                     AND (@@Tipo = '0' OR @@Tipo = PF.TipoDestino)
                                     AND DATEDIFF(DAY, PF.FechaPedido, GETDATE()) <= @@Dias
-                            ORDER BY PF.Estado, NUMERO_VIAJE DESC
+                            ORDER BY PF.Estado, NUMERO_VIAJE DESC, ID_PF DESC
                             """
                     cursor.execute(sql, values)
                     consulta = cursor.fetchall()
