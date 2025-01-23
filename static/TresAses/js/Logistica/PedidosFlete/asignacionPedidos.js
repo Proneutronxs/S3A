@@ -202,7 +202,7 @@ const busca_pendientes = async () => {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
                 datos_he += `
-                            <tr class="pfa-tabla-fila" style="background-color: ${datos.PFE === 'PP' ? '#FFC107' : '#cccccc00'};">
+                            <tr class="pfa-tabla-fila" style="background-color: ${datos.PFE === 'PP' ? '#F7DC6F' : '#cccccc00'};">
                                 <td class="pfa-tabla-celda"><input class="input-checkbox checkbox" type="checkbox" id="idCheck"
                                         name="idCheck" value="${datos.ID}"></td>
                                 <td class="pfa-tabla-celda">${datos.ID}</td>
