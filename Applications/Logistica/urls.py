@@ -79,6 +79,8 @@ urlpatterns = [
 
     path('pedidos-flete/asignacion/liberar-rechazados/', views.llevar_pendientes_rechazados, name='llevar_pendientes_rechazados'),
 
+    path('pedidos-flete/asignacion/postergar-pedidos/', views.portergacion_pedidos, name='portergacion_pedidos'),
+
     path('pedidos-flete/asignacion/mensaje-elimina-destinos/', views.mensaje_elimina_destino_viaje, name='mensaje_elimina_destino_viaje'),
 
     path('pedidos-flete/asignacion/elimina-destinos/', views.mueve_destinos_a_pendientes, name='mueve_destinos_a_pendientes'),

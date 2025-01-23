@@ -1418,7 +1418,7 @@ def inserta_coordenadas_online(Latitud, Longitud, FechaAlta, ID_CA):
             cursor.execute(sql, values)
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("API","INSERTA COORDENADAS ONLINE","FUNCION",error + " - " + str(values))
+        #insertar_registro_error_sql("API","INSERTA COORDENADAS ONLINE","FUNCION",error + " - " + str(values))
     finally:
         connections['TRESASES_APLICATIVO'].close()
 

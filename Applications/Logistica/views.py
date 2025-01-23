@@ -12,7 +12,7 @@ from openpyxl.styles import Alignment, PatternFill, Border, Side, Font
 from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
 from Applications.RRHH.views import buscaDatosParaInsertarHE, obtener_fecha_hora_actual_con_milisegundos
-from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck
+from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck, enviar_notificacion_Tres_Ases
 import datetime 
 
 # Create your views here.
@@ -532,17 +532,19 @@ def mostrar_pedidos_flete(request):
             Tipo = request.POST.get('Tipo')
             Estado = request.POST.get('Estado')
             Dias = request.POST.get('Dias')
-            values = [Tipo,Estado,Dias]
+            if Estado == 'P':
+                Estado = ['PP', 'P']
+            if Estado == 'A':
+                Estado = ['A']
+            Estado_str = ",".join([f"'{estado}'" for estado in Estado])
+            values = [Tipo,Dias]
             try:
                 with connections['S3A'].cursor() as cursor:
-                    sql =   """ 
+                    sql =   f""" 
                             DECLARE @@Tipo VARCHAR(5);
-                            DECLARE @@Estado VARCHAR(2);
                             DECLARE @@Dias INT;
                             SET @@Tipo = %s;
-                            SET @@Estado = %s;
                             SET @@Dias = %s;
-
                             SELECT PF.IdPedidoFlete AS ID_PF, CASE WHEN PF.TipoDestino = 'P' THEN 'PLANTA' WHEN PF.TipoDestino = 'U' THEN 'CAMBIO DOM.' END AS TIPO, CONVERT(VARCHAR(20),RTRIM(PF.Solicitante)) AS SOLICITA,  
                                 CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
                                 WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
@@ -554,7 +556,8 @@ def mostrar_pedidos_flete(request):
                                 COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
                                 COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN, CASE WHEN (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'V' THEN '#008f39' WHEN
                                 (SELECT TOP 1  Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'A' THEN '#ff8000' ELSE '#000000' END AS COLOR, CASE WHEN (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V'))
-                                IS NULL THEN '0' ELSE (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) END AS NUMERO_VIAJE, (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) AS ESTADO
+                                IS NULL THEN '0' ELSE (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) END AS NUMERO_VIAJE, 
+                                (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) AS ESTADO, PF.Estado AS PF_ESTADO
                             FROM PedidoFlete AS PF LEFT JOIN
                                     Zona AS ZN ON ZN.IdZona = PF.IdZona LEFT JOIN
                                     Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
@@ -566,10 +569,10 @@ def mostrar_pedidos_flete(request):
                                     Chofer AS CF ON CF.IdChofer = PF.IdChofer LEFT JOIN
                                     Ubicacion AS UB1 ON UB1.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
                                     Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta
-                            WHERE PF.Estado = @@Estado
+                            WHERE PF.Estado IN ({Estado_str})
                                     AND (@@Tipo = '0' OR @@Tipo = PF.TipoDestino)
                                     AND DATEDIFF(DAY, PF.FechaPedido, GETDATE()) <= @@Dias
-                            ORDER BY NUMERO_VIAJE DESC
+                            ORDER BY PF.Estado, NUMERO_VIAJE DESC
                             """
                     cursor.execute(sql, values)
                     consulta = cursor.fetchall()
@@ -605,10 +608,11 @@ def mostrar_pedidos_flete(request):
                             COLOR = str(i[27])
                             ID_VIAJE = str(i[28])
                             ESTADO = str(i[29])
+                            PFE = str(i[30])
                             datos = {'ID':ID_PF,'Tipo':TIPO, 'Solicita':SOLICITA, 'TipoDestino':TIPO_DESTINO, 'FechaPedido':FECHA_PEDIDO, 'HoraPedido':HORA_PEDIDO, 'FechaRequerido':FECHA_REQUERIDO, 'HoraRequerido':HORA_REQUERIDO, 
                                      'Zona':ZONA , 'Destino': DESTINO, 'Bins': BINS, 'Especie':ESPECIE, 'Variedad':VARIEDAD, 'Vacios':VACIOS, 'Cuellos':CUELLOS, 'Obs':OBSERVACIONES, 'IdTransportista':ID_TRANSPORTISTA,
                                      'Transportista':NOMBRE_TRANSPORTISTA, 'IdCamion':ID_CAMION, 'Camion':NOMBRE_CAMION, 'IdAcoplado':ID_ACOPLADO, 'Acoplado':NOMBRE_ACOPLADO, 'IdChofer':ID_CHOFER, 'Chofer':NOMBRE_CHOFER,
-                                     'Origen':ORIGEN, 'Destino2':DESTINO2, 'Color':COLOR, 'IdViaje':ID_VIAJE, 'Estado':ESTADO}
+                                     'Origen':ORIGEN, 'Destino2':DESTINO2, 'Color':COLOR, 'IdViaje':ID_VIAJE, 'Estado':ESTADO, 'PFE':PFE}
                             data.append(datos)
                         return JsonResponse({'Message': 'Success', 'Datos': data})
                     else:
@@ -1441,7 +1445,7 @@ def mostrar_viajes_rechazados(request):
                     sql = """ 
                             SELECT CVN.ID_CVN AS ID_CVN, CA.NombreChofer AS CHOFER, CONVERT(VARCHAR(5), CVN.FechaAlta,103) + ' ' + CONVERT(VARCHAR(5), CVN.FechaAlta,108) + ' Hs.' AS FECHA,
                                     (SELECT COUNT(*) FROM Chofer_Detalle_Chacras_Viajes WHERE ID_CVN = CVN.ID_CVN AND Estado = 'R') AS CANTIDAD
-                            FROM Chofer_Viajes_Notificacion AS CVN INNER JOIN
+                            FROM Chofer_Viajes_Notificacion AS CVN LEFT JOIN
                                 Chofer_Alta AS CA ON CA.ID_CA = CVN.ID_CA
                             WHERE CVN.Estado = 'R' AND CVN.FechaAlta >= DATEADD(day, -3, GETDATE());
                         """
@@ -1544,6 +1548,63 @@ def llevar_pendientes_rechazados(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
+
+@login_required
+@csrf_exempt
+def portergacion_pedidos(request):
+    if request.method == 'POST':
+        user_has_permission = request.user.has_perm('Logistica.puede_insertar')
+        if user_has_permission:
+            Usuario = str(request.user).upper()
+            listado_id_pedidos = request.POST.getlist('IdPedidosFletes')
+            listado_sql = ','.join(listado_id_pedidos)
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = f"""
+                            UPDATE PedidoFlete SET Estado = 'PP', FechaUltimaModificacion = GETDATE(), UserIDModificacion = %s WHERE IdPedidoFlete IN ({listado_sql})
+                            """
+                    cursor.execute(sql, [Usuario])
+
+                    envio_firebase(listado_sql)
+
+                    return JsonResponse({'Message': 'Success', 'Nota': 'Todos los pedidos fueron postergados.'})
+            except Exception as e:
+                error = str(e)
+                insertar_registro_error_sql("LOGISTICA","POSTERGA","usuario",error)            
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se puedo completar la peticion. ' + error})
+        return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
+    else:
+        data = "No se pudo resolver la Petición"
+        return JsonResponse({'Message': 'Error', 'Nota': data})
+    
+def envio_firebase(listado_sql):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = f"""
+                    SELECT IdAndroid
+                    FROM USUARIOS
+                    WHERE Usuario COLLATE DATABASE_DEFAULT IN (
+                        SELECT DISTINCT PF.UserID 
+                        FROM S3A.dbo.PedidoFlete AS PF 
+                        WHERE PF.IdPedidoFlete IN ({listado_sql})
+                    )
+                    """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            if results:
+                for row in results:
+                    id_firebase = str(row[0])
+                    enviar_notificacion_Tres_Ases(id_firebase,"PEDIDOS DE FLETE: Sus Pedidos fueron postergados para mañana.\nPor favor revise el estado de sus pedidos.","CM","0")
+    except Exception as e:
+        error = str(e)
+        insertar_registro_error_sql("LOGISTICA","ENVIO DE NOTI","usuario",error)        
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+
+
+
 ############ UBICACION DE LOS CHOFERES
 
 

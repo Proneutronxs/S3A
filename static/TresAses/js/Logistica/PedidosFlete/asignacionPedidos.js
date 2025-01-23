@@ -4,6 +4,7 @@ let IdCamion;
 let IdAcoplado;
 let dataCamiones = [];
 let dataAcoplados = [];
+let ejecuta;
 const refresh = document.getElementById("pfa-refresh");
 const cambiosDomicilio = document.getElementById("pfa-cambio-domicilio");
 const pedidosChacra = document.getElementById("pfa-pedido-chacra");
@@ -29,6 +30,7 @@ cambiosDomicilio.addEventListener('change', function () {
     busca_pendientes();
     busca_asignados();
     busca_rechazados();
+    listar_choferes();
 });
 
 pedidosChacra.addEventListener('change', function () {
@@ -52,7 +54,13 @@ document.getElementById('pfa-multiple').addEventListener('click', function () {
 });
 
 document.getElementById('confirmBtn').addEventListener('click', function () {
-    mover_rechazados_pendientes();
+    if (ejecuta == 'R') {
+        mover_rechazados_pendientes();
+    }
+    if (ejecuta == 'P') {
+        postergar_pedidos();
+    }
+    //
 });
 
 document.getElementById('cancelBtn').addEventListener('click', function () {
@@ -194,7 +202,7 @@ const busca_pendientes = async () => {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
                 datos_he += `
-                            <tr class="pfa-tabla-fila">
+                            <tr class="pfa-tabla-fila" style="background-color: ${datos.PFE === 'PP' ? '#FFC107' : '#cccccc00'};">
                                 <td class="pfa-tabla-celda"><input class="input-checkbox checkbox" type="checkbox" id="idCheck"
                                         name="idCheck" value="${datos.ID}"></td>
                                 <td class="pfa-tabla-celda">${datos.ID}</td>
@@ -1111,6 +1119,7 @@ const guardar_asignacion_individual = async () => {
 };
 
 const mover_rechazados_pendientes = async () => {
+    
     openProgressBar();
     try {
         const id_cvn = document.getElementById('id_cvn_mover');
@@ -1144,6 +1153,50 @@ const mover_rechazados_pendientes = async () => {
         var color = "red";
         mostrarInfo(nota, color);
     }
+};
+
+const postergar_pedidos = async () => {
+    openProgressBar();
+    try {
+        const checkboxes = document.querySelectorAll('.input-checkbox:checked');
+        const formData = new FormData();
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                formData.append('IdPedidosFletes', checkbox.value);
+            }
+        });
+
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("postergar-pedidos/", options);
+        const data = await response.json();
+        closeProgressBar();
+        document.getElementById('confirmationPopup').style.display = 'none';
+        if (data.Message == "Success") {
+            busca_pendientes();
+            busca_asignados();
+            var nota = data.Nota
+            var color = "green";
+            mostrarInfo(nota, color);
+        } else {
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        closeProgressBar();
+        document.getElementById('confirmationPopup').style.display = 'none';
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+
 };
 
 function condicionales_asignaciones() {
@@ -1235,6 +1288,17 @@ function verificarCheckbox() {
     }
 }
 
+function verificarCheckbox_pospone() {
+    const checkboxes = document.querySelectorAll('#miTablaPendientes input[type="checkbox"]');
+    const seleccionados = Array.prototype.filter.call(checkboxes, (checkbox) => checkbox.checked);
+
+    if (seleccionados.length >= 1 && seleccionados.length < 5) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function asignar() {
     openAsig.style.display = 'flex'
 }
@@ -1295,10 +1359,27 @@ function mostrarInfo(Message, Color) {
 }
 
 function mostrarPopupMover(ID_CVN) {
+    ejecuta = 'R';
+    document.getElementById('id_pregunta').innerHTML = `
+        <p>¿Estás seguro que quieres mover los Pedidos del Viaje a PEDIDOS PENDIENTES?</p> 
+    `;
     document.getElementById('number_cvn').innerHTML = `
         <input type="hidden" id="id_cvn_mover" name="dataOculta" value="${ID_CVN}">
     `;
     document.getElementById('confirmationPopup').style.display = 'flex';
+}
+
+
+function mostrarPosponer() {
+    ejecuta = 'P';
+    if (verificarCheckbox_pospone()) {
+        document.getElementById('id_pregunta').innerHTML = `
+            <p>¿Estás seguro que quieres POSTERGAR los Pedidos de Flete?<br> (Se notificará al encargado)</p> 
+        `;
+        document.getElementById('confirmationPopup').style.display = 'flex';
+    } else {
+        mostrarInfo("Debe seleccionar al menos 1 ó hasta 4 Pedidos de Flete.", "red")
+    }
 }
 
 function ocultarPopupMover() {

@@ -34,6 +34,9 @@
                 <div class="pfa-boton-container">
                     <button class="btn-submit" id="pfa-multiple">MULTIPLES DESTINOS</button>
                 </div>
+                <div class="pfa-boton-container">
+                    <button class="btn-submit" id="pfa-posponer" onclick="mostrarPosponer();">POSTERGAR</button>
+                </div>
             </div>
         </div>
         <div class="pfs-contenedor-completo">
@@ -219,7 +222,10 @@
 <div class="popup-confirmacion" style="display: none;" id="confirmationPopup">
     <div id="number_cvn"></div>
     <div class="popup-content">
-        <p>¿Estás seguro que quieres mover los Pedidos del Viaje a PEDIDOS PENDIENTES?</p> <br>
+        <div id="id_pregunta">
+            
+        </div>
+        <br>
         <button id="cancelBtn" class="btn-submit botones">CANCELAR</button>
         <button id="confirmBtn" class="btn-submit botones">CONFIRMAR</button>
     </div>

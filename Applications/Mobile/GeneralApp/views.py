@@ -86,7 +86,8 @@ def login_app(request):
                     datos = {'Message': 'Success', 'Data': response_data}
                     estado = "E"
                     if idFireBase != '0':
-                        actualizaIDFirebase(usuario,idFireBase)
+                        if len(idFireBase) > 20:
+                            actualizaIDFirebase(usuario,idFireBase)
                     return JsonResponse(datos)
                 else:
                     response_data = {
