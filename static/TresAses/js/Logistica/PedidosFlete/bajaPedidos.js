@@ -65,6 +65,7 @@ const busca_pedidos_flete = async () => {
         if (data.Message == "Success") {
             let datos_he = ``;
             data.Datos.forEach((datos) => {
+                console.log(datos.Estado);
                 datos_he += `
                     <tr class="pfa-tabla-fila">
                         <td class="pfa-tabla-celda">${datos.ID}</td>

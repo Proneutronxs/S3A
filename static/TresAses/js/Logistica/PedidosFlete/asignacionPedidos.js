@@ -214,7 +214,7 @@ const busca_pendientes = async () => {
                                 <td class="pfa-tabla-celda" style="text-align: center;">${datos.HoraPedido}</td>
                                 <td class="pfa-tabla-celda">${datos.Zona === '0' ? '-' : datos.Zona}</td>
                                 <td class="pfa-tabla-celda">${datos.Destino2 === '0' ? datos.Destino : datos.Destino2}</td>
-                                <td class="pfa-tabla-celda">${datos.Especie}</td>
+                                <td class="pfa-tabla-celda">${datos.Variedad}</td>
                                 <td class="pfa-tabla-celda" style="text-align: center;">${datos.Bins}</td>
                                 <td class="pfa-tabla-celda" style="text-align: center;">${datos.Vacios}</td>
                                 <td class="pfa-tabla-celda" style="text-align: center;">${datos.Cuellos}</td>

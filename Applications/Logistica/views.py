@@ -546,18 +546,19 @@ def mostrar_pedidos_flete(request):
                             SET @@Tipo = %s;
                             SET @@Dias = %s;
                             SELECT PF.IdPedidoFlete AS ID_PF, CASE WHEN PF.TipoDestino = 'P' THEN 'PLANTA' WHEN PF.TipoDestino = 'U' THEN 'CAMBIO DOM.' END AS TIPO, CONVERT(VARCHAR(20),RTRIM(PF.Solicitante)) AS SOLICITA,  
-                                CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
-                                WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
-                                CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), 
-                                PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN RTRIM(CH.Nombre) IS NULL THEN '0' ELSE RTRIM(CH.Nombre) END AS DESTINO,
-                                CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '0' ELSE RTRIM(VR.Nombre) END AS VARIEDAD,
-                                CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' ELSE '' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIM(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' ELSE '' END AS CUELLOS,
-                                CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
-                                COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
-                                COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN, CASE WHEN (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'V' THEN '#008f39' WHEN
-                                (SELECT TOP 1  Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'A' THEN '#ff8000' ELSE '#000000' END AS COLOR, CASE WHEN (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V'))
-                                IS NULL THEN '0' ELSE (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) END AS NUMERO_VIAJE, 
-                                (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) AS ESTADO, PF.Estado AS PF_ESTADO
+                                    CASE WHEN RTRIM(PF.TipoCarga) = 'RAU' THEN 'COSECHA' WHEN RTRIM(PF.TipoCarga) = 'VAC' THEN 'VACÍOS' WHEN RTRIM(PF.TipoCarga) = 'FBI' THEN 'FRUTA EN BINS' WHEN RTRIM(PF.TipoCarga) = 'VAR' THEN 'VARIOS'
+                                    WHEN RTRIM(PF.TipoCarga) = 'MAT' THEN 'MATERIALES' WHEN RTRIM(PF.TipoCarga) = 'EMB' THEN 'EMBALADO' ELSE RTRIM(PF.TipoCarga) END AS TIPO, CONVERT(VARCHAR(10), PF.FechaPedido, 103) AS FECHA_PEDIDO,
+                                    CONVERT(VARCHAR(5), PF.HoraPedido, 108) AS HORA_PEDIDO, CONVERT(VARCHAR(10), PF.FechaRequerida, 103) AS FECHA_REQUERIDO, CASE WHEN CONVERT(VARCHAR(5), PF.HoraRequerida, 108) IS NULL THEN CONVERT(VARCHAR(5), PF.HoraPedido, 108) ELSE CONVERT(VARCHAR(5), 
+                                    PF.HoraRequerida, 108) END AS HORA_REQUERIDO, CASE WHEN RTRIM(ZN.Nombre) IS NULL THEN '0' ELSE RTRIM(ZN.Nombre) END AS ZONA, CASE WHEN RTRIM(CH.Nombre) IS NULL THEN '0' ELSE (CASE WHEN PF.IdProductor IS NULL THEN '' ELSE LEFT(RTRIM(PR.RazonSocial), 10) + ' - ' END) + RTRIM(CH.Nombre) END AS DESTINO,
+                                    CASE WHEN PF.Bins IS NULL THEN '-' ELSE PF.Bins END AS BINS, CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '-' ELSE RTRIM(ES.Nombre) END AS ESPECIE, CASE WHEN RTRIM(VR.Nombre) IS NULL THEN '' ELSE RTRIM(VR.Nombre) END +  
+                                    (CASE WHEN RTRIM(ES.Nombre) IS NULL THEN '' ELSE ' (' + LEFT(RTRIM(ES.Nombre), 1) + ')' END) AS VARIEDAD,
+                                    CASE WHEN RTRIM(PF.Vacios) = 'N' THEN 'NO' WHEN RTRIM(PF.Vacios) = 'S' THEN 'SI' ELSE '' END AS VACIOS, ISNULL(PF.CantVacios,0) AS CANT_VACIOS, CASE WHEN RTRIM(PF.Cuellos) = 'N' THEN 'NO' WHEN RTRIM(PF.Cuellos) = 'S' THEN 'SI' ELSE '' END AS CUELLOS,
+                                    CASE WHEN RTRIM(PF.Obs) IS NULL THEN '' ELSE RTRIM(PF.Obs) END AS OBSERVACIONES, ISNULL(PF.IdTransportista,0) AS ID_TRANSPORTISTA, COALESCE(CONVERT(VARCHAR(15), RTRIM(TR.RazonSocial)),'') AS NOMBRE_TRANSPORTISTA, ISNULL(PF.IdCamion,0) AS ID_CAMION,
+                                    COALESCE(RTRIM(CM.Nombre),'') AS NOMBRE_CAMION, ISNULL(PF.IdAcoplado,0) AS ID_ACOPLADO, COALESCE(RTRIM(AC.Nombre),'') AS NOMBRE_ACOPLADO, ISNULL(PF.IdChofer,0) AS ID_CHOFER, COALESCE(RTRIM(Chofer),'') AS NOMBRE_CHOFER,
+                                    COALESCE(RTRIM(UB1.Descripcion),'0') AS DESTINO, COALESCE(RTRIM(UB2.Descripcion),'0') AS ORIGEN, CASE WHEN (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'V' THEN '#008f39' WHEN
+                                    (SELECT TOP 1  Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) = 'A' THEN '#ff8000' ELSE '#000000' END AS COLOR, CASE WHEN (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V'))
+                                    IS NULL THEN '0' ELSE (SELECT TOP 1 ID_CVN FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) END AS NUMERO_VIAJE, 
+                                    (SELECT TOP 1 Estado FROM TRESASES_APLICATIVO.dbo.Chofer_Detalle_Chacras_Viajes WHERE IdPedidoFlete = PF.IdPedidoFlete AND Estado IN ('A','V')) AS ESTADO, PF.Estado AS PF_ESTADO
                             FROM PedidoFlete AS PF LEFT JOIN
                                     Zona AS ZN ON ZN.IdZona = PF.IdZona LEFT JOIN
                                     Chacra AS CH ON CH.IdChacra = PF.IdChacra LEFT JOIN
@@ -568,7 +569,8 @@ def mostrar_pedidos_flete(request):
                                     Acoplado AS AC ON AC.IdAcoplado = PF.IdAcoplado LEFT JOIN
                                     Chofer AS CF ON CF.IdChofer = PF.IdChofer LEFT JOIN
                                     Ubicacion AS UB1 ON UB1.IdUbicacion = PF.IdPlantaDestino LEFT JOIN
-                                    Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta
+                                    Ubicacion AS UB2 ON UB2.IdUbicacion = PF.IdPlanta LEFT JOIN
+                                    Productor AS PR ON PR.IdProductor = PF.IdProductor
                             WHERE PF.Estado IN ({Estado_str})
                                     AND (@@Tipo = '0' OR @@Tipo = PF.TipoDestino)
                                     AND DATEDIFF(DAY, PF.FechaPedido, GETDATE()) <= @@Dias
