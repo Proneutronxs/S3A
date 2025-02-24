@@ -42,6 +42,10 @@ def Archivos(request):
 def horasExtras(request):
     return render (request, 'RRHH/HorasExtras/horasExtras.html')
 
+@login_required
+def horasExtrasSabados(request):
+    return render (request, 'RRHH/HorasExtras/heSabados.html')
+
 ### RENDERIZADO DE HORAS EXTRAS TRANSFERENCIA
 @login_required
 def transferenciaHorasExtras(request):
@@ -488,8 +492,6 @@ def eliminaHorasCargadas(request): ### PETICIÓN QUE ELIMINA LAS HORAS SELECCION
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
-
-
 @login_required
 @csrf_exempt
 def mostrarHorasArchivo(request):
@@ -592,7 +594,7 @@ def mostrarHorasArchivo(request):
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '29/12/2024' + ', Fecha de Cierre: ' + '28/01/2025' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/01/2025' + ', Fecha de Cierre: ' + '28/02/2025' + '.'
                         return JsonResponse({'Message': 'Success', 'Horas': Horas, 'Legajos': Nombres, 'Text':texto})
                     else:
                         texto = ''
@@ -600,7 +602,7 @@ def mostrarHorasArchivo(request):
                             inicio, final = retornaInicioFinalExcel()
                             fechaUno = formatear_fecha(inicio)
                             fechaDos = formatear_fecha(final)
-                            texto = 'Fecha de Inicio: ' + '29/12/2024' + ', Fecha de Cierre: ' + '28/01/2025' + '.'
+                            texto = 'Fecha de Inicio: ' + '29/01/2025' + ', Fecha de Cierre: ' + '28/02/2025' + '.'
                         data = "No se encontraron horas extras."
                         return JsonResponse({'Message': 'Error', 'Nota': data, 'Text':texto})
 
@@ -615,8 +617,6 @@ def mostrarHorasArchivo(request):
     else:
         data = "No se pudo resolver la Petición"
         return JsonResponse({'Message': 'Error', 'Nota': data})
-
-
 
 def retornaInicioFinalExcel():
     try:
@@ -644,30 +644,11 @@ def retornaInicioFinalExcel():
     finally:
         cursor.close()
         connections['TRESASES_APLICATIVO'].close()
-# SELECT 
-#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
-#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
-# FROM 
-#     Parametros_Aplicativo
-# WHERE 
-#     Codigo = 'EXCEL-ISIS-HE';
-
-##CAMBIAR CONSULTA
-# SELECT 
-#     CONVERT(VARCHAR, YEAR(DATEADD(MONTH, -1, GETDATE()))) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(DATEADD(MONTH, -1, GETDATE()))), 2) + '-' + FORMAT(InicioINT, '00') AS INICIO,
-#     CONVERT(VARCHAR, YEAR(GETDATE())) + '-' + RIGHT('0' + CONVERT(VARCHAR, MONTH(GETDATE())), 2) + '-' +FORMAT(FinalINT, '00') AS FINAL
-# FROM 
-#     Parametros_Aplicativo
-# WHERE 
-#     Codigo = 'EXCEL-ISIS-HE';
-
-
 
 def calcular_porcentajes(numero): 
     diez_por_ciento = round(numero * 0.10, 2)
     noventa_por_ciento = round(numero * 0.90, 2)
     return diez_por_ciento, noventa_por_ciento
-
 
 def traeHorasExtras(): ### COLUMNA 0=LEGAJO
     try:
@@ -675,8 +656,8 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
             sql = """
                 DECLARE @@Inicio DATE;
                 DECLARE @@Final DATE;
-                SET @@Inicio = '2024-12-29';
-                SET @@Final = '2025-01-28';
+                SET @@Inicio = '2025-01-29';
+                SET @@Final = '2025-02-28';
                 SELECT 
                     IdLegajo AS LEGAJO, 
                     ROUND(SUM(CASE WHEN RTRIM(TipoHoraExtra) = '50' THEN CONVERT(FLOAT, CantHoras) ELSE 0 END), 2) AS HORAS_50,
@@ -794,7 +775,6 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
         cursor.close()
         connections['S3A'].close()
    
-
 @login_required  
 @csrf_exempt
 def CreaExcelISIS(request): 
@@ -811,8 +791,6 @@ def CreaExcelISIS(request):
                     ws[f'A{idx}'] = entry['LEGAJO']
                     ws[f'B{idx}'] = entry['CONCEPTO']
                     ws[f'C{idx}'] = entry['HORAS']
-                # ws.protection.sheet = True
-                # ws.protection.enable()
                 output = BytesIO()
                 wb.save(output)
                 output.seek(0)
@@ -848,4 +826,220 @@ def CreaExcelISIS(request):
 # # Example usage
 
 
-# generate_excel_from_dict(traeHorasExtras(), 'output.xlsx')
+# generate_excel_from_dict(traeHorasExtras(), 'output.xlsx').
+
+def carga_combox_sabados(request):
+    if request.method == 'GET':
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        SELECT DISTINCT CONVERT(DATE,PCHE.Fecha) AS FECHA, 'SÁBADO: ' + CONVERT(VARCHAR(10), PCHE.Fecha, 103) AS DIA
+                        FROM Pre_Carga_Horas_Extras AS PCHE
+                        WHERE PCHE. Estado = 'P'
+                            AND (DATENAME(WEEKDAY, CONVERT(DATE, Fecha)) = 'Sábado' OR DATENAME(WEEKDAY, CONVERT(DATE, Fecha)) = 'Saturday')
+                            AND (DATEPART(YEAR, Fecha) = DATEPART(YEAR, GETDATE()))
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        idValue = str(row[0])
+                        value = str(row[1])
+                        lista_data.append({'IdValue': idValue, 'Value':value})
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    data = "No se encontraron Datos."
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+        return JsonResponse({'Message': 'Success', 'Reportes': reportes, "Empaques":empaques})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+@csrf_exempt    
+def data_listado_sabados(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            idFecha = str(request.POST.get('IdFecha'))
+            values = [idFecha,idFecha]
+
+            with connections['principal'].cursor() as cursor:
+                sql = """ 
+                        SET DATEFORMAT ymd;
+                        DECLARE @@FechaDesde DATETIME;
+                        DECLARE @@FechaHasta DATETIME;
+                        SET @@FechaDesde = %s;
+                        SET @@FechaHasta = CONVERT(VARCHAR(10), DATEADD(DAY, +1, %s), 120);
+
+                        SELECT TL.legLegajo AS LEGAJO, TL.legNombre AS NOMBRE,
+                            CONVERT(VARCHAR, (FORMAT(TF.ficFecha, 'yyyy-MM-dd'))) + ' ' + CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm:ss'))) AS DATE_TIME,
+                            CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm'))) AS TIME_DATE, CONVERT(VARCHAR(10), TF.ficFecha,103) AS FECHA
+                        FROM T_Fichadas AS TF LEFT JOIN 
+                                T_Legajos AS TL ON TL.legCodigo = TF.legCodigo
+                        WHERE TL.legLegajo IN (SELECT Legajo
+                                                FROM TRESASES_APLICATIVO.dbo.Pre_Carga_Horas_Extras
+                                                WHERE TRY_CONVERT(DATE, Fecha) = @@FechaDesde)
+                            AND ISNUMERIC(TL.legLegajo) = 1
+                            AND TF.ficFecha + TF.ficHora >= @@FechaDesde + ' 05:00:00'
+                            AND TF.ficFecha + TF.ficHora <= @@FechaHasta + ' 05:00:00'
+                        ORDER BY TL.legLegajo, TF.ficFecha + TF.ficHora 
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        legajo = str(row[0])
+                        nombre = str(row[1])
+                        time = str(row[3])
+                        fecha = 'SÁBADO - ' + str(row[4])
+                        
+                        encontrado = False
+                        for item in lista_data:
+                            if item["Legajo"] == legajo:
+                                item["Fichadas"].append(time)  
+                                encontrado = True
+                                break
+                            
+                        if not encontrado:
+                            nuevo_registro = {
+                                "Legajo": legajo,
+                                "Nombre": nombre,
+                                "Dia": fecha,
+                                "Fichadas": [time]  
+                            }
+                            lista_data.append(nuevo_registro)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    data = "No se encontraron Datos."
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+@csrf_exempt    
+def recibe_data_listado_sabados(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            fecha = str(request.POST.get('IdFecha'))
+            legajos = request.POST.getlist('Legajo[]')
+            time_input_50 = request.POST.getlist('timeInput50[]')
+            time_input_100 = request.POST.getlist('timeInput100[]')
+            
+            for i in range(len(legajos)):
+                legajo = legajos[i]
+                _50 = '00:00' if time_input_50[i] == '' else time_input_50[i]
+                _100 = '00:00' if time_input_100[i] == '' else time_input_100[i]
+                decimal_50 = horas_a_decimales(_50)
+                decimal_100 = horas_a_decimales(_100)
+                #print('Legajo: '+ legajo +' - ' + '50% horas: ' + decimal_50 +' - ' + '100% horas: ' + decimal_100)
+                inserta_horas_sabado(legajo,fecha,'50',decimal_50)
+                inserta_horas_sabado(legajo,fecha,'100',decimal_100)
+                actualiza_pre_carga(fecha,legajo)
+            return JsonResponse({'Message': 'Success', 'Nota': 'Las horas se guardaron correctamente.'})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+def inserta_horas_sabado(legajo,fecha,tipo,cantidad):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """   
+
+                DECLARE @@Legajo INT;
+                DECLARE @@Fecha DATE;
+                DECLARE @@TipoHora VARCHAR(10);
+                DECLARE @@CantidadHora VARCHAR(10);
+
+                SET @@Legajo = %s;
+                SET @@Fecha = %s;
+                SET @@TipoHora = %s;
+                SET @@CantidadHora = %s;
+
+                INSERT INTO HorasExtras_Procesadas (Legajo,FechaHoraDesde,FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras,EstadoEnvia)
+			            VALUES(@@Legajo, @@Fecha, @@Fecha, '17', 'REVISADO POR RRHH', '100','100', @@TipoHora, @@CantidadHora,'4')
+
+                """
+            cursor.execute(sql, [legajo,fecha,tipo,cantidad])    
+            return True
+    except Exception as e:
+        return False
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def actualiza_pre_carga(fecha,legajo):
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """   
+
+                UPDATE Pre_Carga_Horas_Extras SET Estado = 'C' WHERE Fecha = %s AND Legajo = %s
+
+                """
+            cursor.execute(sql, [fecha,legajo])    
+            return True
+    except Exception as e:
+        return False
+    finally:
+        cursor.close()
+        connections['TRESASES_APLICATIVO'].close()
+
+def horas_a_decimales(hora):
+    horas, minutos = hora.split(":")
+    horas = int(horas)
+    minutos = int(minutos)
+    if minutos > 45:
+        horas += 1
+        minutos = 0
+    elif minutos > 15:
+        minutos = 30
+    else:
+        minutos = 0
+    decimales = horas + minutos / 60
+    return str(round(decimales, 2))
+
+
+"""
+
+
+SET DATEFORMAT ymd;
+DECLARE @@FechaDesde DATETIME;
+DECLARE @@FechaHasta DATETIME;
+SET @@FechaDesde = '2025-02-08';
+SET @@FechaHasta = CONVERT(VARCHAR(10), DATEADD(DAY, +1, '2025-02-08'), 120);
+SELECT TL.legLegajo AS LEGAJO, TL.legNombre AS NOMBRE,
+    CONVERT(VARCHAR, (FORMAT(TF.ficFecha, 'yyyy-MM-dd'))) + ' ' + CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm:ss'))) AS DATE_TIME,
+	CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm'))) AS TIME_DATE
+FROM T_Fichadas AS TF LEFT JOIN 
+		T_Legajos AS TL ON TL.legCodigo = TF.legCodigo
+WHERE TL.legLegajo IN (SELECT Legajo
+						FROM TRESASES_APLICATIVO.dbo.Pre_Carga_Horas_Extras
+						WHERE TRY_CONVERT(DATE, Fecha) = @@FechaDesde)
+	AND ISNUMERIC(TL.legLegajo) = 1
+    AND TF.ficFecha + TF.ficHora >= @@FechaDesde + ' 05:00:00'
+    AND TF.ficFecha + TF.ficHora <= @@FechaHasta + ' 05:00:00'
+ORDER BY TL.legLegajo, TF.ficFecha + TF.ficHora 
+
+"""
+
+
+"""
+SELECT DISTINCT CONVERT(DATE,PCHE.Fecha) AS FECHA, 'SÁBADO: ' + CONVERT(VARCHAR(10), PCHE.Fecha, 103) AS DIA
+FROM Pre_Carga_Horas_Extras AS PCHE
+WHERE PCHE. Estado = 'P'
+	AND (DATENAME(WEEKDAY, CONVERT(DATE, Fecha)) = 'Sábado' OR DATENAME(WEEKDAY, CONVERT(DATE, Fecha)) = 'Saturday')
+	AND (DATEPART(YEAR, Fecha) = DATEPART(YEAR, GETDATE()))
+
+"""

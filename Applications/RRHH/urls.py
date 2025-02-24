@@ -51,4 +51,15 @@ urlpatterns = [
 
     path('ranking/ranking-faltas', views.RankingFaltas, name="ranking_faltas"),
 
+
+    #### SÁBADOS
+
+    path('horas-extras/horas-sabados/', views.horasExtrasSabados, name="horasExtras_Sabados"),
+
+    path('horas-extras/horas-sabados/listar-sabados/', views.carga_combox_sabados, name="carga_combox_sabados"),
+
+    path('horas-extras/horas-sabados/listar-tabla/', views.data_listado_sabados, name="data_listado_sabados"),
+
+    path('horas-extras/horas-sabados/enviar-tabla/', views.recibe_data_listado_sabados, name="recibe_data_listado_sabados"),
+
 ]

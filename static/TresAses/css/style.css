@@ -1019,9 +1019,11 @@ input[type="checkbox"].input-checkbox {
 
 .tabla-container {
   max-height: calc(100% - 40px);
-  /* Ajusta según tus necesidades */
   overflow-y: auto;
-  /* Agrega una barra de desplazamiento vertical si es necesario */
+}
+.tabla-container-sabados {
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
 }
 
 .ContenidoCadrsExtras {
@@ -1034,9 +1036,11 @@ input[type="checkbox"].input-checkbox {
   border: 1px solid #a72626;
   border-radius: 5px;
   font-size: 14px;
-  padding: 10px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
   margin: 10px;
-  /* Establece el ancho de la card según tus necesidades */
   display: flex;
 }
 
@@ -1048,7 +1052,7 @@ input[type="checkbox"].input-checkbox {
   padding-right: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .rightDiv {
@@ -1063,6 +1067,10 @@ input[type="checkbox"].input-checkbox {
 .horas-item {
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.horas-item input {
+  max-width: 5rem;
 }
 
 .strong-horas {

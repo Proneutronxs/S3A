@@ -148,7 +148,7 @@ DATABASES = {
 
 
 # ###### LOCAL S3A
-# ip = '192.168.0.2'
+# ip = '192.168.0.126'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -168,6 +168,17 @@ DATABASES = {
 #     'ISISPayroll': {
 #         'ENGINE': 'sql_server.pyodbc',
 #         'NAME': 'TresAses_ISISPayroll',
+#         'USER': 'sa',
+#         'HOST': ip,
+#         'PASSWORD': 'Sideswipe348',
+#         'PORT': '',
+#         'OPTIONS': {
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+#     'principal': {
+#         'ENGINE': 'sql_server.pyodbc',
+#         'NAME': 'principal',
 #         'USER': 'sa',
 #         'HOST': ip,
 #         'PASSWORD': 'Sideswipe348',
@@ -247,6 +258,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50242880
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000000
 
 CRONJOBS = [
     #('0 */2 * * *', 'Applications.TareasProgramadas.tasks.TrasladoLegajos') # EJECUTAR CADA DOS HORAS

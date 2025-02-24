@@ -38,9 +38,9 @@
                     </li>
 
                     <li class="nav-link">
-                        <a href="#">
+                        <a href="{% url 'horasExtras_Sabados' %}">
                             <i class='bx material-symbols-outlined icon'>add_circle</i>
-                            <span class="text nav-text">Agregar</span>
+                            <span class="text nav-text">HE Sábados</span>
                         </a>
                     </li>
 
@@ -65,11 +65,10 @@
     </nav>
     <section class="home">
         <div class="container">
-            <div class="encabezado" style="background-color: #a72626">
-                <div class="text" style="font-size: 20px;">RECURSOS HUMANOS - HORAS EXTRAS</div>
-            </div>
             {% block content %}
-
+                <div class="encabezado" style="background-color: #a72626">
+                    <div class="text" style="font-size: 20px;">RECURSOS HUMANOS - HORAS EXTRAS</div>
+                </div>
             {% endblock %}
         </div>
     </section>
