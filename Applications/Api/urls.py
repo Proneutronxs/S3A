@@ -10,6 +10,8 @@ urlpatterns = [
     path('data-general/', demoCRC.dataGeneral, name="data-general-api"),
 
     path('data-general/with-crc/', demoCRC.dataConCRC, name="data_general_api_con_crc"),
+
+    path('data-general/ultimo-remito/', demoCRC.crc_ultimo_remito, name="crc_ultimo_remito"),
     
 
 

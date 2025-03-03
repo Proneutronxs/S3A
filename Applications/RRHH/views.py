@@ -942,10 +942,12 @@ def recibe_data_listado_sabados(request):
                 _100 = '00:00' if time_input_100[i] == '' else time_input_100[i]
                 decimal_50 = horas_a_decimales(_50)
                 decimal_100 = horas_a_decimales(_100)
-                #print('Legajo: '+ legajo +' - ' + '50% horas: ' + decimal_50 +' - ' + '100% horas: ' + decimal_100)
-                inserta_horas_sabado(legajo,fecha,'50',decimal_50)
-                inserta_horas_sabado(legajo,fecha,'100',decimal_100)
-                actualiza_pre_carga(fecha,legajo)
+                if decimal_100 != '0.00':
+                    inserta_horas_sabado(legajo,fecha,'100',decimal_100)
+                    actualiza_pre_carga(fecha,legajo)
+                if decimal_50 != '0.0':
+                    inserta_horas_sabado(legajo,fecha,'50',decimal_50)
+                    actualiza_pre_carga(fecha,legajo)
             return JsonResponse({'Message': 'Success', 'Nota': 'Las horas se guardaron correctamente.'})
         except Exception as e:
             data = str(e)
