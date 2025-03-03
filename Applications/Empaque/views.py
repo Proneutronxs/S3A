@@ -639,7 +639,6 @@ def insertaHorasExtrasNuevo(Legajo, Fdesde, Fhasta, Choras, Thora,user):
             cursor.close()
             return True
     except Exception as e:
-        print(e)
         insertar_registro_error_sql("EMPAQUE","INSERTA HORAS EXTRAS NUEVO","request.user",str(e))
         return False
     finally:
@@ -746,7 +745,6 @@ def agregaHoraExtra(request):
                         return JsonResponse({'Message': 'Success', 'Nota': 'Ocurrió un error al intentar procesar la solicitud.'})  
             except Exception as e:
                 error = str(e)
-                print(error)
                 insertar_registro_error_sql("EMPAQUE","AGREGA HORA EXTRA",str(request.user),error)
                 return JsonResponse({'Message': 'Not Found', 'Nota': 'Ocurrió un error al intentar procesar la solicitud: ' + error})  
             finally:

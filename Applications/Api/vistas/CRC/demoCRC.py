@@ -229,14 +229,11 @@ def redondear_mas(numero, decimales):
 def crc_ultimo_remito(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        remito = data.get('Remito')
-        values = [remito]
+        remitos = data.get('Remitos', [])
+        remitos_str = ','.join(remitos) 
         try:
             with connections['S3A'].cursor() as cursor:
-                sql = """ 
-                    DECLARE @@Remito INT;
-
-                    SET @@Remito = %s;
+                sql = f""" 
 
                     SELECT 
                         Mercado AS MERCADO, 
@@ -288,14 +285,14 @@ def crc_ultimo_remito(request):
                         VistaDemoDLC AS DLC
                             LEFT OUTER JOIN		
                                 VistaTamañoPorPC AS TPC ON DLC.NroRemito=TPC.NroRemito  AND DLC.NroItem=TPC.NroItem AND DLC.NroSubitem=TPC.NroSubitem 
-                    WHERE DLC.NroRemito > @@Remito  AND DLC.NroRemito < '150000' --69319
+                    WHERE DLC.NroRemito NOT IN ({remitos_str})   --- AND DLC.NroRemito < '150000' --69319
                     GROUP BY 
                         IdCliente, Cliente, IdEspecie, Especie, IdVariedad, Variedad, IdEnvase, Envase, IdEtiqueta, Etiqueta, Mercado, DATEPART(wk, FECH_FAC), Calibres, NRO_FAC, NombreEmbarque, CONVERT(VARCHAR(10), FECH_FAC, 103), PaisDestino, 
                         PesoEnvase, PesoEnvase * Bultos, Bultos, DLC.NroRemito,DATEPART(SECOND, ALTA_REMITO),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION,
                         DLC.Fecha, DLC.FechaAlta
                     ORDER BY DLC.NroRemito
                     """
-                cursor.execute(sql, values)
+                cursor.execute(sql)
                 consulta = cursor.fetchall()
                 lista_data = []
                 if consulta:
