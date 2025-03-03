@@ -230,119 +230,122 @@ def crc_ultimo_remito(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         remitos = data.get('Remitos', [])
-        remitos_str = ','.join(remitos) 
-        try:
-            with connections['S3A'].cursor() as cursor:
-                sql = f""" 
+        if remitos:
+            remitos_str = ','.join(remitos) 
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = f""" 
 
-                    SELECT 
-                        Mercado AS MERCADO, 
-                        ISNULL(NombreEmbarque, '') AS VAPOR, 
-                        UPPER(PaisDestino) AS DESTINO, 
-                        IdCliente AS ID_CLIENTE, 
-                        CONVERT(VARCHAR(30),Cliente) AS CLIENTE, 
-                        CONVERT(DATE, DLC.Fecha, 120) AS FECHA_FACTURA, 
-                        CONVERT(VARCHAR,IdEspecie) AS ID_ESPECIE, 
-                        Especie AS ESPECIE, 
-                        IdVariedad AS ID_VARIEDAD, 
-                        Variedad AS VARIEDAD, 
-                        IdEnvase AS ID_ENVASE, 
-                        Envase AS ENVASE, 
-                        IdEtiqueta AS ID_MARCA, 
-                        Etiqueta AS MARCA, 
-                        Calibres AS CALIBRES, 
-                        CASE 
-                            WHEN ISNUMERIC(PesoEnvase) = 1 THEN CONVERT(DECIMAL(18, 2), PesoEnvase)
-                            ELSE 0
-                        END AS PESO_ENVASE, 
-                        CASE 
-                            WHEN ISNUMERIC(PesoEnvase) = 1 AND ISNUMERIC(Bultos) = 1 THEN CONVERT(DECIMAL(18, 2), PesoEnvase * Bultos)
-                            ELSE 0
-                        END AS TOTAL_KGS, 
-                        FORMAT(Bultos, 'N0') AS CANT_BULTOS, 
-                        CONVERT(DECIMAL(18, 2), SUM(Precio2)) AS IMP_UNI, 
-                        CONVERT(DECIMAL(18, 2), (SUM(Precio2) * TPC.Cantidad)) AS IMP_TOTAL, 
-                        DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
-                        'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, FECH_FAC)) AS CHAR_SEMANA, 
-                        ISNULL(NRO_FAC,'-') AS NRO_FAC, 
-                        CONVERT(VARCHAR,(DLC.NroRemito)) AS NRO_REM, 
-                        DATEPART(SECOND, ALTA_REMITO) AS SEGUNDOS,
-                        CASE CONVERT(VARCHAR,TPC.Tamaño) 
-                            WHEN 'AAAA' THEN '90' 
-                            WHEN 'AAA' THEN '80' 
-                            WHEN 'AA' THEN '70' 
-                            WHEN 'A' THEN '60' 
-                            WHEN 'B' THEN '50' 
-                            WHEN 'C' THEN '40' 
-                            ELSE CONVERT(VARCHAR,TPC.Tamaño) 
-                        END AS CALIBRE, 
-                        TPC.Cantidad AS CANTIDAD, 
-                        CONVERT(VARCHAR,TPC.crc) AS CRC, 
-                        Moneda AS TIPO_MONEDA, 
-                        FUNCION AS FUNC, 
-                        DLC.Fecha AS FECHA, DLC.FechaAlta, YEAR(GETDATE()) AS AÑO
-                    FROM 
-                        VistaDemoDLC AS DLC
-                            LEFT OUTER JOIN		
-                                VistaTamañoPorPC AS TPC ON DLC.NroRemito=TPC.NroRemito  AND DLC.NroItem=TPC.NroItem AND DLC.NroSubitem=TPC.NroSubitem 
-                    WHERE DLC.NroRemito NOT IN ({remitos_str})   --- AND DLC.NroRemito < '150000' --69319
-                    GROUP BY 
-                        IdCliente, Cliente, IdEspecie, Especie, IdVariedad, Variedad, IdEnvase, Envase, IdEtiqueta, Etiqueta, Mercado, DATEPART(wk, FECH_FAC), Calibres, NRO_FAC, NombreEmbarque, CONVERT(VARCHAR(10), FECH_FAC, 103), PaisDestino, 
-                        PesoEnvase, PesoEnvase * Bultos, Bultos, DLC.NroRemito,DATEPART(SECOND, ALTA_REMITO),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION,
-                        DLC.Fecha, DLC.FechaAlta
-                    ORDER BY DLC.NroRemito
-                    """
-                cursor.execute(sql)
-                consulta = cursor.fetchall()
-                lista_data = []
-                if consulta:
-                    for row in consulta:
-                        mercado = str(row[0])
-                        vapor = str(row[1])
-                        destino = str(row[2])
-                        id_cliente = str(row[3])
-                        cliente = str(row[4])
-                        fecha_factura = str(row[5])
-                        id_especie = str(row[6])
-                        especie = str(row[7])
-                        id_variedad = str(row[8])
-                        variedad = str(row[9])
-                        id_envase = str(row[10])
-                        envase = str(row[11])
-                        id_marca = str(row[12])
-                        marca = str(row[13])
-                        calibres = str(row[14])
-                        peso_envase = str(row[15])
-                        total_kgs = str(row[16])
-                        cant_bultos = str(row[17])
-                        imp_uni = str(row[18])
-                        imp_total = str(row[19])
-                        id_semana = str(row[20])
-                        char_semana = str(row[21])
-                        nro_fac = str(row[22])
-                        nro_rem = str(row[23])
-                        segundos = str(row[24])
-                        calibre = str(row[25])
-                        cantidad = str(row[26])
-                        crc = str(row[27])
-                        tipo_moneda = str(row[28])
-                        func = str(row[29])
-                        fecha = str(row[30])
-                        fecha_alta = str(row[31])
-                        año = str(row[32])
-                        lista_data.append({'MERCADO': mercado, 'VAPOR':vapor, 'DESTINO':destino, 'ID_CLIENTE':id_cliente, 'CLIENTE':cliente, 'FECHA_FACTURA':fecha_factura, 'ID_ESPECIE':id_especie, 'ESPECIE':especie,
-                        'ID_VARIEDAD':id_variedad, 'VARIEDAD':variedad, 'ID_ENVASE':id_envase, 'ENVASE':envase, 'ID_MARCA':id_marca, 'MARCA':marca, 'CALIBRES':calibres, 'PESO_ENVASE':peso_envase, 'TOTAL_KGS':total_kgs, 
-                        'CANT_BULTOS':cant_bultos, 'IMP_UNI':imp_uni, 'IMP_TOTAL':imp_total, 'ID_SEMANA':id_semana, 'CHAR_SEMANA':char_semana, 'NRO_FAC':nro_fac, 'NRO_REM':nro_rem, 'SEGUNDOS':segundos, 'CALIBRE':calibre, 'CANTIDAD':cantidad,
-                        'CRC':crc, 'TIPO_MONEDA':tipo_moneda, 'FUNC':func, 'FECHA':fecha, 'FECHA_ALTA':fecha_alta, 'AÑO':año})
+                        SELECT 
+                            Mercado AS MERCADO, 
+                            ISNULL(NombreEmbarque, '') AS VAPOR, 
+                            UPPER(PaisDestino) AS DESTINO, 
+                            IdCliente AS ID_CLIENTE, 
+                            CONVERT(VARCHAR(30),Cliente) AS CLIENTE, 
+                            CONVERT(DATE, DLC.Fecha, 120) AS FECHA_FACTURA, 
+                            CONVERT(VARCHAR,IdEspecie) AS ID_ESPECIE, 
+                            Especie AS ESPECIE, 
+                            IdVariedad AS ID_VARIEDAD, 
+                            Variedad AS VARIEDAD, 
+                            IdEnvase AS ID_ENVASE, 
+                            Envase AS ENVASE, 
+                            IdEtiqueta AS ID_MARCA, 
+                            Etiqueta AS MARCA, 
+                            Calibres AS CALIBRES, 
+                            CASE 
+                                WHEN ISNUMERIC(PesoEnvase) = 1 THEN CONVERT(DECIMAL(18, 2), PesoEnvase)
+                                ELSE 0
+                            END AS PESO_ENVASE, 
+                            CASE 
+                                WHEN ISNUMERIC(PesoEnvase) = 1 AND ISNUMERIC(Bultos) = 1 THEN CONVERT(DECIMAL(18, 2), PesoEnvase * Bultos)
+                                ELSE 0
+                            END AS TOTAL_KGS, 
+                            FORMAT(Bultos, 'N0') AS CANT_BULTOS, 
+                            CONVERT(DECIMAL(18, 2), SUM(Precio2)) AS IMP_UNI, 
+                            CONVERT(DECIMAL(18, 2), (SUM(Precio2) * TPC.Cantidad)) AS IMP_TOTAL, 
+                            DATEPART(wk, FECH_FAC) AS ID_SEMANA, 
+                            'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, FECH_FAC)) AS CHAR_SEMANA, 
+                            ISNULL(NRO_FAC,'-') AS NRO_FAC, 
+                            CONVERT(VARCHAR,(DLC.NroRemito)) AS NRO_REM, 
+                            DATEPART(SECOND, ALTA_REMITO) AS SEGUNDOS,
+                            CASE CONVERT(VARCHAR,TPC.Tamaño) 
+                                WHEN 'AAAA' THEN '90' 
+                                WHEN 'AAA' THEN '80' 
+                                WHEN 'AA' THEN '70' 
+                                WHEN 'A' THEN '60' 
+                                WHEN 'B' THEN '50' 
+                                WHEN 'C' THEN '40' 
+                                ELSE CONVERT(VARCHAR,TPC.Tamaño) 
+                            END AS CALIBRE, 
+                            TPC.Cantidad AS CANTIDAD, 
+                            CONVERT(VARCHAR,TPC.crc) AS CRC, 
+                            Moneda AS TIPO_MONEDA, 
+                            FUNCION AS FUNC, 
+                            DLC.Fecha AS FECHA, DLC.FechaAlta, YEAR(GETDATE()) AS AÑO
+                        FROM 
+                            VistaDemoDLC AS DLC
+                                LEFT OUTER JOIN		
+                                    VistaTamañoPorPC AS TPC ON DLC.NroRemito=TPC.NroRemito  AND DLC.NroItem=TPC.NroItem AND DLC.NroSubitem=TPC.NroSubitem 
+                        WHERE DLC.NroRemito NOT IN ({remitos_str})   --- AND DLC.NroRemito < '150000' --69319
+                        GROUP BY 
+                            IdCliente, Cliente, IdEspecie, Especie, IdVariedad, Variedad, IdEnvase, Envase, IdEtiqueta, Etiqueta, Mercado, DATEPART(wk, FECH_FAC), Calibres, NRO_FAC, NombreEmbarque, CONVERT(VARCHAR(10), FECH_FAC, 103), PaisDestino, 
+                            PesoEnvase, PesoEnvase * Bultos, Bultos, DLC.NroRemito,DATEPART(SECOND, ALTA_REMITO),TPC.Tamaño, TPC.crc,TPC.Cantidad, Moneda, FUNCION,
+                            DLC.Fecha, DLC.FechaAlta
+                        ORDER BY DLC.NroRemito
+                        """
+                    cursor.execute(sql)
+                    consulta = cursor.fetchall()
+                    lista_data = []
+                    if consulta:
+                        for row in consulta:
+                            mercado = str(row[0])
+                            vapor = str(row[1])
+                            destino = str(row[2])
+                            id_cliente = str(row[3])
+                            cliente = str(row[4])
+                            fecha_factura = str(row[5])
+                            id_especie = str(row[6])
+                            especie = str(row[7])
+                            id_variedad = str(row[8])
+                            variedad = str(row[9])
+                            id_envase = str(row[10])
+                            envase = str(row[11])
+                            id_marca = str(row[12])
+                            marca = str(row[13])
+                            calibres = str(row[14])
+                            peso_envase = str(row[15])
+                            total_kgs = str(row[16])
+                            cant_bultos = str(row[17])
+                            imp_uni = str(row[18])
+                            imp_total = str(row[19])
+                            id_semana = str(row[20])
+                            char_semana = str(row[21])
+                            nro_fac = str(row[22])
+                            nro_rem = str(row[23])
+                            segundos = str(row[24])
+                            calibre = str(row[25])
+                            cantidad = str(row[26])
+                            crc = str(row[27])
+                            tipo_moneda = str(row[28])
+                            func = str(row[29])
+                            fecha = str(row[30])
+                            fecha_alta = str(row[31])
+                            año = str(row[32])
+                            lista_data.append({'MERCADO': mercado, 'VAPOR':vapor, 'DESTINO':destino, 'ID_CLIENTE':id_cliente, 'CLIENTE':cliente, 'FECHA_FACTURA':fecha_factura, 'ID_ESPECIE':id_especie, 'ESPECIE':especie,
+                            'ID_VARIEDAD':id_variedad, 'VARIEDAD':variedad, 'ID_ENVASE':id_envase, 'ENVASE':envase, 'ID_MARCA':id_marca, 'MARCA':marca, 'CALIBRES':calibres, 'PESO_ENVASE':peso_envase, 'TOTAL_KGS':total_kgs, 
+                            'CANT_BULTOS':cant_bultos, 'IMP_UNI':imp_uni, 'IMP_TOTAL':imp_total, 'ID_SEMANA':id_semana, 'CHAR_SEMANA':char_semana, 'NRO_FAC':nro_fac, 'NRO_REM':nro_rem, 'SEGUNDOS':segundos, 'CALIBRE':calibre, 'CANTIDAD':cantidad,
+                            'CRC':crc, 'TIPO_MONEDA':tipo_moneda, 'FUNC':func, 'FECHA':fecha, 'FECHA_ALTA':fecha_alta, 'AÑO':año})
 
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                        return JsonResponse({'Message': 'Success', 'Datos': lista_data})
 
-                return JsonResponse({'Message': 'No data found', 'Nota':'No se encontraron datos.'})
-        
-        except Exception as e:
-            return JsonResponse({'Message': 'Error', 'nota': str(e)})
-        finally:
-            connections['S3A'].close()
+                    return JsonResponse({'Message': 'No data found', 'Nota':'No se encontraron datos.'})
+            
+            except Exception as e:
+                return JsonResponse({'Message': 'Error', 'nota': str(e)})
+            finally:
+                connections['S3A'].close()
+        else:
+            return JsonResponse({'Message': 'No data found', 'Nota':'No se cargaron os remitos.'})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
