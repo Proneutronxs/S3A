@@ -9,16 +9,6 @@ import json
 import math
 import os
 
-
-
-
-
-
-
-
-
-
-
 @csrf_exempt
 def dataGeneral(request):
     if request.method == 'POST':
@@ -232,6 +222,7 @@ def crc_ultimo_remito(request):
         remitos = data.get('Remitos', [])
         if remitos:
             remitos_str = ','.join(remitos) 
+            guarda_remitos_enviados(remitos_str)
             try:
                 with connections['S3A'].cursor() as cursor:
                     sql = f""" 
@@ -350,7 +341,24 @@ def crc_ultimo_remito(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+def guarda_remitos_enviados(listado):
+    try:
+        with connections['S3A'].cursor() as cursor:
+            sql = f"""   
 
+                INSERT TRESASES_APLICATIVO.dbo.Registro_Demo_DLC (ListaDLC,FechaAlta) 
+                        VALUES ((SELECT STUFF((SELECT DISTINCT ',' + CONVERT(VARCHAR, DLC.NroRemito)
+                                    FROM VistaDemoDLC AS DLC
+                                    WHERE DLC.NroRemito NOT IN ({listado})
+                                    FOR XML PATH('')), 1, 1, '')), GETDATE())
+
+                """
+            cursor.execute(sql)
+    except Exception as e:
+        return ""
+    finally:
+        cursor.close()
+        connections['S3A'].close()
 
 
 
