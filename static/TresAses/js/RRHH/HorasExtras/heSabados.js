@@ -4,11 +4,15 @@ const timeInput100 = document.getElementById('timeInput100');
 const formattedTime = document.getElementById('formattedTime');
 const confirmaEnviar = document.getElementById('pop-agrega');
 const timePattern = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+const excelFileInput = document.getElementById('excelFile');
+
+
 
 window.addEventListener("load", async () => {
     dataInicial();
 
 });
+
 
 selector_sabados.addEventListener("change", (event) => {
     dataDateTable();
@@ -22,9 +26,14 @@ document.getElementById('idActualizaHoras').addEventListener('click', function (
     }
 });
 
-document.getElementById('idEnviaHoras').addEventListener('click', function () {
-    preguntaEnvío()
+document.getElementById('idDescargaExcel').addEventListener('click', function () {
+    window.location.href = 'Archivo_Horas_Sabados.xlsx';
 });
+
+document.getElementById('idSubeExcel').addEventListener('click', function () {
+    confirmaEnviar.style.display = 'block';
+});
+
 
 const choiceSabados = new Choices('#selector_sabados', {
     allowHTML: true,
@@ -100,13 +109,13 @@ const dataDateTable = async () => {
                             <div class="horas-item">
                                 <strong>${datos.Dia}</strong>
                             </div>
-                            <div class="horas-item">
+                             <!-- <div class="horas-item">
                                 <label class="letras" for="cantHoras">50% :</label>
                                 <input class="time-input50" type="text" id="timeInput50" name="time" placeholder="HH:mm">
                                 <label class="letras" for="cantHoras">100% :</label>
                                 <input class="time-input100" type="text" id="timeInput100" name="time" placeholder="HH:mm">
                             </div>
-                            <p id="formattedTime" class="error-message" style="color: red; font-weight: bold;"></p>
+                            <p id="formattedTime" class="error-message" style="color: red; font-weight: bold;"></p> -->
                         </div>
                     </div>
                 `
@@ -114,9 +123,51 @@ const dataDateTable = async () => {
 
 
             document.getElementById('horas_sabados').innerHTML = datosTabla;
+            document.getElementById('idDescargaExcel').style.display = 'block';
+            document.getElementById('idSubeExcel').style.display = 'block';
         } else {
             document.getElementById('horas_sabados').innerHTML = ``;
+            document.getElementById('idDescargaExcel').style.display = 'none';
+            document.getElementById('idSubeExcel').style.display = 'none';
             var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+    } catch (error) {
+        document.getElementById('idDescargaExcel').style.display = 'none';
+        document.getElementById('idSubeExcel').style.display = 'none';
+        closeProgressBar();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const enviarArchivoExcel = async () => {
+    confirmaEnviar.style.display = 'none';
+    openProgressBar();
+
+    try {
+        const formData = new FormData();
+        const archivoExcel = document.getElementById('excelFile').files[0];
+        formData.append('archivoExcel', archivoExcel);
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+        const response = await fetch('enviar-archivo-excel/', options);
+        const data = await response.json();
+        closeProgressBar();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            var nota = data.Nota;
+            var color = "green";
+            mostrarInfo(nota, color);
+        } else {
+            var nota = data.Nota;
             var color = "red";
             mostrarInfo(nota, color);
         }
@@ -221,7 +272,15 @@ function preguntaEnvío() {
     }
 }
 
+excelFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const fileType = file.type;
 
+    if (fileType !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' && fileType !== 'application/vnd.ms-excel') {
+        alert('Por favor, seleccione un archivo Excel válido (.xlsx o .xls)');
+        excelFileInput.value = '';
+    }
+});
 
 
 

@@ -22,10 +22,16 @@
                     class="selectores btn-submit botones bx material-symbols-outlined icon"
                     type="button">refresh</button>
             </div>
+
             <div>
-                <button id="idEnviaHoras" class="btn-submit botones bx material-symbols-outlined icon"
-                    type="button">schedule_send</button>
+                <button id="idDescargaExcel" style="display: none;"
+                    class="btn-submit botones bx material-symbols-outlined icon" type="button">download</button>
             </div>
+            <div>
+                <button id="idSubeExcel" style="display: none;"
+                    class="btn-submit botones bx material-symbols-outlined icon" type="button">upload</button>
+            </div>
+
         </div>
     </div>
     <div class="vista-container-agrega" style="margin-top: 25px;">
@@ -52,9 +58,11 @@
 
 <div class="popup-agrega" style="display: none;" id="pop-agrega">
     <div class="popup-content-agrega">
-        <p>Las horas que están en blanco se perderan. Está seguro que desea enviar las horas?</p> <br>
-        <button onclick="cancelaEnvío()" class="btn-submit botones" style="width: 150px;">CANCELAR</button>
-        <button onclick="enviarDatosTabla()" id="confirmBtn" class="btn-submit botones" style="width: 150px;">CONFIRMAR</button>
+        <input type="file" id="excelFile" style="margin-bottom: 20px;" accept=".xlsx, .xls">
+        <br>
+        <button onclick="cancelaEnvío();" class="btn-submit botones" style="width: 150px;">CANCELAR</button>
+        <button onclick="enviarArchivoExcel();" id="confirmBtn" class="btn-submit botones"
+            style="width: 150px;">CONFIRMAR</button>
     </div>
 </div>
 

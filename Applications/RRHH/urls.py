@@ -56,6 +56,10 @@ urlpatterns = [
 
     path('horas-extras/horas-sabados/', views.horasExtrasSabados, name="horasExtras_Sabados"),
 
+    path('horas-extras/horas-sabados/<str:filename>', views.descarga_excel_creados, name="descarga_excel_creados"),
+
+    path('horas-extras/horas-sabados/enviar-archivo-excel/', views.recibir_archivo_excel, name="recibir_archivo_excel"),
+
     path('horas-extras/horas-sabados/listar-sabados/', views.carga_combox_sabados, name="carga_combox_sabados"),
 
     path('horas-extras/horas-sabados/listar-tabla/', views.data_listado_sabados, name="data_listado_sabados"),

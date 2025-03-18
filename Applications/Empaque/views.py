@@ -471,29 +471,18 @@ def listaHorasProcesadas(request):
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         sql = """ 
                                 SELECT        HorasExtras_Procesadas.ID_HEP, HorasExtras_Procesadas.Legajo, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
-                                                        FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) + ' - ' + CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA, 
-                                                        CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TME, 108) AS TME, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TMS, 108) END AS TMS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TTE, 108) END AS TTE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TTS, 108) END AS TTS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TNE, 108) END AS TNE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TNS, 108) END AS TNS, CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FME, 108) AS FME, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FMS, 108) END AS FMS, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTE, 108) END AS FTE, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTS, 108) END AS FTS, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNE, 108) END AS FNE, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
-                                                        (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
-                                                        CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
-                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) AS DIA, 
-                                                        CASE WHEN Listado_Turnos_Fichadas_Procesadas.HorasTurno IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.HorasTurno, 108) END AS HORA_TURNO,
-                                                        CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 120) AS FECHA_120
-                                FROM            HorasExtras_Procesadas INNER JOIN
-                                                        TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado LEFT JOIN
-                                                        Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
+                                            FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) + ' - ' + CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA, 
+                                            '' AS TME, '' TMS, '' TTE, '' AS TTS, '' AS TNE, '' AS TNS, '' AS FME, '' FMS, '' AS FTE, '' AS FTS, '' AS FNE, '' AS FNS, 
+                                            (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                            CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
+                                            RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) AS DIA, 
+                                            '--:--' AS HORA_TURNO,
+                                            CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 120) AS FECHA_120
+                                FFROM            HorasExtras_Procesadas INNER JOIN
+                                            TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') AND (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde) = TRY_CONVERT(DATE, %s))
                                             AND (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = %s)
-                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
+                                ORDER BY HorasExtras_Procesadas.FechaHoraDesde, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
                             """
                         cursor.execute(sql, [fecha,cc])
                         results = cursor.fetchall()
@@ -533,28 +522,17 @@ def listaHorasProcesadas(request):
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                         sql = """ 
                                 SELECT        HorasExtras_Procesadas.ID_HEP, HorasExtras_Procesadas.Legajo, CONVERT(VARCHAR(25), TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple + ' ' + TresAses_ISISPayroll.dbo.Empleados.NombresEmple) AS NOMBRE, 
-                                                        FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) + ' - ' + CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA, 
-                                                        CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TME, 108) AS TME, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TMS, 108) END AS TMS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TTE, 108) END AS TTE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TTS, 108) END AS TTS, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TNE, 108) END AS TNE, CASE WHEN CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.TNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.TNS, 108) END AS TNS, CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FME, 108) AS FME, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FMS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FMS, 108) END AS FMS, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FTE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTE, 108) END AS FTE, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FTS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FTS, 108) END AS FTS, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FNE, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNE, 108) END AS FNE, CASE WHEN CONVERT(VARCHAR(5), 
-                                                        Listado_Turnos_Fichadas_Procesadas.FNS, 108) IS NULL THEN '' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.FNS, 108) END AS FNS, 
-                                                        (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
-                                                        CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
-                                                        RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) AS DIA, 
-                                                        CASE WHEN Listado_Turnos_Fichadas_Procesadas.HorasTurno IS NULL THEN '--:--' ELSE CONVERT(VARCHAR(5), Listado_Turnos_Fichadas_Procesadas.HorasTurno, 108) END AS HORA_TURNO,
-                                                        CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 120) AS FECHA_120
+                                            FORMAT(HorasExtras_Procesadas.CantidadHoras, '0.0') AS CantidadHoras, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) + ' - ' + CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 103) AS FECHA, 
+                                            '' AS TME, '' TMS, '' TTE, '' AS TTS, '' AS TNE, '' AS TNS, '' AS FME, '' FMS, '' AS FTE, '' AS FTS, '' AS FNE, '' AS FNS, 
+                                            (SELECT AbrevCtroCosto FROM TresAses_ISISPayroll.dbo.CentrosCostos WHERE Regis_CCo = TresAses_ISISPayroll.dbo.Empleados.Regis_CCo) AS CC,
+                                            CASE WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '10' THEN 'EMPAQUE' WHEN TresAses_ISISPayroll.dbo.Empleados.Regis_Sin = '2' THEN 'COMERCIO' ELSE '' END AS SINDICATO,
+                                            RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) AS DIA, 
+                                            '--:--' AS HORA_TURNO,
+                                            CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 120) AS FECHA_120
                                 FROM            HorasExtras_Procesadas INNER JOIN
-                                                        TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado LEFT JOIN
-                                                        Listado_Turnos_Fichadas_Procesadas ON HorasExtras_Procesadas.ID_LTFP = Listado_Turnos_Fichadas_Procesadas.ID_LTFP
-                                WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') --AND HorasExtras_Procesadas.ID_HEP = 37052
-                                ORDER BY Listado_Turnos_Fichadas_Procesadas.Fecha, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
+                                            TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
+                                WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') --AND CONVERT(DATE,HorasExtras_Procesadas.FechaHoraDesde) = '2025-03-15' 
+                                ORDER BY HorasExtras_Procesadas.FechaHoraDesde, TresAses_ISISPayroll.dbo.Empleados.ApellidoEmple
 
                             """
                         cursor.execute(sql)

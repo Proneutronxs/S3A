@@ -2,9 +2,13 @@ from django.shortcuts import render
 from S3A.funcionesGenerales import *
 from django.contrib.auth.decorators import login_required # type: ignore
 from django.views.decorators.csrf import csrf_exempt # type: ignore
+from django.views.static import serve
+import os
 import datetime 
 import openpyxl
 from openpyxl.styles import Protection
+from openpyxl import Workbook
+from openpyxl import load_workbook
 from io import BytesIO
 from django.db import connections # type: ignore
 from django.http import JsonResponse, HttpResponse # type: ignore
@@ -913,7 +917,32 @@ def data_listado_sabados(request):
                                 "Dia": fecha,
                                 "Fichadas": [time]  
                             }
+
+                        
                             lista_data.append(nuevo_registro)
+
+                    wb = Workbook()
+                    ws = wb.active
+                    ws['A1'] = 'Legajo'
+                    ws['B1'] = 'Nombre'
+                    ws['C1'] = ''
+                    for i in range(6):
+                        ws[f'D{i+1}'] = f' {i+1}'
+                    ws['J1'] = '50'
+                    ws['K1'] = '100'
+
+                    for i, item in enumerate(lista_data, start=2):
+                        ws[f'A{i}'] = item['Legajo']
+                        ws[f'B{i}'] = item['Nombre']
+                        ws[f'C{i}'] = item['Dia']
+                        for j, fichada in enumerate(item['Fichadas']):
+                            if j < 6:
+                                ws.cell(row=i, column=3+j).value = fichada
+                        ws[f'J{i}'] = ''
+                        ws[f'K{i}'] = ''
+
+                    wb.save('Applications/RRHH/Archivos/Excel/Archivo_Horas_Sabados.xlsx')
+                    #print(lista_data)
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
                     data = "No se encontraron Datos."
@@ -924,6 +953,74 @@ def data_listado_sabados(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def descarga_excel_creados(request, filename):
+    nombre = filename
+    filename = 'Applications/RRHH/Archivos/Excel/' + filename
+    if os.path.exists(filename):
+        response = serve(request, os.path.basename(filename), os.path.dirname(filename))
+        response['Content-Disposition'] = f'attachment; filename="{nombre}"'
+        return response
+    else:
+        raise Http404
+    
+@csrf_exempt 
+def recibir_archivo_excel(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            with connections['principal'].cursor() as cursor:
+                sql = """ 
+                        SET DATEFORMAT ymd;
+                        DECLARE @@FechaDesde DATETIME;
+                        DECLARE @@FechaHasta DATETIME;
+                        SET @@FechaDesde = %s;
+                        SET @@FechaHasta = CONVERT(VARCHAR(10), DATEADD(DAY, +1, %s), 120);
+
+                        SELECT TL.legLegajo AS LEGAJO, TL.legNombre AS NOMBRE,
+                            CONVERT(VARCHAR, (FORMAT(TF.ficFecha, 'yyyy-MM-dd'))) + ' ' + CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm:ss'))) AS DATE_TIME,
+                            CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm'))) AS TIME_DATE, CONVERT(VARCHAR(10), TF.ficFecha,103) AS FECHA
+                        FROM T_Fichadas AS TF LEFT JOIN 
+                                T_Legajos AS TL ON TL.legCodigo = TF.legCodigo
+                        WHERE TL.legLegajo IN (SELECT Legajo
+                                                FROM TRESASES_APLICATIVO.dbo.Pre_Carga_Horas_Extras
+                                                WHERE TRY_CONVERT(DATE, Fecha) = @@FechaDesde)
+                            AND ISNUMERIC(TL.legLegajo) = 1
+                            AND TF.ficFecha + TF.ficHora >= @@FechaDesde + ' 05:00:00'
+                            AND TF.ficFecha + TF.ficHora <= @@FechaHasta + ' 05:00:00'
+                        ORDER BY TL.legLegajo, TF.ficFecha + TF.ficHora 
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+
+            archivo_excel = request.FILES['archivoExcel']
+            wb = load_workbook(archivo_excel)
+            ws = wb.active
+            datos = []
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                legajo = str(row[0])
+                nombre = str(row[1])
+                f1 = row[2]
+                f2 = row[3]
+                f3 = row[4]
+                f4 = row[5]
+                f5 = row[6]
+                f6 = row[7]
+                _50 = '0' if row[9] == None else str(row[9])
+                _100 =  '0' if row[10] == None else str(row[10])
+                print(f"{legajo} -- {nombre} -- {f1} -- {f2} -- {f3} -- {f4} -- {f5} -- {f6} -- {_50} -- {_100} ")
+
+
+
+
+
+
+
+            return JsonResponse({'Message': 'Success', 'Nota': 'La horas se cargaron correctamente.'}) 
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 @csrf_exempt    
 def recibe_data_listado_sabados(request):
