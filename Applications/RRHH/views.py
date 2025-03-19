@@ -984,11 +984,13 @@ def recibir_archivo_excel(request):
 
                 valido = False
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    if isinstance(str(row[0]).replace('.0', ''), int):
+                    if not (isinstance(row[0], int) or (isinstance(row[0], float) and row[0].is_integer())):
+                        raise ValueError(f"La columna A contiene un valor no entero: {row[0]} ({type(row[0]).__name__})")
+                    else:
                         valido = True
                         break
                 if not valido:
-                    raise ValueError("La columna A no tiene datos de tipo entero (N° Legajo)")
+                    raise ValueError("La columna A no contiene valores enteros")
                 for row in ws.iter_rows(min_row=2, values_only=True):
                     if row[9] is not None and not isinstance(row[9], datetime.time):
                         raise ValueError("La columna 50 no tiene datos de tipo tiempo HH:mm")
@@ -997,7 +999,7 @@ def recibir_archivo_excel(request):
                 
 
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    legajo = str(row[0]).replace('.0', '')
+                    legajo = str(row[0])
                     nombre = str(row[1])
                     f1 = row[2]
                     f2 = row[3]
