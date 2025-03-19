@@ -151,6 +151,7 @@ const enviarArchivoExcel = async () => {
         const formData = new FormData();
         const archivoExcel = document.getElementById('excelFile').files[0];
         formData.append('archivoExcel', archivoExcel);
+        formData.append("IdFecha", getValueSabados())
         const options = {
             method: 'POST',
             headers: {
@@ -163,6 +164,8 @@ const enviarArchivoExcel = async () => {
         if (data.Message == "Not Authenticated") {
             window.location.href = data.Redirect;
         } else if (data.Message == "Success") {
+            dataInicial();
+            document.getElementById('horas_sabados').innerHTML = ``;
             var nota = data.Nota;
             var color = "green";
             mostrarInfo(nota, color);

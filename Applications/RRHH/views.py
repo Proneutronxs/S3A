@@ -969,58 +969,76 @@ def recibir_archivo_excel(request):
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
     if request.method == 'POST':
         try:
-            with connections['principal'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
-                        SET DATEFORMAT ymd;
-                        DECLARE @@FechaDesde DATETIME;
-                        DECLARE @@FechaHasta DATETIME;
-                        SET @@FechaDesde = %s;
-                        SET @@FechaHasta = CONVERT(VARCHAR(10), DATEADD(DAY, +1, %s), 120);
+                    INSERT INTO HorasExtras_Procesadas
+                    (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, ImpArreglo, Sector, ID_LTFP, EstadoEnvia) VALUES
+                    (%s,%s,%s,'17','CALC-RRHH','100','0',%s,%s,'0','','1001','4')
+                """
+                # cursor.execute(sql)
 
-                        SELECT TL.legLegajo AS LEGAJO, TL.legNombre AS NOMBRE,
-                            CONVERT(VARCHAR, (FORMAT(TF.ficFecha, 'yyyy-MM-dd'))) + ' ' + CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm:ss'))) AS DATE_TIME,
-                            CONVERT(VARCHAR, (FORMAT(TF.ficHora, 'HH:mm'))) AS TIME_DATE, CONVERT(VARCHAR(10), TF.ficFecha,103) AS FECHA
-                        FROM T_Fichadas AS TF LEFT JOIN 
-                                T_Legajos AS TL ON TL.legCodigo = TF.legCodigo
-                        WHERE TL.legLegajo IN (SELECT Legajo
-                                                FROM TRESASES_APLICATIVO.dbo.Pre_Carga_Horas_Extras
-                                                WHERE TRY_CONVERT(DATE, Fecha) = @@FechaDesde)
-                            AND ISNUMERIC(TL.legLegajo) = 1
-                            AND TF.ficFecha + TF.ficHora >= @@FechaDesde + ' 05:00:00'
-                            AND TF.ficFecha + TF.ficHora <= @@FechaHasta + ' 05:00:00'
-                        ORDER BY TL.legLegajo, TF.ficFecha + TF.ficHora 
-                    """
-                cursor.execute(sql)
-                consulta = cursor.fetchall()
+                idFecha = str(request.POST.get('IdFecha'))
+                archivo_excel = request.FILES['archivoExcel']
+                wb = load_workbook(archivo_excel)
+                ws = wb.active
+                valido = False
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    if isinstance(row[0], int):
+                        valido = True
+                        break
+                if not valido:
+                    raise ValueError("La columna A no tiene datos de tipo entero (N° Legajo)")
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    if row[9] is not None and not isinstance(row[9], datetime.time):
+                        raise ValueError("La columna 50 no tiene datos de tipo tiempo HH:mm")
+                    if row[10] is not None and not isinstance(row[10], datetime.time):
+                        raise ValueError("La columna 100 no tiene datos de tipo tiempo HH:mm")
+                
 
-            archivo_excel = request.FILES['archivoExcel']
-            wb = load_workbook(archivo_excel)
-            ws = wb.active
-            datos = []
-            for row in ws.iter_rows(min_row=2, values_only=True):
-                legajo = str(row[0])
-                nombre = str(row[1])
-                f1 = row[2]
-                f2 = row[3]
-                f3 = row[4]
-                f4 = row[5]
-                f5 = row[6]
-                f6 = row[7]
-                _50 = '0' if row[9] == None else str(row[9])
-                _100 =  '0' if row[10] == None else str(row[10])
-                print(f"{legajo} -- {nombre} -- {f1} -- {f2} -- {f3} -- {f4} -- {f5} -- {f6} -- {_50} -- {_100} ")
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    legajo = str(row[0])
+                    nombre = str(row[1])
+                    f1 = row[2]
+                    f2 = row[3]
+                    f3 = row[4]
+                    f4 = row[5]
+                    f5 = row[6]
+                    f6 = row[7]
+                    _50 = '0' if row[9] == None else str(row[9])
+                    _100 =  '0' if row[10] == None else str(row[10])
+                    # print(idFecha)
+                    # print(f"{legajo} -- {nombre} -- {f1} -- {f2} -- {f3} -- {f4} -- {f5} -- {f6} -- {tiempo_a_decimal(_50)} -- {tiempo_a_decimal(_100)} ")
+                    values_50 = [legajo,idFecha,idFecha,'50',str(tiempo_a_decimal(_50))]
+                    values_100 = [legajo,idFecha,idFecha,'100',str(tiempo_a_decimal(_100))]
+                    if _50 == '0' and _100 == '0':
+                        cursor.execute(sql,values_50)
+                    if _50 != '0':
+                        cursor.execute(sql,values_50)
+                    if _100 != '0':
+                        cursor.execute(sql,values_100)
 
-
-
-
-
-
-
+                sql_update = """ UPDATE Pre_Carga_Horas_Extras SET Estado = 'C' WHERE CONVERT(DATE,Fecha) = %s """
+                cursor.execute(sql_update,[idFecha])
             return JsonResponse({'Message': 'Success', 'Nota': 'La horas se cargaron correctamente.'}) 
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def tiempo_a_decimal(tiempo):
+    if tiempo == '0':
+        return '0'
+    horas, minutos, segundos = tiempo.split(':')
+    horas = int(horas)
+    minutos = int(minutos)
+    segundos = int(segundos)
+    decimal_horas = horas
+    decimal_minutos = 0
+    if minutos >= 45:
+        decimal_minutos = 1
+    elif minutos >= 15:
+        decimal_minutos = 0.5
+    return str(decimal_horas + decimal_minutos)
 
 @csrf_exempt    
 def recibe_data_listado_sabados(request):
