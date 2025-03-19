@@ -981,9 +981,10 @@ def recibir_archivo_excel(request):
                 archivo_excel = request.FILES['archivoExcel']
                 wb = load_workbook(archivo_excel)
                 ws = wb.active
+
                 valido = False
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    if isinstance(row[0], int):
+                    if isinstance(str(row[0]).replace('.0', ''), int):
                         valido = True
                         break
                 if not valido:
@@ -996,7 +997,7 @@ def recibir_archivo_excel(request):
                 
 
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    legajo = str(row[0])
+                    legajo = str(row[0]).replace('.0', '')
                     nombre = str(row[1])
                     f1 = row[2]
                     f2 = row[3]
