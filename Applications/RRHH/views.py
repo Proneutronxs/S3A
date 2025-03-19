@@ -984,11 +984,14 @@ def recibir_archivo_excel(request):
 
                 valido = False
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    if not (isinstance(row[0], int) or (isinstance(row[0], float) and row[0].is_integer())):
-                        raise ValueError(f"La columna A contiene un valor no entero: {row[0]} ({type(row[0]).__name__})")
-                    else:
+                    try:
+                        int(row[0])
                         valido = True
-                        break
+                    except ValueError:
+                        raise ValueError(f"La columna A contiene un valor no entero: {row[0]} ({type(row[0]).__name__})")
+                    break
+                if not valido:
+                    raise ValueError("La columna A no contiene valores enteros")
                 if not valido:
                     raise ValueError("La columna A no contiene valores enteros")
                 for row in ws.iter_rows(min_row=2, values_only=True):
