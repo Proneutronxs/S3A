@@ -219,9 +219,9 @@ def idEspecie_Varierad(request,idEspecie):
                         SELECT  IdVariedad, (CONVERT(VARCHAR(3),IdVariedad) + ' - ' + RTRIM(Nombre)) AS Especie 
                         FROM Variedad 
                         WHERE IdEspecie = %s
-                                AND IdVariedad < 1000 
-                                AND IdVariedad NOT IN (940,957,927,951,906,948,934,937,950,908,122,73,84,97,931,935,83,963,86,933,85,936,932)
+                                AND IdVariedad IN (SELECT valor FROM dbo.fn_Split((SELECT Texto FROM TRESASES_APLICATIVO.dbo.Parametros_Aplicativo WHERE Codigo = 'APP-VAR-FLETES'), ','))
                         ORDER BY Nombre
+
                         """
                 cursor.execute(sql, [idEspecie])
                 consulta = cursor.fetchall()
