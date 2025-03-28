@@ -1,7 +1,7 @@
 from openpyxl.styles import PatternFill, Font, Border, Side
 from django.http import JsonResponse, HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
-from S3A.funcionesGenerales import obtenerHorasArchivo
+from S3A.funcionesGenerales import obtenerHorasArchivo, registroRealizado
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from openpyxl.drawing.image import Image
@@ -58,6 +58,7 @@ def data_listado_horas_extras(request):
                 data = 'No se encontraron datos.'
                 return JsonResponse({'Message': 'Error', 'Nota': data})
         except Exception as e:
+            registroRealizado('SD',"EXCEL HORAS",data)
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:
@@ -90,6 +91,7 @@ def jsonHorasExtras(values):
             else:
                 return lista_data
     except Exception as e:
+        registroRealizado('SD',"JSON HORAS",str(e))
         return lista_data
 
 def general_excel_horas_extras(lista_data):
@@ -154,7 +156,7 @@ def general_excel_horas_extras(lista_data):
         return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel}) 
     except Exception as e:
         data = str(e)
-        print(data)
+        registroRealizado('SD',"EXCEL HORAS",data)
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
 def convertir_a_numerico_stock_ventas(df):
@@ -200,6 +202,7 @@ def inserta_elimina_horas_extras(request):
             else: 
                 return JsonResponse({'Message': 'Error', 'Nota': 'Uno o más items no se pudieron guardad o eliminar.'})
         except Exception as e:
+            registroRealizado('SD',"EI HORAS",str(e))
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:
