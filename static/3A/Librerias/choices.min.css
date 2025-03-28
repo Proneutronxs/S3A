@@ -1,0 +1,199 @@
+/* ################### CHOICES INICIO #################### */
+
+.choices {
+    position: relative;
+    font-size: 16px;
+    width: 100%;
+    height: 30px;
+  }
+  
+  /* Estilo del campo cuando está cerrado */
+  .choices__inner {
+    border: 1px solid #c9c9c9;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    border: 1px solid #001327;
+    border-radius: 3px;
+  }
+  
+  .choices.is-open .choices__inner {
+    border-color: #aaa;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  
+  
+  /* Elementos seleccionados */
+  .choices__item--selectable {
+    padding: 5px 10px;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .choices__item--selectable .choices__button {
+    border: none;
+    background-color: transparent;
+    font-size: 12px;
+    color: #999;
+    cursor: pointer;
+  }
+
+  .choices__list--dropdown .choices__item--choice {
+    padding: 10px;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 4px;
+  }
+  
+  .choices__list--dropdown .choices__item--choice:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .choices__list--dropdown .choices__item--choice.is-highlighted {
+    background-color: #d3e9f8;
+  }
+  
+  .choices__list--dropdown .choices__item--no-results {
+    padding: 10px;
+    color: #999;
+  }
+  
+  .choices__list--dropdown .choices__item--selectable.choices__item--disabled {
+    font-style: italic;
+    color: #999;
+  }
+  
+  .choices__inner::after {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+  }
+  
+  .choices.is-open .choices__inner::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  
+  .choices__list--dropdown {
+    position: absolute;
+    width: 100%;
+    max-height: 300px;
+    min-height: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    top: 100%;
+    margin-top: -1px;
+    border-bottom-left-radius: 2.5px;
+    border-bottom-right-radius: 2.5px;
+    font-size: 12px;
+    overflow: auto;
+    z-index: 9999 !important;
+    will-change: visibility !important;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease;
+  }
+  
+  .choices.is-open .choices__list--dropdown {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+    z-index: 9999 !important;
+  }
+  
+  .choices__input--cloned {
+    width: auto !important;
+    padding: 5px 10px;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: none;
+  }
+  
+  .choices[data-type*=select-multiple] .choices__inner,
+  .choices[data-type*=text] .choices__inner {
+    cursor: text;
+  }
+  
+  .choices__list--multiple .choices__item[data-deletable] {
+    padding-right: 5px;
+  }
+  
+  .choices__list--multiple .choices__item {
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 3.75px;
+    margin-bottom: 3.75px;
+    background-color: #005f75;
+    border: 1px solid #005f75;
+    color: #fff;
+    word-break: break-all;
+    box-sizing: border-box;
+    margin-top: 1.5px;
+  }
+  
+  .choices__item--selectable {
+    cursor: pointer;
+  }
+  
+  .choices[data-type*=select-multiple] .choices__button,
+  .choices[data-type*=text] .choices__button {
+    position: relative;
+    display: inline-block;
+    margin: 1px 0px 0px 0px;
+    padding-left: 16px;
+    border-left: 1px solid #005f75;
+    background-image: url("closeBit.png");
+    background-size: 15px;
+    width: 4px;
+    color: #005f75;
+  }
+  
+  .vr-select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .choices__inner::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    cursor: grab;
+  }
+  
+  .choices__inner::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+  }
+  
+  .choices__inner::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+  }
+  
+  .choices__inner::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+    cursor: grabbing;
+  }
+  

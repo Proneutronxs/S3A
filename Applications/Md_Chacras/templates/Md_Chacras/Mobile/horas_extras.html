@@ -1,0 +1,96 @@
+{% extends "Md_Chacras/index.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<!-- AG-Grid Styles -->
+<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" /> 
+<link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
+
+<div class="container-verPlus">
+    <div class="vr-encabezado">
+        <div class="vr-titulo-contenedor">
+            <div class="vr-posicion-titulo">
+                <P>HORAS EXTRAS</P>
+            </div>
+        </div>
+        <div class="vr-fila-1-contenedor">
+            <div class="vr-fila-1">
+                <div class="vr-fila-2">
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-desde">
+                            <span>Desde:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-desde" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-hasta">
+                            <span>Hasta:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-hasta" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_estado" class="choices_inner vr-select">
+                            <option value="">TODO</option>
+                            <option value="0">AUTORIZADO</option>
+                            <option value="8">ELIMINADO</option>
+                            <option value="1">PENDIENTE</option>
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_tipo" class="choices_inner vr-select">
+                            <option value="">TODO</option>
+                            <option value="A">ARREGLO</option>
+                            <option value="N">NOCTURNAS</option>
+                            <option value="50">HORAS 50%</option>
+                            <option value="100">HORAS 100%</option>
+                        </select>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="busqueda-button">BUSCAR</button>
+                    </div>
+                    <div class="vr-col-icon" id="class-bt-download" style="display: block;">
+                        <a>
+                            <i class='bx material-symbols-outlined icon'>download</i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="vr-fila-3">
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-desde">
+                            <span>Valor:</span>
+                            <input type="number" id="valor-arreglo" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="guardar-button">GUARDAR</button>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="eliminar-button">ELIMINAR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vr-contenedor-data">
+        <div class="vr-datos-tabla" id="id-contenedor-empresas">
+            <div id="tableDataResumen" class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            </div>
+        </div>
+    </div>
+
+    <!-- AG-Grid Script -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <script src="{%static '3A/Librerias/choices.min.js' %}"></script>
+    <script src="{%static '3A/Librerias/jquery-3.6.0.min.js' %}"></script>
+
+    <script src="{%static '3A/Librerias/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{%static '3A/js/Md_Chacras/HorasEstras/horasExtras.js' %}"></script>
+
+</div>
+{% endblock %}

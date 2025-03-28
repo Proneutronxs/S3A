@@ -97,6 +97,11 @@ def obtenerHoraActual():
     hora = hora_actual.strftime('%H:%M')
     return hora
 
+def obtenerHorasArchivo():
+    fecha_actual = datetime.now()
+    hora = fecha_actual.strftime('%H_%M_%S')
+    return hora
+
 def buscaCentroCostosPorUsuario(codigo,usuario):
     data = []
     try:

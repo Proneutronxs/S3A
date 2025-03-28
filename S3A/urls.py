@@ -59,6 +59,28 @@ urlpatterns = [
 
     path('estadisticas/', include('Applications.Estadisticas.urls')),
 
+
+
+
+
+    
+
+    path('md-chacras/', include('Applications.Md_Chacras.urls')),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     path('login/', include('Applications.Inicio.urls')),
 
     path('accounts/login/', views.inicioSesion, name="inicio_sesion"),
