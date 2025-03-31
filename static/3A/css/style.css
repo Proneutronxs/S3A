@@ -729,7 +729,7 @@ li {
 }
 
 .vr-col-2 {
-	width: 230px;
+	width: 260px;
 	margin-right: 10px;
 }
 
@@ -1500,14 +1500,17 @@ th.vr-tb-header {
 
 .vr-fila-1 {
 	display: flex;
-	flex-direction: column; /* Cambié a column para que los divs estén uno debajo del otro */
-	justify-content: flex-start; /* Alinea el contenido al principio del contenedor */
-	align-items: stretch; /* Hace que los elementos dentro de la fila ocupen todo el ancho */
+	flex-direction: column;
+	/* Cambié a column para que los divs estén uno debajo del otro */
+	justify-content: flex-start;
+	/* Alinea el contenido al principio del contenedor */
+	align-items: stretch;
+	/* Hace que los elementos dentro de la fila ocupen todo el ancho */
 	background-color: #f9f9f9;
 	border: 1px solid #ccc;
 	border-radius: 5px;
 	padding: 4px;
-  }
+}
 
 .vr-posicion-titulo p {
 	border-bottom: 2px solid #4CAF50;
@@ -1539,4 +1542,3 @@ th.vr-tb-header {
 		box-shadow: 0 0 10px #4CAF4F7B;
 	}
 }
-

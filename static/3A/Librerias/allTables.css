@@ -117,7 +117,12 @@ tr {
     background-color: #f0f0f0;
 }
 
-
+.new-vr-select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
 
 
 
@@ -125,7 +130,7 @@ tr {
 .ag-theme-alpine .ag-menu.ag-filter-menu {
     background-color: white !important;
     border: 1px solid #44546a !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 .ag-theme-alpine .ag-picker-field {

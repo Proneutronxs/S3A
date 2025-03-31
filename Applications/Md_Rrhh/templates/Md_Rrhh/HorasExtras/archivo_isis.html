@@ -1,4 +1,4 @@
-{% extends "Md_Chacras/index.html" %}
+{% extends "Md_Rrhh/index.html" %}
 
 {% load static %}
 
@@ -13,7 +13,7 @@
     <div class="vr-encabezado">
         <div class="vr-titulo-contenedor">
             <div class="vr-posicion-titulo">
-                <P>HORAS EXTRAS</P>
+                <P>ARCHIVO ISIS</P>
             </div>
         </div>
         <div class="vr-fila-1-contenedor">
@@ -21,58 +21,26 @@
                 <div class="vr-fila-2">
                     <div class="vr-col-8">
                         <div class="vr-fecha-desde">
-                            <span>Desde:</span>
+                            <span>Fecha Inicio:</span>
                             <input type="date" onclick="this.showPicker();" id="vr-fecha-desde" class="vr-input">
                         </div>
                     </div>
                     <div class="vr-col-8">
                         <div class="vr-fecha-hasta">
-                            <span>Hasta:</span>
+                            <span>Fecha Ciere:</span>
                             <input type="date" onclick="this.showPicker();" id="vr-fecha-hasta" class="vr-input">
                         </div>
-                    </div>
-                    <div class="vr-col-2">
-                        <select id="selector_estado" class="choices_inner vr-select">
-                            <option value="">TODO</option>
-                            <option value="0">AUTORIZADO</option>
-                            <option value="8">ELIMINADO</option>
-                            <option value="1">PENDIENTE</option>
-                        </select>
-                    </div>
-                    <div class="vr-col-2">
-                        <select id="selector_tipo" class="choices_inner vr-select">
-                            <option value="">TODO</option>
-                            <option value="A">ARREGLO</option>
-                            <option value="N50">NOCTURNAS 50%</option>
-                            <option value="N100">NOCTURNAS 100%</option>
-                            <option value="50">HORAS 50%</option>
-                            <option value="100">HORAS 100%</option>
-                        </select>
                     </div>
                     <div class="vr-col-btn">
                         <button class="vr-button" id="busqueda-button">BUSCAR</button>
                     </div>
-                    <div class="vr-col-icon" id="class-bt-download" style="display: block;">
+                    <div class="vr-col-icon" id="class-bt-download">  <!-- style="display: block;" -->
                         <a>
                             <i class='bx material-symbols-outlined icon'>download</i>
                         </a>
                     </div>
                 </div>
-
-                <div class="vr-fila-3">
-                    <div class="vr-col-8">
-                        <div class="vr-fecha-desde">
-                            <span>Valor:</span>
-                            <input type="number" id="valor-arreglo" class="vr-input">
-                        </div>
-                    </div>
-                    <div class="vr-col-btn">
-                        <button class="vr-button" id="guardar-button">GUARDAR</button>
-                    </div>
-                    <div class="vr-col-btn">
-                        <button class="vr-button" id="eliminar-button">ELIMINAR</button>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -91,7 +59,7 @@
     <script src="{%static '3A/Librerias/jquery-3.6.0.min.js' %}"></script>
 
     <script src="{%static '3A/Librerias/jquery.dataTables.min.js' %}"></script>
-    <script type="text/javascript" src="{%static '3A/js/Md_Chacras/HorasExtras/horasExtras.js' %}"></script>
+    <script type="text/javascript" src="{%static '3A/js/Md_Rrhh/HorasExtras/archivoIsis.js' %}"></script>
 
 </div>
 {% endblock %}

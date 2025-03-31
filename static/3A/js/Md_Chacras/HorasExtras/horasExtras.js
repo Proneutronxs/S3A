@@ -1,3 +1,4 @@
+document.querySelector('.vr-contenedor-data').style.top = document.querySelector('.vr-fila-3') ? '9rem' : '6rem';
 const desde = document.getElementById('vr-fecha-desde');
 const hasta = document.getElementById('vr-fecha-hasta');
 const loadingContainer = document.getElementById('loading-container');

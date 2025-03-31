@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <link href="{%static '3A/images/TA.ico' %}" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Not Found</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #F0F0F0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .container img{
+            width: 280px;
+            height: 140px;
+        }
+
+        .message {
+            font-size: 26px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <img src="{%static '3A/images/TA.png' %}" alt="Imagen 404" class="image">
+
+        <div class="message">
+            <h2>404</h2>
+            <h4>PAGE NOT FOUND</h4>
+        </div>
+    </div>
+
+</body>
+
+</html>

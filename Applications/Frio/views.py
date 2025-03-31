@@ -35,7 +35,7 @@ def verHorasExtras(request):
     return render (request, 'Frio/HorasExtras/verHorasExtrasFrio.html')
 
 
-@login_required
+
 @csrf_exempt
 def cargaCentrosCostosFrio(request):### CAMBIO A CENTRO DE COSTOS MUESTRA LOS CENTROS DE COSTOS CARGADOS
     if request.method == 'GET':

@@ -64,8 +64,6 @@ def Ranking(request):
 def RankingFaltas(request):
     return render (request, 'RRHH/RankingFaltas/rankingFaltas.html')
 
-
-
 def obtener_fecha_hora_actual_con_milisegundos():
     now = datetime.datetime.now()
     fecha_hora_actual = now.strftime("%Y-%m-%dT%H:%M:%S")
@@ -971,9 +969,73 @@ def recibir_archivo_excel(request):
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
-                    INSERT INTO HorasExtras_Procesadas
-                    (Legajo, FechaHoraDesde, FechaHoraHasta, IdMotivo, DescripcionMotivo, Autorizado, UsuarioEncargado, TipoHoraExtra, CantidadHoras, ImpArreglo, Sector, ID_LTFP, EstadoEnvia) VALUES
-                    (%s,%s,%s,'17','CALC-RRHH','100','0',%s,%s,'0','','1001','4')
+                    DECLARE @Legajo VARCHAR(10);
+                    DECLARE @Desde DATETIME;
+                    DECLARE @Hasta DATETIME;
+                    DECLARE @Tipo VARCHAR(10);
+                    DECLARE @Cantidad VARCHAR(10);
+
+                    SET @Legajo = %s;
+                    SET @Desde = %s;
+                    SET @Hasta = %s;
+                    SET @Tipo = %s;
+                    SET @Cantidad = %s;
+
+                    IF EXISTS (
+                        SELECT 1 
+                        FROM HorasExtras_Procesadas 
+                        WHERE Legajo = @Legajo AND FechaHoraDesde = @Desde AND TipoHoraExtra = @Tipo
+                    )
+                    BEGIN
+                        UPDATE HorasExtras_Procesadas 
+                        SET 
+                            FechaHoraHasta = @Hasta, 
+                            IdMotivo = '17', 
+                            DescripcionMotivo = 'CALC-RRHH', 
+                            Autorizado = '100', 
+                            UsuarioEncargado = '0', 
+                            CantidadHoras = @Cantidad, 
+                            ImpArreglo = '0', 
+                            Sector = '', 
+                            ID_LTFP = '1001', 
+                            EstadoEnvia = '4'
+                        WHERE Legajo = @Legajo AND FechaHoraDesde = @Desde AND TipoHoraExtra = @Tipo
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO HorasExtras_Procesadas 
+                        (
+                            Legajo, 
+                            FechaHoraDesde, 
+                            FechaHoraHasta, 
+                            IdMotivo, 
+                            DescripcionMotivo, 
+                            Autorizado, 
+                            UsuarioEncargado, 
+                            TipoHoraExtra, 
+                            CantidadHoras, 
+                            ImpArreglo, 
+                            Sector, 
+                            ID_LTFP, 
+                            EstadoEnvia
+                        ) 
+                        VALUES 
+                        (
+                            @Legajo, 
+                            @Desde, 
+                            @Hasta, 
+                            '17', 
+                            'CALC-RRHH', 
+                            '100', 
+                            '0', 
+                            @Tipo, 
+                            @Cantidad, 
+                            '0', 
+                            '', 
+                            '1001', 
+                            '4'
+                        )
+                    END
                 """
                 # cursor.execute(sql)
 
@@ -1010,10 +1072,8 @@ def recibir_archivo_excel(request):
                     f4 = row[5]
                     f5 = row[6]
                     f6 = row[7]
-                    _50 = '0' if row[9] == None else str(row[9])
-                    _100 =  '0' if row[10] == None else str(row[10])
-                    # print(idFecha)
-                    # print(f"{legajo} -- {nombre} -- {f1} -- {f2} -- {f3} -- {f4} -- {f5} -- {f6} -- {tiempo_a_decimal(_50)} -- {tiempo_a_decimal(_100)} ")
+                    _50 = '0' if row[9] is None or row[9] in ['0:00', '00:00', '00:00:00'] else str(row[9])
+                    _100 = '0' if row[10] is None or row[10] in ['0:00', '00:00', '00:00:00'] else str(row[10])
                     values_50 = [legajo,idFecha,idFecha,'50',str(tiempo_a_decimal(_50))]
                     values_100 = [legajo,idFecha,idFecha,'100',str(tiempo_a_decimal(_100))]
                     if _50 == '0' and _100 == '0':
@@ -1032,9 +1092,17 @@ def recibir_archivo_excel(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 def tiempo_a_decimal(tiempo):
-    if tiempo == '0':
+    if tiempo == '0' or tiempo == '':
         return '0'
-    horas, minutos, segundos = tiempo.split(':')
+    partes = tiempo.split(':')
+    if len(partes) == 2:  
+        horas, minutos = partes
+        segundos = 0
+    elif len(partes) == 3:
+        horas, minutos, segundos = partes
+    else:
+        raise ValueError("Formato de tiempo inválido")
+    
     horas = int(horas)
     minutos = int(minutos)
     segundos = int(segundos)

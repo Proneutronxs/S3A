@@ -65,7 +65,11 @@ urlpatterns = [
 
     
 
-    path('md##-###chacras/', include('Applications.Md_Chacras.urls')),
+    path('md-chacras/', include('Applications.Md_Chacras.urls')),
+
+    path('md-frio/', include('Applications.Md_Frio.urls')),
+
+    path('md-rrhh/', include('Applications.Md_Rrhh.urls')),
 
 
 

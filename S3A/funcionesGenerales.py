@@ -376,5 +376,30 @@ def listaPersonalPorCentro(request): ###listado de personal por listado de centr
 
 
 
+####### NUEVAS FUNCIONES PARTE NUEVA FUNCIONES DE MODULOS MD
 
+
+
+def Centros_Modulos_Usuarios(codigo,usuario):
+    values = [codigo,usuario]
+    lista_data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                    EXEC GENERAL_CENTROS_POR_USUARIO %s, %s
+                """
+            cursor.execute(sql, values)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    lista_data.append({
+                        "IdCentro": str(row[0]),
+                        "Descripcion": str(row[1])
+                    })
+                return lista_data
+            else:
+                return lista_data
+    except Exception as e:
+        print(e)
+        return lista_data
 

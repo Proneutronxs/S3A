@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 
     
     'Applications.Md_Chacras',
+    'Applications.Md_Frio',
+    'Applications.Md_Rrhh',
 
 
 
