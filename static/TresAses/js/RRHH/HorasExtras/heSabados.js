@@ -61,6 +61,8 @@ const dataInicial = async () => {
             choiceSabados.removeActiveItems();
             choiceSabados.setChoices(result, 'value', 'label', true);
         } else {
+            document.getElementById('idDescargaExcel').style.display = 'none';
+            document.getElementById('idSubeExcel').style.display = 'none';
             var nota = data.Nota
             var color = "red";
             mostrarInfo(nota, color);
