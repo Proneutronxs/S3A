@@ -851,12 +851,11 @@ def carga_combox_sabados(request):
                         lista_data.append({'IdValue': idValue, 'Value':value})
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
-                    data = "No se encontraron Datos."
-                    return JsonResponse({'Message': 'Error', 'Nota': data})
+                    lista_data.append({'IdValue': '', 'Value':'SIN DATOS'})
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
         except Exception as e:
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
-        return JsonResponse({'Message': 'Success', 'Reportes': reportes, "Empaques":empaques})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
