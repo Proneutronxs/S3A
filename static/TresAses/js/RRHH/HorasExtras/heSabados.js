@@ -170,6 +170,7 @@ const enviarArchivoExcel = async () => {
             var color = "green";
             mostrarInfo(nota, color);
         } else {
+            dataInicial();
             var nota = data.Nota;
             var color = "red";
             mostrarInfo(nota, color);
