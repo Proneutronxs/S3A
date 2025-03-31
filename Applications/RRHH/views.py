@@ -1072,8 +1072,8 @@ def recibir_archivo_excel(request):
                     f4 = row[5]
                     f5 = row[6]
                     f6 = row[7]
-                    _50 = '0' if row[9] is None or row[9] in ['0:00', '00:00', '00:00:00'] else str(row[9])
-                    _100 = '0' if row[10] is None or row[10] in ['0:00', '00:00', '00:00:00'] else str(row[10])
+                    _50 = '0' if row[9] is None or str(row[9]) in ['0:00', '00:00', '00:00:00'] else str(row[9])
+                    _100 = '0' if row[10] is None or str(row[10]) in ['0:00', '00:00', '00:00:00'] else str(row[10])
                     if _50 != '0':
                         values_50 = [legajo, idFecha, idFecha, '50', str(tiempo_a_decimal(_50))]
                         cursor.execute(sql, values_50)
