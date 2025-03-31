@@ -843,8 +843,8 @@ def carga_combox_sabados(request):
                     """
                 cursor.execute(sql)
                 consulta = cursor.fetchall()
+                lista_data = []
                 if consulta:
-                    lista_data = []
                     for row in consulta:
                         idValue = str(row[0])
                         value = str(row[1])
