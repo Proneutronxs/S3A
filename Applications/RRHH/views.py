@@ -1074,14 +1074,13 @@ def recibir_archivo_excel(request):
                     f6 = row[7]
                     _50 = '0' if row[9] is None or row[9] in ['0:00', '00:00', '00:00:00'] else str(row[9])
                     _100 = '0' if row[10] is None or row[10] in ['0:00', '00:00', '00:00:00'] else str(row[10])
-                    values_50 = [legajo,idFecha,idFecha,'50',str(tiempo_a_decimal(_50))]
-                    values_100 = [legajo,idFecha,idFecha,'100',str(tiempo_a_decimal(_100))]
-                    if _50 == '0' and _100 == '0':
-                        cursor.execute(sql,values_50)
                     if _50 != '0':
-                        cursor.execute(sql,values_50)
+                        values_50 = [legajo, idFecha, idFecha, '50', str(tiempo_a_decimal(_50))]
+                        cursor.execute(sql, values_50)
+
                     if _100 != '0':
-                        cursor.execute(sql,values_100)
+                        values_100 = [legajo, idFecha, idFecha, '100', str(tiempo_a_decimal(_100))]
+                        cursor.execute(sql, values_100)
 
                 sql_update = """ UPDATE Pre_Carga_Horas_Extras SET Estado = 'C' WHERE CONVERT(DATE,Fecha) = %s """
                 cursor.execute(sql_update,[idFecha])
