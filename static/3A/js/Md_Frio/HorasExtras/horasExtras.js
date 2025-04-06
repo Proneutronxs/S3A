@@ -340,6 +340,7 @@ function getValueEstado() {
 }
 
 function changeClean() {
+    document.getElementById('selectAll').checked = false;
     displayGeneral.style.visibility = 'hidden';
 }
 
