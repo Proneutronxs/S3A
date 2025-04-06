@@ -1,0 +1,95 @@
+{% extends "Md_Frio/index.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
+
+<div class="container-verPlus">
+    <div class="vr-encabezado">
+        <div class="vr-titulo-contenedor">
+            <div class="vr-posicion-titulo">
+                <P>LISTADO HORAS EXTRAS</P>
+            </div>
+        </div>
+        <div class="vr-fila-1-contenedor">
+            <div class="vr-fila-1">
+
+                <div class="vr-fila-2" style="justify-content: center; gap: 35px;">
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-desde">
+                            <span>Desde:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-desde" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-hasta">
+                            <span>Hasta:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-hasta" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="busqueda-button">BUSCAR</button>
+                    </div>
+                    <div class="vr-col-icon" id="class-bt-download" style="display: block;">
+                        <a onclick="">
+                            <i class='bx material-symbols-outlined icon'>download</i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="vr-fila-3">
+                    <div class="vr-col-2">
+                        <select id="selector_centros" class="cell-left">
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_personal" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_estado" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="vr-contenedor-data">
+        <div class="vr-datos-tabla" id="id-contenedor-empresas">
+            <table id="tableDataCuentas" class="pfa-tabla" style="width:100%">
+                <thead class="pfa-tabla-encabezado">
+                    <tr>
+                        <th class="pfa-tabla-encabezado-celda">TIPO</th>
+                        <th class="pfa-tabla-encabezado-celda">LEGAJO</th>
+                        <th class="pfa-tabla-encabezado-celda">APELLIDO Y NOMBRE</th>
+                        <th class="pfa-tabla-encabezado-celda">CENTRO DE COSTO</th>
+                        <th class="pfa-tabla-encabezado-celda">DESDE</th>
+                        <th class="pfa-tabla-encabezado-celda">HASTA</th>
+                        <th class="pfa-tabla-encabezado-celda">CANT. HORAS</th>
+                        <th class="pfa-tabla-encabezado-celda">MOTIVO</th>
+                        <th class="pfa-tabla-encabezado-celda">OBSERVACIONES</th>
+                        <th class="pfa-tabla-encabezado-celda">SOLICITA</th>
+                        <th class="pfa-tabla-encabezado-celda">ESTADO</th>
+                        <th class="pfa-tabla-encabezado-celda">DISPO.</th>
+                    </tr>
+                </thead>
+                <tbody class="pfa-tabla-cuerpo" id="pfa-tabla-DataCuentas">
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{%static '3A/Librerias/choices.min.js' %}"></script>
+    <script src="{%static '3A/Librerias/jquery-3.6.0.min.js' %}"></script>
+
+    <script src="{%static '3A/Librerias/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{%static '3A/js/Md_Frio/HorasExtras/listadoHoras.js' %}"></script>
+
+</div>
+{% endblock %}

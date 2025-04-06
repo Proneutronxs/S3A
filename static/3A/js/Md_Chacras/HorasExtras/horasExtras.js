@@ -272,7 +272,7 @@ function getValueArreglo() {
 }
 
 function getValueEstado() {
-    return choiceEstado.getValue() ? choiceEstado.getValue().value : '';
+    return choiceEstado.getValue() ? choiceEstado.getValue().value : '1';
 }
 
 function getValueTipo() {
@@ -298,7 +298,13 @@ function fechaActual() {
     if (dia < 10) dia = '0' + dia;
     if (mes < 10) mes = '0' + mes;
     const formattedDate = `${ano}-${mes}-${dia}`;
-    const formattedDateDesde = `${ano}-${mes}-${'01'}`;
+    let mesDesde = mes - 1;
+    let anoDesde = ano;
+    if (mesDesde < 1) {
+        mesDesde = 12;
+        anoDesde = ano - 1;
+    }
+    const formattedDateDesde = `${anoDesde}-${String(mesDesde).padStart(2, '0')}-${'01'}`;
     desde.value = formattedDateDesde;
     hasta.value = formattedDate;
 }

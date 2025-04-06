@@ -15,6 +15,14 @@ document.getElementById('busqueda-button').addEventListener('click', function ()
     dataDateTable();
 });
 
+document.getElementById('autorizar-button').addEventListener('click', function () {
+    envia_horas('G');
+});
+
+document.getElementById('eliminar-button').addEventListener('click', function () {
+    envia_horas('E');
+});
+
 selector_centro.addEventListener("change", (event) => {
     changeClean();
     dataPersonal();
@@ -116,8 +124,6 @@ const dataPersonal = async () => {
     openLoading();
     try {
         const formData = new FormData();
-        formData.append("Inicio", desde.value);
-        formData.append("Final", hasta.value);
         formData.append("Centro", getValueCentros());
         const options = {
             method: 'POST',
@@ -126,7 +132,7 @@ const dataPersonal = async () => {
             body: formData
         };
 
-        const response = await fetch("personal-horas/", options);
+        const response = await fetch("personal-centro/", options);
         const data = await response.json();
         if (data.Message == "Not Authenticated") {
             window.location.href = data.Redirect;
@@ -262,6 +268,64 @@ const dataDateTable = async () => {
     }
 };
 
+const envia_horas = async (metodo) => {
+    displayGeneral.style.visibility = 'hidden';
+    openLoading();
+    try {
+        const selectedRows = [];
+
+        $('#tableDataCuentas tbody input[type="checkbox"]:checked').each(function () {
+            const row = $(this).closest('tr');
+            const tipoHora = row.find('select[name="tipoHoraExtra"]').val();
+            const cantidad = parseFloat(row.find('input[name="cantHoras"]').val()) || 0;
+            selectedRows.push({
+                IDHEP: row.find('input[name="idCheck"]').val(),
+                tipoHora: tipoHora,
+                cantidad: cantidad
+            });
+        });
+        if (selectedRows.length === 0) {
+            mostrarInfo("Por favor, seleccione al menos una fila", "orange");
+            closeLoading();
+            return;
+        }
+        const formData = new FormData();
+        formData.append("Metodo", metodo);
+        selectedRows.forEach((row, index) => {
+            formData.append(`IDhep${index}`, row.IDHEP);
+            formData.append(`TipoHoraExtra${index}`, row.tipoHora);
+            formData.append(`CantidadHoras${index}`, row.cantidad);
+        });
+        formData.append("IDHEP", selectedRows.length);
+
+        const options = {
+            method: 'POST',
+            body: formData
+        };
+
+        const response = await fetch("enviar-horas/", options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            dataDateTable();
+            document.getElementById('selectAll').checked = false;
+            mostrarInfo(data.Nota, "green");
+        } else {
+            dataDateTable();
+            mostrarInfo(data.Nota, "red");
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+
+
 function getValuePersonal() {
     return choicePersonal.getValue() ? choicePersonal.getValue().value : '';
 }
@@ -275,7 +339,6 @@ function getValueEstado() {
 }
 
 function changeClean() {
-    document.getElementById('selectAll').checked = false;
     displayGeneral.style.visibility = 'hidden';
 }
 

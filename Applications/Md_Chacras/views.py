@@ -19,11 +19,17 @@ import os
 
 @login_required
 def Md_Chacras(request):
-    return render (request, 'Md_Chacras/index.html')
+    user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
+    if user_has_permission:
+        return render (request, 'Md_Chacras/index.html')
+    return render (request, 'Md_Chacras/404.html')
 
 @login_required
 def Horas_Extras(request):
-    return render (request, 'Md_Chacras/Mobile/horas_extras.html')
+    user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
+    if user_has_permission:
+        return render (request, 'Md_Chacras/Mobile/horas_extras.html')
+    return render (request, 'Md_Chacras/404.html')
 
 def descarga_archivo_excel(request, filename):
     nombre = filename
@@ -58,7 +64,6 @@ def data_listado_horas_extras(request):
                 data = 'No se encontraron datos.'
                 return JsonResponse({'Message': 'Error', 'Nota': data})
         except Exception as e:
-            registroRealizado('SD',"EXCEL HORAS",data)
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:
@@ -91,16 +96,11 @@ def jsonHorasExtras(values):
             else:
                 return lista_data
     except Exception as e:
-        registroRealizado('SD',"JSON HORAS",str(e))
         return lista_data
 
 def general_excel_horas_extras(lista_data):
     try:
         df = pd.DataFrame(lista_data)
-        #df = df.drop(["IdLugar"], axis=1)
-        # df = convertir_a_numerico_stock_ventas(df)
-        # if df is None:
-        #     raise ValueError("Ocurrió un error al intentar realizar la conversión.")
         df.fillna('', inplace=True)
         output = BytesIO()
         columns1 = ['ID HORA', 'TIPO HORA', 'LEGAJO', 'APELLIDO Y NOMBRE', 'CENTRO DE COSTO', 'DESDE', 'HASTA', 'MOTIVO', 'DESCRIPCIÓN', 'CANTIDAD', 'SOLICITA', 'IMPORTE A', 'ESTADO']
@@ -156,7 +156,6 @@ def general_excel_horas_extras(lista_data):
         return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel}) 
     except Exception as e:
         data = str(e)
-        registroRealizado('SD',"EXCEL HORAS",data)
         return JsonResponse({'Message': 'Error', 'Nota': data})
 
 def convertir_a_numerico_stock_ventas(df):
@@ -202,7 +201,6 @@ def inserta_elimina_horas_extras(request):
             else: 
                 return JsonResponse({'Message': 'Error', 'Nota': 'Uno o más items no se pudieron guardad o eliminar.'})
         except Exception as e:
-            registroRealizado('SD',"EI HORAS",str(e))
             data = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:

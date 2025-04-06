@@ -400,6 +400,5 @@ def Centros_Modulos_Usuarios(codigo,usuario):
             else:
                 return lista_data
     except Exception as e:
-        print(e)
         return lista_data
 
