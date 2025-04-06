@@ -158,7 +158,7 @@ def inserta_elimina_horas_extras(request):
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
     if request.method == 'POST':
         try:
-            with connections['S3A'].cursor() as cursor:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 metodo = request.POST.get('Metodo', '')
                 permissions = {
                     'G': 'Md_Frio.puede_insertar',
