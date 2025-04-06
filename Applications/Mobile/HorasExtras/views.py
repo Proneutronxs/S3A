@@ -430,7 +430,7 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
 @csrf_exempt
 def busca_legajos_horas_extras(request):
     if request.method == 'POST':
-        lista_data = []
+        lista_data = [{'Legajo':'', 'Nombre': 'TODOS'}]
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 body = request.body.decode('utf-8')
@@ -478,9 +478,10 @@ def busca_horas_extras_legajo(request):
                                     WHEN CONVERT(VARCHAR,HESP.Estado) = '1' THEN 'PENDIENTE' ELSE CONVERT(VARCHAR,HESP.Estado) END AS ESTADO
                         FROM HorasExtras_Sin_Procesar AS HESP INNER JOIN
                             TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo
-                        WHERE HESP.Legajo = %s AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                        WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
                     """
-                cursor.execute(sql, [legajo])
+                cursor.execute(sql, [legajo,legajo])
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
