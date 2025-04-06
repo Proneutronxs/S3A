@@ -446,7 +446,7 @@ def busca_legajos_horas_extras(request):
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
-                        lista_data.appen(
+                        lista_data.append(
                             {
                                 'Legajo':str(row[0]),
                                 'Nombre':str(row[1])
