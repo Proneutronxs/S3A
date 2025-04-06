@@ -21,4 +21,10 @@ urlpatterns = [
     ### MUESTAR POR LA FECHA ENVÍADA LAS HORAS EXTRAS CARGADAS
     path('muestra/horas-extras-cargadas', views.verHorasExtras, name="ver_horas_extras"),
 
+
+
+    ##### NUEVO
+    path('lista-legajos/', views.busca_legajos_horas_extras, name="busca_legajos_horas_extras"),
+    
+    path('lista-horas/', views.busca_horas_extras_legajo, name="busca_horas_extras_legajo"),
 ]

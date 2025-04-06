@@ -425,8 +425,98 @@ def verCargaFechasDeHorasExtras(request, mes, usuario):
             connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
 
+@csrf_exempt
+def busca_legajos_horas_extras(request):
+    if request.method == 'POST':
+        lista_data = []
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                body = request.body.decode('utf-8')
+                usuario = str(json.loads(body)['usuario'])
+                sql = """ 
+                        SELECT DISTINCT HESP.Legajo, (EMP.ApellidoEmple + ' ' + EMP.NombresEmple) AS NOMBRE
+                        FROM HorasExtras_Sin_Procesar AS  HESP INNER JOIN
+                                TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo INNER JOIN
+                                USUARIOS AS US ON US.CodEmpleado = HESP.UsuarioEncargado
+                        WHERE (US.Usuario = %s) AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                    """
+                cursor.execute(sql, [usuario])
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_data.appen(
+                            {
+                                'Legajo':str(row[0]),
+                                'Nombre':str(row[1])
+                            }
+                        )
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def busca_horas_extras_legajo(request):
+    if request.method == 'POST':
+        legajo_actual = None
+        lista_data = []
+        horas = []
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                body = request.body.decode('utf-8')
+                legajo = str(json.loads(body)['Legajo'])
+                sql = """ 
+                        SELECT HESP.Legajo, (EMP.ApellidoEmple + ' ' + EMP.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HESP.DateTimeDesde, 
+                                    103) + ' ' + CONVERT(VARCHAR(5), HESP.DateTimeDesde, 108) AS DESDE, CONVERT(VARCHAR(10), HESP.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), 
+                                    HESP.DateTimeHasta, 108) AS HASTA, CASE WHEN CONVERT(VARCHAR,HESP.Estado) = '8' THEN 'RECHAZADO' WHEN CONVERT(VARCHAR,HESP.Estado) = '0' THEN 'AUTORIZADO'  
+                                    WHEN CONVERT(VARCHAR,HESP.Estado) = '1' THEN 'PENDIENTE' ELSE CONVERT(VARCHAR,HESP.Estado) END AS ESTADO
+                        FROM HorasExtras_Sin_Procesar AS HESP INNER JOIN
+                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo
+                        WHERE HESP.Legajo = %s AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                    """
+                cursor.execute(sql, [legajo])
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        legajo = str(row[0])
+                        nombre = str(row[1])
+                        desde = str(row[2])
+                        hasta = str(row[3])
+                        estado = str(row[4])
 
+                        if legajo != legajo_actual:
+                            if legajo_actual is not None:
+                                lista_data.append({
+                                    'Legajo': legajo_actual,
+                                    'Nombre': nombre_anterior,
+                                    'Horas': horas
+                                })
+                            legajo_actual = legajo
+                            nombre_anterior = nombre
+                            horas = [{'Desde': desde, 'Hasta': hasta, 'Estado': estado}]
+                        else:
+                            horas.append({'Desde': desde, 'Hasta': hasta, 'Estado': estado})
+
+                    if legajo_actual is not None:
+                        lista_data.append({
+                            'Legajo': legajo_actual,
+                            'Nombre': nombre_anterior,
+                            'Horas': horas
+                        })
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
