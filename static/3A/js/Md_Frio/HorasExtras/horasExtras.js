@@ -269,7 +269,6 @@ const dataDateTable = async () => {
 };
 
 const envia_horas = async (metodo) => {
-    displayGeneral.style.visibility = 'hidden';
     openLoading();
     try {
         const selectedRows = [];
@@ -289,6 +288,8 @@ const envia_horas = async (metodo) => {
             closeLoading();
             return;
         }
+
+        displayGeneral.style.visibility = 'hidden';
         const formData = new FormData();
         formData.append("Metodo", metodo);
         selectedRows.forEach((row, index) => {
