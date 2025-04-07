@@ -1733,9 +1733,9 @@ def verReporteCalidad(request):
                         bins = str(result[10])
                         chacra = str(result[12])
                         condicion = str(result[14])
-                        obsAD = str(result[15])
-                        obsAV = str(result[16])
-                        obsControl = str(result[17])
+                        obsAD = "-"
+                        obsAV = "-"
+                        obsControl = "-"
                         hexa = str(result[18])
                         user = str(result[19])
                         datos = {'Productor': productor, 'Lote': lote, 'Fecha': fecha, 'Variedad': variedad, 'Bins': bins, 'Chacra': chacra,
