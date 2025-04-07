@@ -474,17 +474,20 @@ def busca_horas_extras_legajo(request):
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 body = request.body.decode('utf-8')
                 legajo = str(json.loads(body)['Legajo'])
+                usuario = str(json.loads(body)['Usuario'])
                 sql = """ 
                         SELECT HESP.Legajo, (EMP.ApellidoEmple + ' ' + EMP.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HESP.DateTimeDesde, 
                                     103) + ' ' + CONVERT(VARCHAR(5), HESP.DateTimeDesde, 108) AS DESDE, CONVERT(VARCHAR(10), HESP.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), 
                                     HESP.DateTimeHasta, 108) AS HASTA, CASE WHEN CONVERT(VARCHAR,HESP.Estado) = '8' THEN 'RECHAZADO' WHEN CONVERT(VARCHAR,HESP.Estado) = '0' THEN 'AUTORIZADO'  
                                     WHEN CONVERT(VARCHAR,HESP.Estado) = '1' THEN 'PENDIENTE' ELSE CONVERT(VARCHAR,HESP.Estado) END AS ESTADO
                         FROM HorasExtras_Sin_Procesar AS HESP INNER JOIN
-                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo
+                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo INNER JOIN
+                            USUARIOS AS US ON US.CodEmpleado = HESP.UsuarioEncargado 
                         WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                                AND (US.Usuario = %s)
                         ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
                     """
-                cursor.execute(sql, [legajo,legajo])
+                cursor.execute(sql, [legajo,legajo,usuario])
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
@@ -532,17 +535,21 @@ def busca_horas_extras_legajo_pdf(request):
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 body = request.body.decode('utf-8')
                 legajo = str(json.loads(body)['Legajo'])
+                usuario = str(json.loads(body)['Usuario'])
+                nombre_ = legajo + "_" + usuario
                 sql = """ 
                         SELECT HESP.Legajo, (EMP.ApellidoEmple + ' ' + EMP.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HESP.DateTimeDesde, 
                                     103) + ' ' + CONVERT(VARCHAR(5), HESP.DateTimeDesde, 108) AS DESDE, CONVERT(VARCHAR(10), HESP.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), 
                                     HESP.DateTimeHasta, 108) AS HASTA, CASE WHEN CONVERT(VARCHAR,HESP.Estado) = '8' THEN 'RECHAZADO' WHEN CONVERT(VARCHAR,HESP.Estado) = '0' THEN 'AUTORIZADO'  
                                     WHEN CONVERT(VARCHAR,HESP.Estado) = '1' THEN 'PENDIENTE' ELSE CONVERT(VARCHAR,HESP.Estado) END AS ESTADO
                         FROM HorasExtras_Sin_Procesar AS HESP INNER JOIN
-                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo
+                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo INNER JOIN
+                            USUARIOS AS US ON US.CodEmpleado = HESP.UsuarioEncargado 
                         WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                                AND (US.Usuario = %s)
                         ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
                     """
-                cursor.execute(sql, [legajo,legajo])
+                cursor.execute(sql, [legajo,legajo,usuario])
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
@@ -571,7 +578,7 @@ def busca_horas_extras_legajo_pdf(request):
                             'Nombre': nombre_anterior,
                             'Horas': horas
                         })
-                    nombre_pdf = generar_pdf({'Data': lista_data},legajo)
+                    nombre_pdf = generar_pdf({'Data': lista_data},nombre_)
                     if nombre_pdf == 'e':
                         return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudo crear el documento.'})
                     else:
