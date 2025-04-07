@@ -27,4 +27,8 @@ urlpatterns = [
     path('lista-legajos/', views.busca_legajos_horas_extras, name="busca_legajos_horas_extras"),
     
     path('lista-horas/', views.busca_horas_extras_legajo, name="busca_horas_extras_legajo"),
+    
+    path('crea-pdf/', views.busca_horas_extras_legajo_pdf, name="busca_horas_extras_legajo_pdf"),
+
+    path('descarga-pdf/archivo=<str:filename>', views.descarga_archivo_pdf, name="Mobile_descarga_archivo_excel"),
 ]

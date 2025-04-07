@@ -3,7 +3,10 @@ from django.views.decorators.csrf import csrf_exempt
 from S3A.funcionesGenerales import *
 from S3A.conexionessql import *
 from datetime import datetime, timedelta
+from django.views.static import serve
+from fpdf import FPDF
 import json
+import os
 from Applications.Mobile.GeneralApp.archivosGenerales import insertaRegistro
 from Applications.TareasProgramadas.tasks import buscaSector
 from django.db import connections
@@ -518,6 +521,112 @@ def busca_horas_extras_legajo(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def busca_horas_extras_legajo_pdf(request):
+    if request.method == 'POST':
+        legajo_actual = None
+        lista_data = []
+        horas = []
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                body = request.body.decode('utf-8')
+                legajo = str(json.loads(body)['Legajo'])
+                sql = """ 
+                        SELECT HESP.Legajo, (EMP.ApellidoEmple + ' ' + EMP.NombresEmple) AS NOMBRE, CONVERT(VARCHAR(10), HESP.DateTimeDesde, 
+                                    103) + ' ' + CONVERT(VARCHAR(5), HESP.DateTimeDesde, 108) AS DESDE, CONVERT(VARCHAR(10), HESP.DateTimeHasta, 103) + ' ' + CONVERT(VARCHAR(5), 
+                                    HESP.DateTimeHasta, 108) AS HASTA, CASE WHEN CONVERT(VARCHAR,HESP.Estado) = '8' THEN 'RECHAZADO' WHEN CONVERT(VARCHAR,HESP.Estado) = '0' THEN 'AUTORIZADO'  
+                                    WHEN CONVERT(VARCHAR,HESP.Estado) = '1' THEN 'PENDIENTE' ELSE CONVERT(VARCHAR,HESP.Estado) END AS ESTADO
+                        FROM HorasExtras_Sin_Procesar AS HESP INNER JOIN
+                            TresAses_ISISPayroll.dbo.Empleados AS EMP ON EMP.CodEmpleado = HESP.Legajo
+                        WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
+                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
+                    """
+                cursor.execute(sql, [legajo,legajo])
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        legajo = str(row[0])
+                        nombre = str(row[1])
+                        desde = str(row[2])
+                        hasta = str(row[3])
+                        estado = str(row[4])
+
+                        if legajo != legajo_actual:
+                            if legajo_actual is not None:
+                                lista_data.append({
+                                    'Legajo': legajo_actual,
+                                    'Nombre': nombre_anterior,
+                                    'Horas': horas
+                                })
+                            legajo_actual = legajo
+                            nombre_anterior = nombre
+                            horas = [{'Desde': desde, 'Hasta': hasta, 'Estado': estado}]
+                        else:
+                            horas.append({'Desde': desde, 'Hasta': hasta, 'Estado': estado})
+
+                    if legajo_actual is not None:
+                        lista_data.append({
+                            'Legajo': legajo_actual,
+                            'Nombre': nombre_anterior,
+                            'Horas': horas
+                        })
+                    nombre_pdf = generar_pdf({'Data': lista_data},legajo)
+                    if nombre_pdf == 'e':
+                        return JsonResponse({'Message': 'Not Found', 'Nota': 'No se pudo crear el documento.'})
+                    else:
+                        return JsonResponse({'Message': 'Success', 'Pdf': nombre_pdf})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+def descarga_archivo_pdf(request, filename):
+    nombre = filename
+    filename = 'Applications/Mobile/HorasExtras/Archivos/' + filename
+    if os.path.exists(filename):
+        response = serve(request, os.path.basename(filename), os.path.dirname(filename))
+        response['Content-Disposition'] = f'attachment; filename="{nombre}"'
+        return response
+    else:
+        raise Http404
+
+def generar_pdf(data,legajo):
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=16)
+        pdf.cell(200, 10, txt="LISTADO HORAS EXTRAS", ln=True, align='C')
+
+        for item in data['Data']:
+            pdf.set_font("Arial", size=12)
+            pdf.cell(40, 10, txt=item['Legajo'], border=0, align='C')
+            pdf.cell(100, 10, txt=item['Nombre'], border=0, align='C')
+            pdf.ln(10)
+
+            pdf.set_font("Arial", size=10)
+            pdf.cell(50, 10, txt="DESDE", border=1, align='C')
+            pdf.cell(50, 10, txt="HASTA", border=1, align='C')
+            pdf.cell(40, 10, txt="ESTADO", border=1, align='C')
+            pdf.ln(10)
+
+            for hora in item['Horas']:
+                pdf.cell(50, 5, txt=hora['Desde'], border=1, align='C')
+                pdf.cell(50, 5, txt=hora['Hasta'], border=1, align='C')
+                pdf.cell(40, 5, txt=hora['Estado'], border=1, align='C')
+                pdf.ln(5)
+
+            pdf.ln(10)
+
+        nombre_pdf = "listado_horas_extras_" + legajo + ".pdf"
+        pdf.output("Applications/Mobile/HorasExtras/Archivos/" + nombre_pdf)
+        return nombre_pdf
+    except Exception as e:
+        return 'e'
+
 
 
 
