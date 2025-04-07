@@ -485,7 +485,7 @@ def busca_horas_extras_legajo(request):
                             USUARIOS AS US ON US.CodEmpleado = HESP.UsuarioEncargado 
                         WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
                                 AND (US.Usuario = %s)
-                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
+                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde DESC
                     """
                 cursor.execute(sql, [legajo,legajo,usuario])
                 consulta = cursor.fetchall()
@@ -547,7 +547,7 @@ def busca_horas_extras_legajo_pdf(request):
                             USUARIOS AS US ON US.CodEmpleado = HESP.UsuarioEncargado 
                         WHERE (HESP.Legajo = %s OR %s = '') AND HESP.FechaAlta >= DATEADD(DAY, -60, GETDATE()) 
                                 AND (US.Usuario = %s)
-                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde
+                        ORDER BY (EMP.ApellidoEmple + ' ' + EMP.NombresEmple), HESP.DateTimeDesde DESC
                     """
                 cursor.execute(sql, [legajo,legajo,usuario])
                 consulta = cursor.fetchall()
