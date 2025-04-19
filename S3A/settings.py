@@ -103,11 +103,11 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 
 ###### ORIGINAL S3A
 DATABASES = {
-    'default2': {
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'S3A/SQLite/db.SQLite',
     },
-    'default': {
+    'default2': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'DJANGOS3A',
         'USER': 'admindb',
