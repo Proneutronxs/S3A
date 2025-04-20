@@ -21,7 +21,7 @@ from django.contrib.auth.views import logout_then_login
 urlpatterns = [
 
     ### ADMINISTRACION DE PANEL DJANGO
-    path('administracion/sistemas/Django', admin.site.urls),
+    path('administracion/sistemas/Django/', admin.site.urls),
 
     path('api/demo-general/', include('Applications.Api.urls')),
 

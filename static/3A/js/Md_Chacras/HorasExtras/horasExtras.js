@@ -142,6 +142,8 @@ const dataDateTable = async () => {
 
             try {
                 gridOptions = {
+                    rowHeight: 30,
+                    headerHeight: 32,
                     columnDefs: columnDefs,
                     rowData: tableData,
                     floatingFilter: true,
@@ -155,6 +157,12 @@ const dataDateTable = async () => {
                         if (params.data.Estado === 'A') {
                             return 'disabled-row';
                         }
+                    },
+                    defaultColDef: {
+                        resizable: true 
+                    },
+                    onGridReady: function(params) {
+                        params.api.sizeColumnsToFit();
                     }
                 };
 

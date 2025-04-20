@@ -50,21 +50,37 @@
                         <ul class="menu-list">
                             <li><a href="{% url 'tresases' %}">Inicio</a></li>
 
+                            <li class="menu-parent">SIPRETA
+                                <ul class="sub-menu">
+                                    <li class="menu-parent">Poda / Raleo
+                                        <ul class="sub-menu">
+                                            <a href="#">
+                                                <li>Consultas - Reportes</li>
+                                            </a>
+                                            <li class="menu-parent">Parametrización
+                                                <ul class="sub-menu">
+                                                    <a href="">
+                                                        <li>Base Cálculo Días</li>
+                                                    </a>
+                                                    <a href="">
+                                                        <li>Valor del Jornal</li>
+                                                    </a>
+
+                                                </ul>
+                                            </li>
+                                            <a href="{% url 'Md_Chacras_Presupuesto' %}">
+                                                <li>Presupuesto</li>
+                                            </a>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
                             <li class="menu-parent">Mobile
                                 <ul class="sub-menu">
                                     <a href="{% url 'Md_Chacras_Horas_Extras' %}">
                                         <li>Horas Extras</li>
                                     </a>
-                                    <!-- <li class="menu-parent">Listados
-                                        <ul class="sub-menu">
-                                            <a href="#">
-                                                <li>Horas Extras</li>
-                                            </a>
-                                            <a href="#">
-                                                <li>#</li>
-                                            </a>
-                                        </ul>
-                                    </li> -->
                                 </ul>
                             </li>
 

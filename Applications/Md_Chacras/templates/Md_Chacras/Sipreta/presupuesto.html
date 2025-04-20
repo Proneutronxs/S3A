@@ -1,0 +1,62 @@
+{% extends "Md_Chacras/index.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<!-- AG-Grid Styles -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" /> -->
+<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" /> 
+<link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
+
+<div class="container-verPlus">
+    <div class="vr-encabezado">
+        <div class="vr-titulo-contenedor">
+            <div class="vr-posicion-titulo">
+                <P>PRESUPUESTO</P>
+            </div>
+        </div>
+        <div class="vr-fila-1-contenedor">
+            <div class="vr-fila-1">
+
+                <div class="vr-fila-2">
+                    <div class="vr-col-2">
+                        <select id="selector_productores" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_chacras" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="busqueda-button">BUSCAR</button>
+                    </div>
+                    <div class="vr-col-icon" id="class-bt-download" style="display: none;">
+                        <a>
+                            <i class='bx material-symbols-outlined icon'>download</i>
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="vr-contenedor-data">
+        <div class="vr-datos-tabla" id="id-contenedor-empresas">
+            <div id="tableDataResumen" class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            </div>
+        </div>
+    </div>
+
+    <!-- AG-Grid Script -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <script src="{%static '3A/Librerias/choices.min.js' %}"></script>
+    <script src="{%static '3A/Librerias/jquery-3.6.0.min.js' %}"></script>
+
+    <script src="{%static '3A/Librerias/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{%static '3A/js/Md_Chacras/Sipreta/presupuesto.js' %}"></script>
+
+</div>
+{% endblock %}

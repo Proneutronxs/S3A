@@ -103,10 +103,6 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 
 ###### ORIGINAL S3A
 DATABASES = {
-    'default2': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'S3A/SQLite/db.SQLite',
-    },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'DJANGOS3A',
@@ -165,11 +161,15 @@ DATABASES = {
 
 
 ###### LOCAL S3A
-# ip = '192.168.0.127'
+# ip = '192.168.0.126'
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': 'S3A/SQLite/db.SQLite',
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'DJANGOS3A',
+#         'USER': 'admindb',
+#         'PASSWORD': 'Sskvi$%$%1722',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
 #     },
 #     'TRESASES_APLICATIVO': {
 #         'ENGINE': 'sql_server.pyodbc',

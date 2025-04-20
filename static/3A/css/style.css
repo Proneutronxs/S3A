@@ -148,12 +148,13 @@ ul>li {
 .sub-menu .sub-menu {
 	top: -1px;
 	left: 100%;
+	width: 20px;
 }
 
 .menu-parent:hover>.sub-menu {
 	display: block;
 	z-index: 999;
-	width: 20rem;
+	width: 17rem;
 	padding-left: 0;
 	text-align: left;
 }
@@ -1458,7 +1459,7 @@ th.vr-tb-header {
 
 .vr-titulo-contenedor {
 	position: absolute;
-	left: 60px;
+	left: 20px;
 	top: 40%;
 	transform: translateY(-50%);
 	display: flex;

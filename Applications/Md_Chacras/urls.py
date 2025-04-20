@@ -6,6 +6,18 @@ urlpatterns = [
     ### CHACRAS MODULO HORAS EXTRAS
     path('', views.Md_Chacras, name="Md_Chacras_index"),
 
+
+
+    path('sipreta/presupuesto/', views.Presupuesto, name="Md_Chacras_Presupuesto"),
+
+    path('sipreta/presupuesto/combox-productores/', views.listado_combox_productor, name="Md_Chacras_listado_combox_productor"),
+
+    path('sipreta/presupuesto/combox-chacras/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor"),
+
+    path('sipreta/presupuesto/data-listado/', views.listado_chacras_x_filas, name="Md_Chacras_listado_chacras_x_filas"),
+
+
+
     path('mobile/horas-extras/', views.Horas_Extras, name="Md_Chacras_Horas_Extras"),
 
     path('mobile/horas-extras/listar-horas-extras/', views.data_listado_horas_extras, name="Md_Chacras_data_listado_horas_extras"),

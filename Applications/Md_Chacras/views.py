@@ -25,11 +25,19 @@ def Md_Chacras(request):
     return render (request, 'Md_Chacras/404.html')
 
 @login_required
+def Presupuesto(request):
+    user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
+    if user_has_permission:
+        return render (request, 'Md_Chacras/Sipreta/presupuesto.html')
+    return render (request, 'Md_Chacras/404.html')
+
+@login_required
 def Horas_Extras(request):
     user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
     if user_has_permission:
         return render (request, 'Md_Chacras/Mobile/horas_extras.html')
     return render (request, 'Md_Chacras/404.html')
+
 
 def descarga_archivo_excel(request, filename):
     nombre = filename
@@ -207,14 +215,118 @@ def inserta_elimina_horas_extras(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+#SIPRETA → Sistema de Información para Poda y Raleo en Establecimientos de Tres Ases
+
+def listado_combox_productor(request):
+    if request.method == 'GET':
+        try:
+            lista_data = []
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        EXEC LISTADO_PRODUCTORES_HABILITADOS
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_data.append({
+                            "IdProductor":str(row[0]),
+                            "Descripcion":str(row[1])
+                        })
+            if lista_data:
+                return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+            else:
+                data = "No se encontraron Datos."
+                return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+@csrf_exempt
+def listado_combox_chacras_x_productor(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            idProductor = str(request.POST.get('IdProductor'))
+            values = [idProductor]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        EXEC LISTADO_CHACRAS_X_PRODUCTOR %s
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = [{'IdChacra': '', 'Descripcion':'TODOS'}]
+                    for row in consulta:
+                        lista_data.append({
+                            "IdChacra":str(row[0]),
+                            "Descripcion":str(row[1])
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    data = "No se encontraron Datos."
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def listado_chacras_x_filas(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            idProductor = str(request.POST.get('IdProductor'))
+            idChacra = str(request.POST.get('IdChacra'))
+            tipo = str(request.POST.get('Tipo'))
+            values = [idProductor,idChacra]
+            listado_data = jsonListadoChacrasFilas(values)
+            if tipo == 'TT':
+                return JsonResponse({'Message': 'Success', 'Datos': listado_data})
+
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
-
-
-
-
-
+def jsonListadoChacrasFilas(values):
+    lista_data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            cursor.execute('EXEC LISTADO_FILAS_POR_CHACRA %s,%s', values)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    lista_data.append({
+                        "IdProductor":str(row[0]),
+                        "Productor":str(row[1]),
+                        "IdChacra":str(row[2]),
+                        "Chacra":str(row[3]),
+                        "Cuadro":str(row[4]),
+                        "Fila":str(row[5]),
+                        "IdEspecie":str(row[6]),
+                        "Especie":str(row[7]),
+                        "IdVariedad":str(row[8]),
+                        "Variedad":str(row[9]),
+                        "AñoPlantacion":str(row[10]),
+                        "NroPlantas":str(row[11]),
+                        "DFilas":str(row[12]),
+                        "DPlantas":str(row[13]),
+                        "SupPlanta":str(row[14]),
+                        "Presupuesto":str(row[15])
+                    })
+                return lista_data 
+            else:
+                return lista_data
+    except Exception as e:
+        return lista_data
 
 
 
