@@ -320,7 +320,8 @@ def jsonListadoChacrasFilas(values):
                         "DFilas":str(row[12]),
                         "DPlantas":str(row[13]),
                         "SupPlanta":str(row[14]),
-                        "Presupuesto":str(row[15])
+                        "Presupuesto":str(row[15]),
+                        "QRFila":str(row[16])
                     })
                 return lista_data 
             else:

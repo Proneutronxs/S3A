@@ -9,7 +9,7 @@ window.addEventListener("load", async () => {
 });
 
 selector_productores.addEventListener("change", (event) => {
-    //changeClean();
+    changeClean();
     dataSubItems();
 });
 
@@ -146,6 +146,7 @@ const dataDateTable = async () => {
                 DPlantas: String(datos.DPlantas || ""),
                 SupPlanta: String(datos.SupPlanta || ""),
                 Presupuesto: String(datos.Presupuesto || ""),
+                QRFila: String(datos.QRFila || ""),
             }));
 
             const columnDefs = [
@@ -153,6 +154,7 @@ const dataDateTable = async () => {
                 { headerName: "CHACRA", field: "Chacra", filter: true, sortable: true, width: 180},
                 { headerName: "CUADRO", field: "Cuadro", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "FILA", field: "Fila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "QR", field: "QRFila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "ESPECIE", field: "Especie", filter: true, sortable: true, width: 150},
                 { headerName: "VARIEDAD", field: "Variedad", filter: true, sortable: true, width: 150 },
                 { headerName: "AÑO PLANTACIÓN", field: "AñoPlantacion", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
@@ -191,6 +193,7 @@ const dataDateTable = async () => {
                 }
                 displayGeneral.style.visibility = 'visible';
                 document.getElementById("class-bt-download").style.display = "block";
+                document.getElementById("class-bt-upload").style.display = "block";
             } catch (alternativeError) {
                 mostrarInfo("Error al crear la tabla: " + alternativeError.message, "red");
             }
@@ -269,6 +272,12 @@ function getValuesProductor() {
 
 function getValuesChacra() {
     return choiceChacras.getValue() ? choiceChacras.getValue().value : '';
+}
+
+function changeClean() {
+    displayGeneral.style.visibility = 'hidden';
+    document.getElementById("class-bt-download").style.display = "none";
+    document.getElementById("class-bt-upload").style.display = "none";
 }
 
 function mostrarInfo(Message, Color) {

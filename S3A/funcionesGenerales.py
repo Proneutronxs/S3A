@@ -28,17 +28,28 @@ def insertar_registro_pass(usuario, contraseña_vieja, contraseña_nueva):
         print(e)
         return False
     
+# def insertar_registro_error_sql(aplicacion,funcion,usuario,error): #`Aplicacion`, `Funcion`, `Usuario`, `Error`, `Fecha`
+#     try:
+#         fecha_actual = timezone.now()
+#         nuevo_registro = CapturaErroresSQL(
+#             Aplicacion=aplicacion,
+#             Funcion=funcion,
+#             Usuario=usuario,
+#             Error=error,
+#             Fecha=fecha_actual
+#         )
+#         nuevo_registro.save()
+#         return True
+#     except Exception as e:
+#         return False
+    
 def insertar_registro_error_sql(aplicacion,funcion,usuario,error):
+    values = [aplicacion,funcion,usuario,error]
     try:
-        fecha_actual = timezone.now()
-        nuevo_registro = CapturaErroresSQL(
-            Aplicacion=aplicacion,
-            Funcion=funcion,
-            Usuario=usuario,
-            Error=error,
-            Fecha=fecha_actual
-        )
-        nuevo_registro.save()
+        with connections['default'].cursor() as cursor:
+            sql = "INSERT INTO TresAses_capturaerroressql (Aplicacion,Funcion,Usuario,Error,Fecha) VALUES (%s,%s,%s,%s,NOW())"
+            cursor.execute(sql,values)
+            cursor.commit()
         return True
     except Exception as e:
         return False
