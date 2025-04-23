@@ -1,17 +1,22 @@
+
+from S3A.funcionesGenerales import obtenerHorasArchivo, registroRealizado
 from openpyxl.styles import PatternFill, Font, Border, Side
 from django.http import JsonResponse, HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
-from S3A.funcionesGenerales import obtenerHorasArchivo, registroRealizado
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from openpyxl.drawing.image import Image
+from openpyxl.styles import Protection
 from django.views.static import serve
 from openpyxl.styles import Alignment
 from django.shortcuts import render
 from django.db import connections
+from openpyxl import load_workbook
+from openpyxl import Workbook
 from datetime import datetime
 from io import BytesIO
 import pandas as pd
+import xlrd
 import os
 
 # Create your views here.
@@ -259,7 +264,7 @@ def listado_combox_chacras_x_productor(request):
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
                 if consulta:
-                    lista_data = [{'IdChacra': '', 'Descripcion':'TODOS'}]
+                    lista_data = [] #{'IdChacra': '', 'Descripcion':'TODOS'}
                     for row in consulta:
                         lista_data.append({
                             "IdChacra":str(row[0]),
@@ -329,8 +334,62 @@ def jsonListadoChacrasFilas(values):
     except Exception as e:
         return lista_data
 
+@csrf_exempt 
+def recibir_archivo_excel(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+
+    if request.method == 'POST':
+        try:
+            archivo_excel = request.FILES['archivoExcel']
+            nombre_archivo = archivo_excel.name
+            extension = os.path.splitext(nombre_archivo)[1].lower()
+            lista_data = []
+
+            # if extension == '.xlsx':
+            #     wb = load_workbook(archivo_excel)
+            #     ws = wb.worksheets[0]  
+            #     for row in ws.iter_rows(min_row=2, min_col=1, max_col=19):
+            #         lista_data.append(formatear_fila(row))
+
+            if extension == '.xls':
+                libro = xlrd.open_workbook(file_contents=archivo_excel.read())
+                hoja = libro.sheet_by_index(0)
+                for i in range(1, hoja.nrows): 
+                    row = hoja.row_values(i)[0:19]
+                    lista_data.append(formatear_fila(row))
+
+            else:
+                raise ValueError("Formato de archivo no soportado. Solo se aceptan .xls")
+            return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+def formatear_fila(row):
+    return {
+        "IdChacra": str(row[0]),
+        "Chacra": str(row[1]),
+        "Zona": str(row[2]),
+        "IdProductor": str(row[3]),
+        "Productor": str(row[4]),
+        "PNombre": str(row[5]),
+        "Cuadro": str(row[6]).replace('.0',''),
+        "Fila": str(row[7]).replace('.0',''),
+        "IdEspecie": str(row[8]),
+        "Especie": str(row[9]),
+        "IdVariedad": str(row[10]),
+        "Variedad": str(row[11]),
+        "AñoPlantacion": str(row[12]).replace('.0',''),
+        "NroPlantas": str(row[13]).replace('.0',''),
+        "DFilas": str(row[14]),
+        "DPlantas": str(row[15]),
+        "SupPlanta": str(row[16]),
+        "Presupuesto": str(row[17]),
+        "QRFila": str(row[18]) 
+    }
 
 
 

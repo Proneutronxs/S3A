@@ -716,6 +716,15 @@ li {
 	gap: 5px;
 }
 
+.vr-fila-5 {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 5px;
+	width: 100%;
+}
+
 .vr-col-2 {
 	width: 260px;
 	/* margin-right: 10px; */
@@ -725,6 +734,11 @@ li {
 	width: 108px;
 	color: #4CAF50;
 	/* margin-right: 10px; */
+}
+
+.vr-col-btn-5 {
+	width: 100%;
+	margin-bottom: 10px;
 }
 
 .vr-col-icon {
@@ -785,6 +799,16 @@ li {
 .vr-button:hover {
 	background-color: #8a1d1d;
 	cursor: pointer;
+}
+
+#file-name {
+	width: 260px;
+	height: 30px;
+	padding: 5px;
+	border: 1px solid #8a1d1d;
+	border-radius: 5px;
+	font-size: 14px;
+	margin: 0 auto;
 }
 
 .vr-fecha-desde,
@@ -1334,10 +1358,6 @@ th.vr-tb-header {
 	border-radius: 0.25em;
 	z-index: 1000;
 }
-
-
-
-
 
 #tableFooter {
 	text-align: center;

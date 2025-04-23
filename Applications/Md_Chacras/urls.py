@@ -16,6 +16,8 @@ urlpatterns = [
 
     path('sipreta/presupuesto/data-listado/', views.listado_chacras_x_filas, name="Md_Chacras_listado_chacras_x_filas"),
 
+    path('sipreta/presupuesto/enviar-archivo-excel/', views.recibir_archivo_excel, name="Md_Chacras_recibir_archivo_excel"),
+
 
 
     path('mobile/horas-extras/', views.Horas_Extras, name="Md_Chacras_Horas_Extras"),

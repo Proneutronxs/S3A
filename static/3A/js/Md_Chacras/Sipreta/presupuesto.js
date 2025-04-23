@@ -13,12 +13,20 @@ selector_productores.addEventListener("change", (event) => {
     dataSubItems();
 });
 
+selector_chacras.addEventListener("change", (event) => {
+    changeClean();
+});
+
 document.getElementById('busqueda-button').addEventListener('click', function () {
     if (!choiceProductores.getValue()) {
         mostrarInfo("Por favor, seleccione un Productor.", "red");
     } else {
         dataDateTable();
     }
+});
+
+document.getElementById('class-bt-upload').addEventListener('click', function () {
+    showInnerSubirExcel('Subir datos a ' + getLabelChacra());
 });
 
 const choiceProductores = new Choices('#selector_productores', {
@@ -151,11 +159,11 @@ const dataDateTable = async () => {
 
             const columnDefs = [
                 { headerName: "PRODUCTOR", field: "Productor", filter: true, sortable: true, width: 180 },
-                { headerName: "CHACRA", field: "Chacra", filter: true, sortable: true, width: 180},
+                { headerName: "CHACRA", field: "Chacra", filter: true, sortable: true, width: 180 },
                 { headerName: "CUADRO", field: "Cuadro", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "FILA", field: "Fila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "QR", field: "QRFila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
-                { headerName: "ESPECIE", field: "Especie", filter: true, sortable: true, width: 150},
+                { headerName: "ESPECIE", field: "Especie", filter: true, sortable: true, width: 150 },
                 { headerName: "VARIEDAD", field: "Variedad", filter: true, sortable: true, width: 150 },
                 { headerName: "AÑO PLANTACIÓN", field: "AñoPlantacion", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "CANT. PLANTAS", field: "NroPlantas", filter: true, sortable: true, width: 150, cellClass: 'cell-center' },
@@ -179,9 +187,9 @@ const dataDateTable = async () => {
                     floatingFilter: true,
                     quickFilterText: '',
                     defaultColDef: {
-                        resizable: true 
+                        resizable: true
                     },
-                    onGridReady: function(params) {
+                    onGridReady: function (params) {
                         params.api.sizeColumnsToFit();
                     }
                 };
@@ -212,6 +220,112 @@ const dataDateTable = async () => {
     }
 };
 
+const enviarCenso = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        const archivoExcel = document.getElementById('excel-file').files[0];
+        formData.append('archivoExcel', archivoExcel);
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+        const response = await fetch('enviar-archivo-excel/', options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            jsonData = data.Datos;
+            if (!Array.isArray(jsonData) || jsonData.length === 0) {
+                displayGeneral.style.visibility = 'hidden';
+                mostrarInfo("No se encontraron datos para mostrar", "orange");
+                return;
+            }
+
+            const tableData = jsonData.map((datos) => ({
+                IdProductor: String(datos.IdProductor || ""),
+                Productor: String(datos.Productor || ""),
+                IdChacra: String(datos.IdChacra || ""),
+                Chacra: String(datos.Chacra || ""),
+                Cuadro: String(datos.Cuadro || ""),
+                Fila: String(datos.Fila || ""),
+                IdEspecie: String(datos.IdEspecie || ""),
+                Especie: String(datos.Especie || ""),
+                IdVariedad: String(datos.IdVariedad || ""),
+                Variedad: String(datos.Variedad || ""),
+                AñoPlantacion: String(datos.AñoPlantacion || ""),
+                NroPlantas: String(datos.NroPlantas || ""),
+                DFilas: String(datos.DFilas || ""),
+                DPlantas: String(datos.DPlantas || ""),
+                SupPlanta: String(datos.SupPlanta || ""),
+                Presupuesto: String(datos.Presupuesto || ""),
+                QRFila: String(datos.QRFila || ""),
+            }));
+
+            const columnDefs = [
+                { headerName: "PRODUCTOR", field: "Productor", filter: true, sortable: true, width: 180 },
+                { headerName: "CHACRA", field: "Chacra", filter: true, sortable: true, width: 180 },
+                { headerName: "CUADRO", field: "Cuadro", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "FILA", field: "Fila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "QR", field: "QRFila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "ESPECIE", field: "Especie", filter: true, sortable: true, width: 150 },
+                { headerName: "VARIEDAD", field: "Variedad", filter: true, sortable: true, width: 150 },
+                { headerName: "AÑO PLANTACIÓN", field: "AñoPlantacion", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "CANT. PLANTAS", field: "NroPlantas", filter: true, sortable: true, width: 150, cellClass: 'cell-center' },
+                { headerName: "D. FILAS", field: "DFilas", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "D. PLANTAS", field: "DPlantas", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "SUP. PLANTAS", field: "SupPlanta", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
+                { headerName: "PRESUPUESTO", field: "Presupuesto", filter: true, sortable: true, width: 140, cellClass: 'cell-center' },
+            ];
+
+            const gridDiv = document.getElementById('tableDataResumen');
+            if (!gridDiv) {
+                return;
+            }
+            gridDiv.innerHTML = '';
+            try {
+                gridOptions = {
+                    rowHeight: 30,
+                    headerHeight: 32,
+                    columnDefs: columnDefs,
+                    rowData: tableData,
+                    floatingFilter: true,
+                    quickFilterText: '',
+                    defaultColDef: {
+                        resizable: true
+                    },
+                    onGridReady: function (params) {
+                        params.api.sizeColumnsToFit();
+                    }
+                };
+
+                gridDiv.classList.add("ag-theme-alpine");
+                const gridApi = agGrid.createGrid(gridDiv, gridOptions);
+                if (gridApi) {
+                    gridOptions.api = gridApi;
+                }
+                displayGeneral.style.visibility = 'visible';
+                document.getElementById("class-bt-download").style.display = "block";
+                document.getElementById("class-bt-upload").style.display = "block";
+            } catch (alternativeError) {
+                mostrarInfo("Error al crear la tabla: " + alternativeError.message, "red");
+            }
+            hideInnerSubirExcel();
+        } else {
+            var nota = data.Nota;
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
 
 
 
@@ -274,6 +388,10 @@ function getValuesChacra() {
     return choiceChacras.getValue() ? choiceChacras.getValue().value : '';
 }
 
+function getLabelChacra() {
+    return choiceChacras.getValue() ? choiceChacras.getValue().label : '';
+}
+
 function changeClean() {
     displayGeneral.style.visibility = 'hidden';
     document.getElementById("class-bt-download").style.display = "none";
@@ -298,4 +416,44 @@ function openLoading() {
 
 function closeLoading() {
     loadingContainer.style.display = 'none';
+}
+
+function showInnerSubirExcel(texto) {
+    document.getElementById('contenido-popup').innerHTML = `
+        <div class="carga-contenedor">
+            <p>${texto}</p>
+        </div>
+        <div class="carga-contenedor">
+            <div class="vr-fila-5">
+                <div class="vr-col-btn-5">
+                    <input type="text" id="file-name" placeholder="SELECCIONE ARCHIVO" readonly onclick="document.getElementById('excel-file').click();">
+                    <input type="file" id="excel-file" accept=".xls" style="display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor">
+            <div class="vr-fila-2">
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="hideInnerSubirExcel();" id="cancelar-subir-button">CANCELAR</button>
+                </div>
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="enviarCenso();" id="acepta-subir-button">ACEPTAR</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById("fondo-oscuro").style.display = "block";
+    document.getElementById("popup-confirmacion").style.display = "block";
+    document.getElementById('excel-file').addEventListener('change', function () {
+        var fileName = this.files[0].name;
+        document.getElementById('file-name').value = fileName;
+    });
+}
+
+
+
+function hideInnerSubirExcel() {
+    document.getElementById('contenido-popup').innerHTML = ``;
+    document.getElementById("fondo-oscuro").style.display = "none";
+    document.getElementById("popup-confirmacion").style.display = "none";
 }
