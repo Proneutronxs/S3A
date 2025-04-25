@@ -374,10 +374,10 @@ def tabla_sim_remito(request):
                 if consulta:
                     for row in consulta:
                         lista_data.append({
-                            "Sim":str(row[0]),
-                            "USRRomaneo":str(row[1]),
-                            "RIRomaneo":str(row[2]),
-                            "NroRemito":str(row[3])
+                            "SIM":str(row[0]),
+                            "USR_ROMANEO":str(row[1]),
+                            "RI_ROMANEO":str(row[2]),
+                            "NRO_REMITO":str(row[3])
                         })
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
