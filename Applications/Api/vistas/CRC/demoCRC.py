@@ -360,6 +360,50 @@ def guarda_remitos_enviados(listado):
         cursor.close()
         connections['S3A'].close()
 
+def tabla_sim_remito(request):
+    if request.method == 'GET':
+        try:
+            lista_data = []
+            with connections['S3A'].cursor() as cursor:
+                sql = """ 
+                        SELECT SIM, USR_ROMANEO, RI_ROMANEO, NRO_REMITO
+                        FROM VistaDemoRR
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_data.append({
+                            "Sim":str(row[0]),
+                            "USRRomaneo":str(row[1]),
+                            "RIRomaneo":str(row[2]),
+                            "NroRemito":str(row[3])
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

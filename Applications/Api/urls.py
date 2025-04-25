@@ -12,6 +12,8 @@ urlpatterns = [
     path('data-general/with-crc/', demoCRC.dataConCRC, name="data_general_api_con_crc"),
 
     path('data-general/ultimo-remito/', demoCRC.crc_ultimo_remito, name="crc_ultimo_remito"),
+
+    path('data-general/sim-remito/', demoCRC.tabla_sim_remito, name="tabla_sim_remito"),
     
 
 
