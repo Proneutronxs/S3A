@@ -10,13 +10,21 @@ urlpatterns = [
 
     path('sipreta/presupuesto/', views.Presupuesto, name="Md_Chacras_Presupuesto"),
 
-    path('sipreta/presupuesto/combox-productores/', views.listado_combox_productor, name="Md_Chacras_listado_combox_productor"),
+    path('sipreta/presupuesto/combox-productores/', views.listado_combox_productor, name="Md_Chacras_SP_listado_combox_productor"),
 
-    path('sipreta/presupuesto/combox-chacras/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor"),
+    path('sipreta/presupuesto/combox-chacras/', views.listado_combox_chacras_x_productor, name="Md_Chacras_SP_listado_combox_chacras_x_productor"),
 
     path('sipreta/presupuesto/data-listado/', views.listado_chacras_x_filas, name="Md_Chacras_listado_chacras_x_filas"),
 
-    path('sipreta/presupuesto/enviar-archivo-excel/', views.recibir_archivo_excel, name="Md_Chacras_recibir_archivo_excel"),
+    path('sipreta/presupuesto/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Chacras_SP_descarga_archivo_excel"),
+
+    path('sipreta/presupuesto/enviar-archivo-excel/', views.recibir_archivo_excel, name="Md_Chacras_SP_recibir_archivo_excel"),
+
+    path('sipreta/presupuesto/enviar-presupuesto-excel/', views.recibir_archivo_excel_presupuesto, name="Md_Chacras_SP_recibir_archivo_excel_presupuesto"),
+
+    path('sipreta/presupuesto/insertar-chacras/', views.insertar_chacras, name="Md_Chacras_SP_insertar_chacras"),
+
+    path('sipreta/presupuesto/insertar-presupuesto/', views.insertar_presupuesto, name="Md_Chacras_SP_insertar_presupuesto"),
 
 
 

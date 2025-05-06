@@ -6,7 +6,7 @@ table {
 
 th,
 td {
-    padding: 2px;
+    padding: 4px;
     border: 1px solid #c5c5c5;
 }
 
@@ -43,6 +43,7 @@ tbody tr:hover {
 }
 
 thead th {
+    /* background-color: #f0f0f0; */
     position: sticky;
     top: 0;
     z-index: 1;
@@ -90,7 +91,7 @@ tr {
 }
 
 .ag-theme-alpine .ag-cell {
-    padding: 2px !important;
+    padding: 4px !important;
     border: 1px solid #c5c5c5 !important;
     font-size: 12px !important;
 }
@@ -109,81 +110,4 @@ tr {
 
 .cell-right {
     text-align: right !important;
-}
-
-.disabled-row {
-    opacity: 0.5;
-    background-color: #f0f0f0;
-}
-
-.new-vr-select {
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-/* .ag-theme-alpine .ag-row {
-    min-height: 15px;
-} */
-
-.ag-theme-alpine .ag-menu.ag-filter-menu {
-    background-color: white !important;
-    border: 1px solid #44546a !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-.ag-theme-alpine .ag-picker-field {
-    background-color: #f1f1f1 !important;
-    border: 1px solid #44546a !important;
-}
-
-.ag-theme-alpine .ag-picker-field-display {
-    color: #44546a !important;
-    font-size: 12px !important;
-}
-
-.ag-theme-alpine .ag-picker-field-icon {
-    color: #44546a !important;
-}
-
-.ag-theme-alpine .ag-text-field.ag-filter-filter {
-    background-color: white !important;
-}
-
-.ag-theme-alpine .ag-input-field-input.ag-text-field-input {
-    background-color: white !important;
-    border: 1px solid #44546a !important;
-    color: #44546a !important;
-    font-size: 12px !important;
-    padding: 4px 8px !important;
-}
-
-.ag-theme-alpine .ag-input-field-input.ag-text-field-input::placeholder {
-    color: #44546a80 !important;
-}
-
-.ag-theme-alpine .ag-select-list {
-    background-color: white !important;
-    border: 1px solid #44546a !important;
-}
-
-.ag-theme-alpine .ag-select-list .ag-list-item {
-    color: #44546a !important;
-    font-size: 12px !important;
-}
-
-.ag-theme-alpine .ag-select-list .ag-list-item:hover {
-    background-color: #44546a3b !important;
-    color: black !important;
-}
-
-.ag-theme-alpine .ag-select-list .ag-list-item.ag-active {
-    background-color: #44546a3b !important;
-    color: black !important;
-}
-
-.ag-input-wrapper:before {
-    margin-left: var(--ag-spacing);
-    display: none;
 }

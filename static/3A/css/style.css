@@ -436,6 +436,7 @@ li {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.356);
 	padding: 10px;
 	transition: right 0.3s ease;
+	z-index: 999999;
 }
 
 .popup.active {
@@ -1525,4 +1526,19 @@ th.vr-tb-header {
 	100% {
 		box-shadow: 0 0 10px #4CAF4F7B;
 	}
+}
+
+.usuario-encabezado {
+	margin: 20px 0 10px;
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #eaeaea;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 14px;
+}
+
+.mini-titulo {
+	font-size: 14px;
+	font-weight: bold;
 }

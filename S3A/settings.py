@@ -158,7 +158,8 @@ DATABASES = {
 }
 
 
-
+#pip install mssql-django==1.0
+#
 
 ###### LOCAL S3A
 # ip = '192.168.0.126'
@@ -172,7 +173,7 @@ DATABASES = {
 #         'PORT': '3306',
 #     },
 #     'TRESASES_APLICATIVO': {
-#         'ENGINE': 'sql_server.pyodbc',
+#         'ENGINE': 'mssql',
 #         'NAME': 'TRESASES_APLICATIVO',
 #         'USER': 'sa',
 #         'HOST': ip,
@@ -183,7 +184,7 @@ DATABASES = {
 #         },
 #     },
 #     'ISISPayroll': {
-#         'ENGINE': 'sql_server.pyodbc',
+#         'ENGINE': 'mssql',
 #         'NAME': 'TresAses_ISISPayroll',
 #         'USER': 'sa',
 #         'HOST': ip,
@@ -194,7 +195,7 @@ DATABASES = {
 #         },
 #     },
 #     'principal': {
-#         'ENGINE': 'sql_server.pyodbc',
+#         'ENGINE': 'mssql',
 #         'NAME': 'principal',
 #         'USER': 'sa',
 #         'HOST': ip,
@@ -205,7 +206,7 @@ DATABASES = {
 #         },
 #     },
 #     'S3A': {
-#         'ENGINE': 'sql_server.pyodbc',
+#         'ENGINE': 'mssql',
 #         'NAME': 'S3A',
 #         'USER': 'sa',
 #         'HOST': ip,

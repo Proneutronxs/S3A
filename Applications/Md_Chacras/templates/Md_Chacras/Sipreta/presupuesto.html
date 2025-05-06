@@ -3,10 +3,6 @@
 {% load static %}
 
 {% block content %}
-
-<!-- AG-Grid Styles -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" /> -->
-<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" /> 
 <link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
 
 <div class="container-verPlus">
@@ -17,7 +13,7 @@
             </div>
         </div>
         <div class="vr-fila-1-contenedor">
-            <div class="vr-fila-1">
+            <div class="vr-fila-1" id="busqueda-chacras">
 
                 <div class="vr-fila-2">
                     <div class="vr-col-2">
@@ -28,24 +24,35 @@
                         <select id="selector_chacras" class="choices_inner vr-select">
                         </select>
                     </div>
-                    <div class="vr-col-btn">
+                    <div class="vr-col-btn" style="display: none;">
                         <button class="vr-button" id="busqueda-button">BUSCAR</button>
                     </div>
-                    <div class="vr-col-icon" id="class-bt-download" style="display: none;">
-                        <a>
-                            <i class='bx material-symbols-outlined icon'>download</i>
-                        </a>
+                    <div class="vr-col-icon" id="class-bt-download" style="display: block;">
+                        <button class="vr-button" id="alta-button">DESCARGA</button>
                     </div>
-                    <div class="vr-col-icon" id="class-bt-upload" style="display: none;">
-                        <a>
-                            <i class='bx material-symbols-outlined icon'>upload_file</i>
-                        </a>
+                    <div class="vr-col-icon" id="class-bt-upload" style="display: block;">
+                        <button class="vr-button" id="alta-button">SUBIR CHA.</button>
+                    </div>
+                    <div class="vr-col-icon" id="class-bt-pres" style="display: block;">
+                        <button class="vr-button" id="presupuesto-button">SUBIR PRES.</button>
                     </div>
                 </div>
-
-                
-                
             </div>
+
+            <div class="vr-fila-1" id="confirmacion-chacras" style="display: none; text-align: center;">   
+                <div class="vr-fila-2">
+                    <div class="vr-col-2" style="width: 100%">
+                        <p class="mini-titulo">CONFIRMACIÓN: ¿Desea guardar los datos enviados?</p>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="cancelar-up">CANCELAR</button>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="confirmar-up">CONFIRMAR</button>
+                    </div>
+                </div>         
+            </div>
+
         </div>
     </div>
 
