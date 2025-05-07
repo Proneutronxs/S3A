@@ -96,7 +96,7 @@ li {
 
 .nav-desktop li,
 .nav-desktop li a {
-	font-size: 1.4rem;
+	font-size: 1.2rem;
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
 	color: #3a3a3a;
@@ -154,7 +154,7 @@ ul>li {
 .menu-parent:hover>.sub-menu {
 	display: block;
 	z-index: 999;
-	width: 17rem;
+	width: 16rem;
 	padding-left: 0;
 	text-align: left;
 }
@@ -167,9 +167,9 @@ ul>li {
 .menu-parent::after {
 	content: "";
 	border: solid #3a3a3a;
-	border-width: 0 3px 3px 0;
+	border-width: 0 2px 2px 0;
 	display: inline-block;
-	padding: 3px;
+	padding: 2px;
 	margin-left: 10px;
 	transform: rotate(45deg);
 	-webkit-transform: rotate(45deg);
@@ -178,9 +178,9 @@ ul>li {
 .menu-parent .menu-parent::after {
 	content: "";
 	border: solid #3a3a3a;
-	border-width: 0 3px 3px 0;
+	border-width: 0 2px 2px 0;
 	display: inline-block;
-	padding: 3px;
+	padding: 2px;
 	margin-left: 10px;
 	transform: rotate(-45deg);
 	-webkit-transform: rotate(-45deg);

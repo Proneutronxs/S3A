@@ -2,6 +2,7 @@ from django.urls import path
 from Applications.Api import views
 from Applications.Api.vistas.CRC import demoCRC
 from Applications.Api.vistas.FruitTruck import fruit
+from Applications.Api.vistas.Sipreta import sipreta
 from S3A.funcionesGenerales import *
 
 
@@ -66,6 +67,13 @@ urlpatterns = [
 
 
     ############ ON LINE ###################
+
+
+    ################ SIPRETA ######################
+
+    path('sipreta/data-chacras-filas/', sipreta.chacras_filas_qr, name="sipreta_chacras_filas_qr"),  
+
+
 
 
 ]
