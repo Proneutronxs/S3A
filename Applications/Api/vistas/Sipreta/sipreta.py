@@ -48,7 +48,8 @@ def chacras_filas_qr(request):
                             "DIST_FILAS": row[18],
                             "DIST_PLANTAS": row[19],
                             "SUPERFICIE": row[20],
-                            "ESTADO_FILA": row[21]
+                            "ESTADO_FILA": row[21],
+                            "VARIEDAD": row[22]
                         })
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
