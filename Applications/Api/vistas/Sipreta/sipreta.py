@@ -14,7 +14,7 @@ import os
 
 
 
-def chacras_filas_qr(request):
+def chacras_filas_qr(request,usuario):
     if request.method == 'GET':
         try:
             lista_data = []
@@ -49,9 +49,12 @@ def chacras_filas_qr(request):
                             "DIST_PLANTAS": row[19],
                             "SUPERFICIE": row[20],
                             "ESTADO_FILA": row[21],
-                            "VARIEDAD": row[22]
+                            "VARIEDAD": row[22],
+                            "V_PODA":row[23],
+                            "V_RALEO":row[24]
                         })
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                    lista_chacras = listado_Chacras(usuario)
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
@@ -61,15 +64,27 @@ def chacras_filas_qr(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 
-# ID_PRODUCTOR	PRODUCTOR	ID_CHACRA	CHACRA	ID_FILA	ID_CUADRO	CUADRO	ID_VARIEDAD	ID_QR	QR	TIPO_QR	TEMPORADA_QR	ALTA_QR	ESTADO_QR	ACTIVIDAD_QR	VALOR_REFERENCIA	AÑO_PLANTACION	NRO_PLANTAS	DIST_FILAS	DIST_PLANTAS	SUPERFICIE	ESTADO_FILA
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	1	1	50	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2500.00	2006	58	4.000	1.000	0.023	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	2	1	50	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2507.00	2006	58	4.000	1.500	0.035	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	1	2	2	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2501.00	1970	16	4.000	6.500	0.042	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	2	2	2	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2506.00	2006	55	4.000	2.000	0.044	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	1	3	3	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2502.00	1970	17	4.000	6.500	0.044	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	2	3	3	51	NULL	NULL	NULL	NULL	NULL	NULL	P	2505.00	2005	57	4.000	2.000	0.046	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	7	4	4	51	NULL	NULL	NULL	NULL	NULL	NULL	P	2508.00	2005	57	4.000	2.000	0.046	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	8	4	4	51	NULL	NULL	NULL	NULL	NULL	NULL	P	5500.00	2005	35	4.000	3.000	0.042	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	8	4	4	51	NULL	NULL	NULL	NULL	NULL	NULL	R	1200.00	2005	35	4.000	3.000	0.042	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	1	7	1	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2503.00	2006	58	4.000	1.000	0.023	A
-# 5200	ROM - MIK S.A.	1000001	LOTE 1	2	7	1	27	NULL	NULL	NULL	NULL	NULL	NULL	P	2504.00	2006	58	4.000	1.500	0.035	A
+def listado_Chacras(usuario):
+    listado_chacras = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                    SELECT CH.IdChacra AS ID_CHACRA, RTRIM(CH.Nombre) AS CHACRA, CH.IdProductor AS ID_PRODUCTOR, RTRIM(PR.Nombre) AS PRODUCTOR
+                    FROM S3A.dbo.Chacra AS CH INNER JOIN
+                        S3A.dbo.Productor AS PR ON PR.IdProductor = CH.IdProductor
+                    WHERE CH.IdChacra IN (SELECT valor FROM dbo.fn_Split((SELECT Chacras FROM USUARIOS WHERE Usuario = %s), ','))
+                    ORDER BY RTRIM(CH.Nombre)
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    listado_chacras.append({
+                        "ID_CHACRA":row[0],
+                        "CHACRA":row[1],
+                        "ID_PRODUCTOR":row[2],
+                        "PRODUCTOR":row[3]
+                    })
+            return listado_chacras
+    except Exception as e:
+        return listado_chacras
