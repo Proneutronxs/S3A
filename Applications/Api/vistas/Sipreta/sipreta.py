@@ -20,9 +20,9 @@ def chacras_filas_qr(request,usuario):
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
-                        EXEC SP_SELECT_CHACRAS_FILAS_QR
+                        EXEC SP_SELECT_CHACRAS_FILAS_QR %s
                     """
-                cursor.execute(sql)
+                cursor.execute(sql,[usuario])
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
