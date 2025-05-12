@@ -16,13 +16,14 @@ import os
 
 def chacras_filas_qr(request,usuario):
     if request.method == 'GET':
+        values = [str(usuario)]
         try:
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
                         EXEC SP_SELECT_CHACRAS_FILAS_QR %s
                     """
-                cursor.execute(sql,[usuario])
+                cursor.execute(sql,values)
                 consulta = cursor.fetchall()
                 if consulta:
                     for row in consulta:
@@ -53,7 +54,7 @@ def chacras_filas_qr(request,usuario):
                             "V_PODA":row[23],
                             "V_RALEO":row[24]
                         })
-                    lista_chacras = listado_Chacras(usuario)
+                    lista_chacras = listado_Chacras(values)
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
@@ -64,7 +65,7 @@ def chacras_filas_qr(request,usuario):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 
-def listado_Chacras(usuario):
+def listado_Chacras(values):
     listado_chacras = []
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -75,7 +76,7 @@ def listado_Chacras(usuario):
                     WHERE CH.IdChacra IN (SELECT valor FROM dbo.fn_Split((SELECT Chacras FROM USUARIOS WHERE Usuario = %s), ','))
                     ORDER BY RTRIM(CH.Nombre)
                 """
-            cursor.execute(sql,[usuario])
+            cursor.execute(sql,values)
             consulta = cursor.fetchall()
             if consulta:
                 for row in consulta:
