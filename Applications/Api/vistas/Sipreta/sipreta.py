@@ -20,6 +20,7 @@ def chacras_filas_qr(request,usuario):
         try:
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                lista_chacras = listado_Chacras(values)
                 sql = """ 
                         EXEC SP_SELECT_CHACRAS_FILAS_QR %s
                     """
@@ -54,7 +55,6 @@ def chacras_filas_qr(request,usuario):
                             "V_PODA":row[23],
                             "V_RALEO":row[24]
                         })
-                    lista_chacras = listado_Chacras(values)
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
@@ -88,4 +88,5 @@ def listado_Chacras(values):
                     })
             return listado_chacras
     except Exception as e:
+        registroRealizado(values,"LISTADO_CHACRAS",str(e))
         return listado_chacras
