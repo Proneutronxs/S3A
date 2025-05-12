@@ -75,7 +75,7 @@ def listado_Chacras(usuario):
                     WHERE CH.IdChacra IN (SELECT valor FROM dbo.fn_Split((SELECT Chacras FROM USUARIOS WHERE Usuario = %s), ','))
                     ORDER BY RTRIM(CH.Nombre)
                 """
-            cursor.execute(sql)
+            cursor.execute(sql,[usuario])
             consulta = cursor.fetchall()
             if consulta:
                 for row in consulta:
