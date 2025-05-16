@@ -341,8 +341,6 @@ def traeMotivos():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","traeMotivos","usuario",error)
         return error
-    finally:
-        connections['S3A'].close()
     
 def traeMontoMax():
     try:
@@ -362,8 +360,6 @@ def traeMontoMax():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","traerMontoMAx","usuario",error)
         return error
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 
 
