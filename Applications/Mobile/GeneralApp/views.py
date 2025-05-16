@@ -294,9 +294,25 @@ def personal_por_Ccostos_asistencia(request, codigo):
 def personal_por_Ccostos_anticipos(request, codigo):
     if request.method == 'GET':
         id = str(codigo)
-        lista_data_personal = traePersonal(id)
-        #print("LLAMA PERSONAL DE ANTICIPOS / HORAS EXTRAS")
-        return JsonResponse({'Message': 'Success','DataPersonal': lista_data_personal})
+        try:
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """EXEC APP_SELECT_EMPLEADOS_X_REGIS_CCO %s"""
+                cursor.execute(sql, [id])
+                consulta = cursor.fetchall()
+                lista_data = []
+                if consulta:
+                    for row in consulta:
+                        legajo = str(row[1]) if row[1] is not None else ''
+                        Regis_Epl = str(row[0]) if row[0] is not None else ''
+                        nombre = str(row[2]) if row[2] is not None else ''
+                        datos = {'Legajo': legajo, 'Regis_Epl': Regis_Epl, 'Nombre': nombre}
+                        lista_data.append(datos)
+        
+            return JsonResponse({'Message': 'Success','DataPersonal': lista_data})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("GeneralApp","traePersonal","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
@@ -322,8 +338,6 @@ def traePersonal(id):
         error = str(e)
         insertar_registro_error_sql("GeneralApp","traePersonal","usuario",error)
         return error
-    finally:
-        connections['ISISPayroll'].close()
     
 def traeMotivos():
     try:
