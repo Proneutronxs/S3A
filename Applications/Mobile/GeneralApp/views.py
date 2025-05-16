@@ -262,11 +262,11 @@ def personal_por_Ccostos_asistencia(request, codigo):
         idCC = str(codigo)
         try:
             with connections['ISISPayroll'].cursor() as cursor:
-                sql = """SELECT        Empleados.CodEmpleado AS LEGAJO, principal.dbo.T_Legajos.legCodigo AS LEGCODIGO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBREyAPELLIDO " \
-                      "FROM            Empleados INNER JOIN " \
-                      "principal.dbo.T_Legajos ON CONVERT(VARCHAR, Empleados.CodEmpleado) = principal.dbo.T_Legajos.legLegajo " \
-                      "WHERE        (Empleados.Regis_CCo = %s AND Empleados.BajaDefinitivaEmple='2') " \
-                      "ORDER BY Empleados.ApellidoEmple"""
+                sql = """ SELECT        Empleados.CodEmpleado AS LEGAJO, principal.dbo.T_Legajos.legCodigo AS LEGCODIGO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBREyAPELLIDO 
+                      FROM          Empleados INNER JOIN 
+                                    principal.dbo.T_Legajos ON CONVERT(VARCHAR, Empleados.CodEmpleado) = principal.dbo.T_Legajos.legLegajo 
+                      WHERE        (Empleados.Regis_CCo = %s AND Empleados.BajaDefinitivaEmple='2')
+                      ORDER BY Empleados.ApellidoEmple """
                 cursor.execute(sql, [idCC])
                 consulta = cursor.fetchall()
                 if consulta:
