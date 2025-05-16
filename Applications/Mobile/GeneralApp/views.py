@@ -235,8 +235,14 @@ def id_Nombre_Ccostos(request, legajo):
                         datos = {'Codigo': codigo, 'Descripcion': descripcion, 'Regis_Epl': regis_epl}
                         lista_data.append(datos)
                     lista_data_motivos = traeMotivos()
-                    montoMax = traeMontoMax()
-                    return JsonResponse({'Message': 'Success', 'Data': lista_data, 'DataMotivos': lista_data_motivos, 'Monto': montoMax})
+
+                    sql2 = """ SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-MONTO-MAX' """
+                    cursor.execute(sql2)
+                    consulta2 = cursor.fetchone()
+                    monto = "0"
+                    if consulta2:
+                        monto = str(consulta2[0])
+                    return JsonResponse({'Message': 'Success', 'Data': lista_data, 'DataMotivos': lista_data_motivos, 'Monto': monto})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
@@ -322,9 +328,9 @@ def traePersonal(id):
 def traeMotivos():
     try:
         with connections['S3A'].cursor() as cursor:
-            sql = "SELECT IdMotivo AS ID, RTRIM(Descripcion) AS MOTIVO " \
-                    "FROM RH_HE_Motivo " \
-                    "ORDER BY Descripcion "
+            sql = """SELECT IdMotivo AS ID, RTRIM(Descripcion) AS MOTIVO 
+                    FROM RH_HE_Motivo 
+                    ORDER BY Descripcion """
             cursor.execute(sql)
             consulta = cursor.fetchall()
             lista_data = []
@@ -345,10 +351,8 @@ def traeMotivos():
 def traeMontoMax():
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = """
-                    SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-MONTO-MAX'
-                    """
-            cursor.execute(sql)
+            sql2 = """ SELECT Texto FROM Parametros_Aplicativo WHERE Codigo = 'APP-MONTO-MAX' """
+            cursor.execute(sql2)
             consulta = cursor.fetchone()
             monto = "0"
             if consulta:
