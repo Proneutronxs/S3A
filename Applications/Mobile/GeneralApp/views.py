@@ -222,10 +222,7 @@ def id_Nombre_Ccostos(request, legajo):
         id = str(legajo)
         try:
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = "SELECT        USR_CCOSTOS.CodCtroCosto AS CODIGO, TresAses_ISISPayroll.dbo.CentrosCostos.DescrCtroCosto AS DESCRIPCION, TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo AS REGISCCo " \
-                      "FROM            USR_CCOSTOS INNER JOIN " \
-                      "TresAses_ISISPayroll.dbo.CentrosCostos ON USR_CCOSTOS.CodCtroCosto = TresAses_ISISPayroll.dbo.CentrosCostos.Regis_CCo " \
-                      "WHERE (USR_CCOSTOS.CodEmpleado = %s) "
+                sql = """ EXEC APP_SELECT_CENTROS_X_LEGAJO %s """
                 cursor.execute(sql, [id])
                 consulta = cursor.fetchall()
 
@@ -239,7 +236,6 @@ def id_Nombre_Ccostos(request, legajo):
                         lista_data.append(datos)
                     lista_data_motivos = traeMotivos()
                     montoMax = traeMontoMax()
-                    #print("LLAMA A LAS CHACRAS ASIGNADAS")
                     return JsonResponse({'Message': 'Success', 'Data': lista_data, 'DataMotivos': lista_data_motivos, 'Monto': montoMax})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
@@ -260,11 +256,11 @@ def personal_por_Ccostos_asistencia(request, codigo):
         idCC = str(codigo)
         try:
             with connections['ISISPayroll'].cursor() as cursor:
-                sql = "SELECT        Empleados.CodEmpleado AS LEGAJO, principal.dbo.T_Legajos.legCodigo AS LEGCODIGO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBREyAPELLIDO " \
+                sql = """SELECT        Empleados.CodEmpleado AS LEGAJO, principal.dbo.T_Legajos.legCodigo AS LEGCODIGO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBREyAPELLIDO " \
                       "FROM            Empleados INNER JOIN " \
                       "principal.dbo.T_Legajos ON CONVERT(VARCHAR, Empleados.CodEmpleado) = principal.dbo.T_Legajos.legLegajo " \
                       "WHERE        (Empleados.Regis_CCo = %s AND Empleados.BajaDefinitivaEmple='2') " \
-                      "ORDER BY Empleados.ApellidoEmple"
+                      "ORDER BY Empleados.ApellidoEmple"""
                 cursor.execute(sql, [idCC])
                 consulta = cursor.fetchall()
                 if consulta:
@@ -301,11 +297,8 @@ def personal_por_Ccostos_anticipos(request, codigo):
 
 def traePersonal(id):
     try:
-        with connections['ISISPayroll'].cursor() as cursor:
-            sql = "SELECT Regis_Epl AS REGIS, CodEmpleado AS LEGAJO, (ApellidoEmple + ' ' + NombresEmple) AS NOMBREyAPELLIDO " \
-                    "FROM Empleados " \
-                    "WHERE Regis_CCo = %s AND BajaDefinitivaEmple='2' "\
-                    "ORDER BY ApellidoEmple "
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """EXEC APP_SELECT_EMPLEADOS_X_REGIS_CCO %s"""
             cursor.execute(sql, [id])
             consulta = cursor.fetchall()
             lista_data = []
