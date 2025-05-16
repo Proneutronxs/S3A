@@ -19,7 +19,7 @@ path('codigo/centro_costos/id=<int:legajo>', views.id_Nombre_Ccostos, name="id_d
 ### PERSONAL POR CENTROS DE COSTOS (parametro Cod: de Centro de Costos)
 path('personal/centro_costos/asistencia/id=<int:codigo>', views.personal_por_Ccostos_asistencia, name="personal_por_Ccostos_asistencia"),
 
-path('personal/centro_costos/anticipos/id=<int:codigo>', views.personal_por_Ccostos_anticipos, name="personal_por_Ccostos_anticipos"),
+path('personal/centro_costos/anticipos/id=<str:codigo>', views.personal_por_Ccostos_anticipos, name="personal_por_Ccostos_anticipos"),
 
 
 
