@@ -302,8 +302,8 @@ def personal_por_Ccostos_anticipos(request, codigo):
                 lista_data = []
                 if consulta:
                     for row in consulta:
-                        legajo = str(row[1]) if row[1] is not None else ''
-                        Regis_Epl = str(row[0]) if row[0] is not None else ''
+                        legajo = str(row[0]) if row[0] is not None else ''
+                        Regis_Epl = str(row[1]) if row[1] is not None else ''
                         nombre = str(row[2]) if row[2] is not None else ''
                         datos = {'Legajo': legajo, 'Regis_Epl': Regis_Epl, 'Nombre': nombre}
                         lista_data.append(datos)
