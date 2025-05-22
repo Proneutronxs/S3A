@@ -307,7 +307,7 @@ def personal_por_Ccostos_anticipos(request, codigo):
                         nombre = str(row[2]) if row[2] is not None else ''
                         datos = {'Legajo': legajo, 'Regis_Epl': Regis_Epl, 'Nombre': nombre}
                         lista_data.append(datos)
-            return JsonResponse({'Message': 'Success','Datos': lista_data})
+            return JsonResponse({'Message': 'Success','Datos': lista_data,'DataPersonal':lista_data})
         except Exception as e:
             error = str(e)
             insertar_registro_error_sql("GeneralApp","traePersonal","usuario",error)
