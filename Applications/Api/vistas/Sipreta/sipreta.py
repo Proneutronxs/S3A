@@ -90,3 +90,20 @@ def listado_Chacras(values):
     except Exception as e:
         registroRealizado(values,"LISTADO_CHACRAS",str(e))
         return listado_chacras
+    
+
+
+
+@csrf_exempt
+def data_sync_all(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            
+            nota = "Los registros se guardaron exitosamente."
+            return JsonResponse({'Message': 'Success', 'Nota': nota})                  
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
