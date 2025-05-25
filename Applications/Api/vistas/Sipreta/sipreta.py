@@ -99,11 +99,80 @@ def data_sync_all(request):
     if request.method == 'POST':
         try:
             body = request.body.decode('utf-8')
+            dataJsonBody = json.loads(body)
             
-            nota = "Los registros se guardaron exitosamente."
-            return JsonResponse({'Message': 'Success', 'Nota': nota})                  
+            USUARIO2 = dataJsonBody['Usuario']
+            data_qrs = dataJsonBody['DataQrs']
+            data_labores = dataJsonBody['DataLabores']
+
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                #### INSERTA LOS QR ACTUALIZADOS
+                insertQR = """ EXEC SP_INSERTA_QR_PERSONAL_FILAS %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
+                #### INSERTA LAS LABORES
+                insertLabores = """ EXEC SP_INSERTA_LABORES %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
+                qr_insertados = 0
+                labores_insertadas = 0
+                errores_qr = []
+                errores_labores = []
+
+                for qr in data_qrs:
+                    try:
+                        TIPO_QR = qr["TIPO_QR"] if qr["TIPO_QR"] != "" else None
+                        QR = qr["QR"] if qr["QR"] != "" else None
+                        ID_LEGAJO = qr["ID_LEGAJO"] if qr["ID_LEGAJO"] != "" else None
+                        ID_FILA = qr["ID_FILA"] if qr["ID_FILA"] != "" else None
+                        ID_CUADRO = qr["ID_CUADRO"] if qr["ID_CUADRO"] != "" else None
+                        ID_VARIEDAD = qr["ID_VARIEDAD"] if qr["ID_VARIEDAD"] != "" else None
+                        FECHA_ALTA = qr["FECHA_ALTA"] if qr["FECHA_ALTA"] != "" else None
+                        TEMPORADA = qr["TEMPORADA"] if qr["TEMPORADA"] != "" else None
+                        ESTADO = qr["ESTADO"] if qr["ESTADO"] != "" else None
+                        valuesQR = [TIPO_QR, QR, ID_LEGAJO, ID_FILA, ID_CUADRO, ID_VARIEDAD, FECHA_ALTA, TEMPORADA, ESTADO, USUARIO2]
+                        cursor.execute(insertQR,valuesQR)
+                        qr_insertados += 1
+                    except Exception as e:
+                        errores_qr.append(str(e))
+
+                for lb in data_labores:
+                    try:
+                        QR_FILA = lb["QR_FILA"] if lb["QR_FILA"] != "" else None
+                        QR_EMPLEADO = lb["QR_EMPLEADO"] if lb["QR_EMPLEADO"] != "" else None
+                        ID_LEGAJO = lb["ID_LEGAJO"] if lb["ID_LEGAJO"] != "" else None
+                        LABOR = lb["LABOR"] if lb["LABOR"] != "" else None
+                        ID_CHACRA = lb["ID_CHACRA"] if lb["ID_CHACRA"] != "" else None
+                        ID_CUADRO = lb["ID_CUADRO"] if lb["ID_CUADRO"] != "" else None
+                        ID_FILA = lb["ID_FILA"] if lb["ID_FILA"] != "" else None
+                        ID_VARIEDAD = lb["ID_VARIEDAD"] if lb["ID_VARIEDAD"] != "" else None
+                        CANTIDAD = lb["CANTIDAD"] if lb["CANTIDAD"] != "" else None
+                        UNIDAD = lb["UNIDAD"] if lb["UNIDAD"] != "" else None
+                        TEMPORADA = lb["TEMPORADA"] if lb["TEMPORADA"] != "" else None
+                        VALOR = lb["VALOR"] if lb["VALOR"] != "" else None
+                        FECHA_ALTA = lb["FECHA_ALTA"] if lb["FECHA_ALTA"] != "" else None
+                        USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
+                        ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
+                        valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO]
+                        cursor.execute(insertLabores,valuesLabores)
+                        labores_insertadas += 1
+                    except Exception as e:
+                        errores_labores.append(str(e))
+
+            nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
+            if errores_qr or errores_labores:
+                nota += " Sin embargo, se produjeron errores en algunos registros."
+            return JsonResponse({'Message': 'Success', 'Nota': nota, 'RegistrosInsertados': {'QR': qr_insertados, 'Labores': labores_insertadas}, 
+                                 'Errores': {'QR': errores_qr, 'Labores': errores_labores}})                  
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+    
+
+
+        # @ID_QR_FILA VARCHAR(15),
+        # @ID_QR_PERSONAL VARCHAR(15),
+        # @ID_LABOR VARCHAR(15),
+        # @FECHA DATETIME,
+        # @CANTIDAD DECIMAL(10, 2),
+        # @UNIDAD VARCHAR(10),
+        # @VALOR DECIMAL(10, 2),
+        # @USUARIO VARCHAR(15)
