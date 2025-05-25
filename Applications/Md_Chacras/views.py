@@ -478,10 +478,8 @@ def validar_fila_chacras(row):
     except ValueError:
         raise ValidacionError("La columna 'ID CHACRA' debe contener sólo números enteros.")  
     
-    try:
-        cuadro = int(row[7]) 
-    except ValueError:
-        raise ValidacionError("La columna 'ID CUADRO' debe contener sólo números enteros.")
+    if not row[7].strip():
+        raise ValidacionError("La columna 'ID CUADRO' no puede estar vacía.")
     
     if row[8] is None:
         raise ValidacionError("La columna 'FILA' debe contener un valor.")
