@@ -73,7 +73,9 @@ urlpatterns = [
 
     path('sipreta/data-chacras-filas/usuario=<str:usuario>', sipreta.chacras_filas_qr, name="sipreta_chacras_filas_qr"),  
 
-    path('sipreta/data-sync-all/', sipreta.data_sync_all, name="sipreta_data_sync_all"),  
+    path('sipreta/data-sync-all/', sipreta.data_sync_all, name="sipreta_data_sync_all"),    
+
+    path('sipreta/detalle-labores-realizados/', sipreta.detalle_labores_app, name="sipreta_detalle_labores_app"),  
 
 
 

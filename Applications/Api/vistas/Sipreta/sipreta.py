@@ -167,12 +167,50 @@ def data_sync_all(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
     
 
-
-        # @ID_QR_FILA VARCHAR(15),
-        # @ID_QR_PERSONAL VARCHAR(15),
-        # @ID_LABOR VARCHAR(15),
-        # @FECHA DATETIME,
-        # @CANTIDAD DECIMAL(10, 2),
-        # @UNIDAD VARCHAR(10),
-        # @VALOR DECIMAL(10, 2),
-        # @USUARIO VARCHAR(15)
+@csrf_exempt
+def detalle_labores_app(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            inicio = str(json.loads(body)['Inicio'])
+            final = str(json.loads(body)['Final'])
+            legajo = str(json.loads(body)['Legajo'])
+            idChacra = str(json.loads(body)['IdChacra'])
+            encargado = str(json.loads(body)['Encargado'])
+            values = [inicio,final,legajo,idChacra,encargado]            
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                        EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s
+                    """
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    importe_total = 0
+                    for row in consulta:
+                        lista_data.append({
+                            "LEGAJO": row[0],
+                            "NOMBRES": (row[1] or "Sin Nombre"),
+                            "FECHA": row[2],
+                            "QR": row[3],
+                            "ID_CUADRO": row[4],
+                            "ID_CHACRA": row[5],
+                            "ID_PRODUCTOR": row[6],
+                            "PRODUCTOR": row[7],
+                            "CHACRA": row[8],
+                            "CUADRO": row[9],
+                            "FILA": row[10],
+                            "VARIEDADES": str(row[11]).replace(',','\n'),
+                            "CANT_PLANTAS": row[12],
+                            "LABOR": row[13],
+                            "IMPORTE_FILA": formato_moneda("$",row[14])
+                        })
+                        importe_total += float(row[14] or 0) # Asumiendo que row[14] es un número
+                    return JsonResponse({'Message': 'Success', 'ImporteTotal': formato_moneda("$",importe_total), 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
