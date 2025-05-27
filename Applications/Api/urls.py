@@ -77,6 +77,10 @@ urlpatterns = [
 
     path('sipreta/detalle-labores-realizados/', sipreta.detalle_labores_app, name="sipreta_detalle_labores_app"),  
 
+    path('sipreta/detalle-labores-pdf/', sipreta.detalle_labores_app_pdf, name="sipreta_detalle_labores_app_pdf"),  
+
+    path('sipreta/descarga-labores-pdf/archivo=<str:filename>', sipreta.descarga_archivo_pdf, name="sipreta_descarga_archivo_pdf"),
+
 
 
 
