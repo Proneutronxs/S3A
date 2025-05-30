@@ -711,7 +711,7 @@ li {
 .vr-fila-3 {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	justify-content: space-around;
 	align-items: center;
 	margin-bottom: 5px;
 	gap: 5px;

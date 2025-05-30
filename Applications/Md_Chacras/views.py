@@ -39,12 +39,18 @@ def Presupuesto(request):
     return render (request, 'Md_Chacras/404.html')
 
 @login_required
+def listado_labores(request):
+    user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
+    if user_has_permission:
+        return render (request, 'Md_Chacras/Sipreta/listadoLabores.html')
+    return render (request, 'Md_Chacras/404.html')
+
+@login_required
 def Horas_Extras(request):
     user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
     if user_has_permission:
         return render (request, 'Md_Chacras/Mobile/horas_extras.html')
     return render (request, 'Md_Chacras/404.html')
-
 
 def descarga_archivo_excel(request, filename):
     nombre = filename
@@ -271,7 +277,7 @@ def listado_combox_chacras_x_productor(request):
                             "IdChacra":str(row[0]),
                             "Descripcion":str(row[1])
                         })
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_data})
                 else:
                     data = "No se encontraron Datos."
                     return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -635,6 +641,76 @@ def insertar_presupuesto(request):
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+
+############# LISTADO LABORES
+
+def carga_inicial_listado_labores(request):
+    if request.method == 'GET':
+        try:
+            listado_productores = []
+            listado_personal = []
+            listado_labores = [{'Codigo': 'P', 'Descripcion':'PODA'},{'Codigo': 'R', 'Descripcion':'RALEO'}]
+            listado_encargados = []
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                #### listado productores
+                sql = """ EXEC LISTADO_PRODUCTORES_HABILITADOS """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_productores.append({
+                            'Codigo':str(row[0]),
+                            'Descripcion':str(row[1])
+                        })
+
+                #### listado personal
+                sql = """
+                        SELECT EM.CodEmpleado AS LEGAJO, ((CONVERT(VARCHAR, EM.CodEmpleado)) + ' - ' + EM.ApellidoEmple + ' ' + EM.NombresEmple) AS NOMBRES
+                        FROM TresAses_ISISPayroll.dbo.Empleados AS EM INNER JOIN
+                            TresAses_ISISPayroll.dbo.CentrosCostos AS CC ON CC.Regis_CCo = EM.Regis_CCo
+                        WHERE CC.AbrevCtroCosto LIKE ('C%%')
+                                AND EM.BajaDefinitivaEmple = '2'
+                        ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
+                    """
+
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_personal.append({
+                            'Codigo':str(row[0]),
+                            'Descripcion':str(row[1])
+                        })
+
+                #### listado encargados
+                sql = """
+                        SELECT RTRIM(US.Usuario) AS ENCARGADO, CASE WHEN ( EM.ApellidoEmple + ' ' + EM.NombresEmple) IS NULL THEN US.Usuario 
+                            ELSE ( EM.ApellidoEmple + ' ' + EM.NombresEmple) END AS NOMBRES
+                        FROM USUARIOS AS US LEFT JOIN 
+                            TresAses_ISISPayroll.dbo.Empleados AS EM ON EM.CodEmpleado = US.CodEmpleado
+                        WHERE US.Estado = 'A'
+                            AND US.CodEmpleado NOT IN('99999')
+                            AND US.Tipo = 'EC' 
+                        ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
+
+                    """
+
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_encargados.append({
+                            'Codigo':str(row[0]),
+                            'Descripcion':str(row[1])
+                        })
+            return JsonResponse({'Message': 'Success', 'Productores':listado_productores, 'Personal':listado_personal, 'Labores':listado_labores, 'Encargados':listado_encargados})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 

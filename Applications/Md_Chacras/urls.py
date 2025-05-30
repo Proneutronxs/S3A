@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.Md_Chacras, name="Md_Chacras_index"),
 
 
-
+    ##################### MODULO PRESUPUESTO
     path('sipreta/presupuesto/', views.Presupuesto, name="Md_Chacras_Presupuesto"),
 
     path('sipreta/presupuesto/combox-productores/', views.listado_combox_productor, name="Md_Chacras_SP_listado_combox_productor"),
@@ -27,7 +27,15 @@ urlpatterns = [
     path('sipreta/presupuesto/insertar-presupuesto/', views.insertar_presupuesto, name="Md_Chacras_SP_insertar_presupuesto"),
 
 
+    ##################### MODULO REPORTES LABORES
+    path('sipreta/reportes-labores/', views.listado_labores, name="Md_Chacras_listado_labores"),
 
+    path('sipreta/reportes-labores/data-inicial/', views.carga_inicial_listado_labores, name="Md_Chacras_carga_inicial_listado_labores"),
+
+    path('sipreta/reportes-labores/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor_X"),
+
+
+    ##################### MODULO MOBILE
     path('mobile/horas-extras/', views.Horas_Extras, name="Md_Chacras_Horas_Extras"),
 
     path('mobile/horas-extras/listar-horas-extras/', views.data_listado_horas_extras, name="Md_Chacras_data_listado_horas_extras"),
