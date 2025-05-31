@@ -111,6 +111,14 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
     },
+    'BD_DEBUG': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'DEBUG',
+        'USER': 'admindb',
+        'PASSWORD': 'Sskvi$%$%1722',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    },
     'TRESASES_APLICATIVO': {
         'ENGINE': 'sql_server.pyodbc',
         'NAME': 'TRESASES_APLICATIVO',

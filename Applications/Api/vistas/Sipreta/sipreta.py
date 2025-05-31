@@ -101,10 +101,10 @@ def data_sync_all(request):
         try:
             body = request.body.decode('utf-8')
             dataJsonBody = json.loads(body)
-            
             USUARIO2 = dataJsonBody['Usuario']
             data_qrs = dataJsonBody['DataQrs']
             data_labores = dataJsonBody['DataLabores']
+            debug_error(str(USUARIO2),str(dataJsonBody))
             lista_chacras = listado_Chacras([str(USUARIO2)])
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -397,3 +397,18 @@ def descarga_archivo_pdf(request, filename):
         return response
     else:
         raise Http404
+    
+
+def debug_error(usuario, body, error=None):
+    try:
+        with connections['BD_DEBUG'].cursor() as cursor:
+            sql = """ 
+                    INSERT INTO TB_DEBUG (USUARIO, FECHA, BODY)
+                    VALUES (%s, NOW(), %s)
+                """
+            if error:
+                body += f" - Error: {error}"
+            cursor.execute(sql, (usuario, body))
+            connections['BD_DEBUG'].commit()
+    except Exception as e:
+        print(f"Error al registrar en TB_DEBUG: {e}")
