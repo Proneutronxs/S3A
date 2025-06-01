@@ -263,7 +263,7 @@ def detalle_labores_app_pdf(request):
             body = request.body.decode('utf-8')
             inicio = str(json.loads(body)['Inicio'])
             final = str(json.loads(body)['Final'])
-            legajo = str(json.loads(body)['Legajo']) or 'TODOS'
+            legajo = str(json.loads(body)['Legajo'])#or 'TODOS'
             idChacra = str(json.loads(body)['IdChacra'])
             encargado = str(json.loads(body)['Encargado'])
             values = [inicio,final,legajo,idChacra,encargado]
@@ -348,7 +348,7 @@ def generar_pdf_detalle_labores(lista_data,nombre):
         pdf.output('Applications/Api/vistas/Sipreta/documentos/'+nombre_archivo)
         return nombre_archivo
     except Exception as e:
-        debug_error("ERR",str(e))   
+        debug_error("ERR pdf",str(e))   
         return "0"
 
 class FPDF_detalle_labores(FPDF):
