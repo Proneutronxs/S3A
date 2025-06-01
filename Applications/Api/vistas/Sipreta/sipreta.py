@@ -193,11 +193,11 @@ def data_sync_all(request):
                             "V_RALEO":row[24]
                         })
 
-            nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
-            
-            if errores_qr or errores_labores:
-                nota += " Sin embargo, se produjeron errores en algunos registros."
-            return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras, 'Nota': nota, 'RegistrosInsertados': {'QR': qr_insertados, 'Labores': labores_insertadas}, 
+                nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
+                
+                if errores_qr or errores_labores:
+                    nota += " Sin embargo, se produjeron errores en algunos registros."
+                return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras, 'Nota': nota, 'RegistrosInsertados': {'QR': qr_insertados, 'Labores': labores_insertadas}, 
                                  'Errores': {'QR': errores_qr, 'Labores': errores_labores}})                  
         except Exception as e:
             error = str(e)
@@ -268,7 +268,7 @@ def detalle_labores_app_pdf(request):
             encargado = str(json.loads(body)['Encargado'])
             values = [inicio,final,legajo,idChacra,encargado]
         
-            debug_error(str(encargado),str(values))            
+            #debug_error(str(encargado),str(values))            
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
                         EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s
@@ -302,7 +302,7 @@ def detalle_labores_app_pdf(request):
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
-            debug_error("ERR",str(e))      
+            debug_error("ERR EXCE",str(e))      
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
@@ -348,7 +348,7 @@ def generar_pdf_detalle_labores(lista_data,nombre):
         pdf.output('Applications/Api/vistas/Sipreta/documentos/'+nombre_archivo)
         return nombre_archivo
     except Exception as e:
-        debug_error("ERR pdf",str(e))   
+        debug_error("ERR PDF",str(e))   
         return "0"
 
 class FPDF_detalle_labores(FPDF):
