@@ -263,10 +263,12 @@ def detalle_labores_app_pdf(request):
             body = request.body.decode('utf-8')
             inicio = str(json.loads(body)['Inicio'])
             final = str(json.loads(body)['Final'])
-            legajo = str(json.loads(body)['Legajo'])
+            legajo = str(json.loads(body)['Legajo']) or 'TODOS'
             idChacra = str(json.loads(body)['IdChacra'])
             encargado = str(json.loads(body)['Encargado'])
-            values = [inicio,final,legajo,idChacra,encargado]            
+            values = [inicio,final,legajo,idChacra,encargado]
+        
+            debug_error(str(encargado),str(values))            
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ 
                         EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s
@@ -300,6 +302,7 @@ def detalle_labores_app_pdf(request):
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
+            debug_error("ERR",str(e))      
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
@@ -345,6 +348,7 @@ def generar_pdf_detalle_labores(lista_data,nombre):
         pdf.output('Applications/Api/vistas/Sipreta/documentos/'+nombre_archivo)
         return nombre_archivo
     except Exception as e:
+        debug_error("ERR",str(e))   
         return "0"
 
 class FPDF_detalle_labores(FPDF):
