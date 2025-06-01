@@ -297,7 +297,7 @@ def detalle_labores_app_pdf(request):
                             "IMPORTE_FILA": formato_moneda("$",row[14])
                         })
                         importe_total += float(row[14] or 0)
-                        nombrePDF = generar_pdf_detalle_labores(lista_data,legajo)
+                    nombrePDF = generar_pdf_detalle_labores(lista_data,legajo)
                     return JsonResponse({'Message': 'Success', 'NombrePDF': nombrePDF})
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
