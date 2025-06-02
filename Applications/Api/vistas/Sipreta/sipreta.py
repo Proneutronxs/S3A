@@ -160,42 +160,42 @@ def data_sync_all(request):
                         errores_labores.append(str(e))
 
 
-                # sql2 = """ 
-                #         EXEC SP_SELECT_CHACRAS_FILAS_QR %s
-                #     """
-                # cursor.execute(sql2,[str(USUARIO2)])
-                # consulta = cursor.fetchall()
-                # if consulta:
-                #     for row in consulta:
-                #         lista_data.append({
-                #             "ID_PRODUCTOR": row[0],
-                #             "PRODUCTOR": row[1],
-                #             "ID_CHACRA": row[2],
-                #             "CHACRA": row[3],
-                #             "ID_FILA": row[4],
-                #             "ID_CUADRO": row[5],
-                #             "CUADRO": row[6],
-                #             "ID_VARIEDAD": row[7],
-                #             "ID_QR": row[8],
-                #             "QR": row[9],
-                #             "TIPO_QR": row[10],
-                #             "TEMPORADA_QR": row[11],
-                #             "ALTA_QR": row[12],
-                #             "ESTADO_QR": row[13],
-                #             "ACTIVIDAD_QR": row[14],
-                #             "VALOR_REFERENCIA": row[15],
-                #             "AÑO_PLANTACION": row[16],
-                #             "NRO_PLANTAS": row[17],
-                #             "DIST_FILAS": row[18],
-                #             "DIST_PLANTAS": row[19],
-                #             "SUPERFICIE": row[20],
-                #             "ESTADO_FILA": row[21],
-                #             "VARIEDAD": row[22],
-                #             "V_PODA":row[23],
-                #             "V_RALEO":row[24]
-                #         })
+                sql2 = """ 
+                        EXEC SP_SELECT_CHACRAS_FILAS_QR %s
+                    """
+                cursor.execute(sql2,[str(USUARIO2)])
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_data.append({
+                            "ID_PRODUCTOR": row[0],
+                            "PRODUCTOR": row[1],
+                            "ID_CHACRA": row[2],
+                            "CHACRA": row[3],
+                            "ID_FILA": row[4],
+                            "ID_CUADRO": row[5],
+                            "CUADRO": row[6],
+                            "ID_VARIEDAD": row[7],
+                            "ID_QR": row[8],
+                            "QR": row[9],
+                            "TIPO_QR": row[10],
+                            "TEMPORADA_QR": row[11],
+                            "ALTA_QR": row[12],
+                            "ESTADO_QR": row[13],
+                            "ACTIVIDAD_QR": row[14],
+                            "VALOR_REFERENCIA": row[15],
+                            "AÑO_PLANTACION": row[16],
+                            "NRO_PLANTAS": row[17],
+                            "DIST_FILAS": row[18],
+                            "DIST_PLANTAS": row[19],
+                            "SUPERFICIE": row[20],
+                            "ESTADO_FILA": row[21],
+                            "VARIEDAD": row[22],
+                            "V_PODA":row[23],
+                            "V_RALEO":row[24]
+                        })
 
-                nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
+            nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
                 
             if errores_qr or errores_labores:
                 nota += " Sin embargo, se produjeron errores en algunos registros."
