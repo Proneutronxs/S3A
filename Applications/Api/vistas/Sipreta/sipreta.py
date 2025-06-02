@@ -104,7 +104,8 @@ def data_sync_all(request):
             USUARIO2 = dataJsonBody['Usuario']
             data_qrs = dataJsonBody['DataQrs']
             data_labores = dataJsonBody['DataLabores']
-            debug_error(str(USUARIO2),str(data_labores))
+            debug_error(str("LAB-"+USUARIO2),str(data_labores))
+            debug_error(str("QRS-"+USUARIO2),str(data_qrs))
             lista_chacras = listado_Chacras([str(USUARIO2)])
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
