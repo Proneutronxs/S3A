@@ -119,45 +119,45 @@ def data_sync_all(request):
                 errores_qr = []
                 errores_labores = []
 
-                for qr in data_qrs:
-                    try:
-                        TIPO_QR = qr["TIPO_QR"] if qr["TIPO_QR"] != "" else None
-                        QR = qr["QR"] if qr["QR"] != "" else None
-                        ID_LEGAJO = qr["ID_LEGAJO"] if qr["ID_LEGAJO"] != "" else None
-                        ID_FILA = qr["ID_FILA"] if qr["ID_FILA"] != "" else None
-                        ID_CUADRO = qr["ID_CUADRO"] if qr["ID_CUADRO"] != "" else None
-                        ID_VARIEDAD = qr["ID_VARIEDAD"] if qr["ID_VARIEDAD"] != "" else None
-                        FECHA_ALTA = qr["FECHA_ALTA"] if qr["FECHA_ALTA"] != "" else None
-                        TEMPORADA = qr["TEMPORADA"] if qr["TEMPORADA"] != "" else None
-                        ESTADO = qr["ESTADO"] if qr["ESTADO"] != "" else None
-                        valuesQR = [TIPO_QR, QR, ID_LEGAJO, ID_FILA, ID_CUADRO, ID_VARIEDAD, FECHA_ALTA, TEMPORADA, ESTADO, USUARIO2]
-                        cursor.execute(insertQR,valuesQR)
-                        qr_insertados += 1
-                    except Exception as e:
-                        errores_qr.append(str(e))
+                # for qr in data_qrs:
+                #     try:
+                #         TIPO_QR = qr["TIPO_QR"] if qr["TIPO_QR"] != "" else None
+                #         QR = qr["QR"] if qr["QR"] != "" else None
+                #         ID_LEGAJO = qr["ID_LEGAJO"] if qr["ID_LEGAJO"] != "" else None
+                #         ID_FILA = qr["ID_FILA"] if qr["ID_FILA"] != "" else None
+                #         ID_CUADRO = qr["ID_CUADRO"] if qr["ID_CUADRO"] != "" else None
+                #         ID_VARIEDAD = qr["ID_VARIEDAD"] if qr["ID_VARIEDAD"] != "" else None
+                #         FECHA_ALTA = qr["FECHA_ALTA"] if qr["FECHA_ALTA"] != "" else None
+                #         TEMPORADA = qr["TEMPORADA"] if qr["TEMPORADA"] != "" else None
+                #         ESTADO = qr["ESTADO"] if qr["ESTADO"] != "" else None
+                #         valuesQR = [TIPO_QR, QR, ID_LEGAJO, ID_FILA, ID_CUADRO, ID_VARIEDAD, FECHA_ALTA, TEMPORADA, ESTADO, USUARIO2]
+                #         cursor.execute(insertQR,valuesQR)
+                #         qr_insertados += 1
+                #     except Exception as e:
+                #         errores_qr.append(str(e))
 
-                for lb in data_labores:
-                    try:
-                        QR_FILA = lb["QR_FILA"] if lb["QR_FILA"] != "" else None
-                        QR_EMPLEADO = lb["QR_EMPLEADO"] if lb["QR_EMPLEADO"] != "" else None
-                        ID_LEGAJO = lb["ID_LEGAJO"] if lb["ID_LEGAJO"] != "" else None
-                        LABOR = lb["LABOR"] if lb["LABOR"] != "" else None
-                        ID_CHACRA = lb["ID_CHACRA"] if lb["ID_CHACRA"] != "" else None
-                        ID_CUADRO = lb["ID_CUADRO"] if lb["ID_CUADRO"] != "" else None
-                        ID_FILA = lb["ID_FILA"] if lb["ID_FILA"] != "" else None
-                        ID_VARIEDAD = lb["ID_VARIEDAD"] if lb["ID_VARIEDAD"] != "" else None
-                        CANTIDAD = lb["CANTIDAD"] if lb["CANTIDAD"] != "" else None
-                        UNIDAD = lb["UNIDAD"] if lb["UNIDAD"] != "" else None
-                        TEMPORADA = lb["TEMPORADA"] if lb["TEMPORADA"] != "" else None
-                        VALOR = lb["VALOR"] if lb["VALOR"] != "" else None
-                        FECHA_ALTA = lb["FECHA_ALTA"] if lb["FECHA_ALTA"] != "" else None
-                        USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
-                        ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
-                        valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO]
-                        cursor.execute(insertLabores,valuesLabores)
-                        labores_insertadas += 1
-                    except Exception as e:
-                        errores_labores.append(str(e))
+                # for lb in data_labores:
+                #     try:
+                #         QR_FILA = lb["QR_FILA"] if lb["QR_FILA"] != "" else None
+                #         QR_EMPLEADO = lb["QR_EMPLEADO"] if lb["QR_EMPLEADO"] != "" else None
+                #         ID_LEGAJO = lb["ID_LEGAJO"] if lb["ID_LEGAJO"] != "" else None
+                #         LABOR = lb["LABOR"] if lb["LABOR"] != "" else None
+                #         ID_CHACRA = lb["ID_CHACRA"] if lb["ID_CHACRA"] != "" else None
+                #         ID_CUADRO = lb["ID_CUADRO"] if lb["ID_CUADRO"] != "" else None
+                #         ID_FILA = lb["ID_FILA"] if lb["ID_FILA"] != "" else None
+                #         ID_VARIEDAD = lb["ID_VARIEDAD"] if lb["ID_VARIEDAD"] != "" else None
+                #         CANTIDAD = lb["CANTIDAD"] if lb["CANTIDAD"] != "" else None
+                #         UNIDAD = lb["UNIDAD"] if lb["UNIDAD"] != "" else None
+                #         TEMPORADA = lb["TEMPORADA"] if lb["TEMPORADA"] != "" else None
+                #         VALOR = lb["VALOR"] if lb["VALOR"] != "" else None
+                #         FECHA_ALTA = lb["FECHA_ALTA"] if lb["FECHA_ALTA"] != "" else None
+                #         USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
+                #         ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
+                #         valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO]
+                #         cursor.execute(insertLabores,valuesLabores)
+                #         labores_insertadas += 1
+                #     except Exception as e:
+                #         errores_labores.append(str(e))
 
 
                 sql2 = """ 
