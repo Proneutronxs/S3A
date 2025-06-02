@@ -196,10 +196,10 @@ def data_sync_all(request):
 
                 nota = f"Se insertaron {qr_insertados} registros de QR y {labores_insertadas} registros de labores."
                 
-            if errores_qr or errores_labores:
-                nota += " Sin embargo, se produjeron errores en algunos registros."
-            return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras, 'Nota': nota, 'RegistrosInsertados': {'QR': qr_insertados, 'Labores': labores_insertadas}, 
-                                'Errores': {'QR': errores_qr, 'Labores': errores_labores}})                  
+                if errores_qr or errores_labores:
+                    nota += " Sin embargo, se produjeron errores en algunos registros."
+                return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras, 'Nota': nota, 'RegistrosInsertados': {'QR': qr_insertados, 'Labores': labores_insertadas}, 
+                                    'Errores': {'QR': errores_qr, 'Labores': errores_labores}})                  
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
