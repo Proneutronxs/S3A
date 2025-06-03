@@ -81,6 +81,12 @@ urlpatterns = [
 
     path('sipreta/descarga-labores-pdf/archivo=<str:filename>', sipreta.descarga_archivo_pdf, name="sipreta_descarga_archivo_pdf"),
 
+    path('sipreta/data-sync-qr/', sipreta.data_sync_qr, name="sipreta_data_sync_qr"),
+
+    path('sipreta/data-sync-labores/', sipreta.data_sync_labores, name="sipreta_data_sync_labores"),
+
+    path('sipreta/data-sync-filas/', sipreta.data_sync_filas, name="sipreta_data_sync_filas"),            
+
 
 
 
