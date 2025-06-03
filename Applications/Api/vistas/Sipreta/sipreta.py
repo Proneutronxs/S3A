@@ -256,8 +256,6 @@ def detalle_labores_app(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
-
 @csrf_exempt
 def detalle_labores_app_pdf(request):
     if request.method == 'POST':
@@ -310,7 +308,6 @@ def detalle_labores_app_pdf(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
-
 def generar_pdf_detalle_labores(lista_data,nombre):
     try:
         pdf = FPDF_detalle_labores(orientation='L', unit='mm', format='A4')
@@ -393,7 +390,6 @@ class FPDF_detalle_labores(FPDF):
         self.line(262,192,262,204)
         self.ln(275)
 
-
 def descarga_archivo_pdf(request, filename):
     nombre = filename
     filename = 'Applications/Api/vistas/Sipreta/documentos/' + filename
@@ -404,7 +400,6 @@ def descarga_archivo_pdf(request, filename):
     else:
         raise Http404
     
-
 def debug_error(usuario, body, error=None):
     try:
         with connections['BD_DEBUG'].cursor() as cursor:
@@ -418,3 +413,145 @@ def debug_error(usuario, body, error=None):
             connections['BD_DEBUG'].commit()
     except Exception as e:
         print(f"Error al registrar en TB_DEBUG: {e}")
+
+
+@csrf_exempt
+def data_sync_qr(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            dataJsonBody = json.loads(body)
+            USUARIO2 = dataJsonBody['Usuario']
+            temporada = dataJsonBody['Temporada']
+            data_qrs = dataJsonBody['DataQrs']
+            debug_error("QR"+str(USUARIO2),str(dataJsonBody))
+            lista_data = []
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                insertQR = """ EXEC SP_INSERTA_QR_PERSONAL_FILAS %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
+                for qr in data_qrs:
+                    TIPO_QR = qr["TIPO_QR"] if qr["TIPO_QR"] != "" else None
+                    QR = qr["QR"] if qr["QR"] != "" else None
+                    ID_LEGAJO = qr["ID_LEGAJO"] if qr["ID_LEGAJO"] != "" else None
+                    ID_FILA = qr["ID_FILA"] if qr["ID_FILA"] != "" else None
+                    ID_CUADRO = qr["ID_CUADRO"] if qr["ID_CUADRO"] != "" else None
+                    ID_VARIEDAD = qr["ID_VARIEDAD"] if qr["ID_VARIEDAD"] != "" else None
+                    FECHA_ALTA = qr["FECHA_ALTA"] if qr["FECHA_ALTA"] != "" else None
+                    TEMPORADA = qr["TEMPORADA"] if qr["TEMPORADA"] != "" else None
+                    ESTADO = qr["ESTADO"] if qr["ESTADO"] != "" else None
+                    valuesQR = [TIPO_QR, QR, ID_LEGAJO, ID_FILA, ID_CUADRO, ID_VARIEDAD, FECHA_ALTA, TEMPORADA, ESTADO, USUARIO2]
+                    cursor.execute(insertQR,valuesQR)
+
+                sql = """ EXEC SP_SELECT_QRS %s, %s """
+                values = [str(USUARIO2),str(temporada)]
+                cursor.execute(sql,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:  ###  ID_QR, TIPO_QR, QR, ID_LEGAJO, ID_FILA, ID_CUADRO, ID_VARIEDAD, FECHA_ALTA, TEMPORADA, ESTADO
+                        lista_data.append({
+                            "ID_QR":row[0],
+                            "TIPO_QR":row[1],
+                            "QR":row[2],
+                            "ID_LEGAJO":row[3],
+                            "ID_FILA":row[4],
+                            "ID_CUADRO":row[5],
+                            "ID_VARIEDAD":row[6],
+                            "FECHA_ALTA":row[7],
+                            "TEMPORADA":row[8],
+                            "ESTADO":row[9]
+                        })
+
+            return JsonResponse({'Message': 'Success', 'Qr': lista_data})                  
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+    
+@csrf_exempt
+def data_sync_labores(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            dataJsonBody = json.loads(body)
+            USUARIO2 = dataJsonBody['Usuario']
+            data_labores = dataJsonBody['DataLabores']
+            debug_error("LB"+str(USUARIO2),str(dataJsonBody))
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                insertLabores = """ EXEC SP_INSERTA_LABORES %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
+                for lb in data_labores:
+                    QR_FILA = lb["QR_FILA"] if lb["QR_FILA"] != "" else None
+                    QR_EMPLEADO = lb["QR_EMPLEADO"] if lb["QR_EMPLEADO"] != "" else None
+                    ID_LEGAJO = lb["ID_LEGAJO"] if lb["ID_LEGAJO"] != "" else None
+                    LABOR = lb["LABOR"] if lb["LABOR"] != "" else None
+                    ID_CHACRA = lb["ID_CHACRA"] if lb["ID_CHACRA"] != "" else None
+                    ID_CUADRO = lb["ID_CUADRO"] if lb["ID_CUADRO"] != "" else None
+                    ID_FILA = lb["ID_FILA"] if lb["ID_FILA"] != "" else None
+                    ID_VARIEDAD = lb["ID_VARIEDAD"] if lb["ID_VARIEDAD"] != "" else None
+                    CANTIDAD = lb["CANTIDAD"] if lb["CANTIDAD"] != "" else None
+                    UNIDAD = lb["UNIDAD"] if lb["UNIDAD"] != "" else None
+                    TEMPORADA = lb["TEMPORADA"] if lb["TEMPORADA"] != "" else None
+                    VALOR = lb["VALOR"] if lb["VALOR"] != "" else None
+                    FECHA_ALTA = lb["FECHA_ALTA"] if lb["FECHA_ALTA"] != "" else None
+                    USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
+                    ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
+                    valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO]
+                    cursor.execute(insertLabores,valuesLabores)
+
+            return JsonResponse({'Message': 'Success'})                  
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+    
+@csrf_exempt
+def data_sync_filas(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            dataJsonBody = json.loads(body)
+            USUARIO2 = dataJsonBody['Usuario']
+            debug_error(str(USUARIO2),str(dataJsonBody))
+            lista_chacras = listado_Chacras([str(USUARIO2)])
+            lista_data = []
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql2 = """ 
+                        EXEC SP_SELECT_CHACRAS_FILAS_QR %s
+                    """
+                cursor.execute(sql2,[str(USUARIO2)])
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_data.append({
+                            "ID_PRODUCTOR": row[0],
+                            "PRODUCTOR": row[1],
+                            "ID_CHACRA": row[2],
+                            "CHACRA": row[3],
+                            "ID_FILA": row[4],
+                            "ID_CUADRO": row[5],
+                            "CUADRO": row[6],
+                            "ID_VARIEDAD": row[7],
+                            "ID_QR": row[8],
+                            "QR": row[9],
+                            "TIPO_QR": row[10],
+                            "TEMPORADA_QR": row[11],
+                            "ALTA_QR": row[12],
+                            "ESTADO_QR": row[13],
+                            "ACTIVIDAD_QR": row[14],
+                            "VALOR_REFERENCIA": row[15],
+                            "AÑO_PLANTACION": row[16],
+                            "NRO_PLANTAS": row[17],
+                            "DIST_FILAS": row[18],
+                            "DIST_PLANTAS": row[19],
+                            "SUPERFICIE": row[20],
+                            "ESTADO_FILA": row[21],
+                            "VARIEDAD": row[22],
+                            "V_PODA":row[23],
+                            "V_RALEO":row[24]
+                        })
+            return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras})                  
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
