@@ -460,7 +460,7 @@ def data_sync_qr(request):
                             "ESTADO":row[9]
                         })
 
-            return JsonResponse({'Message': 'Success', 'Qr': lista_data})                  
+            return JsonResponse({'Message': 'Success', 'Nota': 'Los QR se insertaron correctamente.', 'Qr': lista_data})                  
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
@@ -497,7 +497,7 @@ def data_sync_labores(request):
                     valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO]
                     cursor.execute(insertLabores,valuesLabores)
 
-            return JsonResponse({'Message': 'Success'})                  
+            return JsonResponse({'Message': 'Success', 'Nota': 'Los Labores se insertaron correctamente.'})                  
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
@@ -549,7 +549,7 @@ def data_sync_filas(request):
                             "V_PODA":row[23],
                             "V_RALEO":row[24]
                         })
-            return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_chacras})                  
+            return JsonResponse({'Message': 'Success', 'Nota': 'Filas guardadas.', 'Datos': lista_data, 'Chacras':lista_chacras})                  
         except Exception as e:
             error = str(e)
             return JsonResponse({'Message': 'Error', 'Nota': error})
