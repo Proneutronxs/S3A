@@ -457,7 +457,8 @@ def data_sync_qr(request):
                             "ID_VARIEDAD":row[6],
                             "FECHA_ALTA":row[7],
                             "TEMPORADA":row[8],
-                            "ESTADO":row[9]
+                            "ESTADO":row[9],
+                            "NOMBRES":row[10]
                         })
 
             return JsonResponse({'Message': 'Success', 'Nota': 'Los QR se insertaron correctamente.', 'Qr': lista_data})                  
