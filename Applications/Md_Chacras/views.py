@@ -692,7 +692,7 @@ def carga_inicial_listado_labores(request):
                             TresAses_ISISPayroll.dbo.Empleados AS EM ON EM.CodEmpleado = US.CodEmpleado
                         WHERE US.Estado = 'A'
                             AND US.CodEmpleado NOT IN('99999')
-                            AND US.Tipo = 'EC' 
+                            AND US.Tipo IN ('EC','G') 
                         ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
 
                     """
@@ -712,11 +712,55 @@ def carga_inicial_listado_labores(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt 
+def listado_detalle_labores(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            listado_data = []
+            inicio = str(request.POST.get('Inicio'))
+            final = str(request.POST.get('Final'))
+            idLegajo = str(request.POST.get('IdLegajo'))
+            idChacra = str(request.POST.get('IdChacra'))
+            #idProductor = str(request.POST.get('IdProductor'))
+            idEncargado = str(request.POST.get('IdEncargado'))
+            idLabor = str(request.POST.get('IdLabor'))
+            values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:  
+                sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s  """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_data.append({
+                            "LEGAJO":row[0],
+                            "NOMBRES":row[1],
+                            "FECHA":row[2],
+                            "QR":row[3],
+                            "ID_CUADRO":row[4],
+                            "ID_CHACRA":row[5],
+                            "ID_PRODUCTOR":row[6],
+                            "PRODUCTOR":row[7],
+                            "CHACRA":row[8],
+                            "CUADRO":row[9],
+                            "FILA":row[10],
+                            "VARIEDADES":row[11],
+                            "CANT_PLANTAS":row[12],
+                            "LABOR":row[13],
+                            "IMPORTE":row[14],
+                            "ID_QR_FILA":row[15],
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': listado_data})
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
-
-
+# LEGAJO	NOMBRES	FECHA	QR	ID_CUADRO	ID_CHACRA	ID_PRODUCTOR	PRODUCTOR	CHACRA	CUADRO	FILA	VARIEDADES	CANT_PLANTAS	LABOR	IMPORTE_FILA	ID_QR_FILA
+# 54009	URDANETA ALVAREZ SENEN ALBERTO	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
+# 58015	CHAMBI JOSUE RUBEN	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
 
 
 

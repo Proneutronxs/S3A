@@ -168,9 +168,9 @@ DATABASES = {
 
 #pip install mssql-django==1.0
 #
-
+## SQL SERVER 2022 modificar base.py en las librerias del entorno virtual
 ###### LOCAL S3A
-# ip = '192.168.0.126'
+# ip = '192.168.0.2'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -202,17 +202,6 @@ DATABASES = {
 #             'driver': 'ODBC Driver 17 for SQL Server',
 #         },
 #     },
-#     'principal': {
-#         'ENGINE': 'mssql',
-#         'NAME': 'principal',
-#         'USER': 'sa',
-#         'HOST': ip,
-#         'PASSWORD': 'Sideswipe348',
-#         'PORT': '',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 17 for SQL Server',
-#         },
-#     },
 #     'S3A': {
 #         'ENGINE': 'mssql',
 #         'NAME': 'S3A',
@@ -224,6 +213,17 @@ DATABASES = {
 #             'driver': 'ODBC Driver 17 for SQL Server',
 #         },
 #     }
+#     # 'principal': {
+#     #     'ENGINE': 'mssql',
+#     #     'NAME': 'principal',
+#     #     'USER': 'sa',
+#     #     'HOST': ip,
+#     #     'PASSWORD': 'Sideswipe348',
+#     #     'PORT': '',
+#     #     'OPTIONS': {
+#     #         'driver': 'ODBC Driver 17 for SQL Server',
+#     #     },
+#     # },
 # }
 
 
