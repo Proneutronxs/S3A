@@ -1554,6 +1554,7 @@ th.vr-tb-header {
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
 .vr-col-6 input[type="radio"] {
