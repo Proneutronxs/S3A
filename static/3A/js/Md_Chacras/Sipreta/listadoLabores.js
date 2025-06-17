@@ -15,8 +15,8 @@ document.getElementById('busqueda-button').addEventListener('click', function ()
     dataDateTable();
 });
 
-document.getElementById('descargar-button').addEventListener('click', function () {
-    //descargarArchivo();
+document.getElementById('exportar-button').addEventListener('click', function () {
+    showInnerPop();
 });
 
 selector_productores.addEventListener("change", (event) => {
@@ -35,6 +35,14 @@ const choiceChacra = new Choices('#selector_chacras', {
     allowHTML: true,
     shouldSort: false,
     placeholderValue: 'SELECCIONE CHACRA',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const choiceCuadro = new Choices('#selector_cuadros', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SEL. CUADRO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -369,7 +377,73 @@ const dataDateTable = async () => {
 
 
 
+function showInnerPop() {
+    document.getElementById('contenido-popup').innerHTML = `
+        <div class="carga-contenedor" style="border: 1px solid #ccc; width: 380px;">
+            <p>Tipo de Reporte:</p>
+            <div class="vr-fila-5">
+                <div class="vr-col-btn-5 style="text-align: center;">
+                    <input type="radio" id="pdf" name="report-type" value="pdf" checked>
+                    <label for="pdf">PDF</label>
+                    <input type="radio" id="excel" name="report-type" value="excel">
+                    <label for="excel">Excel</label>
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
+            <p>Listados:</p>
+            
+            <div class="vr-fila-5">
+                <div class="vr-col-6">
+                    <div>
+                        <input type="radio" id="R" name="listado-type" value="R" checked>
+                        <label for="R">Resumido</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="RP" name="listado-type" value="RP">
+                        <label for="RP">Res. por Persona</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="RC" name="listado-type" value="RC">
+                        <label for="RC">Res. por Chacra</label>
+                    </div>
+                </div>
+                <div class="vr-col-6">
+                    <div>
+                        <input type="radio" id="D" name="listado-type" value="D">
+                        <label for="D">Detallado</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="DP" name="listado-type" value="DP">
+                        <label for="DP">Det. por Persona</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="DC" name="listado-type" value="DC">
+                        <label for="DC">Det. por Chacra</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor" style="text-align: center; margin-top: 10px;">
+            <div class="vr-fila-2">
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
+                </div>
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="mostrarInfo('No disponible.','red');" id="descargar-subir-button">DESCARGAR</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById("fondo-oscuro").style.display = "block";
+    document.getElementById("popup-confirmacion").style.display = "block";
+}
 
+function hiddenInnerPop() {
+    document.getElementById('contenido-popup').innerHTML = ``;
+    document.getElementById("fondo-oscuro").style.display = "none";
+    document.getElementById("popup-confirmacion").style.display = "none";
+}
 
 function getValuesProductor() {
     return choiceProductor.getValue() ? choiceProductor.getValue().value : '';
@@ -423,3 +497,10 @@ function openLoading() {
 function closeLoading() {
     loadingContainer.style.display = 'none';
 }
+
+// `<div class="vr-fila-5">
+//     <div class="vr-col-btn-5" style="text-align: center;">
+//         <input type="radio" id="global" name="listado-type" value="global" checked>
+//         <label for="global">Global</label>
+//     </div>
+// </div>`

@@ -1389,8 +1389,8 @@ th.vr-tb-header {
 	transform: translate(-50%, -50%);
 	background-color: #fff;
 	border: 1px solid #ddd;
-	padding: 20px;
-	width: 300px;
+	padding: 8px;
+	/* width: 380px; */
 	z-index: 1001;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 	border-radius: 10px;
@@ -1481,7 +1481,7 @@ th.vr-tb-header {
 .vr-titulo-contenedor {
 	position: absolute;
 	left: 20px;
-	top: 40%;
+	top: 60%;
 	transform: translateY(-50%);
 	display: flex;
 	justify-content: center;
@@ -1542,3 +1542,35 @@ th.vr-tb-header {
 	font-size: 14px;
 	font-weight: bold;
 }
+
+.vr-col-6 {
+  width: 50%;
+  display: inline-block;
+  padding: 5px;
+}
+
+.vr-col-6 div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.vr-col-6 input[type="radio"] {
+  margin-right: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
