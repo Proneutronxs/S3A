@@ -1565,6 +1565,9 @@ th.vr-tb-header {
   cursor: pointer;
 }
 
+.vr-col-btn-5 label, .vr-col-btn-5 input {
+    cursor: pointer;
+}
 
 
 
