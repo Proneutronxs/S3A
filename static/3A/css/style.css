@@ -1557,7 +1557,12 @@ th.vr-tb-header {
 }
 
 .vr-col-6 input[type="radio"] {
-  margin-right: 10px;
+  margin-right: 10px; 
+  cursor: pointer;
+}
+
+.vr-col-6 label {
+  cursor: pointer;
 }
 
 

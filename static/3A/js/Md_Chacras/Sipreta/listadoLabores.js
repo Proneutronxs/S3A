@@ -384,9 +384,9 @@ function showInnerPop() {
             <div class="vr-fila-5">
                 <div class="vr-col-btn-5 style="text-align: center;">
                     <input type="radio" id="pdf" name="report-type" value="pdf" checked>
-                    <label for="pdf" style="cursor: pointer;">PDF</label>
+                    <label for="pdf">PDF</label>
                     <input type="radio" id="excel" name="report-type" value="excel">
-                    <label for="excel" style="cursor: pointer;">Excel</label>
+                    <label for="excel">Excel</label>
                 </div>
             </div>
         </div>
@@ -395,29 +395,29 @@ function showInnerPop() {
             
             <div class="vr-fila-5">
                 <div class="vr-col-6">
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="R" name="listado-type" value="R" checked>
                         <label for="R">Resumido</label>
                     </div>
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="RP" name="listado-type" value="RP">
                         <label for="RP">Res. por Persona</label>
                     </div>
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="RC" name="listado-type" value="RC">
                         <label for="RC">Res. por Chacra</label>
                     </div>
                 </div>
                 <div class="vr-col-6">
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="D" name="listado-type" value="D">
                         <label for="D">Detallado</label>
                     </div>
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="DP" name="listado-type" value="DP">
                         <label for="DP">Det. por Persona</label>
                     </div>
-                    <div style="cursor: pointer;">
+                    <div>
                         <input type="radio" id="DC" name="listado-type" value="DC">
                         <label for="DC">Det. por Chacra</label>
                     </div>
