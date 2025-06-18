@@ -62,7 +62,7 @@ def descarga_archivo_excel(request, filename):
     else:
         raise Http404
 
-@csrf_exempt    
+@csrf_exempt
 def data_listado_horas_extras(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -77,10 +77,10 @@ def data_listado_horas_extras(request):
             lista_data = jsonHorasExtras(values)
             if lista_data:
                 if archivo == "N":
-                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})  
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
-                    excel_response = general_excel_horas_extras(lista_data)            
-                    return excel_response 
+                    excel_response = general_excel_horas_extras(lista_data)
+                    return excel_response
             else:
                 data = 'No se encontraron datos.'
                 return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -99,21 +99,21 @@ def jsonHorasExtras(values):
             if consulta:
                 for row in consulta:
                     lista_data.append({
-                        'IDhep':str(row[0]), 
-                        'Tipo':str(row[1]), 
-                        'Legajo':str(row[2]), 
-                        'Nombre':str(row[3]), 
-                        'Centro':str(row[4]), 
-                        'Desde':str(row[5]), 
-                        'Hasta':str(row[6]), 
-                        'Motivo':str(row[7]), 
-                        'Descripcion':str(row[8]), 
-                        'Cantidad':str(row[9]), 
-                        'Solicita':str(row[10]), 
-                        'Importe':str(row[11]), 
+                        'IDhep':str(row[0]),
+                        'Tipo':str(row[1]),
+                        'Legajo':str(row[2]),
+                        'Nombre':str(row[3]),
+                        'Centro':str(row[4]),
+                        'Desde':str(row[5]),
+                        'Hasta':str(row[6]),
+                        'Motivo':str(row[7]),
+                        'Descripcion':str(row[8]),
+                        'Cantidad':str(row[9]),
+                        'Solicita':str(row[10]),
+                        'Importe':str(row[11]),
                         'Estado':str(row[12])
                     })
-                return lista_data 
+                return lista_data
             else:
                 return lista_data
     except Exception as e:
@@ -146,7 +146,7 @@ def general_excel_horas_extras(lista_data):
                 cell.fill = header_fill
                 cell.font = header_font
                 cell.alignment = header_alignment
-                
+
             border_style = Border(
                 left=Side(style='thin'),
                 right=Side(style='thin'),
@@ -168,13 +168,13 @@ def general_excel_horas_extras(lista_data):
                         pass
                 adjusted_width = (max_length + 2)
                 worksheet.column_dimensions[column].width = adjusted_width
-                
+
         output.seek(0)
         nombre_excel = f'Listado_horas_extras_{obtenerHorasArchivo()}.xlsx'
         with open('Applications/Md_Chacras/Archivos/Excel/'+ nombre_excel, 'wb') as f:
             f.write(output.getvalue())
 
-        return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel}) 
+        return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel})
     except Exception as e:
         data = str(e)
         return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -197,9 +197,9 @@ def convertir_a_numerico_stock_ventas(df):
         df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
         return df
     except Exception as e:
-        return None 
+        return None
 
-@csrf_exempt    
+@csrf_exempt
 def inserta_elimina_horas_extras(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -218,8 +218,8 @@ def inserta_elimina_horas_extras(request):
                     cursor.execute('EXEC MDC_HORAS_EXTRAS_INSERTA_ELIMINA %s, %s, %s, %s', values)
                     index = index + 1
             if index == cantidad:
-                return JsonResponse({'Message': 'Success', 'Nota': 'La petición se realizó correctamente.'}) 
-            else: 
+                return JsonResponse({'Message': 'Success', 'Nota': 'La petición se realizó correctamente.'})
+            else:
                 return JsonResponse({'Message': 'Error', 'Nota': 'Uno o más items no se pudieron guardad o eliminar.'})
         except Exception as e:
             data = str(e)
@@ -234,7 +234,7 @@ def listado_combox_productor(request):
         try:
             lista_data = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ 
+                sql = """
                         EXEC LISTADO_PRODUCTORES_HABILITADOS
                     """
                 cursor.execute(sql)
@@ -265,7 +265,7 @@ def listado_combox_chacras_x_productor(request):
             idProductor = str(request.POST.get('IdProductor'))
             values = [idProductor]
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
-                sql = """ 
+                sql = """
                         EXEC LISTADO_CHACRAS_X_PRODUCTOR %s
                     """
                 cursor.execute(sql, values)
@@ -286,7 +286,7 @@ def listado_combox_chacras_x_productor(request):
             return JsonResponse({'Message': 'Error', 'Nota': data})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-    
+
 @csrf_exempt
 def listado_chacras_x_filas(request):
     if not request.user.is_authenticated:
@@ -337,12 +337,12 @@ def jsonListadoChacrasFilas(values):
                         "QRFila":str(row[16]),
                         "IdCuadro":str(row[17])
                     })
-                return lista_data 
+                return lista_data
             else:
                 return lista_data
     except Exception as e:
         return lista_data
-    
+
 def crear_excel_presupuesto(lista_data, chacra, productor):
     try:
         wb = Workbook()
@@ -353,7 +353,7 @@ def crear_excel_presupuesto(lista_data, chacra, productor):
             "CANT. PLANTAS", "ID VARIEDAD", "VARIEDAD", "AÑO", "P. PODA", "P. RALEO"
         ]
         ws.append(columnas)
-        
+
         for row in lista_data:
             fila = [
                 row["Productor"],
@@ -389,7 +389,7 @@ def crear_excel_presupuesto(lista_data, chacra, productor):
                     cell.protection = Protection(locked=False)
                 else:
                     cell.protection = Protection(locked=True)
-        
+
         ws.protection.sheet = True
         nombre = f'Listado_Chacra_{chacra}_{productor}.xlsx'
         wb.save('Applications/Md_Chacras/Archivos/Excel/' + nombre)
@@ -397,7 +397,7 @@ def crear_excel_presupuesto(lista_data, chacra, productor):
     except Exception as e:
         return str(e)
 
-@csrf_exempt 
+@csrf_exempt
 def recibir_archivo_excel(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -410,7 +410,7 @@ def recibir_archivo_excel(request):
 
             if extension == '.xlsx':
                 wb = load_workbook(archivo_excel)
-                ws = wb.worksheets[0]  
+                ws = wb.worksheets[0]
                 for row in ws.iter_rows(min_row=2, values_only=True):
                     validar_fila_chacras(row)
                     lista_data.append(row)
@@ -418,14 +418,14 @@ def recibir_archivo_excel(request):
             elif extension == '.xls':
                 libro = xlrd.open_workbook(file_contents=archivo_excel.read())
                 hoja = libro.sheet_by_index(0)
-                for i in range(1, hoja.nrows): 
+                for i in range(1, hoja.nrows):
                     row = [None if cell == '' else cell for cell in hoja.row_values(i)]
                     row = tuple(row)
                     validar_fila_chacras(row)
                     lista_data.append(row)
             else:
                 raise ValueError("Formato de archivo no soportado. Solo se aceptan .xls o .xlsx")
-        
+
             if lista_data:
                 json_resultado = json_chacras(lista_data)
                 return JsonResponse({'Message': 'Success', 'Datos': json_resultado})
@@ -436,7 +436,7 @@ def recibir_archivo_excel(request):
 
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-@csrf_exempt 
+@csrf_exempt
 def recibir_archivo_excel_presupuesto(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -448,7 +448,7 @@ def recibir_archivo_excel_presupuesto(request):
             lista_data = []
             if extension == '.xlsx':
                 wb = load_workbook(archivo_excel)
-                ws = wb.worksheets[0]  
+                ws = wb.worksheets[0]
                 for row in ws.iter_rows(min_row=2, values_only=True):
                     validar_fila_presupuesto(row)
                     lista_data.append({
@@ -478,47 +478,47 @@ def recibir_archivo_excel_presupuesto(request):
 class ValidacionError(Exception):
     pass
 
-def validar_fila_chacras(row):  
+def validar_fila_chacras(row):
     try:
-        legajo = int(row[1]) 
+        legajo = int(row[1])
     except ValueError:
-        raise ValidacionError("La columna 'ID CHACRA' debe contener sólo números enteros.")  
-    
+        raise ValidacionError("La columna 'ID CHACRA' debe contener sólo números enteros.")
+
     if not str(row[7]).strip():
         raise ValidacionError("La columna 'ID CUADRO' no puede estar vacía.")
-    
+
     if row[8] is None:
         raise ValidacionError("La columna 'FILA' debe contener un valor.")
-    
+
     try:
-        variedad = int(row[11]) 
+        variedad = int(row[11])
     except ValueError:
         raise ValidacionError("La columna 'ID VARIEDAD' debe contener sólo números enteros.")
-    
+
     try:
-        anio = int(row[13]) 
+        anio = int(row[13])
     except ValueError:
         raise ValidacionError("La columna 'AÑO' debe contener sólo números enteros.")
-    
+
     try:
-        anio = int(row[14]) 
+        anio = int(row[14])
     except ValueError:
         raise ValidacionError("La columna 'N° PLANTAS' debe contener sólo números enteros.")
-    
+
     for i in [15, 16, 17, 18]:
         if not isinstance(row[i], (int, float, type(None))):
             raise ValidacionError(f"La columna {i+1} debe contener sólo números o estar vacía.")
-        
-def validar_fila_presupuesto(row):  
+
+def validar_fila_presupuesto(row):
     try:
-        legajo = int(row[9]) 
+        legajo = int(row[9])
     except ValueError:
-        raise ValidacionError("La columna AÑO' debe contener sólo números enteros.")  
-        
+        raise ValidacionError("La columna AÑO' debe contener sólo números enteros.")
+
     for i in [10, 11]:
         if not isinstance(row[i], (int, float, type(None))):
             raise ValidacionError(f"La columna {i+1} debe contener sólo números o estar vacía.")
-        
+
 def json_chacras(filas):
     resultado = {
         "Chacras": []
@@ -586,7 +586,7 @@ def json_chacras(filas):
     resultado["Chacras"] = list(chacras_dict.values())
     return resultado
 
-@csrf_exempt 
+@csrf_exempt
 def insertar_chacras(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -595,7 +595,7 @@ def insertar_chacras(request):
             Usuario = str(request.user).upper()
             chacras_json = request.POST.get('Chacras')
             datos_chacras = json.loads(chacras_json)
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:           
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 for chacra in datos_chacras['Chacras']:
                     id_chacra = chacra['IdCracra']
                     for cuadro in chacra['Cuadros']:
@@ -613,7 +613,7 @@ def insertar_chacras(request):
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-@csrf_exempt 
+@csrf_exempt
 def insertar_presupuesto(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -621,7 +621,7 @@ def insertar_presupuesto(request):
         try:
             presupuesto_json = request.POST.get('Presupuesto')
             datos_presupuesto = json.loads(presupuesto_json)
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:  
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 for row in datos_presupuesto:
                     IdCuadro = row['IdCuadro']
                     IdFila = row['Fila']
@@ -630,7 +630,7 @@ def insertar_presupuesto(request):
                     Poda = row['Poda']
                     Raleo = row['Raleo']
                     values_poda = [IdFila, IdCuadro, IdVariedad, 'P', Año, Poda]
-                    values_raleo = [IdFila, IdCuadro, IdVariedad, 'R', Año, Poda] 
+                    values_raleo = [IdFila, IdCuadro, IdVariedad, 'R', Año, Poda]
 
                     if Poda != None:
                         cursor.execute("EXEC SP_INSERTA_PRESUPUESTO %s,%s,%s,%s,%s,%s", values_poda)
@@ -686,13 +686,13 @@ def carga_inicial_listado_labores(request):
 
                 #### listado encargados
                 sql = """
-                        SELECT RTRIM(US.Usuario) AS ENCARGADO, CASE WHEN ( EM.ApellidoEmple + ' ' + EM.NombresEmple) IS NULL THEN US.Usuario 
+                        SELECT RTRIM(US.Usuario) AS ENCARGADO, CASE WHEN ( EM.ApellidoEmple + ' ' + EM.NombresEmple) IS NULL THEN US.Usuario
                             ELSE ( EM.ApellidoEmple + ' ' + EM.NombresEmple) END AS NOMBRES
-                        FROM USUARIOS AS US LEFT JOIN 
+                        FROM USUARIOS AS US LEFT JOIN
                             TresAses_ISISPayroll.dbo.Empleados AS EM ON EM.CodEmpleado = US.CodEmpleado
                         WHERE US.Estado = 'A'
                             AND US.CodEmpleado NOT IN('99999')
-                            AND US.Tipo IN ('EC','G') 
+                            AND US.Tipo IN ('EC','G')
                         ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
 
                     """
@@ -712,7 +712,61 @@ def carga_inicial_listado_labores(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-@csrf_exempt 
+@csrf_exempt
+def cuadro_personal_x_chacra(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            listado_cuadros = []
+            listado_personal = []
+            idChacra = request.POST.get('IdChacra')
+            values = [idChacra]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql_cuadros = """
+                    SELECT ID_CUADRO, NOMBRE_CUADRO
+                    FROM SPA_CUADRO
+                    WHERE ID_CHACRA = %s
+                    ORDER BY NOMBRE_CUADRO
+                    """
+                cursor.execute(sql_cuadros, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_cuadros.append({
+                            "IdCuadro": str(row[0]),
+                            "Cuadro":str(row[1])
+                        })
+
+                sql_personal = """
+                    SELECT DISTINCT(ST.ID_LEGAJO)  AS LEGAJO,
+                        CASE
+                            WHEN SC.ID_CHACRA = '1000001' THEN (SELECT CONVERT(VARCHAR(30), (ApellidoEmple + ' ' + NombresEmple)) FROM Rommik_isispayroll.dbo.Empleados WHERE CodEmpleado = ST.ID_LEGAJO)
+                            ELSE (SELECT CONVERT(VARCHAR(30), (ApellidoEmple + ' ' + NombresEmple)) FROM TresAses_ISISPayroll.dbo.Empleados WHERE CodEmpleado = ST.ID_LEGAJO)
+                        END AS NOMBRES
+                    FROM SPA_TAREA AS ST INNER JOIN
+                        SPA_QR AS QR ON QR.ID_QR = ST.ID_QR_FILA INNER JOIN
+                        SPA_CUADRO AS SC ON SC.ID_CUADRO = QR.ID_CUADRO
+                    WHERE (CONVERT(DATE,ST.FECHA) >= '2025-06-08')
+                        AND	SC.ID_CHACRA = %s
+                    ORDER BY NOMBRES
+
+                    """
+                cursor.execute(sql_personal,values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_personal.append({
+                            "Legajo":str(row[0]),
+                            "Nombre":str(row[1])
+                        })
+            return JsonResponse({'Message': 'Success', 'Cuadros': listado_cuadros, 'Personal': listado_personal})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+
+
+@csrf_exempt
 def listado_detalle_labores(request):
     if not request.user.is_authenticated:
         return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
@@ -723,12 +777,12 @@ def listado_detalle_labores(request):
             final = str(request.POST.get('Final'))
             idLegajo = str(request.POST.get('IdLegajo'))
             idChacra = str(request.POST.get('IdChacra'))
-            #idProductor = str(request.POST.get('IdProductor'))
+            idCuadro = str(request.POST.get('IdCuadro'))
             idEncargado = str(request.POST.get('IdEncargado'))
             idLabor = str(request.POST.get('IdLabor'))
-            values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor]
-            with connections['TRESASES_APLICATIVO'].cursor() as cursor:  
-                sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s  """
+            values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor,idCuadro]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s, %s  """
                 cursor.execute(sql, values)
                 consulta = cursor.fetchall()
                 if consulta:
@@ -761,6 +815,11 @@ def listado_detalle_labores(request):
 # LEGAJO	NOMBRES	FECHA	QR	ID_CUADRO	ID_CHACRA	ID_PRODUCTOR	PRODUCTOR	CHACRA	CUADRO	FILA	VARIEDADES	CANT_PLANTAS	LABOR	IMPORTE_FILA	ID_QR_FILA
 # 54009	URDANETA ALVAREZ SENEN ALBERTO	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
 # 58015	CHAMBI JOSUE RUBEN	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
+
+
+
+
+
 
 
 

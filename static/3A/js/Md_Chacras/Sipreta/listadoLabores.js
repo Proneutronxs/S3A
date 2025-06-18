@@ -19,8 +19,39 @@ document.getElementById('exportar-button').addEventListener('click', function ()
     showInnerPop();
 });
 
+desde.addEventListener("change", (event) => {
+    limpiaTabla();
+});
+
+hasta.addEventListener("change", (event) => {
+    limpiaTabla();
+})
+
 selector_productores.addEventListener("change", (event) => {
+    limpiaTabla();
     dataSubItems();
+});
+
+selector_chacras.addEventListener("change", (event) => {
+    limpiaTabla();
+    limpiaPersonalCuadros();
+    dataPersonalCuadros();
+});
+
+selector_cuadros.addEventListener("change", (event) => {
+    limpiaTabla();
+});
+
+selector_personal.addEventListener("change", (event) => {
+    limpiaTabla();
+});
+
+selector_labores.addEventListener("change", (event) => {
+    limpiaTabla();
+});
+
+selector_encargados.addEventListener("change", (event) => {
+    limpiaTabla();
 });
 
 const choiceProductor = new Choices('#selector_productores', {
@@ -42,7 +73,7 @@ const choiceChacra = new Choices('#selector_chacras', {
 const choiceCuadro = new Choices('#selector_cuadros', {
     allowHTML: true,
     shouldSort: false,
-    placeholderValue: 'SEL. CUADRO',
+    placeholderValue: 'CUADROS',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -88,22 +119,20 @@ const dataInicial = async () => {
             choiceProductor.removeActiveItems();
             choiceProductor.setChoices(result, 'value', 'label', true);
 
-            let result2 = [{
-                    value: '', label: 'TODOS'
-                }];
-            result2.push();
-            data.Personal.forEach((datos) => {
-                result2.push({
-                    value: datos.Codigo, label: datos.Descripcion
-                });
-            });
-            choicePersonal.clearChoices();
-            choicePersonal.removeActiveItems();
-            choicePersonal.setChoices(result2, 'value', 'label', true);
+            // let result2 = [{
+            //         value: '', label: 'TODOS'
+            //     }];
+            // result2.push();
+            // data.Personal.forEach((datos) => {
+            //     result2.push({
+            //         value: datos.Codigo, label: datos.Descripcion
+            //     });
+            // });
+            // choicePersonal.clearChoices();
+            // choicePersonal.removeActiveItems();
+            // choicePersonal.setChoices(result2, 'value', 'label', true);
 
-            let result3 = [{
-                    value: '', label: 'TODO'
-                }];
+            let result3 = [{value: '', label: 'TODO'}];
             result3.push();
             data.Labores.forEach((datos) => {
                 result3.push({
@@ -114,9 +143,7 @@ const dataInicial = async () => {
             choiceLabor.removeActiveItems();
             choiceLabor.setChoices(result3, 'value', 'label', true);
 
-            let result4 = [{
-                    value: '', label: 'TODOS'
-                }];
+            let result4 = [{value: '', label: 'TODOS'}];
             result4.push();
             data.Encargados.forEach((datos) => {
                 result4.push({
@@ -129,8 +156,8 @@ const dataInicial = async () => {
         } else {
             choiceProductor.clearChoices();
             choiceProductor.removeActiveItems();
-            choicePersonal.clearChoices();
-            choicePersonal.removeActiveItems();
+            // choicePersonal.clearChoices();
+            // choicePersonal.removeActiveItems();
             choiceLabor.clearChoices();
             choiceLabor.removeActiveItems();
             choiceEncargado.clearChoices();
@@ -186,6 +213,56 @@ const dataSubItems = async () => {
     }
 };
 
+const dataPersonalCuadros = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        formData.append("IdChacra", getValuesChacra());
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("chacra-personal-cuadros/", options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            let result = [{ value: '', label: 'TODO' }];
+            result.push();
+            data.Cuadros.forEach((datos) => {
+                result.push({ value: datos.IdCuadro, label: datos.Cuadro });
+            });
+            choiceCuadro.clearChoices();
+            choiceCuadro.removeActiveItems();
+            choiceCuadro.setChoices(result, 'value', 'label', true);
+
+
+            let result2 = [{ value: '', label: 'TODO' }];
+            result2.push();
+            data.Personal.forEach((datos) => {
+                result2.push({ value: datos.Legajo, label: datos.Nombre });
+            });
+            choicePersonal.clearChoices();
+            choicePersonal.removeActiveItems();
+            choicePersonal.setChoices(result2, 'value', 'label', true);
+        } else {
+            choiceCuadro.clearChoices();
+            choiceCuadro.removeActiveItems();
+            choicePersonal.clearChoices();
+            choicePersonal.removeActiveItems();
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
 const dataDateTable = async () => {
     openLoading();
     try {
@@ -196,6 +273,7 @@ const dataDateTable = async () => {
         formData.append("IdChacra", getValuesChacra());
         formData.append("IdEncargado", getValuesEncargado());
         formData.append("IdLabor", getValuesLabores());
+        formData.append("IdCuadro", getValuesCuadro());
         formData.append("Tipo", "TT");
 
         const options = {
@@ -300,8 +378,16 @@ const dataDateTable = async () => {
     }
 };
 
+function limpiaPersonalCuadros() {
+    choiceCuadro.clearChoices();
+    choiceCuadro.removeActiveItems();
+    choicePersonal.clearChoices();
+    choicePersonal.removeActiveItems();
+}
 
-
+function limpiaTabla() {
+    displayGeneral.style.visibility = 'hidden';
+}
 
 
 
@@ -451,6 +537,10 @@ function getValuesProductor() {
 
 function getValuesChacra() {
     return choiceChacra.getValue() ? choiceChacra.getValue().value : '';
+}
+
+function getValuesCuadro() {
+    return choiceCuadro.getValue() ? choiceCuadro.getValue().value : '';
 }
 
 function getValuesPersonal() {

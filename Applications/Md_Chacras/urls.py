@@ -33,6 +33,8 @@ urlpatterns = [
     path('sipreta/reportes-labores/data-inicial/', views.carga_inicial_listado_labores, name="Md_Chacras_carga_inicial_listado_labores"),
 
     path('sipreta/reportes-labores/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor_X"),
+
+    path('sipreta/reportes-labores/chacra-personal-cuadros/', views.cuadro_personal_x_chacra, name="Md_Chacras_cuadro_personal_x_chacra_X"),
     
     path('sipreta/reportes-labores/detalle-labores/', views.listado_detalle_labores, name="Md_Chacras_listado_detalle_labores"),
 
