@@ -247,7 +247,7 @@ def detalle_labores_app(request):
                             "IMPORTE_FILA": formato_moneda("$",row[14])
                         })
                         importe_total += float(row[14] or 0) # Asumiendo que row[14] es un número
-                    return JsonResponse({'Message': 'Success', 'ImporteTotal': '-', 'Datos': lista_data})   #formato_moneda("$",importe_total)
+                    return JsonResponse({'Message': 'Success', 'ImporteTotal': '0', 'Datos': lista_data})   #formato_moneda("$",importe_total)
                 else:
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
