@@ -340,7 +340,7 @@ def generar_pdf_detalle_labores(lista_data,nombre):
             pdf.cell(38, 5, str(row['VARIEDADES'])[:20], 1, 0, 'L')
             pdf.cell(10, 5, row['CANT_PLANTAS'], 1, 0, 'C')
             pdf.cell(18, 5, row['LABOR'], 1, 0, 'C')
-            pdf.multi_cell(30, 5, row['IMPORTE_PDF'], 1, 0, 'C')
+            pdf.multi_cell(30, 5, row['IMPORTE_FILA'], 1, 0, 'C')
             #pdf.ln(5)
 
         nombre_archivo = 'DetalleLabores_' + nombre + '_' + obtenerHorasArchivo() + '.pdf'  #/home/sides/MAIN S3A/S3A/Applications/Api/vistas/Sipreta/documentos
