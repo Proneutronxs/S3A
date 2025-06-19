@@ -294,7 +294,7 @@ def detalle_labores_app_pdf(request):
                             "VARIEDADES": str(row[11]),
                             "CANT_PLANTAS": str(row[12]),
                             "LABOR": str(row[13]),
-                            "IMPORTE_FILA": formato_moneda("$",str(row[14]).replace('.',','))
+                            "IMPORTE_FILA": formato_moneda("$",str(row[14]))
                         })
                         importe_total += float(row[14] or 0)
                     nombrePDF = generar_pdf_detalle_labores(lista_data,legajo)
