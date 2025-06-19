@@ -244,7 +244,7 @@ def detalle_labores_app(request):
                             "VARIEDADES": str(row[11]).replace(',','\n'),
                             "CANT_PLANTAS": row[12],
                             "LABOR": row[13],
-                            "IMPORTE_FILA": formato_moneda("$",row[14])
+                            "IMPORTE_FILA": row[14]
                         })
                         importe_total += float(row[14] or 0) # Asumiendo que row[14] es un número
                     return JsonResponse({'Message': 'Success', 'ImporteTotal': '0', 'Datos': lista_data})   #formato_moneda("$",importe_total)
@@ -340,7 +340,7 @@ def generar_pdf_detalle_labores(lista_data,nombre):
             pdf.cell(38, 5, str(row['VARIEDADES'])[:20], 1, 0, 'L')
             pdf.cell(10, 5, row['CANT_PLANTAS'], 1, 0, 'C')
             pdf.cell(18, 5, row['LABOR'], 1, 0, 'C')
-            pdf.multi_cell(30, 5, row['IMPORTE_FILA'], 1, 0, 'C')
+            pdf.multi_cell(30, 5, row['IMPORTE_PDF'], 1, 0, 'C')
             #pdf.ln(5)
 
         nombre_archivo = 'DetalleLabores_' + nombre + '_' + obtenerHorasArchivo() + '.pdf'  #/home/sides/MAIN S3A/S3A/Applications/Api/vistas/Sipreta/documentos
