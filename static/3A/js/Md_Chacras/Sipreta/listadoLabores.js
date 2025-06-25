@@ -378,6 +378,48 @@ const dataDateTable = async () => {
     }
 };
 
+const descargar_archivo = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        formData.append("Inicio", desde.value);
+        formData.append("Final", hasta.value);
+        formData.append("IdLegajo", getValuesPersonal());
+        formData.append("IdChacra", getValuesChacra());
+        formData.append("IdEncargado", getValuesEncargado());
+        formData.append("IdLabor", getValuesLabores());
+        formData.append("IdCuadro", getValuesCuadro());
+        formData.append("Archivo", getReportType());
+        formData.append("Tipo", getListadoType());
+
+        const options = {
+            method: 'POST',
+            body: formData
+        };
+
+        const response = await fetch("descarga-archivo/", options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            window.location.href = 'archivo=' + data.Archivo;
+            document.getElementById("fondo-oscuro").style.display = "none";
+            document.getElementById("popup-confirmacion").style.display = "none";
+        } else {
+            displayGeneral.style.visibility = 'hidden';
+            const nota = data.Nota || "No se pudo cargar la información";
+            const color = "red";
+            mostrarInfo(nota, color);
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        const nota = "Se produjo un error al procesar la solicitud. " + error.message;
+        const color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
 function limpiaPersonalCuadros() {
     choiceCuadro.clearChoices();
     choiceCuadro.removeActiveItems();
@@ -469,6 +511,125 @@ function showInnerPop() {
             <p>Tipo de Reporte:</p>
             <div class="vr-fila-5">
                 <div class="vr-col-btn-5 style="text-align: center;">
+                    <input type="radio" id="pdf" name="report-type" value="pdf">
+                    <label for="pdf">PDF</label>
+                    <input type="radio" id="excel" name="report-type" value="excel" checked>
+                    <label for="excel">Excel</label>
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
+            <p>Listados:</p>
+            <div class="vr-fila-5" style="display: block;">
+                <div class="vr-col-6">
+                    <div>
+                        <input type="radio" id="DP" name="listado-type" value="DP" checked>
+                        <label for="DP">Det. por Persona</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="DC" name="listado-type" value="DC">
+                        <label for="DC">Det. por Chacra</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor" style="text-align: center; margin-top: 10px;">
+            <div class="vr-fila-2">
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
+                </div>
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="descargar_archivo();" id="descargar-subir-button">DESCARGAR</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById("fondo-oscuro").style.display = "block";
+    document.getElementById("popup-confirmacion").style.display = "block";
+}
+
+function hiddenInnerPop() {
+    document.getElementById('contenido-popup').innerHTML = ``;
+    document.getElementById("fondo-oscuro").style.display = "none";
+    document.getElementById("popup-confirmacion").style.display = "none";
+}
+
+function getValuesProductor() {
+    return choiceProductor.getValue() ? choiceProductor.getValue().value : '';
+}
+
+function getValuesChacra() {
+    return choiceChacra.getValue() ? choiceChacra.getValue().value : '';
+}
+
+function getValuesCuadro() {
+    return choiceCuadro.getValue() ? choiceCuadro.getValue().value : '';
+}
+
+function getValuesPersonal() {
+    return choicePersonal.getValue() ? choicePersonal.getValue().value : '';
+}
+
+function getValuesLabores() {
+    return choiceLabor.getValue() ? choiceLabor.getValue().value : '';
+}
+
+function getValuesEncargado() {
+    return choiceEncargado.getValue() ? choiceEncargado.getValue().value : '';
+}
+
+function getReportType() {
+    return document.querySelector('input[name="report-type"]:checked').value;
+}
+
+function getListadoType() {
+    return document.querySelector('input[name="listado-type"]:checked').value;
+}
+
+function fechaActual() {
+    var fecha = new Date();
+    var mes = fecha.getMonth() + 1;
+    var dia = fecha.getDate();
+    var ano = fecha.getFullYear();
+    if (dia < 10) dia = '0' + dia;
+    if (mes < 10) mes = '0' + mes;
+    const formattedDate = `${ano}-${mes}-${dia}`;
+    const formattedDateDesde = `${ano}-${mes}-${'01'}`;
+    desde.value = formattedDateDesde;
+    hasta.value = formattedDate;
+}
+
+function mostrarInfo(Message, Color) {
+    document.getElementById("popup").classList.add("active");
+    const colorBorderMsg = document.getElementById("popup");
+    const mensaje = document.getElementById("mensaje-pop-up");
+    colorBorderMsg.style.border = `2px solid ${Color}`;
+    mensaje.innerHTML = `<p style="color: black; font-size: 13px;"><b>${Message}</b></p>`;
+
+    setTimeout(() => {
+        document.getElementById("popup").classList.remove("active");
+    }, 5000);
+}
+
+function openLoading() {
+    loadingContainer.style.display = 'flex';
+}
+
+function closeLoading() {
+    loadingContainer.style.display = 'none';
+}
+
+
+
+
+
+
+function original() {
+    document.getElementById('contenido-popup').innerHTML = `
+        <div class="carga-contenedor" style="border: 1px solid #ccc; width: 380px;">
+            <p>Tipo de Reporte:</p>
+            <div class="vr-fila-5">
+                <div class="vr-col-btn-5 style="text-align: center;">
                     <input type="radio" id="pdf" name="report-type" value="pdf" checked>
                     <label for="pdf">PDF</label>
                     <input type="radio" id="excel" name="report-type" value="excel">
@@ -478,7 +639,12 @@ function showInnerPop() {
         </div>
         <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
             <p>Listados:</p>
-            
+            <div class="vr-fila-5">
+                <div class="vr-col-btn-5" style="text-align: center;">
+                    <input type="radio" id="global" name="listado-type" value="global" checked>
+                    <label for="global">Global</label>
+                </div>
+            </div>
             <div class="vr-fila-5">
                 <div class="vr-col-6">
                     <div>
@@ -521,76 +687,4 @@ function showInnerPop() {
             </div>
         </div>
     `;
-    document.getElementById("fondo-oscuro").style.display = "block";
-    document.getElementById("popup-confirmacion").style.display = "block";
 }
-
-function hiddenInnerPop() {
-    document.getElementById('contenido-popup').innerHTML = ``;
-    document.getElementById("fondo-oscuro").style.display = "none";
-    document.getElementById("popup-confirmacion").style.display = "none";
-}
-
-function getValuesProductor() {
-    return choiceProductor.getValue() ? choiceProductor.getValue().value : '';
-}
-
-function getValuesChacra() {
-    return choiceChacra.getValue() ? choiceChacra.getValue().value : '';
-}
-
-function getValuesCuadro() {
-    return choiceCuadro.getValue() ? choiceCuadro.getValue().value : '';
-}
-
-function getValuesPersonal() {
-    return choicePersonal.getValue() ? choicePersonal.getValue().value : '';
-}
-
-function getValuesLabores() {
-    return choiceLabor.getValue() ? choiceLabor.getValue().value : '';
-}
-
-function getValuesEncargado() {
-    return choiceEncargado.getValue() ? choiceEncargado.getValue().value : '';
-}
-
-function fechaActual() {
-    var fecha = new Date();
-    var mes = fecha.getMonth() + 1;
-    var dia = fecha.getDate();
-    var ano = fecha.getFullYear();
-    if (dia < 10) dia = '0' + dia;
-    if (mes < 10) mes = '0' + mes;
-    const formattedDate = `${ano}-${mes}-${dia}`;
-    const formattedDateDesde = `${ano}-${mes}-${'01'}`;
-    desde.value = formattedDateDesde;
-    hasta.value = formattedDate;
-}
-
-function mostrarInfo(Message, Color) {
-    document.getElementById("popup").classList.add("active");
-    const colorBorderMsg = document.getElementById("popup");
-    const mensaje = document.getElementById("mensaje-pop-up");
-    colorBorderMsg.style.border = `2px solid ${Color}`;
-    mensaje.innerHTML = `<p style="color: black; font-size: 13px;"><b>${Message}</b></p>`;
-
-    setTimeout(() => {
-        document.getElementById("popup").classList.remove("active");
-    }, 5000);
-}
-
-function openLoading() {
-    loadingContainer.style.display = 'flex';
-}
-
-function closeLoading() {
-    loadingContainer.style.display = 'none';
-}
-
-// `<div class="vr-fila-5">
-//     <div class="vr-col-btn-5" style="text-align: center;">
-//         <input type="radio" id="global" name="listado-type" value="global" checked>
-//         <label for="global">Global</label>
-//     </div>
-// </div>`

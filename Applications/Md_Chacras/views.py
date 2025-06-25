@@ -816,14 +816,257 @@ def listado_detalle_labores(request):
 # 54009	URDANETA ALVAREZ SENEN ALBERTO	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
 # 58015	CHAMBI JOSUE RUBEN	14/06/2025	5107	137	1001025	5405	TRES ASES S.A.	Z	1	4	RED DEL CHAÑAR	86	PODA	25000.00	5107
 
+def convert_json_labores(json_data,tipo):
+    try:
+        if tipo == 'L':
+            result = {}
+            for item in json_data:
+                nombre = item['NOMBRES']
+                legajo = item['LEGAJO']
+                importe = float(item['IMPORTE'])
+                detalle = {
+                    'LEGAJO': str(legajo),  
+                    'FECHA': item['FECHA'],
+                    'PRODUCTOR': item['PRODUCTOR'],
+                    'CHACRA': item['CHACRA'],
+                    'CUADRO': item['CUADRO'],
+                    'FILA': item['FILA'],
+                    'QR': item['QR'],
+                    'LABOR': item['LABOR'],
+                    'IMPORTE': importe,
+                    'VARIEDADES': item['VARIEDADES'],
+                    'PLANTAS': item['CANT_PLANTAS']
+                }
+                if nombre in result:
+                    result[nombre]['IMPORTE_TOTAL'] += importe
+                    result[nombre]['DETALLES'].append(detalle)
+                else:
+                    result[nombre] = {
+                        'NOMBRES': nombre,
+                        'IMPORTE_TOTAL': importe,
+                        'DETALLES': [detalle]
+                    }
+            result_json = sorted(list(result.values()), key=lambda x: x['NOMBRES'])
+            return result_json
+        elif tipo == 'C':
+            result = {}
+            for item in json_data:
+                chacra = item['CHACRA']
+                importe = float(item['IMPORTE'])
+                detalle = {
+                    'LEGAJO': str(item['LEGAJO']),
+                    'NOMBRES': item['NOMBRES'],
+                    'FECHA': item['FECHA'],
+                    'PRODUCTOR': item['PRODUCTOR'],
+                    'CUADRO': item['CUADRO'],
+                    'FILA': item['FILA'],
+                    'QR': item['QR'],
+                    'LABOR': item['LABOR'],
+                    'IMPORTE': importe,
+                    'VARIEDADES': item['VARIEDADES'],
+                    'PLANTAS': item['CANT_PLANTAS']
+                }
+                if chacra in result:
+                    result[chacra]['IMPORTE_TOTAL'] += importe
+                    result[chacra]['DETALLES'].append(detalle)
+                else:
+                    result[chacra] = {
+                        'CHACRA': chacra,
+                        'IMPORTE_TOTAL': importe,
+                        'DETALLES': [detalle]
+                    }
+            for chacra in result:
+                result[chacra]['DETALLES'] = sorted(result[chacra]['DETALLES'], key=lambda x: x['NOMBRES'])
+
+            result_json = list(result.values())
+            return result_json
+    except Exception as e:
+        return 'e'
+
+@csrf_exempt
+def archivo_detalle_labores(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            listado_data = []
+            inicio = str(request.POST.get('Inicio'))
+            final = str(request.POST.get('Final'))
+            idLegajo = str(request.POST.get('IdLegajo'))
+            idChacra = str(request.POST.get('IdChacra'))
+            idCuadro = str(request.POST.get('IdCuadro'))
+            idEncargado = str(request.POST.get('IdEncargado'))
+            idLabor = str(request.POST.get('IdLabor'))
+            archivo = str(request.POST.get('Archivo'))
+            tipo = str(request.POST.get('Tipo'))
+            values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor,idCuadro]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s, %s  """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_data.append({
+                            "LEGAJO":row[0],
+                            "NOMBRES":row[1],
+                            "FECHA":row[2],
+                            "QR":row[3],
+                            "ID_CUADRO":row[4],
+                            "ID_CHACRA":row[5],
+                            "ID_PRODUCTOR":row[6],
+                            "PRODUCTOR":row[7],
+                            "CHACRA":row[8],
+                            "CUADRO":row[9],
+                            "FILA":row[10],
+                            "VARIEDADES":row[11],
+                            "CANT_PLANTAS":row[12],
+                            "LABOR":row[13],
+                            "IMPORTE":row[14],
+                            "ID_QR_FILA":row[15],
+                        })
+                    if archivo == 'excel':
+                        nombre_excel = crear_excel_labores(listado_data,tipo)
+                        return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel})
+                    if archivo == 'pdf':
+                        return JsonResponse({'Message': 'Error', 'Nota': 'Este tipo de Archivo aún no esta disponible.'})
+                    #return JsonResponse({'Message': 'Success', 'Datos': listado_data})
+                return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos para generar el archivo.'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
+def crear_excel_labores(jsonData,tipo):
+    if tipo == 'DC':
+        lista_data = convert_json_labores(jsonData,"C")
+        try:
+            df = pd.json_normalize(lista_data, 'DETALLES', ['CHACRA'])
+            output = BytesIO()
+            columns1 = ['CHACRA', 'NOMBRES', 'LEGAJO', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'VARIEDADES', 'PLANTAS']
+            df = df[columns1]
+            #df.fillna('', inplace=True)
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, startrow=5, sheet_name='DATA', header=columns1)
+                worksheet = writer.sheets['DATA']
+                logo = Image('static/3A/images/TA.png')  
+                logo.width = 80
+                logo.height = 50
+                worksheet.add_image(logo, 'G2')
+                worksheet['C4'] = 'DETALLE LABORES'
+                worksheet['C4'].font = Font(size=14, bold=True)
+                worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
+                fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                worksheet['E2'] = fecha_actual
+                worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
+                header_fill = PatternFill(start_color="44546a", end_color="44546a", fill_type="solid")
+                header_font = Font(color="FFFFFF")
+                header_alignment = Alignment(horizontal='center', vertical='center')
 
+                for cell in worksheet[6]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    
+                border_style = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                for row in worksheet.iter_rows(min_row=7, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
 
+                for col in worksheet.columns:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col[6:]:
+                        try:
+                            if cell.value and len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                                pass
+                    adjusted_width = (max_length + 6)
+                    worksheet.column_dimensions[column].width = adjusted_width
 
+                # for cell in worksheet['J']:
+                #    if cell.row > 6 and isinstance(cell.value, (int, float)):
+                #       cell.number_format = '#.##0,0'
+                    
+            output.seek(0)
+            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
+                f.write(output.getvalue())
 
+            return nombre_excel
+        except Exception as e:
+            return 'e'
+    if tipo == 'DP':
+        lista_data = convert_json_labores(jsonData,"L")
+        try:
+            df = pd.json_normalize(lista_data, 'DETALLES', ['NOMBRES'])
+            output = BytesIO()
+            columns1 = ['NOMBRES', 'LEGAJO', 'CHACRA', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'VARIEDADES', 'PLANTAS']
+            df = df[columns1]
+            #df.fillna('', inplace=True)
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, startrow=5, sheet_name='DATA', header=columns1)
+                worksheet = writer.sheets['DATA']
+                logo = Image('static/3A/images/TA.png')  
+                logo.width = 80
+                logo.height = 50
+                worksheet.add_image(logo, 'G2')
+                worksheet['C4'] = 'DETALLE LABORES'
+                worksheet['C4'].font = Font(size=14, bold=True)
+                worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
+                fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                worksheet['E2'] = fecha_actual
+                worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
+                header_fill = PatternFill(start_color="44546a", end_color="44546a", fill_type="solid")
+                header_font = Font(color="FFFFFF")
+                header_alignment = Alignment(horizontal='center', vertical='center')
 
+                for cell in worksheet[6]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    
+                border_style = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                for row in worksheet.iter_rows(min_row=7, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
 
+                for col in worksheet.columns:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col[6:]:
+                        try:
+                            if cell.value and len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                                pass
+                    adjusted_width = (max_length + 6)
+                    worksheet.column_dimensions[column].width = adjusted_width
+
+                # for cell in worksheet['J']:
+                #    if cell.row > 6 and isinstance(cell.value, (int, float)):
+                #       cell.number_format = '#.##0,0'
+                    
+            output.seek(0)
+            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
+                f.write(output.getvalue())
+
+            return nombre_excel
+        except Exception as e:
+            return 'e'
+
+#/home/sides/MAIN S3A/S3A/Applications/Md_Chacras/Archivos/Excel
 
 
 
