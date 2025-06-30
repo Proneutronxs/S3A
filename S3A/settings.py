@@ -101,7 +101,7 @@ WSGI_APPLICATION = 'S3A.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-###### ORIGINAL S3A
+##### ORIGINAL S3A
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -175,6 +175,14 @@ DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'DJANGOS3A',
+#         'USER': 'admindb',
+#         'PASSWORD': 'Sskvi$%$%1722',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     },
+#     'BD_DEBUG': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'DEBUG',
 #         'USER': 'admindb',
 #         'PASSWORD': 'Sskvi$%$%1722',
 #         'HOST': 'localhost',

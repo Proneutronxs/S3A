@@ -1,5 +1,5 @@
 
-from S3A.funcionesGenerales import obtenerHorasArchivo, registroRealizado
+from S3A.funcionesGenerales import obtenerHorasArchivo, registroRealizado, formatear_moneda
 from openpyxl.styles import PatternFill, Font, Border, Side
 from django.http import JsonResponse, HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
@@ -43,6 +43,13 @@ def listado_labores(request):
     user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
     if user_has_permission:
         return render (request, 'Md_Chacras/Sipreta/listadoLabores.html')
+    return render (request, 'Md_Chacras/404.html')
+
+@login_required
+def listado_labores_chacras(request):
+    user_has_permission = request.user.has_perm('Md_Chacras.puede_ingresar')
+    if user_has_permission:
+        return render (request, 'Md_Chacras/Sipreta/listadoLaboresChacra.html')
     return render (request, 'Md_Chacras/404.html')
 
 @login_required
@@ -642,8 +649,6 @@ def insertar_presupuesto(request):
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
-
 ############# LISTADO LABORES
 
 def carga_inicial_listado_labores(request):
@@ -674,7 +679,6 @@ def carga_inicial_listado_labores(request):
                                 AND EM.BajaDefinitivaEmple = '2'
                         ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
                     """
-
                 cursor.execute(sql)
                 consulta = cursor.fetchall()
                 if consulta:
@@ -696,7 +700,6 @@ def carga_inicial_listado_labores(request):
                         ORDER BY EM.ApellidoEmple + ' ' + EM.NombresEmple
 
                     """
-
                 cursor.execute(sql)
                 consulta = cursor.fetchall()
                 if consulta:
@@ -804,6 +807,8 @@ def listado_detalle_labores(request):
                             "LABOR":row[13],
                             "IMPORTE":row[14],
                             "ID_QR_FILA":row[15],
+                            "PRESUPUESTO":row[16],
+                            "SUPERFICIE":row[17]
                         })
                     return JsonResponse({'Message': 'Success', 'Datos': listado_data})
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
@@ -833,9 +838,11 @@ def convert_json_labores(json_data,tipo):
                     'FILA': item['FILA'],
                     'QR': item['QR'],
                     'LABOR': item['LABOR'],
-                    'IMPORTE': importe,
+                    'IMPORTE': formatear_moneda(importe),
+                    'PRESUPUESTO': formatear_moneda(item['PRESUPUESTO']),
                     'VARIEDADES': item['VARIEDADES'],
-                    'PLANTAS': item['CANT_PLANTAS']
+                    'PLANTAS': item['CANT_PLANTAS'],
+                    'SUPERFICIE': item['SUPERFICIE']
                 }
                 if nombre in result:
                     result[nombre]['IMPORTE_TOTAL'] += importe
@@ -863,8 +870,10 @@ def convert_json_labores(json_data,tipo):
                     'QR': item['QR'],
                     'LABOR': item['LABOR'],
                     'IMPORTE': importe,
+                    'PRESUPUESTO': item['PRESUPUESTO'],
                     'VARIEDADES': item['VARIEDADES'],
-                    'PLANTAS': item['CANT_PLANTAS']
+                    'PLANTAS': item['CANT_PLANTAS'],
+                    'SUPERFICIE': item['SUPERFICIE']
                 }
                 if chacra in result:
                     result[chacra]['IMPORTE_TOTAL'] += importe
@@ -900,6 +909,8 @@ def archivo_detalle_labores(request):
             archivo = str(request.POST.get('Archivo'))
             tipo = str(request.POST.get('Tipo'))
             values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor,idCuadro]
+            filtros = request.POST.get('Filtros')
+            filtros_dict = json.loads(filtros)
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s, %s  """
                 cursor.execute(sql, values)
@@ -923,9 +934,27 @@ def archivo_detalle_labores(request):
                             "LABOR":row[13],
                             "IMPORTE":row[14],
                             "ID_QR_FILA":row[15],
+                            "PRESUPUESTO":row[16],
+                            "SUPERFICIE":row[17],
+                            "SUM_PLANTAS":row[18],
+                            "SUM_SUPERFICIE":row[19]
                         })
+                        suma_plantas = row[18]
+                        suma_superficie = row[19]
+                    totales = {
+                        "IMPORTE": sum(item["IMPORTE"] for item in listado_data),
+                        "PRESUPUESTO": sum(item["PRESUPUESTO"] for item in listado_data),
+                        "CANT_PLANTAS": sum(item["CANT_PLANTAS"] for item in listado_data),
+                        "SUPERFICIE": sum(item["SUPERFICIE"] for item in listado_data)
+                    }
+                    totales_censo = {
+                        "SUMA_PLANTAS":suma_plantas,
+                        "SUMA_SUPERFICIE":suma_superficie,
+                        "PORCEN_PLANTAS":round(float((totales["CANT_PLANTAS"]/suma_plantas)*100),2),
+                        "PORCEN_SUPERFICIE":round(float((totales["SUPERFICIE"]/suma_superficie)*100),2) 
+                    }
                     if archivo == 'excel':
-                        nombre_excel = crear_excel_labores(listado_data,tipo)
+                        nombre_excel = crear_excel_labores(listado_data,tipo,filtros_dict,totales,totales_censo)
                         return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel})
                     if archivo == 'pdf':
                         return JsonResponse({'Message': 'Error', 'Nota': 'Este tipo de Archivo aún no esta disponible.'})
@@ -936,7 +965,7 @@ def archivo_detalle_labores(request):
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-def crear_excel_labores(jsonData,tipo):
+def crear_excel_labores(jsonData,tipo,filtros,totales,total_censo):
     if tipo == 'DC':
         lista_data = convert_json_labores(jsonData,"C")
         try:
@@ -946,13 +975,13 @@ def crear_excel_labores(jsonData,tipo):
             df = df[columns1]
             #df.fillna('', inplace=True)
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False, startrow=5, sheet_name='DATA', header=columns1)
-                worksheet = writer.sheets['DATA']
+                df.to_excel(writer, index=False, startrow=5, sheet_name='RESUMIDO POR LEGAJO', header=columns1)
+                worksheet = writer.sheets['RESUMIDO POR LEGAJO']
                 logo = Image('static/3A/images/TA.png')  
                 logo.width = 80
                 logo.height = 50
                 worksheet.add_image(logo, 'G2')
-                worksheet['C4'] = 'DETALLE LABORES'
+                worksheet['C4'] = 'DETALLE LABORES RESUMIDO POR LEGAJO'
                 worksheet['C4'].font = Font(size=14, bold=True)
                 worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
                 fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -986,7 +1015,7 @@ def crear_excel_labores(jsonData,tipo):
                                 max_length = len(str(cell.value))
                         except:
                                 pass
-                    adjusted_width = (max_length + 6)
+                    adjusted_width = (max_length + 8)
                     worksheet.column_dimensions[column].width = adjusted_width
 
                 # for cell in worksheet['J']:
@@ -1006,19 +1035,19 @@ def crear_excel_labores(jsonData,tipo):
         try:
             df = pd.json_normalize(lista_data, 'DETALLES', ['NOMBRES'])
             output = BytesIO()
-            columns1 = ['NOMBRES', 'LEGAJO', 'CHACRA', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'VARIEDADES', 'PLANTAS']
+            columns1 = ['NOMBRES', 'LEGAJO', 'CHACRA', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'PRESUPUESTO', 'VARIEDADES', 'PLANTAS', 'SUPERFICIE']
             df = df[columns1]
             #df.fillna('', inplace=True)
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False, startrow=5, sheet_name='DATA', header=columns1)
-                worksheet = writer.sheets['DATA']
+                df.to_excel(writer, index=False, startrow=9, sheet_name='DETALLADO POR LEGAJO', header=columns1)
+                worksheet = writer.sheets['DETALLADO POR LEGAJO']
                 logo = Image('static/3A/images/TA.png')  
                 logo.width = 80
                 logo.height = 50
-                worksheet.add_image(logo, 'G2')
-                worksheet['C4'] = 'DETALLE LABORES'
-                worksheet['C4'].font = Font(size=14, bold=True)
-                worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
+                worksheet.add_image(logo, 'J2')
+                worksheet['E5'] = 'LABORES POR LEGAJO'
+                worksheet['E5'].font = Font(size=14, bold=True)
+                worksheet['E5'].alignment = Alignment(horizontal='center', vertical='center')
                 fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                 worksheet['E2'] = fecha_actual
                 worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
@@ -1026,7 +1055,35 @@ def crear_excel_labores(jsonData,tipo):
                 header_font = Font(color="FFFFFF")
                 header_alignment = Alignment(horizontal='center', vertical='center')
 
-                for cell in worksheet[6]:
+                worksheet['A2'] = 'Desde:'
+                worksheet['B2'] = filtros['DESDE']
+                worksheet['A2'].font = Font(size=12, bold=True)
+
+                worksheet['A3'] = 'Hasta:'
+                worksheet['B3'] = filtros['HASTA']
+                worksheet['A3'].font = Font(size=12, bold=True)
+
+                worksheet['A4'] = 'Productor:'
+                worksheet['B4'] = filtros['PRODUCTOR']
+                worksheet['A4'].font = Font(size=12, bold=True)
+
+                worksheet['A5'] = 'Chacra:'
+                worksheet['B5'] = filtros['CHACRA']
+                worksheet['A5'].font = Font(size=12, bold=True)
+
+                worksheet['A6'] = 'Cuadro:'
+                worksheet['B6'] = filtros['CUADRO']
+                worksheet['A6'].font = Font(size=12, bold=True)
+
+                worksheet['A7'] = 'Personal:'
+                worksheet['B7'] = filtros['PERSONAL']
+                worksheet['A7'].font = Font(size=12, bold=True)
+
+                worksheet['A8'] = 'Labor:'
+                worksheet['B8'] = filtros['LABOR']
+                worksheet['A8'].font = Font(size=12, bold=True)
+
+                for cell in worksheet[10]:
                     cell.fill = header_fill
                     cell.font = header_font
                     cell.alignment = header_alignment
@@ -1037,25 +1094,58 @@ def crear_excel_labores(jsonData,tipo):
                     top=Side(style='thin'),
                     bottom=Side(style='thin')
                 )
-                for row in worksheet.iter_rows(min_row=7, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                for row in worksheet.iter_rows(min_row=11, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
                     for cell in row:
                         cell.border = border_style
 
                 for col in worksheet.columns:
                     max_length = 0
                     column = col[0].column_letter
-                    for cell in col[6:]:
+                    for cell in col[10:]:
                         try:
                             if cell.value and len(str(cell.value)) > max_length:
                                 max_length = len(str(cell.value))
                         except:
                                 pass
-                    adjusted_width = (max_length + 6)
+                    adjusted_width = (max_length + 8)
                     worksheet.column_dimensions[column].width = adjusted_width
+                    
+                worksheet.cell(row=worksheet.max_row + 1, column=9).value = "TOTALES:"
+                worksheet.cell(row=worksheet.max_row, column=10).value = formatear_moneda(totales["IMPORTE"])
+                worksheet.cell(row=worksheet.max_row, column=11).value = formatear_moneda(totales["PRESUPUESTO"])
+                worksheet.cell(row=worksheet.max_row, column=13).value = totales["CANT_PLANTAS"]
+                worksheet.cell(row=worksheet.max_row, column=14).value = totales["SUPERFICIE"]
+                
+                for i in range(9, worksheet.max_column + 1):
+                    cell = worksheet.cell(row=worksheet.max_row, column=i)
+                    cell.font = Font(bold=True)
+                    cell.border = border_style
+                
+                # Obtén la fila actual
+                fila_actual = worksheet.max_row + 2
 
-                # for cell in worksheet['J']:
-                #    if cell.row > 6 and isinstance(cell.value, (int, float)):
-                #       cell.number_format = '#.##0,0'
+                # Agrega la primera fila de información
+                worksheet.cell(row=fila_actual, column=12).value = "TOTAL CENSO:"
+                worksheet.cell(row=fila_actual, column=12).font = Font(bold=True)
+                worksheet.cell(row=fila_actual, column=13).value = total_censo["SUMA_PLANTAS"]
+                worksheet.cell(row=fila_actual, column=14).value = total_censo["SUMA_SUPERFICIE"]
+
+                # Agrega la segunda fila de información
+                fila_actual += 1
+                worksheet.cell(row=fila_actual, column=12).value = "% REALIZADO:"
+                worksheet.cell(row=fila_actual, column=12).font = Font(bold=True)
+                worksheet.cell(row=fila_actual, column=13).value = str(total_censo["PORCEN_PLANTAS"]) + ' %'
+                worksheet.cell(row=fila_actual, column=14).value = str(total_censo["PORCEN_SUPERFICIE"]) + ' %'
+
+                # Aplica borde a las celdas
+                for i in range(12, 15):
+                    for j in range(fila_actual - 1, fila_actual + 1):
+                        cell = worksheet.cell(row=j, column=i)
+                        cell.border = border_style
+                for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row):
+                    for cell in row:
+                        if cell.column_letter in ['J', 'K', 'M', 'N']:
+                            cell.alignment = Alignment(horizontal='right')
                     
             output.seek(0)
             nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'

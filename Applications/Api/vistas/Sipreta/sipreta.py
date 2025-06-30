@@ -476,7 +476,7 @@ def data_sync_labores(request):
             dataJsonBody = json.loads(body)
             USUARIO2 = dataJsonBody['Usuario']
             data_labores = dataJsonBody['DataLabores']
-            debug_error("LB"+str(USUARIO2),str(dataJsonBody))
+            debug_error("LB "+str(USUARIO2),str(dataJsonBody))
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 insertLabores = """ EXEC SP_INSERTA_LABORES %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
                 for lb in data_labores:
@@ -556,3 +556,64 @@ def data_sync_filas(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def data_sync_labores_v2(request):
+    if request.method == 'POST':
+        try:
+            body = request.body.decode('utf-8')
+            dataJsonBody = json.loads(body)
+            USUARIO2 = dataJsonBody['Usuario']
+            data_labores = dataJsonBody['DataLabores']
+            debug_error("LB "+str(USUARIO2),str(dataJsonBody))
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                insertLabores = """ EXEC SP_INSERTA_LABORES %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s """
+                for lb in data_labores:
+                    QR_FILA = lb["QR_FILA"] if lb["QR_FILA"] != "" else None
+                    QR_EMPLEADO = lb["QR_EMPLEADO"] if lb["QR_EMPLEADO"] != "" else None
+                    ID_LEGAJO = lb["ID_LEGAJO"] if lb["ID_LEGAJO"] != "" else None
+                    LABOR = lb["LABOR"] if lb["LABOR"] != "" else None
+                    ID_CHACRA = lb["ID_CHACRA"] if lb["ID_CHACRA"] != "" else None
+                    ID_CUADRO = lb["ID_CUADRO"] if lb["ID_CUADRO"] != "" else None
+                    ID_FILA = lb["ID_FILA"] if lb["ID_FILA"] != "" else None
+                    ID_VARIEDAD = lb["ID_VARIEDAD"] if lb["ID_VARIEDAD"] != "" else None
+                    CANTIDAD = lb["CANTIDAD"] if lb["CANTIDAD"] != "" else None
+                    UNIDAD = lb["UNIDAD"] if lb["UNIDAD"] != "" else None
+                    TEMPORADA = lb["TEMPORADA"] if lb["TEMPORADA"] != "" else None
+                    VALOR = lb["VALOR"] if lb["VALOR"] != "" else None
+                    FECHA_ALTA = lb["FECHA_ALTA"] if lb["FECHA_ALTA"] != "" else None
+                    USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
+                    ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
+                    TIPO_DIA = lb["TIPO_DIA"] if lb["TIPO_DIA"] != "" else None
+                    valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_LEGAJO, TIPO_DIA]
+                    #print(valuesLabores)
+                    cursor.execute(insertLabores,valuesLabores)
+            return JsonResponse({'Message': 'Success', 'Nota': 'Los Labores se insertaron correctamente.'})                  
+        except Exception as e:
+            error = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -391,6 +391,7 @@ const descargar_archivo = async () => {
         formData.append("IdCuadro", getValuesCuadro());
         formData.append("Archivo", getReportType());
         formData.append("Tipo", getListadoType());
+        formData.append("Filtros", JSON.stringify(getSelectedOptions()));
 
         const options = {
             method: 'POST',
@@ -431,8 +432,23 @@ function limpiaTabla() {
     displayGeneral.style.visibility = 'hidden';
 }
 
+function getLabel(choices) {
+    const value = choices.getValue();
+    return value && value.label ? value.label : 'TODOS';
+}
 
-
+function getSelectedOptions() {
+    return {
+        PRODUCTOR: getLabel(choiceProductor),
+        CHACRA: getLabel(choiceChacra),
+        CUADRO: getLabel(choiceCuadro),
+        PERSONAL: getLabel(choicePersonal),
+        LABOR: getLabel(choiceLabor),
+        ENCARGADO: getLabel(choiceEncargado),
+        DESDE: desde.value,
+        HASTA: hasta.value
+    };
+}
 
 
 

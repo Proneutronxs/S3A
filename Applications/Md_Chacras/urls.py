@@ -28,19 +28,22 @@ urlpatterns = [
 
 
     ##################### MODULO REPORTES LABORES
-    path('sipreta/reportes-labores/', views.listado_labores, name="Md_Chacras_listado_labores"),
+    path('sipreta/reportes-labores-personal/', views.listado_labores, name="Md_Chacras_listado_labores"),
 
-    path('sipreta/reportes-labores/data-inicial/', views.carga_inicial_listado_labores, name="Md_Chacras_carga_inicial_listado_labores"),
+    path('sipreta/reportes-labores-personal/data-inicial/', views.carga_inicial_listado_labores, name="Md_Chacras_carga_inicial_listado_labores"),
 
-    path('sipreta/reportes-labores/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor_X"),
+    path('sipreta/reportes-labores-personal/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor_X"),
 
-    path('sipreta/reportes-labores/chacra-personal-cuadros/', views.cuadro_personal_x_chacra, name="Md_Chacras_cuadro_personal_x_chacra_X"),
+    path('sipreta/reportes-labores-personal/chacra-personal-cuadros/', views.cuadro_personal_x_chacra, name="Md_Chacras_cuadro_personal_x_chacra_X"),
     
-    path('sipreta/reportes-labores/detalle-labores/', views.listado_detalle_labores, name="Md_Chacras_listado_detalle_labores"),
+    path('sipreta/reportes-labores-personal/detalle-labores/', views.listado_detalle_labores, name="Md_Chacras_listado_detalle_labores"),
     
-    path('sipreta/reportes-labores/descarga-archivo/', views.archivo_detalle_labores, name="Md_Chacras_archivo_detalle_labores"),
+    path('sipreta/reportes-labores-personal/descarga-archivo/', views.archivo_detalle_labores, name="Md_Chacras_archivo_detalle_labores"),
     
-    path('sipreta/reportes-labores/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Chacras_descarga_archivo_excel"),
+    path('sipreta/reportes-labores-personal/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Chacras_descarga_archivo_excel"),
+
+    ##################### MODULO REPORTES LABORES CHACRAS
+    path('sipreta/reportes-labores-chacras/', views.listado_labores_chacras, name="Md_Chacras_listado_labores_chacras"),
 
 
     ##################### MODULO MOBILE
