@@ -1201,7 +1201,7 @@ def horas_a_decimales(hora):
 
 
 """
-
+format
 
 SET DATEFORMAT ymd;
 DECLARE @@FechaDesde DATETIME;
