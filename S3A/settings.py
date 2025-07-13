@@ -170,7 +170,8 @@ DATABASES = {
 #
 ## SQL SERVER 2022 modificar base.py en las librerias del entorno virtual
 ###### LOCAL S3A
-# ip = '192.168.0.2'
+# ip = '192.168.0.4'     ### CASA
+# #ip = '192.168.0.2'   ### LOCAL
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

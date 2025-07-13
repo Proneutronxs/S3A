@@ -536,15 +536,17 @@ function showInnerPop() {
         </div>
         <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
             <p>Listados:</p>
-            <div class="vr-fila-5" style="display: block;">
+            <div class="vr-fila-5">
+                <div class="vr-col-6">
+                    <div>
+                        <input type="radio" id="RP" name="listado-type" value="RP">
+                        <label for="RP">Res. por Persona</label>
+                    </div>
+                </div>
                 <div class="vr-col-6">
                     <div>
                         <input type="radio" id="DP" name="listado-type" value="DP" checked>
                         <label for="DP">Det. por Persona</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="DC" name="listado-type" value="DC">
-                        <label for="DC">Det. por Chacra</label>
                     </div>
                 </div>
             </div>

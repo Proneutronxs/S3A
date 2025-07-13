@@ -911,6 +911,10 @@ def archivo_detalle_labores(request):
             values = [inicio,final,idLegajo,idChacra,idEncargado,idLabor,idCuadro]
             filtros = request.POST.get('Filtros')
             filtros_dict = json.loads(filtros)
+            if tipo == 'RP':
+                values = [inicio,final,idLegajo,idChacra,idEncargado]
+                nombre_excel = consulta_resumido_persona(values,filtros_dict)
+                return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel})
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """ EXEC SP_SELECT_DETALLE_LABORES %s, %s, %s, %s, %s, %s, %s  """
                 cursor.execute(sql, values)
@@ -958,7 +962,6 @@ def archivo_detalle_labores(request):
                         return JsonResponse({'Message': 'Success', 'Archivo': nombre_excel})
                     if archivo == 'pdf':
                         return JsonResponse({'Message': 'Error', 'Nota': 'Este tipo de Archivo aún no esta disponible.'})
-                    #return JsonResponse({'Message': 'Success', 'Datos': listado_data})
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos para generar el archivo.'})
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
@@ -1155,11 +1158,232 @@ def crear_excel_labores(jsonData,tipo,filtros,totales,total_censo):
             return nombre_excel
         except Exception as e:
             return 'e'
+    
+def crear_excel_resumido(tipo,lista_data,filtros):
+    if tipo == 'RP':
+        try:
+            df = pd.DataFrame(lista_data)
+            output = BytesIO()
+            columns1 = ['NOMBRES', 'LEGAJO', 'CANT_PLANTAS', 'LABOR', 'IMPORTE', 'VALOR_REFERENCIA', 'DIAS_TRABAJADOS', 'IMPORTE_DIA']
+            df = df[columns1]
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, startrow=9, sheet_name='RESUMIDO POR LEGAJO')
+                worksheet = writer.sheets['RESUMIDO POR LEGAJO']
+                logo = Image('static/3A/images/TA.png')  
+                logo.width = 80
+                logo.height = 50
+                worksheet.add_image(logo, 'J2')
+                worksheet['E5'] = 'RESUMIDO POR LEGAJO'
+                worksheet['E5'].font = Font(size=14, bold=True)
+                worksheet['E5'].alignment = Alignment(horizontal='center', vertical='center')
+                fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                worksheet['E2'] = fecha_actual
+                worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
+                header_fill = PatternFill(start_color="44546a", end_color="44546a", fill_type="solid")
+                header_font = Font(color="FFFFFF")
+                header_alignment = Alignment(horizontal='center', vertical='center')
+
+                worksheet['A2'] = 'Desde:'
+                worksheet['B2'] = filtros['DESDE']
+                worksheet['A2'].font = Font(size=12, bold=True)
+
+                worksheet['A3'] = 'Hasta:'
+                worksheet['B3'] = filtros['HASTA']
+                worksheet['A3'].font = Font(size=12, bold=True)
+
+                worksheet['A4'] = 'Productor:'
+                worksheet['B4'] = filtros['PRODUCTOR']
+                worksheet['A4'].font = Font(size=12, bold=True)
+
+                worksheet['A5'] = 'Chacra:'
+                worksheet['B5'] = filtros['CHACRA']
+                worksheet['A5'].font = Font(size=12, bold=True)
+
+                worksheet['A7'] = 'Personal:'
+                worksheet['B7'] = filtros['PERSONAL']
+                worksheet['A7'].font = Font(size=12, bold=True)
+
+                worksheet['A8'] = 'Labor:'
+                worksheet['B8'] = filtros['LABOR']
+                worksheet['A8'].font = Font(size=12, bold=True)
+
+                for cell in worksheet[10]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    
+                border_style = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                for row in worksheet.iter_rows(min_row=11, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
+
+                for col in worksheet.columns:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col[10:]:
+                        try:
+                            if cell.value and len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                                pass
+                    adjusted_width = (max_length + 8)
+                    worksheet.column_dimensions[column].width = adjusted_width
+                    
+                # worksheet.cell(row=worksheet.max_row + 1, column=9).value = "TOTALES:"
+                # worksheet.cell(row=worksheet.max_row, column=10).value = formatear_moneda(totales["IMPORTE"])
+                # worksheet.cell(row=worksheet.max_row, column=11).value = formatear_moneda(totales["PRESUPUESTO"])
+                # worksheet.cell(row=worksheet.max_row, column=13).value = totales["CANT_PLANTAS"]
+                # worksheet.cell(row=worksheet.max_row, column=14).value = totales["SUPERFICIE"]
+                
+                # for i in range(9, worksheet.max_column + 1):
+                #     cell = worksheet.cell(row=worksheet.max_row, column=i)
+                #     cell.font = Font(bold=True)
+                #     cell.border = border_style
+                
+                # Obtén la fila actual
+                # fila_actual = worksheet.max_row + 2
+
+                # # Agrega la primera fila de información
+                # worksheet.cell(row=fila_actual, column=12).value = "TOTAL CENSO:"
+                # worksheet.cell(row=fila_actual, column=12).font = Font(bold=True)
+                # worksheet.cell(row=fila_actual, column=13).value = total_censo["SUMA_PLANTAS"]
+                # worksheet.cell(row=fila_actual, column=14).value = total_censo["SUMA_SUPERFICIE"]
+
+                # # Agrega la segunda fila de información
+                # fila_actual += 1
+                # worksheet.cell(row=fila_actual, column=12).value = "% REALIZADO:"
+                # worksheet.cell(row=fila_actual, column=12).font = Font(bold=True)
+                # worksheet.cell(row=fila_actual, column=13).value = str(total_censo["PORCEN_PLANTAS"]) + ' %'
+                # worksheet.cell(row=fila_actual, column=14).value = str(total_censo["PORCEN_SUPERFICIE"]) + ' %'
+
+                # # Aplica borde a las celdas
+                # for i in range(12, 15):
+                #     for j in range(fila_actual - 1, fila_actual + 1):
+                #         cell = worksheet.cell(row=j, column=i)
+                #         cell.border = border_style
+                # for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row):
+                #     for cell in row:
+                #         if cell.column_letter in ['J', 'K', 'M', 'N']:
+                #             cell.alignment = Alignment(horizontal='right')
+                    
+            output.seek(0)
+            nombre_excel = f'Resumido_Persona_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
+                f.write(output.getvalue())
+
+            return nombre_excel
+        except Exception as e:
+            print(e)
+            return 'e'
 
 #/home/sides/MAIN S3A/S3A/Applications/Md_Chacras/Archivos/Excel
 
+def consulta_resumido_persona(values,filtros):
+    listado_data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """ 
+                DECLARE @Inicio DATE
+                DECLARE @Final DATE
+                DECLARE @IdLegajo VARCHAR(10)
+                DECLARE @IdChacra VARCHAR(20)
+                DECLARE @Encargado VARCHAR(20)
+                DECLARE @Labor VARCHAR(2) = ''
+                DECLARE @IdCuadro VARCHAR(10) = ''
 
+                SET @Inicio = '2025-06-01'
+                SEt @Final = '2025-06-30'
+                SET @IdLegajo = ''
+                SET @IdChacra = ''
+                SET @Encargado = ''
 
+                SELECT 
+                    CASE 
+                        WHEN ST.USUARIO = 'JCASTILLO' THEN 
+                            (SELECT CONVERT(VARCHAR(30), (ApellidoEmple + ' ' + NombresEmple)) 
+                            FROM Rommik_isispayroll.dbo.Empleados 
+                            WHERE CodEmpleado = ST.ID_LEGAJO) 
+                        ELSE 
+                            (SELECT CONVERT(VARCHAR(30), (ApellidoEmple + ' ' + NombresEmple)) 
+                            FROM TresAses_ISISPayroll.dbo.Empleados 
+                            WHERE CodEmpleado = ST.ID_LEGAJO) 
+                    END AS NOMBRES, 
+                    ST.ID_LEGAJO AS LEGAJO, 
+                    COALESCE(SUM(SPF_1.NRO_PLANTAS), 0) AS NRO_PLANTAS, 
+                    SL.NOMBRE_LABOR AS LABOR, 
+                    SUM(ST.VALOR) AS IMPORTE, 
+                    COALESCE(FORMAT(SUM(SPP_1.VALOR_REFERENCIA), '0.0'), '0.0') AS SUMA_VALOR_REFERENCIA, 
+                    CASE 
+                        WHEN P_1.DIAS_TRABAJADOS IS NULL THEN 0 
+                        ELSE P_1.DIAS_TRABAJADOS 
+                    END AS DIAS_TRABAJADOS, 
+                    CASE 
+                        WHEN P_1.DIAS_TRABAJADOS = 0.0 OR P_1.DIAS_TRABAJADOS IS NULL THEN '' 
+                        ELSE FORMAT((SUM(ST.VALOR) / P_1.DIAS_TRABAJADOS), '0.00') 
+                    END AS IMPORTE_DIA
+                    
+                FROM 
+                    SPA_QR 
+                INNER JOIN 
+                    (SELECT SPQR.ID_QR, SUM(SPF.NRO_PLANTAS) AS NRO_PLANTAS 
+                    FROM SPA_FILAS AS SPF 
+                    INNER JOIN SPA_QR AS SPQR ON SPF.ID_VARIEDAD = SPQR.ID_VARIEDAD AND SPF.ID_CUADRO = SPQR.ID_CUADRO AND SPF.ID_FILA = SPQR.ID_FILA 
+                    GROUP BY SPQR.ID_QR) AS SPF_1 ON SPA_QR.ID_QR = SPF_1.ID_QR 
+                INNER JOIN 
+                    SPA_CUADRO ON SPA_QR.ID_CUADRO = SPA_CUADRO.ID_CUADRO 
+                RIGHT OUTER JOIN 
+                    SPA_TAREA AS ST 
+                INNER JOIN 
+                    SPA_LABOR AS SL ON SL.ID_LABOR = ST.ID_LABOR ON SPF_1.ID_QR = ST.ID_QR_FILA 
+                LEFT OUTER JOIN 
+                    (SELECT SPQR.ID_QR, SUM(SPP.VALOR_REFERENCIA) AS VALOR_REFERENCIA 
+                    FROM SPA_PRESUPUESTO AS SPP 
+                    INNER JOIN SPA_QR AS SPQR ON SPP.ID_VARIEDAD = SPQR.ID_VARIEDAD AND SPP.ID_CUADRO = SPQR.ID_CUADRO AND SPP.ID_FILA = SPQR.ID_FILA 
+                    GROUP BY SPQR.ID_QR) AS SPP_1 ON SPP_1.ID_QR = ST.ID_QR_FILA 
+                LEFT OUTER JOIN 
+                    (SELECT IdLegajo, SUM(CASE WHEN P.M = 'P' THEN 0.5 ELSE 0 END + CASE WHEN P.T = 'P' THEN 0.5 ELSE 0 END) AS DIAS_TRABAJADOS 
+                    FROM S3A.dbo.RH_Presentismo AS P 
+                    WHERE (CONVERT(DATE, Fecha) >= @Inicio) AND (CONVERT(DATE, Fecha) <= @Final) AND (IdLegajo = @IdLegajo OR @IdLegajo = '') 
+                    GROUP BY IdLegajo) AS P_1 ON P_1.IdLegajo = ST.ID_LEGAJO
+                WHERE 
+                    CONVERT(DATE, ST.FECHA) >= @Inicio 
+                    AND CONVERT(DATE, ST.FECHA) <= @Final 
+                    AND (ST.ID_LEGAJO = @IdLegajo OR @IdLegajo = '') 
+                    AND (ST.ID_LABOR = @Labor OR @Labor = '') 
+                    AND (ST.USUARIO = @Encargado OR @Encargado = '')
+                    AND (SPA_CUADRO.ID_CHACRA = @IdChacra OR @IdChacra = '')
+                GROUP BY 
+                    ST.ID_LEGAJO, 
+                    ST.USUARIO, 
+                    SL.NOMBRE_LABOR, 
+                    P_1.DIAS_TRABAJADOS, 
+                    SPA_CUADRO.ID_CHACRA
+
+              """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            if results:
+                for row in results:
+                    listado_data.append({
+                        "NOMBRES":row[0],
+                        "LEGAJO":row[1],
+                        "CANT_PLANTAS":row[2],
+                        "LABOR":row[3],
+                        "IMPORTE":row[4],
+                        "VALOR_REFERENCIA":row[5],
+                        "DIAS_TRABAJADOS":row[6],
+                        "IMPORTE_DIA":row[7],
+                    })
+            nombre_excel = crear_excel_resumido('RP',listado_data,filtros)
+        return nombre_excel
+    except Exception as e:
+        print(e)
+        return 'e'
 
 
 
