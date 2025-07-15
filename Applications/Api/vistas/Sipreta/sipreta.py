@@ -623,7 +623,7 @@ def data_new_sync_labores(request):
                     USUARIO = lb["USUARIO"] if lb["USUARIO"] != "" else None
                     ESTADO = lb["ESTADO"] if lb["ESTADO"] != "" else None
                     TIPO_DIA = lb["TIPO_DIA"] if lb["TIPO_DIA"] != "" else None
-                    valuesLabores = [None, None, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_VARIEDAD, ID_LEGAJO, TIPO_DIA]
+                    valuesLabores = [QR_FILA, QR_EMPLEADO, LABOR, FECHA_ALTA, CANTIDAD, UNIDAD, VALOR, USUARIO, ID_CUADRO, ID_FILA, ID_VARIEDAD, ID_LEGAJO, TIPO_DIA]
                     cursor.execute(insertLabores,valuesLabores)
             return JsonResponse({'Message': 'Success', 'Nota': 'Los Labores se insertaron correctamente.'})                  
         except Exception as e:
