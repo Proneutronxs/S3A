@@ -1296,11 +1296,11 @@ def consulta_resumido_persona(values,filtros):
                 DECLARE @Labor VARCHAR(2) = ''
                 DECLARE @IdCuadro VARCHAR(10) = ''
 
-                SET @Inicio = '2025-06-01'
-                SEt @Final = '2025-06-30'
-                SET @IdLegajo = ''
-                SET @IdChacra = ''
-                SET @Encargado = ''
+                SET @Inicio = %s
+                SEt @Final = %s
+                SET @IdLegajo = %s
+                SET @IdChacra = %s
+                SET @Encargado = %s
 
                 SELECT 
                     CASE 
@@ -1365,7 +1365,7 @@ def consulta_resumido_persona(values,filtros):
                     SPA_CUADRO.ID_CHACRA
 
               """
-            cursor.execute(sql)
+            cursor.execute(sql, values)
             results = cursor.fetchall()
             if results:
                 for row in results:
