@@ -1288,7 +1288,7 @@ def consulta_resumido_persona(values,filtros):
     try:
         with connections['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """ 
-                EXEC SELECT_RESUMEN_LABORES %s, %s, %s, %s, %s
+                EXEC SP_SELECT_RESUMEN_LABORES %s, %s, %s, %s, %s
 
               """
             cursor.execute(sql, values)
