@@ -87,6 +87,8 @@ urlpatterns = [
 
     path('sipreta/data-sync-labores-v2/', sipreta.data_sync_labores_v2, name="sipreta_data_sync_labores_v2"),
 
+    path('sipreta/data-new-sync-labores/', sipreta.data_new_sync_labores, name="sipreta_data_new_sync_labores"),
+
     path('sipreta/data-sync-filas/', sipreta.data_sync_filas, name="sipreta_data_sync_filas"),            
 
 
