@@ -204,7 +204,8 @@ def data_listado_planilla_labores(request):
                                                     WHEN SL.ALIAS_LABOR = 'P' THEN '51'
                                                     WHEN SL.ALIAS_LABOR = 'R' THEN '52'
                                                     WHEN SL.ALIAS_LABOR = 'C' THEN '53'
-                                                END  AS CODIGO_ASISTENCIA
+                                                END  AS CODIGO_ASISTENCIA,
+                                                SL.ALIAS_LABOR AS ALIAS_LABOR
                         FROM            SPA_QR INNER JOIN
                                                 SPA_CUADRO ON SPA_QR.ID_CUADRO = SPA_CUADRO.ID_CUADRO RIGHT OUTER JOIN
                                                 SPA_TAREA AS ST INNER JOIN
@@ -220,7 +221,7 @@ def data_listado_planilla_labores(request):
                             CONVERT(DATE, FECHA) >= @Inicio 
                             AND CONVERT(DATE, FECHA) <= @Final 
                             AND (REGIS_CCO = @IdCentro OR (@IdCentro = '' AND REGIS_CCO NOT IN ('18','20')))
-                            AND (LABOR = @Labor OR @Labor = '')
+                            AND (ALIAS_LABOR = @Labor OR @Labor = '')
                         ORDER BY NOMBRES
                      """
                     cursor.execute(sql,values)  ##INSERTAR VALUES
