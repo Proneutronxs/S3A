@@ -60,7 +60,7 @@ def listaCentrosChacras(request):
                 consulta = cursor.fetchall()
                 if consulta:
                     lista_tarea = [{'Codigo': '', 'Descripcion': 'TODO'},{'Codigo': 'P', 'Descripcion': 'PODA'},{'Codigo': 'R', 'Descripcion': 'RALEO'}]
-                    lista_data = [{'Codigo': '', 'Descripcion': 'TODOS'},{'Codigo': '18', 'Descripcion': 'RMK - ROMMIK'}]
+                    lista_data = [{'Codigo': '', 'Descripcion': 'TODOS - (NO ROMMIK)'},{'Codigo': '18', 'Descripcion': 'RMK - ROMMIK'}]
                     for row in consulta:
                         codigo = str(row[0])
                         descripcion = str(row[1])
@@ -219,7 +219,7 @@ def data_listado_planilla_labores(request):
                         WHERE 
                             CONVERT(DATE, FECHA) >= @Inicio 
                             AND CONVERT(DATE, FECHA) <= @Final 
-                            AND (REGIS_CCO = @IdCentro OR @IdCentro = '')
+                            AND (REGIS_CCO = @IdCentro OR (@IdCentro = '' AND REGIS_CCO NOT IN ('18')))
                             AND (LABOR = @Labor OR @Labor = '')
                      """
                     cursor.execute(sql,values)  ##INSERTAR VALUES
