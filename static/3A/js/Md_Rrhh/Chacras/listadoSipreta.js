@@ -19,18 +19,21 @@ document.getElementById('exportar-button').addEventListener('click', function ()
     showPopDescarga();
 });
 
+desde.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+});
 
+hasta.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+})
 
+selector_centros.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+});
 
-
-
-
-
-
-
-
-
-
+selector_tareas.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+});
 
 const choiceCentro = new Choices('#selector_centros', {
     allowHTML: true,
