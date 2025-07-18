@@ -294,7 +294,6 @@ def listaCentros(request):
                     return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
         except Exception as e:
             error = str(e)
-            insertar_registro_error_sql("FUNCIONES GENERAL","LISTA CENTROS","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
         finally:
             connections['ISISPayroll'].close()

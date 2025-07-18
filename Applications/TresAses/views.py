@@ -25,7 +25,7 @@ def verificarPermisos(request, sector):
         if sector == 'Empaque':
             return JsonResponse ({'Message': 'Success', 'URL': 'empaque/'})
         if sector == 'RRHH':
-            return JsonResponse ({'Message': 'Success', 'URL': 'rrhh/'})
+            return JsonResponse ({'Message': 'Success', 'URL': 'md-rrhh/'})
         if sector == 'Frio':
             return JsonResponse ({'Message': 'Success', 'URL': 'frigorifico/'})
         if sector == 'Logistica':

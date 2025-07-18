@@ -20,6 +20,14 @@ urlpatterns = [
 
     # path('mobile/horas-extras/enviar-horas/', views.inserta_elimina_horas_extras, name="Md_Chacras_inserta_elimina_horas_extras"),
 
+    path('chacras/listado-sipreta/', views.Listado_Sipreta, name="Md_Rrhh_Listado_Sipreta"),
+
+    path('chacras/listado-sipreta/lista-centros-chacras/', views.listaCentrosChacras, name="Md_Rrhh_listaCentrosChacras"),
+
+    path('chacras/listado-sipreta/listado-labores/', views.data_listado_planilla_labores, name="Md_Rrhh_data_listado_planilla_labores"),
+
+    path('chacras/listado-sipreta/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Rrhh_descarga_archivo_excel"),
+
     
 
 ]

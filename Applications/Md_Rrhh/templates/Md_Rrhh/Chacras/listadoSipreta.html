@@ -1,0 +1,68 @@
+{% extends "Md_Rrhh/index.html" %}
+
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
+
+<div class="container-verPlus">
+    <div class="vr-encabezado">
+        <div class="vr-titulo-contenedor">
+            <div class="vr-posicion-titulo">
+                <P>LISTADO SIPRETA</P>
+            </div>
+        </div>
+        <div class="vr-fila-1-contenedor">
+            <div class="vr-fila-1">
+
+                <div class="vr-fila-2">
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-desde">
+                            <span>Desde:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-desde" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-8">
+                        <div class="vr-fecha-hasta">
+                            <span>Hasta:</span>
+                            <input type="date" onclick="this.showPicker();" id="vr-fecha-hasta" class="vr-input">
+                        </div>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_centros" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_tareas" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="busqueda-button">BUSCAR</button>
+                    </div>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="exportar-button">EXPORTAR</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="vr-contenedor-data">
+        <div class="vr-datos-tabla" id="id-contenedor-empresas">
+            <div id="tableDataResumen" class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <script src="{%static '3A/Librerias/choices.min.js' %}"></script>
+    <script src="{%static '3A/Librerias/jquery-3.6.0.min.js' %}"></script>
+
+    <script src="{%static '3A/Librerias/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{%static '3A/js/Md_Rrhh/Chacras/listadoSipreta.js' %}"></script>
+
+</div>
+{% endblock %}

@@ -50,9 +50,34 @@
                         <ul class="menu-list">
                             <li><a href="{% url 'tresases' %}">Inicio</a></li>
 
-                            <li class="menu-parent">Legajos
+                            <li><a href="{% url 'rrhh' %}">MD Antiguo</a></li>
+
+                            <li class="menu-parent">Chacras
                                 <ul class="sub-menu">
-                                    <!-- <a href="{% url 'Md_Chacras_Horas_Extras' %}">
+                                    <li class="menu-parent">Reportes
+                                        <ul class="sub-menu">
+                                            <a href="{% url 'Md_Rrhh_Listado_Sipreta' %}">
+                                                <li>Listado Sipreta</li>
+                                            </a>
+                                            <!-- <li class="menu-parent">Parametrización
+                                                <ul class="sub-menu">
+                                                    <a href="">
+                                                        <li>Base Cálculo Días</li>
+                                                    </a>
+                                                    <a href="">
+                                                        <li>Valor del Jornal</li>
+                                                    </a>
+
+                                                </ul>
+                                            </li> -->
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- <li class="menu-parent">Legajos
+                                <ul class="sub-menu">
+                                    <a href="{% url 'Md_Chacras_Horas_Extras' %}">
                                         <li>ABM</li>
                                     </a>
                                     <a href="{% url 'Md_Chacras_Horas_Extras' %}">
@@ -60,14 +85,14 @@
                                     </a>
                                     <a href="{% url 'Md_Chacras_Horas_Extras' %}">
                                         <li>Importar</li>
-                                    </a> -->
+                                    </a>
                                 </ul>
-                            </li>
+                            </li> -->
 
-                            <li class="menu-parent">Horas Extras
+                            <!-- <li class="menu-parent">Horas Extras
                                 <ul class="sub-menu">
                                     <li class="menu-parent">Carga
-                                        <!-- <ul class="sub-menu">
+                                        <ul class="sub-menu">
                                             <a href="#">
                                                 <li>Simple</li>
                                             </a>
@@ -77,7 +102,7 @@
                                             <a href="#">
                                                 <li>Por Legajos</li>
                                             </a>
-                                        </ul> -->
+                                        </ul>
                                     </li>
                                     <a href="{% url 'Md_Rrhh_Archivo_Isis' %}">
                                         <li>Busqueda / Listados</li>
@@ -86,7 +111,7 @@
                                         <li>Archivo ISIS</li>
                                     </a>
                                 </ul>
-                            </li>
+                            </li> -->
 
 
 
