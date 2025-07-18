@@ -423,11 +423,11 @@ def crear_excel_rrhh(tipo, json_data, filtros):
                             'CE': "1",
                             'CF': "1",
                             'CG': "1",
-                            'CANTIDAD': f"{float(detalle['CANTIDAD']):.2f}".replace('.', ','),
+                            'CANTIDAD': f"{float(detalle['CANTIDAD']):.2f}",
                             'CI': "1",
                             'CJ': "1",
                             'CK': "1",
-                            'IMPORTE': f"{float(detalle['IMPORTE'] or 0):.2f}".replace('.', ',')
+                            'IMPORTE': f"{float(detalle['IMPORTE'] or 0):.2f}"
                         }
                         lista_filas.append(fila)
 
@@ -454,7 +454,7 @@ def crear_excel_rrhh(tipo, json_data, filtros):
 def formatear_numero(numero):
     if not numero:
         return ''
-    return f"{float(numero):.2f}".replace('.', ',')
+    return f"{float(numero):.2f}".replace(',', '.')
 
 def formatear_importe(numero):
     if not numero:
