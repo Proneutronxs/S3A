@@ -219,8 +219,9 @@ def data_listado_planilla_labores(request):
                         WHERE 
                             CONVERT(DATE, FECHA) >= @Inicio 
                             AND CONVERT(DATE, FECHA) <= @Final 
-                            AND (REGIS_CCO = @IdCentro OR (@IdCentro = '' AND REGIS_CCO NOT IN ('18')))
+                            AND (REGIS_CCO = @IdCentro OR (@IdCentro = '' AND REGIS_CCO NOT IN ('18','20')))
                             AND (LABOR = @Labor OR @Labor = '')
+                        ORDER BY NOMBRES
                      """
                     cursor.execute(sql,values)  ##INSERTAR VALUES
                     results = cursor.fetchall()
