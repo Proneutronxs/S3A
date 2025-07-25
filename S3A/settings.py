@@ -25,7 +25,7 @@ SECRET_KEY = 'o@gi7gzjk8)i3m_gqsqu94$diq2^joa!8gr%1pi*td3e9bqi5_'
 
 # SECURITY WARNING: don't run with debug turned on in production! ##
 DEBUG = False
-
+##   source "/home/sides/MAIN S3A/env/bin/activate"
 ALLOWED_HOSTS = ['*']
 
 

@@ -340,7 +340,7 @@ function showPopDescarga() {
             </div>
         </div>
         <div class="carga-contenedor" style="text-align: center; margin-top: 10px;">
-            <div class="vr-fila-2">
+            <div class="vr-fila-2" style="gap: 25px;">
                 <div class="vr-col-btn">
                     <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
                 </div>

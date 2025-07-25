@@ -5,8 +5,8 @@
 {% block content %}
 
 <!-- AG-Grid Styles -->
-<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" /> 
+<!-- <link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" rel="stylesheet" />  -->
 <link rel="stylesheet" type="text/css" href="{%static '3A/Librerias/allTables.css' %}">
 
 <div class="container-verPlus">
@@ -21,23 +21,29 @@
                 <div class="vr-fila-2">
                     <div class="vr-col-8">
                         <div class="vr-fecha-desde">
-                            <span>Fecha Inicio:</span>
+                            <span>Desde:</span>
                             <input type="date" onclick="this.showPicker();" id="vr-fecha-desde" class="vr-input">
                         </div>
                     </div>
                     <div class="vr-col-8">
                         <div class="vr-fecha-hasta">
-                            <span>Fecha Ciere:</span>
+                            <span>Hasta:</span>
                             <input type="date" onclick="this.showPicker();" id="vr-fecha-hasta" class="vr-input">
                         </div>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_centros" class="choices_inner vr-select">
+                        </select>
+                    </div>
+                    <div class="vr-col-2">
+                        <select id="selector_legajos" class="choices_inner vr-select">
+                        </select>
                     </div>
                     <div class="vr-col-btn">
                         <button class="vr-button" id="busqueda-button">BUSCAR</button>
                     </div>
-                    <div class="vr-col-icon" id="class-bt-download">  <!-- style="display: block;" -->
-                        <a>
-                            <i class='bx material-symbols-outlined icon'>download</i>
-                        </a>
+                    <div class="vr-col-btn">
+                        <button class="vr-button" id="exportar-button">ISIS</button>
                     </div>
                 </div>
                 

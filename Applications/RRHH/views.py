@@ -611,9 +611,6 @@ def mostrarHorasArchivo(request):
             except Exception as e:
                 insertar_registro_error_sql("RRHH","mostrarHorasArchivo",str(request.user).upper(),str(e))
                 return JsonResponse ({'Message': 'Not Found', 'Nota': 'Hubo un error al intentar resolver la petición. ' + str(e) })
-            finally:
-                cursor.close()
-                connections['S3A'].close()
         else:
             return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
@@ -690,8 +687,7 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
                 ORDER BY 
                     IdLegajo;
             """
-            inicio,final = retornaInicioFinalExcel()
-            cursor.execute(sql)#,[inicio,final])
+            cursor.execute(sql)
             results = cursor.fetchall()
             data = []
             if results:
@@ -773,9 +769,6 @@ def traeHorasExtras(): ### COLUMNA 0=LEGAJO
     except Exception as e:
         insertar_registro_error_sql("RRHH","TRAE HORAS EXTRAS","request.user",str(e))
         return '0'
-    finally:
-        cursor.close()
-        connections['S3A'].close()
    
 @login_required  
 @csrf_exempt
@@ -785,7 +778,6 @@ def CreaExcelISIS(request):
         if user_has_permission:
             data_dict = traeHorasExtras() 
             if data_dict != '0':
-                file_name='horas_extras_isis.xlsx'
                 wb = openpyxl.Workbook()
                 ws = wb.active
 

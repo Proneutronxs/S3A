@@ -5,6 +5,7 @@ const loadingContainer = document.getElementById('loading-container');
 const displayGeneral = document.getElementById('id-contenedor-empresas');
 
 window.addEventListener("load", async () => {
+    dataInicial();
     fechaActual();
 });
 
@@ -13,12 +14,119 @@ document.getElementById('busqueda-button').addEventListener('click', function ()
     dataDateTable();
 });
 
+document.getElementById('exportar-button').addEventListener('click', function () {
+    showPopDescarga();
+});
+
+desde.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+});
+
+hasta.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+})
+
+
+selector_centros.addEventListener("change", (event) => {
+    displayGeneral.style.visibility = 'hidden';
+    dataSubItems();
+});
+
+const choiceCentro = new Choices('#selector_centros', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE CENTRO',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+const choiceLegajo = new Choices('#selector_legajos', {
+    allowHTML: true,
+    shouldSort: false,
+    placeholderValue: 'SELECCIONE LEGAJO',
+    searchPlaceholderValue: 'Escriba para buscar..',
+    itemSelectText: ''
+});
+
+const dataInicial = async () => {
+    openLoading();
+    try {
+        const response = await fetch("data-inicial/");
+        const data = await response.json();
+        if (data.Message === "Success") {
+            let result = [];
+            result.push();
+            data.Datos.forEach((datos) => {
+                result.push({
+                    value: datos.Codigo, label: datos.Descripcion
+                });
+            });
+
+            choiceCentro.clearChoices();
+            choiceCentro.removeActiveItems();
+
+            choiceCentro.setChoices(result, 'value', 'label', true);
+        } else {
+            choiceCentro.clearChoices();
+            choiceCentro.removeActiveItems();
+            var nota = data.Nota
+            var color = "red";
+            mostrarInfo(nota, color);
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+}
+
+const dataSubItems = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        formData.append("Centro", getValueCentro());
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("sub-data/", options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            let result = [{ value: '', label: 'TODO' }];
+            result.push();
+            data.Datos.forEach((datos) => {
+                result.push({ value: datos.Codigo, label: datos.Descripcion });
+            });
+            choiceLegajo.clearChoices();
+            choiceLegajo.removeActiveItems();
+            choiceLegajo.setChoices(result, 'value', 'label', true);
+        } else {
+            choiceLegajo.clearChoices();
+            choiceLegajo.removeActiveItems();
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
 const dataDateTable = async () => {
     openLoading();
     try {
         const formData = new FormData();
         formData.append("Incio", desde.value);
         formData.append("Final", hasta.value);
+        formData.append("Centro", getValueCentro());
+        formData.append("Legajo", getValueLegajo());
         formData.append("Archivo", 'N');
 
         const options = {
@@ -32,6 +140,7 @@ const dataDateTable = async () => {
             window.location.href = data.Redirect;
         } else if (data.Message == "Success") {
             jsonData = data.Datos;
+
             if (!Array.isArray(jsonData) || jsonData.length === 0) {
                 displayGeneral.style.visibility = 'hidden';
                 mostrarInfo("No se encontraron datos para mostrar", "orange");
@@ -74,10 +183,18 @@ const dataDateTable = async () => {
 
             try {
                 gridOptions = {
+                    rowHeight: 30,
+                    headerHeight: 32,
                     columnDefs: columnDefs,
                     rowData: tableData,
                     floatingFilter: true,
                     quickFilterText: '',
+                    defaultColDef: {
+                        resizable: true
+                    },
+                    onGridReady: function (params) {
+                        params.api.sizeColumnsToFit();
+                    }
                 };
 
                 gridDiv.classList.add("ag-theme-alpine");
@@ -87,7 +204,6 @@ const dataDateTable = async () => {
                 }
 
                 displayGeneral.style.visibility = 'visible';
-                document.getElementById("class-bt-download").style.display = "block";
             } catch (alternativeError) {
                 mostrarInfo("Error al crear la tabla: " + alternativeError.message, "red");
             }
@@ -102,6 +218,48 @@ const dataDateTable = async () => {
         const color = "red";
         mostrarInfo(nota, color);
     } finally {
+        closeLoading();
+    }
+};
+
+const descargaExcel = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        formData.append("Incio", fechaIsisDesde());
+        formData.append("Final", fechaIsisHasta());
+        formData.append("Centro", '');
+        formData.append("Legajo", '');
+        formData.append("Archivo", 'S');
+
+        const options = {
+            method: 'POST',
+            body: formData
+        };
+
+        const response = await fetch("listar-data/", options);
+        const contentType = response.headers.get('content-type');
+
+        if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+            const blob = await response.blob();
+            const excelURL = URL.createObjectURL(blob);
+            window.open(excelURL);
+            hiddenInnerPop();
+        } else {
+            const data = await response.json();
+            if (data.Message == "Not Authenticated") {
+                window.location.href = data.Redirect;
+            } else {
+                var nota = data.Nota || data.Message;
+                var color = "red";
+                mostrarInfo(nota, color);
+            }
+        }
+    } catch (error) {
+        const nota = "Se produjo un error al procesar la solicitud. " + error.message;
+        const color = "red";
+        mostrarInfo(nota, color);
+    }  finally {
         closeLoading();
     }
 };
@@ -180,15 +338,72 @@ const dataDateTable = async () => {
 
 
 
+function fechaIsisDesde() {
+    return document.getElementById('desde-isis').value;
+}
 
+function fechaIsisHasta() {
+    return document.getElementById('hasta-isis').value;
+}
 
+function Inicio() {
+    const fechaDesde = document.getElementById('vr-fecha-desde').value;
+    return fechaDesde;
+}
 
+function Final() {
+    const fechaHasta = document.getElementById('vr-fecha-hasta').value;
+    return fechaHasta;
+}
 
+function getValueCentro() {
+    return choiceCentro.getValue() ? choiceCentro.getValue().value : '';
+}
 
+function getValueLegajo() {
+    return choiceLegajo.getValue() ? choiceLegajo.getValue().value : '';
+}
 
+function showPopDescarga() {
 
+    document.getElementById('contenido-popup').innerHTML = `
+        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px; width: 400px;">
+            <p>ARCHIVO ISIS</p>
+            <div class="vr-fila-5">
+                <div class="vr-col-6">
+                    <div>
+                        <span>Desde:</span>
+                        <input type="date" onclick="this.showPicker();" id="desde-isis" class="vr-input" value="${Inicio()}">
+                    </div>
+                </div>
+                <div class="vr-col-6">
+                    <div>
+                        <span>Hasta:</span>
+                        <input type="date" onclick="this.showPicker();" id="hasta-isis" class="vr-input" value="${Final()}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carga-contenedor" style="text-align: center; margin-top: 10px;">
+            <div class="vr-fila-2" style="gap: 25px;">
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
+                </div>
+                <div class="vr-col-btn">
+                    <button class="vr-button" onclick="descargaExcel();" id="descargar-subir-button">DESCARGAR</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById("fondo-oscuro").style.display = "block";
+    document.getElementById("popup-confirmacion").style.display = "block";
+}
 
-
+function hiddenInnerPop() {
+    document.getElementById('contenido-popup').innerHTML = ``;
+    document.getElementById("fondo-oscuro").style.display = "none";
+    document.getElementById("popup-confirmacion").style.display = "none";
+}
 
 function fechaActual() {
     var fecha = new Date();
