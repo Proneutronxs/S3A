@@ -34,23 +34,19 @@ selector_productores.addEventListener("change", (event) => {
 
 selector_chacras.addEventListener("change", (event) => {
     limpiaTabla();
-    limpiaPersonalCuadros();
-    dataPersonalCuadros();
+    dataSubItemsCuadros();
+});
+
+selector_especies.addEventListener("change", (event) => {
+    limpiaTabla();
+    dataSubItemsVariedades();
 });
 
 selector_cuadros.addEventListener("change", (event) => {
     limpiaTabla();
 });
 
-selector_personal.addEventListener("change", (event) => {
-    limpiaTabla();
-});
-
-selector_labores.addEventListener("change", (event) => {
-    limpiaTabla();
-});
-
-selector_encargados.addEventListener("change", (event) => {
+selector_variedades.addEventListener("change", (event) => {
     limpiaTabla();
 });
 
@@ -73,23 +69,23 @@ const choiceChacra = new Choices('#selector_chacras', {
 const choiceCuadro = new Choices('#selector_cuadros', {
     allowHTML: true,
     shouldSort: false,
-    placeholderValue: 'CUADROS',
+    placeholderValue: 'SELECCIONE CUADRO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
 
-const choicePersonal = new Choices('#selector_personal', {
+const choiceEspecie = new Choices('#selector_especies', {
     allowHTML: true,
     shouldSort: false,
-    placeholderValue: 'SELECCIONE PERSONAL',
+    placeholderValue: 'SELECCIONE ESPECIE',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
 
-const choiceLabor = new Choices('#selector_labores', {
+const choiceVariedad = new Choices('#selector_variedades', {
     allowHTML: true,
     shouldSort: false,
-    placeholderValue: 'SELECCIONE LABOR',
+    placeholderValue: 'SELECCIONE VARIEDAD',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -97,7 +93,7 @@ const choiceLabor = new Choices('#selector_labores', {
 const choiceEncargado = new Choices('#selector_encargados', {
     allowHTML: true,
     shouldSort: false,
-    placeholderValue: 'SELECCIONE ENCARGADO',
+    //placeholderValue: 'SELECCIONE ENCARGADO',
     searchPlaceholderValue: 'Escriba para buscar..',
     itemSelectText: ''
 });
@@ -110,58 +106,30 @@ const dataInicial = async () => {
         if (data.Message === "Success") {
             let result = [];
             result.push();
-            data.Productores.forEach((datos) => {
+            data.Datos.forEach((datos) => {
                 result.push({
-                    value: datos.Codigo, label: datos.Descripcion
+                    value: datos.IdProductor, label: datos.Descripcion
                 });
             });
             choiceProductor.clearChoices();
             choiceProductor.removeActiveItems();
             choiceProductor.setChoices(result, 'value', 'label', true);
 
-            // let result2 = [{
-            //         value: '', label: 'TODOS'
-            //     }];
-            // result2.push();
-            // data.Personal.forEach((datos) => {
-            //     result2.push({
-            //         value: datos.Codigo, label: datos.Descripcion
-            //     });
-            // });
-            // choicePersonal.clearChoices();
-            // choicePersonal.removeActiveItems();
-            // choicePersonal.setChoices(result2, 'value', 'label', true);
-
-            let result3 = [{value: '', label: 'TODO'}];
-            result3.push();
-            data.Labores.forEach((datos) => {
-                result3.push({
-                    value: datos.Codigo, label: datos.Descripcion
+            let result1 = [{ value: '', label: 'TODO' }];
+            result1.push();
+            data.Especies.forEach((datos) => {
+                result1.push({
+                    value: datos.IdEspecie, label: datos.Descripcion
                 });
             });
-            choiceLabor.clearChoices();
-            choiceLabor.removeActiveItems();
-            choiceLabor.setChoices(result3, 'value', 'label', true);
-
-            let result4 = [{value: '', label: 'TODOS'}];
-            result4.push();
-            data.Encargados.forEach((datos) => {
-                result4.push({
-                    value: datos.Codigo, label: datos.Descripcion
-                });
-            });
-            choiceEncargado.clearChoices();
-            choiceEncargado.removeActiveItems();
-            choiceEncargado.setChoices(result4, 'value', 'label', true);
+            choiceEspecie.clearChoices();
+            choiceEspecie.removeActiveItems();
+            choiceEspecie.setChoices(result1, 'value', 'label', true);
         } else {
             choiceProductor.clearChoices();
             choiceProductor.removeActiveItems();
-            // choicePersonal.clearChoices();
-            // choicePersonal.removeActiveItems();
-            choiceLabor.clearChoices();
-            choiceLabor.removeActiveItems();
-            choiceEncargado.clearChoices();
-            choiceEncargado.removeActiveItems();
+            choiceEspecie.clearChoices();
+            choiceEspecie.removeActiveItems();
             var nota = data.Nota
             var color = "red";
             mostrarInfo(nota, color);
@@ -213,7 +181,45 @@ const dataSubItems = async () => {
     }
 };
 
-const dataPersonalCuadros = async () => {
+const dataSubItemsVariedades = async () => {
+    openLoading();
+    try {
+        const formData = new FormData();
+        formData.append("IdEspecie", getValuesEspecie());
+        const options = {
+            method: 'POST',
+            headers: {
+            },
+            body: formData
+        };
+
+        const response = await fetch("especie-variedad/", options);
+        const data = await response.json();
+        if (data.Message == "Not Authenticated") {
+            window.location.href = data.Redirect;
+        } else if (data.Message == "Success") {
+            let result = [{ value: '', label: 'TODO' }];
+            result.push();
+            data.Datos.forEach((datos) => {
+                result.push({ value: datos.IdVariedad, label: datos.Descripcion });
+            });
+            choiceVariedad.clearChoices();
+            choiceVariedad.removeActiveItems();
+            choiceVariedad.setChoices(result, 'value', 'label', true);
+        } else {
+            choiceVariedad.clearChoices();
+            choiceVariedad.removeActiveItems();
+        }
+        closeLoading();
+    } catch (error) {
+        closeLoading();
+        var nota = "Se produjo un error al procesar la solicitud. " + error;
+        var color = "red";
+        mostrarInfo(nota, color);
+    }
+};
+
+const dataSubItemsCuadros = async () => {
     openLoading();
     try {
         const formData = new FormData();
@@ -225,34 +231,22 @@ const dataPersonalCuadros = async () => {
             body: formData
         };
 
-        const response = await fetch("chacra-personal-cuadros/", options);
+        const response = await fetch("chacra-cuadro/", options);
         const data = await response.json();
         if (data.Message == "Not Authenticated") {
             window.location.href = data.Redirect;
         } else if (data.Message == "Success") {
             let result = [{ value: '', label: 'TODO' }];
             result.push();
-            data.Cuadros.forEach((datos) => {
-                result.push({ value: datos.IdCuadro, label: datos.Cuadro });
+            data.Datos.forEach((datos) => {
+                result.push({ value: datos.IdCuadro, label: datos.Descripcion });
             });
             choiceCuadro.clearChoices();
             choiceCuadro.removeActiveItems();
             choiceCuadro.setChoices(result, 'value', 'label', true);
-
-
-            let result2 = [{ value: '', label: 'TODO' }];
-            result2.push();
-            data.Personal.forEach((datos) => {
-                result2.push({ value: datos.Legajo, label: datos.Nombre });
-            });
-            choicePersonal.clearChoices();
-            choicePersonal.removeActiveItems();
-            choicePersonal.setChoices(result2, 'value', 'label', true);
         } else {
             choiceCuadro.clearChoices();
             choiceCuadro.removeActiveItems();
-            choicePersonal.clearChoices();
-            choicePersonal.removeActiveItems();
         }
         closeLoading();
     } catch (error) {
@@ -269,19 +263,17 @@ const dataDateTable = async () => {
         const formData = new FormData();
         formData.append("Inicio", desde.value);
         formData.append("Final", hasta.value);
-        formData.append("IdLegajo", getValuesPersonal());
         formData.append("IdChacra", getValuesChacra());
-        formData.append("IdEncargado", getValuesEncargado());
-        formData.append("IdLabor", getValuesLabores());
         formData.append("IdCuadro", getValuesCuadro());
-        formData.append("Tipo", "TT");
+        formData.append("IdEspecie", getValuesEspecie());
+        formData.append("IdVariedad", getValuesVariedad());
 
         const options = {
             method: 'POST',
             body: formData
         };
 
-        const response = await fetch("detalle-labores/", options);
+        const response = await fetch("data-chacras/", options);
         const data = await response.json();
         if (data.Message == "Not Authenticated") {
             window.location.href = data.Redirect;
@@ -296,45 +288,38 @@ const dataDateTable = async () => {
             }
 
             const tableData = jsonData.map((datos) => ({
-                Legajo: String(datos.LEGAJO || ""),
-                Nombres: String(datos.NOMBRES || ""),
-                Fecha: String(datos.FECHA || ""),
-                Productor: String(datos.PRODUCTOR || ""),
                 Chacra: String(datos.CHACRA || ""),
+                Fecha: String(datos.FECHA || ""),
                 Cuadro: String(datos.CUADRO || ""),
                 Fila: String(datos.FILA || ""),
-                Qr: String(datos.QR || ""),
-                Importe: String(formatoMoneda(datos.IMPORTE) || ""),
-                Labor: String(datos.LABOR || ""),
-                Variedades: String(datos.VARIEDADES || ""),
                 CantPlantas: String(datos.CANT_PLANTAS || ""),
-                // NroPlantas: String(datos.NroPlantas || ""),
-                // DFilas: String(datos.DFilas || ""),
-                // DPlantas: String(datos.DPlantas || ""),
-                // SupPlanta: String(datos.SupPlanta || ""),
-                // Presupuesto: String(datos.Presupuesto || ""),
-                // QRFila: String(datos.QRFila || ""),
+                Labor: String(datos.LABOR || ""),
+                ImporteFila: String(formatoMoneda(datos.IMPORTE_FILA) || ""),
+                Variedades: String(datos.VARIEDADES || ""),
+                Presupuesto: String(formatoMoneda(datos.PRESUPUESTO) || ""),
+                Porcentaje: String(datos.PORCENTAJE || ""),
+                Superficie: String(datos.SUPERFICIE || ""),
             }));
 
             const columnDefs = [
-                { headerName: "LEGAJO", field: "Legajo", filter: true, sortable: true, width: 80, cellClass: 'cell-center' },
-                { headerName: "NOMBRES", field: "Nombres", filter: true, sortable: true, width: 180 },
-                { headerName: "FECHA", field: "Fecha", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
-                { headerName: "PRODUCTOR", field: "Productor", filter: true, sortable: true, width: 180 },
                 { headerName: "CHACRA", field: "Chacra", filter: true, sortable: true, width: 180 },
+                { headerName: "FECHA", field: "Fecha", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "CUADRO", field: "Cuadro", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
                 { headerName: "FILA", field: "Fila", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
-                { headerName: "QR", field: "Qr", filter: true, sortable: true, width: 100, cellClass: 'cell-center' },
-                { headerName: "IMPORTE", field: "Importe", filter: true, sortable: true, width: 120, cellClass: 'cell-center' },
+                { headerName: "CANT. PLANTAS", field: "CantPlantas", filter: true, sortable: true, width: 80, cellClass: 'cell-center' },
                 { headerName: "LABOR", field: "Labor", filter: true, sortable: true, width: 100, cellClass: 'cell-center'  },
                 { headerName: "VARIEDADES", field: "Variedades", filter: true, sortable: true, width: 180},
-                { headerName: "CANT. PLANTAS", field: "CantPlantas", filter: true, sortable: true, width: 80, cellClass: 'cell-center' },
+                { headerName: "IMPORTE", field: "ImporteFila", filter: true, sortable: true, width: 120, cellClass: 'cell-center' },
+                { headerName: "PRESUPUESTO", field: "Presupuesto", filter: true, sortable: true, width: 120, cellClass: 'cell-center' },
+                { headerName: "PORCENTAJE", field: "Porcentaje", filter: true, sortable: true, width: 100, cellClass: 'cell-center'  },
+                { headerName: "SUPERFICIE", field: "Superficie", filter: true, sortable: true, width: 120, cellClass: 'cell-center' },
             ];
 
             const gridDiv = document.getElementById('tableDataResumen');
             if (!gridDiv) {
                 return;
             }
+
             gridDiv.innerHTML = '';
             try {
                 gridOptions = {
@@ -378,18 +363,16 @@ const dataDateTable = async () => {
     }
 };
 
-const descargar_archivo = async () => {
+const dataDateArchivo = async () => {
     openLoading();
     try {
         const formData = new FormData();
         formData.append("Inicio", desde.value);
         formData.append("Final", hasta.value);
-        formData.append("IdLegajo", getValuesPersonal());
         formData.append("IdChacra", getValuesChacra());
-        formData.append("IdEncargado", getValuesEncargado());
-        formData.append("IdLabor", getValuesLabores());
         formData.append("IdCuadro", getValuesCuadro());
-        formData.append("Archivo", getReportType());
+        formData.append("IdEspecie", getValuesEspecie());
+        formData.append("IdVariedad", getValuesVariedad());
         formData.append("Tipo", getListadoType());
         formData.append("Filtros", JSON.stringify(getSelectedOptions()));
 
@@ -398,7 +381,7 @@ const descargar_archivo = async () => {
             body: formData
         };
 
-        const response = await fetch("descarga-archivo/", options);
+        const response = await fetch("archivo-chacras/", options);
         const data = await response.json();
         if (data.Message == "Not Authenticated") {
             window.location.href = data.Redirect;
@@ -421,17 +404,6 @@ const descargar_archivo = async () => {
     }
 };
 
-function limpiaPersonalCuadros() {
-    choiceCuadro.clearChoices();
-    choiceCuadro.removeActiveItems();
-    choicePersonal.clearChoices();
-    choicePersonal.removeActiveItems();
-}
-
-function limpiaTabla() {
-    displayGeneral.style.visibility = 'hidden';
-}
-
 function getLabel(choices) {
     const value = choices.getValue();
     return value && value.label ? value.label : 'TODOS';
@@ -442,9 +414,9 @@ function getSelectedOptions() {
         PRODUCTOR: getLabel(choiceProductor),
         CHACRA: getLabel(choiceChacra),
         CUADRO: getLabel(choiceCuadro),
-        PERSONAL: getLabel(choicePersonal),
-        LABOR: getLabel(choiceLabor),
-        ENCARGADO: getLabel(choiceEncargado),
+        ESPECIE: getLabel(choiceEspecie),
+        //LABOR: getLabel(choiceLabor),
+        VARIEDAD: getLabel(choiceVariedad),
         DESDE: desde.value,
         HASTA: hasta.value
     };
@@ -470,83 +442,21 @@ function getSelectedOptions() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function showInnerPop() {
     document.getElementById('contenido-popup').innerHTML = `
-        <div class="carga-contenedor" style="border: 1px solid #ccc; width: 380px;">
-            <p>Tipo de Reporte:</p>
-            <div class="vr-fila-5">
-                <div class="vr-col-btn-5 style="text-align: center;">
-                    <input type="radio" id="pdf" name="report-type" value="pdf">
-                    <label for="pdf">PDF</label>
-                    <input type="radio" id="excel" name="report-type" value="excel" checked>
-                    <label for="excel">Excel</label>
-                </div>
-            </div>
-        </div>
-        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
-            <p>Listados:</p>
+        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px; width: 380px;">
+            <p>LISTADOS CHACRAS:</p>
             <div class="vr-fila-5">
                 <div class="vr-col-6">
                     <div>
                         <input type="radio" id="RP" name="listado-type" value="RP">
-                        <label for="RP">Res. por Persona</label>
+                        <label for="RP">Res. por Chacra</label>
                     </div>
                 </div>
                 <div class="vr-col-6">
                     <div>
                         <input type="radio" id="DP" name="listado-type" value="DP" checked>
-                        <label for="DP">Det. por Persona</label>
+                        <label for="DP">Det. por Chacra</label>
                     </div>
                 </div>
             </div>
@@ -557,7 +467,7 @@ function showInnerPop() {
                     <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
                 </div>
                 <div class="vr-col-btn">
-                    <button class="vr-button" onclick="descargar_archivo();" id="descargar-subir-button">DESCARGAR</button>
+                    <button class="vr-button" onclick="dataDateArchivo();" id="descargar-subir-button">DESCARGAR</button>
                 </div>
             </div>
         </div>
@@ -584,24 +494,20 @@ function getValuesCuadro() {
     return choiceCuadro.getValue() ? choiceCuadro.getValue().value : '';
 }
 
-function getValuesPersonal() {
-    return choicePersonal.getValue() ? choicePersonal.getValue().value : '';
+function getValuesEspecie() {
+    return choiceEspecie.getValue() ? choiceEspecie.getValue().value : '';
 }
 
-function getValuesLabores() {
-    return choiceLabor.getValue() ? choiceLabor.getValue().value : '';
-}
-
-function getValuesEncargado() {
-    return choiceEncargado.getValue() ? choiceEncargado.getValue().value : '';
-}
-
-function getReportType() {
-    return document.querySelector('input[name="report-type"]:checked').value;
+function getValuesVariedad() {
+    return choiceVariedad.getValue() ? choiceVariedad.getValue().value : '';
 }
 
 function getListadoType() {
     return document.querySelector('input[name="listado-type"]:checked').value;
+}
+
+function limpiaTabla() {
+    displayGeneral.style.visibility = 'hidden';
 }
 
 function fechaActual() {
@@ -643,73 +549,15 @@ function formatoMoneda(valor) {
     const parteDecimal = numero.toFixed(2).split('.')[1];
     return `$ ${parteEntera},${parteDecimal}`;
 }
+ // style="gap: 25px;"
 
 
 
 
 
 
-function original() {
-    document.getElementById('contenido-popup').innerHTML = `
-        <div class="carga-contenedor" style="border: 1px solid #ccc; width: 380px;">
-            <p>Tipo de Reporte:</p>
-            <div class="vr-fila-5">
-                <div class="vr-col-btn-5 style="text-align: center;">
-                    <input type="radio" id="pdf" name="report-type" value="pdf" checked>
-                    <label for="pdf">PDF</label>
-                    <input type="radio" id="excel" name="report-type" value="excel">
-                    <label for="excel">Excel</label>
-                </div>
-            </div>
-        </div>
-        <div class="carga-contenedor" style="border: 1px solid #ccc; margin-top: 5px;">
-            <p>Listados:</p>
-            <div class="vr-fila-5">
-                <div class="vr-col-btn-5" style="text-align: center;">
-                    <input type="radio" id="global" name="listado-type" value="global" checked>
-                    <label for="global">Global</label>
-                </div>
-            </div>
-            <div class="vr-fila-5">
-                <div class="vr-col-6">
-                    <div>
-                        <input type="radio" id="R" name="listado-type" value="R" checked>
-                        <label for="R">Resumido</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="RP" name="listado-type" value="RP">
-                        <label for="RP">Res. por Persona</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="RC" name="listado-type" value="RC">
-                        <label for="RC">Res. por Chacra</label>
-                    </div>
-                </div>
-                <div class="vr-col-6">
-                    <div>
-                        <input type="radio" id="D" name="listado-type" value="D">
-                        <label for="D">Detallado</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="DP" name="listado-type" value="DP">
-                        <label for="DP">Det. por Persona</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="DC" name="listado-type" value="DC">
-                        <label for="DC">Det. por Chacra</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="carga-contenedor" style="text-align: center; margin-top: 10px;">
-            <div class="vr-fila-2">
-                <div class="vr-col-btn">
-                    <button class="vr-button" onclick="hiddenInnerPop();" id="cancelar-descarga-button">CANCELAR</button>
-                </div>
-                <div class="vr-col-btn">
-                    <button class="vr-button" onclick="mostrarInfo('No disponible.','red');" id="descargar-subir-button">DESCARGAR</button>
-                </div>
-            </div>
-        </div>
-    `;
-}
+
+
+
+
+

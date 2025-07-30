@@ -45,6 +45,20 @@ urlpatterns = [
     ##################### MODULO REPORTES LABORES CHACRAS
     path('sipreta/reportes-labores-chacras/', views.listado_labores_chacras, name="Md_Chacras_listado_labores_chacras"),
 
+    path('sipreta/reportes-labores-chacras/data-inicial/', views.listado_combox_productor, name="Md_Chacras_carga_inicial_listado_labores_chacras"),
+
+    path('sipreta/reportes-labores-chacras/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Chacras_listado_combox_chacras_x_productor_chacras"),
+
+    path('sipreta/reportes-labores-chacras/especie-variedad/', views.listado_combox_variedades_x_especies, name="Md_Chacras_listado_combox_variedades_x_especies_chacras"),
+
+    path('sipreta/reportes-labores-chacras/chacra-cuadro/', views.listado_combox_cuadros_x_chacra, name="Md_Chacras_listado_combox_cuadros_x_chacra_chacras"),
+
+    path('sipreta/reportes-labores-chacras/data-chacras/', views.archivo_detalle_labores_chacras, name="Md_Chacras_archivo_detalle_labores_chacras_chacras"),
+
+    path('sipreta/reportes-labores-chacras/archivo-chacras/', views.crea_archivo_detalle_labores_chacras, name="Md_Chacras_crea_archivo_detalle_labores_chacras_chacras"),
+    
+    path('sipreta/reportes-labores-chacras/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Chacras_descarga_archivo_excel_chacras"),
+
 
     ##################### MODULO MOBILE
     path('mobile/horas-extras/', views.Horas_Extras, name="Md_Chacras_Horas_Extras"),

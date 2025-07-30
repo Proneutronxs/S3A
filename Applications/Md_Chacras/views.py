@@ -240,6 +240,7 @@ def listado_combox_productor(request):
     if request.method == 'GET':
         try:
             lista_data = []
+            lista_especies = []
             with connections['TRESASES_APLICATIVO'].cursor() as cursor:
                 sql = """
                         EXEC LISTADO_PRODUCTORES_HABILITADOS
@@ -252,8 +253,21 @@ def listado_combox_productor(request):
                             "IdProductor":str(row[0]),
                             "Descripcion":str(row[1])
                         })
+                sql_especies = """
+                        EXEC LISTADO_ESPECIES_HABILITADAS
+                """
+                cursor.execute(sql_especies)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        lista_especies.append({
+                            "IdEspecie":str(row[0]),
+                            "Descripcion":str(row[1])
+                        })
+
+
             if lista_data:
-                return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Especies':lista_especies})
             else:
                 data = "No se encontraron Datos."
                 return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -285,6 +299,68 @@ def listado_combox_chacras_x_productor(request):
                             "Descripcion":str(row[1])
                         })
                     return JsonResponse({'Message': 'Success', 'Datos': lista_data, 'Chacras':lista_data})
+                else:
+                    data = "No se encontraron Datos."
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def listado_combox_variedades_x_especies(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            idProductor = str(request.POST.get('IdEspecie'))
+            values = [idProductor]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                        EXEC LISTADO_VARIEDADES_X_ESPECIE  %s
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = [] #{'IdChacra': '', 'Descripcion':'TODOS'}
+                    for row in consulta:
+                        lista_data.append({
+                            "IdVariedad":str(row[0]),
+                            "Descripcion":str(row[1])
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    data = "No se encontraron Datos."
+                    return JsonResponse({'Message': 'Error', 'Nota': data})
+        except Exception as e:
+            data = str(e)
+            return JsonResponse({'Message': 'Error', 'Nota': data})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+@csrf_exempt
+def listado_combox_cuadros_x_chacra(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            idChacra = str(request.POST.get('IdChacra'))
+            values = [idChacra]
+            with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                        EXEC LISTADO_CUADROS_X_CHACRA %s
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = [] 
+                    for row in consulta:
+                        lista_data.append({
+                            "IdCuadro":str(row[0]),
+                            "Descripcion":str(row[1])
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                 else:
                     data = "No se encontraron Datos."
                     return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -768,7 +844,6 @@ def cuadro_personal_x_chacra(request):
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-
 @csrf_exempt
 def listado_detalle_labores(request):
     if not request.user.is_authenticated:
@@ -966,7 +1041,6 @@ def archivo_detalle_labores(request):
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 def crear_excel_labores(jsonData,tipo,filtros,totales,total_censo):
     if tipo == 'DC':
@@ -1308,15 +1382,282 @@ def consulta_resumido_persona(values,filtros):
             nombre_excel = crear_excel_resumido('RP',listado_data,filtros)
         return nombre_excel
     except Exception as e:
-        print(e)
         return 'e'
 
 
+@csrf_exempt
+def archivo_detalle_labores_chacras(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            listado_data = []
+            inicio = str(request.POST.get('Inicio'))
+            final = str(request.POST.get('Final'))
+            idChacra = str(request.POST.get('IdChacra'))
+            idCuadro = str(request.POST.get('IdCuadro'))
+            # idLabor = str(request.POST.get('IdLabor'))
+            idEspecie = str(request.POST.get('IdEspecie'))
+            idVariedad = str(request.POST.get('IdVariedad'))
+            values = [inicio,final,idChacra,idCuadro,idEspecie,idVariedad]
+            jsonDetalleChacras = consulta_detallado_chacra(values)
+            if jsonDetalleChacras:
+                return JsonResponse({'Message': 'Success', 'Datos': jsonDetalleChacras})
+            return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def crea_archivo_detalle_labores_chacras(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'Message': 'Not Authenticated', 'Redirect': '/'})
+    if request.method == 'POST':
+        try:
+            listado_data = []
+            inicio = str(request.POST.get('Inicio'))
+            final = str(request.POST.get('Final'))
+            idChacra = str(request.POST.get('IdChacra'))
+            idCuadro = str(request.POST.get('IdCuadro'))
+            # idLabor = str(request.POST.get('IdLabor'))
+            idEspecie = str(request.POST.get('IdEspecie'))
+            idVariedad = str(request.POST.get('IdVariedad'))
+            tipo = str(request.POST.get('Tipo'))
+            print(tipo)
+            values = [inicio,final,idChacra,idCuadro,idEspecie,idVariedad]
+            filtros = request.POST.get('Filtros')
+            filtros_dict = json.loads(filtros)
+            if tipo == 'DP':
+                jsonData = consulta_detallado_chacra(values)
+                nombre_archivo = crear_excel_labores_chacra(jsonData,tipo,filtros_dict,'','')
+                return JsonResponse({'Message': 'Success', 'Archivo': nombre_archivo})
+            else:
+                return JsonResponse({'Message': 'Error', 'Nota': 'El reporte aún no esta disponible.'})
+        except Exception as e:
+            return JsonResponse({'Message': 'Error', 'Nota': str(e)})
+    return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+def consulta_detallado_chacra(values):
+    listado_data = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                    DECLARE @Inicio DATE;
+                    DECLARE @Final DATE;
+                    DECLARE @IdChacra VARCHAR(10);
+                    DECLARE @IdCuadro VARCHAR(10);
+                    DECLARE @IdEspecie VARCHAR(10);
+                    DECLARE @IdVariedad VARCHAR(10);
 
+                    SET @Inicio = %s;
+                    SET @Final = %s;
+                    SET @IdChacra = %s;
+                    SET @IdCuadro = %s;
+                    SET @IdEspecie = %s;
+                    SET @IdVariedad = %s;
 
+                    SELECT      CD.ID_CHACRA, RTRIM(TA_CH.Nombre) AS NOM_CHACRA, CONVERT(VARCHAR(10), ST.FECHA, 103) AS FECHA, QR.ID_CUADRO, CD.NOMBRE_CUADRO AS CUADRO, LB.NOMBRE_LABOR,
+                                (SELECT STRING_AGG(RTRIM(V.Nombre), ', ') AS Resultado
+                                FROM    SPA_FILAS AS S INNER JOIN
+                                            S3A.dbo.Variedad AS V ON V.IdVariedad = S.ID_VARIEDAD
+                                WHERE (S.ID_CUADRO = CD.ID_CUADRO) AND (S.ID_FILA = FL.ID_FILA)) AS VARIEDADES,
+                                (SELECT SUM(NRO_PLANTAS) AS Expr1
+                                FROM    SPA_FILAS AS S
+                                WHERE (ID_CUADRO = CD.ID_CUADRO) AND (ID_FILA = FL.ID_FILA)) AS CANT_PLANTAS, ST.VALOR AS IMPORTE_FILA, CASE WHEN PR.VALOR_REFERENCIA IS NULL THEN 0 ELSE PR.VALOR_REFERENCIA END AS PRESUPUESTO,
+                                CASE 
+                                    WHEN PR.VALOR_REFERENCIA IS NULL OR PR.VALOR_REFERENCIA = 0 THEN 0 
+                                    ELSE FORMAT(((ST.VALOR - PR.VALOR_REFERENCIA) / PR.VALOR_REFERENCIA) * 100, 'N2') 
+                                END AS PORCENTAJE_SUPERADO,
+                                (SELECT (SUM(SUPERFICIE) * SUM(NRO_PLANTAS)) FROM SPA_FILAS AS S WHERE ID_CUADRO = CD.ID_CUADRO AND ID_FILA = FL.ID_FILA) AS SUP_TRABAJADA, FL.ID_FILA AS ID_FILA,
+                                (SELECT E.IdEspecie FROM S3A.dbo.Variedad AS E WHERE E.IdVariedad = FL.ID_VARIEDAD) AS ID_ESPECIE
+                    FROM        SPA_TAREA AS ST INNER JOIN
+                                SPA_QR AS QR ON ST.ID_QR_FILA = QR.ID_QR INNER JOIN
+                                SPA_CUADRO AS CD ON QR.ID_CUADRO = CD.ID_CUADRO INNER JOIN
+                                SPA_FILAS AS FL ON QR.ID_CUADRO = FL.ID_CUADRO AND QR.ID_FILA = FL.ID_FILA AND QR.ID_VARIEDAD = FL.ID_VARIEDAD INNER JOIN
+                                S3A.dbo.Chacra AS TA_CH ON TA_CH.IdChacra = CD.ID_CHACRA INNER JOIN
+                                SPA_LABOR AS LB ON ST.ID_LABOR = LB.ID_LABOR LEFT JOIN
+                                SPA_PRESUPUESTO AS PR ON QR.ID_FILA = PR.ID_FILA AND QR.ID_CUADRO = PR.ID_CUADRO AND QR.ID_VARIEDAD = PR.ID_VARIEDAD INNER JOIN
+                                S3A.dbo.Variedad AS V ON V.IdVariedad = FL.ID_VARIEDAD
+                    WHERE	    CONVERT(DATE, ST.FECHA) >= @Inicio
+                                AND CONVERT(DATE, ST.FECHA) <= @Final
+                                AND (@IdChacra = CD.ID_CHACRA OR @IdChacra = '')
+                                AND (@IdCuadro = CD.ID_CUADRO OR @IdCuadro = '')
+                                AND (@IdEspecie = CONVERT(VARCHAR,V.IdEspecie) OR @IdEspecie = '')
+                                AND (@IdVariedad = FL.ID_VARIEDAD OR @IdVariedad = '')
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_data.append({
+                            "ID_CHACRA":row[0],
+                            "CHACRA":row[1],
+                            "FECHA":row[2],
+                            "ID_CUADRO":row[3],
+                            "CUADRO":row[4],
+                            "LABOR":row[5],
+                            "VARIEDADES":row[6],
+                            "CANT_PLANTAS":row[7],
+                            "IMPORTE_FILA":row[8],
+                            "PRESUPUESTO":row[9],
+                            "PORCENTAJE":row[10],
+                            "SUPERFICIE":row[11],
+                            "FILA":row[13],
+                        })
+        return listado_data
+    except Exception as e:
+        return listado_data
 
+def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
+    if tipo == 'DC':
+        lista_data = convert_json_labores(jsonData,"C")
+        try:
+            df = pd.json_normalize(lista_data, 'DETALLES', ['CHACRA'])
+            output = BytesIO()
+            columns1 = ['CHACRA', 'NOMBRES', 'LEGAJO', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'VARIEDADES', 'PLANTAS']
+            df = df[columns1]
+            #df.fillna('', inplace=True)
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, startrow=5, sheet_name='RESUMIDO POR LEGAJO', header=columns1)
+                worksheet = writer.sheets['RESUMIDO POR LEGAJO']
+                logo = Image('static/3A/images/TA.png')  
+                logo.width = 80
+                logo.height = 50
+                worksheet.add_image(logo, 'G2')
+                worksheet['C4'] = 'DETALLE LABORES RESUMIDO POR LEGAJO'
+                worksheet['C4'].font = Font(size=14, bold=True)
+                worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
+                fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                worksheet['E2'] = fecha_actual
+                worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
+                header_fill = PatternFill(start_color="44546a", end_color="44546a", fill_type="solid")
+                header_font = Font(color="FFFFFF")
+                header_alignment = Alignment(horizontal='center', vertical='center')
+
+                for cell in worksheet[6]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    
+                border_style = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                for row in worksheet.iter_rows(min_row=7, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
+
+                for col in worksheet.columns:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col[6:]:
+                        try:
+                            if cell.value and len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                                pass
+                    adjusted_width = (max_length + 8)
+                    worksheet.column_dimensions[column].width = adjusted_width
+
+                # for cell in worksheet['J']:
+                #    if cell.row > 6 and isinstance(cell.value, (int, float)):
+                #       cell.number_format = '#.##0,0'
+                    
+            output.seek(0)
+            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
+                f.write(output.getvalue())
+
+            return nombre_excel
+        except Exception as e:
+            return 'e'
+    if tipo == 'DP':
+        try:
+            df = pd.DataFrame(jsonData)
+            columns1 = ['CHACRA', 'FECHA', 'CUADRO', 'FILA', 'CANT_PLANTAS', 'LABOR', 'VARIEDADES', 'IMPORTE_FILA', 'PRESUPUESTO', 'PORCENTAJE', 'SUPERFICIE']
+            df = df[columns1]
+            df = df.rename(columns={
+                'IMPORTE_FILA': 'IMPORTE',
+            })
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, startrow=9, sheet_name='DETALLADO POR CHACRA')
+                worksheet = writer.sheets['DETALLADO POR CHACRA']
+                logo = Image('static/3A/images/TA.png')  
+                logo.width = 80
+                logo.height = 50
+                worksheet.add_image(logo, 'J2')
+                worksheet['E5'] = 'LABORES POR CHACRA'
+                worksheet['E5'].font = Font(size=14, bold=True)
+                worksheet['E5'].alignment = Alignment(horizontal='center', vertical='center')
+                fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                worksheet['E2'] = fecha_actual
+                worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
+                header_fill = PatternFill(start_color="44546a", end_color="44546a", fill_type="solid")
+                header_font = Font(color="FFFFFF")
+                header_alignment = Alignment(horizontal='center', vertical='center')
+
+                worksheet['A2'] = 'Desde:'
+                worksheet['B2'] = filtros.get('DESDE', '')
+                worksheet['A2'].font = Font(size=12, bold=True)
+
+                worksheet['A3'] = 'Hasta:'
+                worksheet['B3'] = filtros.get('HASTA', '')
+                worksheet['A3'].font = Font(size=12, bold=True)
+
+                worksheet['A5'] = 'Chacra:'
+                worksheet['B5'] = filtros.get('CHACRA', '')
+                worksheet['A5'].font = Font(size=12, bold=True)
+
+                worksheet['A6'] = 'Cuadro:'
+                worksheet['B6'] = filtros.get('CUADRO', '')
+                worksheet['A6'].font = Font(size=12, bold=True)
+
+                worksheet['A7'] = 'Especie:'
+                worksheet['B7'] = filtros.get('ESPECIE', '')
+                worksheet['A7'].font = Font(size=12, bold=True)
+
+                worksheet['A8'] = 'Variedad:'
+                worksheet['B8'] = filtros.get('VARIEDAD', '')
+                worksheet['A8'].font = Font(size=12, bold=True)
+
+                for cell in worksheet[10]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    
+                border_style = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                for row in worksheet.iter_rows(min_row=11, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
+
+                for col in worksheet.columns:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col[10:]:
+                        try:
+                            if cell.value and len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                                pass
+                    adjusted_width = (max_length + 8)
+                    worksheet.column_dimensions[column].width = adjusted_width
+
+            output.seek(0)
+            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
+                f.write(output.getvalue())
+
+            return nombre_excel
+        except Exception as e:
+            return 'e'
 
 
 
