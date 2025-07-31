@@ -1423,7 +1423,6 @@ def crea_archivo_detalle_labores_chacras(request):
             idEspecie = str(request.POST.get('IdEspecie'))
             idVariedad = str(request.POST.get('IdVariedad'))
             tipo = str(request.POST.get('Tipo'))
-            print(tipo)
             values = [inicio,final,idChacra,idCuadro,idEspecie,idVariedad]
             filtros = request.POST.get('Filtros')
             filtros_dict = json.loads(filtros)
@@ -1432,7 +1431,9 @@ def crea_archivo_detalle_labores_chacras(request):
                 nombre_archivo = crear_excel_labores_chacra(jsonData,tipo,filtros_dict,'','')
                 return JsonResponse({'Message': 'Success', 'Archivo': nombre_archivo})
             else:
-                return JsonResponse({'Message': 'Error', 'Nota': 'El reporte aún no esta disponible.'})
+                jsonData, jsonGeneral = consulta_resumido_chacra(values)
+                nombre_archivo = crear_excel_labores_chacra(jsonData,tipo,filtros_dict,jsonGeneral,'')
+                return JsonResponse({'Message': 'Success', 'Archivo': nombre_archivo})
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'Nota': str(e)})
     return JsonResponse({'Message': 'No se pudo resolver la petición.'})
@@ -1498,8 +1499,8 @@ def consulta_detallado_chacra(values):
                             "LABOR":row[5],
                             "VARIEDADES":row[6],
                             "CANT_PLANTAS":row[7],
-                            "IMPORTE_FILA":row[8],
-                            "PRESUPUESTO":row[9],
+                            "IMPORTE_FILA":formatear_moneda(str(row[8])),
+                            "PRESUPUESTO":formatear_moneda(str(row[9])),
                             "PORCENTAJE":row[10],
                             "SUPERFICIE":row[11],
                             "FILA":row[13],
@@ -1507,26 +1508,104 @@ def consulta_detallado_chacra(values):
         return listado_data
     except Exception as e:
         return listado_data
+    
+def consulta_resumido_chacra(values):
+    listado_data = []
+    listado_general = []
+    try:
+        with connections['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """ 
+                    DECLARE @Inicio DATE;
+                    DECLARE @Final DATE;
+                    DECLARE @IdChacra VARCHAR(10);
+                    DECLARE @IdCuadro VARCHAR(10);
+                    DECLARE @IdEspecie VARCHAR(10);
+                    DECLARE @IdVariedad VARCHAR(10);
 
-def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
-    if tipo == 'DC':
-        lista_data = convert_json_labores(jsonData,"C")
+                    SET @Inicio = %s;
+                    SET @Final = %s;
+                    SET @IdChacra = %s;    ---- CHACRA 1000026 CUADRO 106 CANT FILAS 9 VALOR 360.000 SUPERFICIE 0.405 CANT PLANTAS 504
+                    SET @IdCuadro = %s;
+                    SET @IdEspecie = %s;
+                    SET @IdVariedad = %s;
+
+                    SELECT RTRIM(CH.Nombre) AS NOM_CHACRA, COUNT(FL.ID_FILA) AS FILA, SUM(FL.NRO_PLANTAS) AS CANT_PLANTAS, LB.NOMBRE_LABOR AS LABOR, SUM(ST.VALOR) AS IMPORTE, 
+                            CASE WHEN PRE.VALOR_REFERENCIA IS NULL THEN 0 ELSE SUM(PRE.VALOR_REFERENCIA) END AS PRESUPUESTO,
+                            CASE 
+                                WHEN PRE.VALOR_REFERENCIA IS NULL OR SUM(PRE.VALOR_REFERENCIA) = 0 
+                                THEN 0 
+                                ELSE FORMAT(((SUM(ST.VALOR) - SUM(PRE.VALOR_REFERENCIA)) / SUM(PRE.VALOR_REFERENCIA)) * 100, 'N2')
+                            END AS PORCENTAJE_SUPERADO, SUM(FL.SUPERFICIE) AS SUPERFICIE,
+                            (SELECT SUM(SUPERFICIE) FROM SPA_FILAS WHERE ID_CUADRO IN (SELECT ID_CUADRO FROM SPA_CUADRO WHERE ID_CHACRA = CD.ID_CHACRA)) AS SUP_TOTAL,
+                            CASE 
+                                WHEN (SELECT SUM(SUPERFICIE) FROM SPA_FILAS WHERE ID_CUADRO IN (SELECT ID_CUADRO FROM SPA_CUADRO WHERE ID_CHACRA = CD.ID_CHACRA)) = 0 
+                                THEN 0 
+                                ELSE ((SUM(FL.SUPERFICIE) * 1.0 / (SELECT SUM(SUPERFICIE) FROM SPA_FILAS WHERE ID_CUADRO IN (SELECT ID_CUADRO FROM SPA_CUADRO WHERE ID_CHACRA = CD.ID_CHACRA))) * 100)
+                            END AS PORCENTAJE_TRABAJADO
+                    FROM   SPA_TAREA AS ST INNER JOIN
+                                SPA_QR AS QR ON ST.ID_QR_FILA = QR.ID_QR INNER JOIN
+                                SPA_FILAS AS FL ON QR.ID_FILA = FL.ID_FILA AND QR.ID_CUADRO = FL.ID_CUADRO AND QR.ID_VARIEDAD = FL.ID_VARIEDAD INNER JOIN
+                                SPA_CUADRO AS CD ON CD.ID_CUADRO = FL.ID_CUADRO INNER JOIN
+                                S3A.dbo.Chacra AS CH ON CH.IdChacra = CD.ID_CHACRA INNER JOIN
+                                SPA_LABOR AS LB ON LB.ID_LABOR = ST.ID_LABOR LEFT JOIN
+                                SPA_PRESUPUESTO AS PRE ON FL.ID_FILA = PRE.ID_FILA AND FL.ID_CUADRO = PRE.ID_CUADRO AND FL.ID_VARIEDAD = PRE.ID_VARIEDAD INNER JOIN
+                                S3A.dbo.Variedad AS V ON V.IdVariedad = FL.ID_VARIEDAD
+                    WHERE	CONVERT(DATE, ST.FECHA) >= @Inicio
+                            AND CONVERT(DATE, ST.FECHA) <= @Final
+                            AND (@IdChacra = CD.ID_CHACRA OR @IdChacra = '')
+                            AND (@IdCuadro = CD.ID_CUADRO OR @IdCuadro = '')
+                            AND (@IdEspecie = CONVERT(VARCHAR,V.IdEspecie) OR @IdEspecie = '')
+                            AND (@IdVariedad = FL.ID_VARIEDAD OR @IdVariedad = '')
+                    GROUP BY RTRIM(CH.Nombre),LB.NOMBRE_LABOR,PRE.VALOR_REFERENCIA,CD.ID_CHACRA
+                    ORDER BY RTRIM(CH.Nombre)
+                    """
+                cursor.execute(sql, values)
+                consulta = cursor.fetchall()
+                if consulta:
+                    for row in consulta:
+                        listado_data.append({
+                            "CHACRA":row[0],
+                            "FILAS":row[1],
+                            "PLANTAS":row[2],
+                            "LABOR":row[3],
+                            "IMPORTE":formatear_moneda(str(row[4])),
+                            "PRESUPUESTO":formatear_moneda(str(row[5])),
+                            "PORCENTAJE_SUPERADO":row[6],
+                            "SUPERFICIE":row[7],
+                        })
+                        listado_general.append({
+                            "CHACRA":row[0],
+                            "TOTAL_SUPERFICIE":round(row[8],2),
+                            "PORCENTAJE_TRABAJADO":round(row[9],2),
+                        })
+        return listado_data,listado_general
+    except Exception as e:
+        return listado_data,listado_general
+
+def crear_excel_labores_chacra(jsonData,tipo,filtros,listado_general,total_censo):
+    if tipo == 'RP':
         try:
-            df = pd.json_normalize(lista_data, 'DETALLES', ['CHACRA'])
+            df_detalles = pd.DataFrame(jsonData)
+            df_general = pd.DataFrame(listado_general)
+            df_detalles = df_detalles.rename(columns={
+                'PORCENTAJE_SUPERADO': '% SUPERADO',
+            })
+            df_general = df_general.rename(columns={
+                'TOTAL_SUPERFICIE': 'TOTAL SUP.',
+                'PORCENTAJE_TRABAJADO': '% TRABAJADO',
+            })
+
             output = BytesIO()
-            columns1 = ['CHACRA', 'NOMBRES', 'LEGAJO', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'VARIEDADES', 'PLANTAS']
-            df = df[columns1]
-            #df.fillna('', inplace=True)
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False, startrow=5, sheet_name='RESUMIDO POR LEGAJO', header=columns1)
-                worksheet = writer.sheets['RESUMIDO POR LEGAJO']
+                df_detalles.to_excel(writer, index=False, startrow=9, sheet_name='RESUMIDO POR CHACRA')
+                worksheet = writer.sheets['RESUMIDO POR CHACRA']
                 logo = Image('static/3A/images/TA.png')  
                 logo.width = 80
                 logo.height = 50
                 worksheet.add_image(logo, 'G2')
-                worksheet['C4'] = 'DETALLE LABORES RESUMIDO POR LEGAJO'
-                worksheet['C4'].font = Font(size=14, bold=True)
-                worksheet['C4'].alignment = Alignment(horizontal='center', vertical='center')
+                worksheet['D4'] = 'RESUMIDO POR CHACRA'
+                worksheet['D4'].font = Font(size=14, bold=True)
+                worksheet['D4'].alignment = Alignment(horizontal='center', vertical='center')
                 fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                 worksheet['E2'] = fecha_actual
                 worksheet['E2'].alignment = Alignment(horizontal='right', vertical='center')
@@ -1534,7 +1613,31 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                 header_font = Font(color="FFFFFF")
                 header_alignment = Alignment(horizontal='center', vertical='center')
 
-                for cell in worksheet[6]:
+                worksheet['A2'] = 'Desde:'
+                worksheet['B2'] = filtros.get('DESDE', '')
+                worksheet['A2'].font = Font(size=12, bold=True)
+
+                worksheet['A3'] = 'Hasta:'
+                worksheet['B3'] = filtros.get('HASTA', '')
+                worksheet['A3'].font = Font(size=12, bold=True)
+
+                worksheet['A5'] = 'Chacra:'
+                worksheet['B5'] = filtros.get('CHACRA', '')
+                worksheet['A5'].font = Font(size=12, bold=True)
+
+                worksheet['A6'] = 'Cuadro:'
+                worksheet['B6'] = filtros.get('CUADRO', '')
+                worksheet['A6'].font = Font(size=12, bold=True)
+
+                worksheet['A7'] = 'Especie:'
+                worksheet['B7'] = filtros.get('ESPECIE', '')
+                worksheet['A7'].font = Font(size=12, bold=True)
+
+                worksheet['A8'] = 'Variedad:'
+                worksheet['B8'] = filtros.get('VARIEDAD', '')
+                worksheet['A8'].font = Font(size=12, bold=True)
+
+                for cell in worksheet[10]:
                     cell.fill = header_fill
                     cell.font = header_font
                     cell.alignment = header_alignment
@@ -1545,7 +1648,8 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                     top=Side(style='thin'),
                     bottom=Side(style='thin')
                 )
-                for row in worksheet.iter_rows(min_row=7, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
+
+                for row in worksheet.iter_rows(min_row=10, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
                     for cell in row:
                         cell.border = border_style
 
@@ -1557,16 +1661,39 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                             if cell.value and len(str(cell.value)) > max_length:
                                 max_length = len(str(cell.value))
                         except:
-                                pass
+                            pass
                     adjusted_width = (max_length + 8)
                     worksheet.column_dimensions[column].width = adjusted_width
 
-                # for cell in worksheet['J']:
-                #    if cell.row > 6 and isinstance(cell.value, (int, float)):
-                #       cell.number_format = '#.##0,0'
-                    
+                # Alinear columnas 2, 3, 5, 6, 7 y 8 de df_detalles a la derecha
+                for row in worksheet.iter_rows(min_row=11, max_row=worksheet.max_row, min_col=2, max_col=3):
+                    for cell in row:
+                        cell.alignment = Alignment(horizontal='right')
+                for row in worksheet.iter_rows(min_row=11, max_row=worksheet.max_row, min_col=5, max_col=8):
+                    for cell in row:
+                        cell.alignment = Alignment(horizontal='right')
+
+                # Agregar tabla general
+                start_row = worksheet.max_row + 3
+                df_general.to_excel(writer, index=False, startrow=start_row - 1, startcol=5, sheet_name='RESUMIDO POR CHACRA', header=True)
+                for col_idx, col in enumerate(df_general.columns, start=6):  # 6 porque startcol=5 y se suma 1 para la columna correcta
+                    cell = worksheet.cell(row=start_row, column=col_idx)
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+
+                for row in worksheet.iter_rows(min_row=start_row + 1, min_col=6, max_row=worksheet.max_row, max_col=worksheet.max_column):
+                    for cell in row:
+                        cell.border = border_style
+
+                # Alinear columnas 7 y 8 de df_general a la derecha
+                start_row_general = worksheet.max_row - len(df_general) + 1
+                for row in worksheet.iter_rows(min_row=start_row_general, max_row=worksheet.max_row, min_col=7, max_col=8):
+                    for cell in row:
+                        cell.alignment = Alignment(horizontal='right')
+
             output.seek(0)
-            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            nombre_excel = f'Listado_Resumido_Chacra_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
             with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
                 f.write(output.getvalue())
 
@@ -1579,7 +1706,9 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
             columns1 = ['CHACRA', 'FECHA', 'CUADRO', 'FILA', 'CANT_PLANTAS', 'LABOR', 'VARIEDADES', 'IMPORTE_FILA', 'PRESUPUESTO', 'PORCENTAJE', 'SUPERFICIE']
             df = df[columns1]
             df = df.rename(columns={
+                'CANT_PLANTAS': 'N° PTAS',
                 'IMPORTE_FILA': 'IMPORTE',
+                'PORCENTAJE': '%',
             })
             output = BytesIO()
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -1589,7 +1718,7 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                 logo.width = 80
                 logo.height = 50
                 worksheet.add_image(logo, 'J2')
-                worksheet['E5'] = 'LABORES POR CHACRA'
+                worksheet['E5'] = 'DETALLADO POR CHACRA'
                 worksheet['E5'].font = Font(size=14, bold=True)
                 worksheet['E5'].alignment = Alignment(horizontal='center', vertical='center')
                 fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -1634,6 +1763,15 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                     top=Side(style='thin'),
                     bottom=Side(style='thin')
                 )
+                
+                for row in worksheet.iter_rows(min_row=10, max_row=worksheet.max_row, min_col=2, max_col=5):
+                    for cell in row:
+                        cell.alignment = Alignment(horizontal='center')
+
+                for row in worksheet.iter_rows(min_row=10, max_row=worksheet.max_row, min_col=8, max_col=11):
+                    for cell in row:
+                        cell.alignment = Alignment(horizontal='right')
+
                 for row in worksheet.iter_rows(min_row=11, min_col=1, max_row=worksheet.max_row, max_col=worksheet.max_column):
                     for cell in row:
                         cell.border = border_style
@@ -1651,7 +1789,7 @@ def crear_excel_labores_chacra(jsonData,tipo,filtros,totales,total_censo):
                     worksheet.column_dimensions[column].width = adjusted_width
 
             output.seek(0)
-            nombre_excel = f'Listado_Labores_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
+            nombre_excel = f'Listado_Detallado_Chacra_{str(datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))}.xlsx'
             with open('Applications/Md_Chacras/Archivos/Excel/'+nombre_excel, 'wb') as f:
                 f.write(output.getvalue())
 

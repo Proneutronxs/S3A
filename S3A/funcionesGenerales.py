@@ -240,7 +240,7 @@ def formatear_fecha(fecha):
     
 def formatear_moneda(numero):
     numero = float(numero)
-    return "${:,.2f}".format(numero).replace(",", "#").replace(".", ",").replace("#", ".")
+    return "$ {:,.2f}".format(numero).replace(",", "#").replace(".", ",").replace("#", ".")
 
 def obtener_calibres(calibres):
     calibre_map = {
