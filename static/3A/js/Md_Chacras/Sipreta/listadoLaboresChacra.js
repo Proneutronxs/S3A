@@ -294,9 +294,9 @@ const dataDateTable = async () => {
                 Fila: String(datos.FILA || ""),
                 CantPlantas: String(datos.CANT_PLANTAS || ""),
                 Labor: String(datos.LABOR || ""),
-                ImporteFila: String(formatoMoneda(datos.IMPORTE_FILA) || ""),
+                ImporteFila: String(datos.IMPORTE_FILA || ""),
                 Variedades: String(datos.VARIEDADES || ""),
-                Presupuesto: String(formatoMoneda(datos.PRESUPUESTO) || ""),
+                Presupuesto: String(datos.PRESUPUESTO || ""),
                 Porcentaje: String(datos.PORCENTAJE || ""),
                 Superficie: String(datos.SUPERFICIE || ""),
             }));
