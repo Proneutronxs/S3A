@@ -1503,7 +1503,7 @@ def consulta_detallado_chacra(values):
                             "PRESUPUESTO":formatear_moneda(str(row[9])),
                             "PORCENTAJE":row[10],
                             "SUPERFICIE":row[11],
-                            "FILA":row[13],
+                            "FILA":row[12],
                         })
         return listado_data
     except Exception as e:
