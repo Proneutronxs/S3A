@@ -1539,7 +1539,6 @@ def llevar_pendientes_rechazados(request):
                     return JsonResponse({'Message': 'Success', 'Nota': 'Los pedidos se movieron a PENDIENTES correctamente.'})
             except Exception as e:
                 error = str(e)
-                print(error)
                 insertar_registro_error_sql("LOGISTICA","MOVER PEDIDOS RECHZADOS",request.user,error)
                 data = str(e)
                 return JsonResponse({'Message': 'Error', 'Nota': data})
@@ -1721,9 +1720,6 @@ def cantidad_destinos(ID_PEDIDO):
         error = str(e)
         insertar_registro_error_sql("LOGISTICA","CANT DESTINOS","usuario",error)
         return cantidad
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 def idPedido_esta_viaje(ID_PEDIDO):
     values = [ID_PEDIDO]
@@ -1743,9 +1739,6 @@ def idPedido_esta_viaje(ID_PEDIDO):
         error = str(e)
         insertar_registro_error_sql("LOGISTICA","ESTA EN VIAJE","usuario",error)
         return False
-    finally:
-        cursor.close()
-        connections['TRESASES_APLICATIVO'].close()
 
 @login_required
 @csrf_exempt
@@ -1807,9 +1800,6 @@ def mensaje_elimina_destino_viaje(request):
                     insertar_registro_error_sql("LOGISTICA","DETALLE UBICACION CHOFERES",request.user,error)
                     data = str(e)
                     return JsonResponse({'Message': 'Error', 'Nota': data})
-                finally:
-                    cursor.close()
-                    connections['TRESASES_APLICATIVO'].close()
                 
         return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
@@ -1858,9 +1848,6 @@ def mueve_destinos_a_pendientes(request):
                     insertar_registro_error_sql("LOGISTICA","ELIMINA DESTINO",request.user,error)
                     data = str(e)
                     return JsonResponse({'Message': 'Error', 'Nota': data})
-                finally:
-                    cursor.close()
-                    connections['TRESASES_APLICATIVO'].close()
             else:
                 try:
                     with connections['TRESASES_APLICATIVO'].cursor() as cursor:
@@ -1895,10 +1882,7 @@ def mueve_destinos_a_pendientes(request):
                     error = str(e)
                     insertar_registro_error_sql("LOGISTICA","ELIMINA VIAJE / DESTINOS",request.user,error)
                     data = str(e)
-                    return JsonResponse({'Message': 'Error', 'Nota': data})
-                finally:
-                    cursor.close()
-                    connections['TRESASES_APLICATIVO'].close()             
+                    return JsonResponse({'Message': 'Error', 'Nota': data})         
         return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         data = "No se pudo resolver la Petición"
@@ -1996,9 +1980,6 @@ def mostrar_pedidos_flete_para_baja(request):
                 insertar_registro_error_sql("LOGISTICA","MOSTRAR PEDIDOS FLETES BAJA",request.user,error)
                 data = str(e)
                 return JsonResponse({'Message': 'Error', 'Nota': data})
-            finally:
-                cursor.close()
-                connections['S3A'].close()
         return JsonResponse ({'Message': 'Not Found', 'Nota': 'No tiene permisos para resolver la petición.'})
     else:
         data = "No se pudo resolver la Petición"
