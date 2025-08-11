@@ -1770,10 +1770,11 @@ def envio_notificaciones_al_canal():
             if consulta:
                 for row in consulta:
                     ID_CNG = str(row[0])
-                    Body = str(row[1])
-                    Pestaña = str(row[2])
-                    Legajo = str(row[3])
-                    Id_Firebase = str(row[4])
+                    Titulo = str(row[1])
+                    Body = str(row[2])
+                    Pestaña = str(row[3])
+                    Legajo = str(row[4])
+                    Id_Firebase = str(row[5])
                     enviar_notificacion_Tres_Ases(Id_Firebase,Body,Pestaña,ID_CNG)
 
     except Exception as e:
