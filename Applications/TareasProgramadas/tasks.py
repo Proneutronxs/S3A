@@ -1,4 +1,5 @@
 from django.db import connections
+from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck, enviar_notificacion_Tres_Ases
 from S3A.funcionesGenerales import *
 from django.core.mail import send_mail
 import datetime
@@ -1715,12 +1716,68 @@ def Registro_Errores_SQL(funcion, error):
 
     except Exception as e:
         insertar_registro_error_sql("TareasProgramadas","Registro_Errores_SQL","request.user",str(e))
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 
+############################################################################################################################
+############################################################################################################################
+###################################### INICIO DE NOTIFICACIONES ############################################################
+############################################################################################################################
+############################################################################################################################
 
 
+def inserta_resgistros_al_canal():
+    try:
+        with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                INSERT INTO Canal_Notificaciones_Generales (Titulo, Body, Pestaña, CodEmpleado, FechaAlta, Estado)
+
+                SELECT 'TRES ASES', 'ASISTENCIA NO ENVÍADA - Es necesario envíar la asistencia para registrar los días del trabajador.', 'AS', US.CodEmpleado, GETDATE(), 'P'
+                FROM 
+                    USUARIOS AS US
+                LEFT JOIN 
+                    Auditoria_Aplicacion_Android AS AAA 
+                    ON US.Usuario = AAA.Usuario 
+                    AND AAA.TipoRegistro = '2'
+                    AND AAA.Estado = 'E'
+                    AND CONVERT(DATE, AAA.FechaHora) = CONVERT(DATE, GETDATE())
+                    AND CONVERT(TIME, AAA.FechaHora) <= CONVERT(TIME, GETDATE())
+                    AND CONVERT(TIME, AAA.FechaHora) >= DATEADD(HOUR, -2, CONVERT(TIME, GETDATE()))
+                WHERE 
+                    US.Chacras IS NOT NULL
+                GROUP BY 
+                    US.CodEmpleado, US.Usuario
+                HAVING COALESCE(COUNT(AAA.Usuario), 0) = 0
+                """
+            cursor.execute(sql)
+
+    except Exception as e:
+        pass
+
+
+def envio_notificaciones_al_canal():
+    try:
+        with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
+            sql = """
+                SELECT CNG.ID_CNG, CNG.Titulo, CNG.Body, CNG.Pestaña, CNG.CodEmpleado, US.IdAndroid
+                FROM Canal_Notificaciones_Generales AS CNG INNER JOIN
+                    USUARIOS AS US ON US.CodEmpleado = CNG.CodEmpleado
+                WHERE CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
+                    AND CNG.Estado = 'P'
+                    AND CNG.CodEmpleado = '58015'
+                """
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+            if consulta:
+                for row in consulta:
+                    ID_CNG = str(row[0])
+                    Body = str(row[1])
+                    Pestaña = str(row[2])
+                    Legajo = str(row[3])
+                    Id_Firebase = str(row[4])
+                    enviar_notificacion_Tres_Ases(Id_Firebase,Body,Pestaña,ID_CNG)
+
+    except Exception as e:
+        pass
 
 
 
