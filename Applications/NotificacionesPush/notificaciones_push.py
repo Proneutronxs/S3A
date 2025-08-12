@@ -56,7 +56,7 @@ def enviar_notificacion_Tres_Ases(token, body, pestaña,ID_CNG):
                 "Title": "Tres Ases",
                 "Body": body,
                 "Pestaña": pestaña,
-                "ID_CNG": ID_CNG
+                "ID_CNG": ID_CNG #ID_CNG
             },
             token=token,
         )

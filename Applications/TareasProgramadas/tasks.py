@@ -1767,15 +1767,18 @@ def envio_notificaciones_al_canal():
                 """
             cursor.execute(sql)
             consulta = cursor.fetchall()
+
+            sql_update = """ UPDATE Canal_Notificaciones_Generales SET Estado = 'R' WHERE ID_CNG = %s """
+
             if consulta:
                 for row in consulta:
                     ID_CNG = str(row[0])
-                    Titulo = str(row[1])
                     Body = str(row[2])
                     Pestaña = str(row[3])
-                    Legajo = str(row[4])
                     Id_Firebase = str(row[5])
                     enviar_notificacion_Tres_Ases(Id_Firebase,Body,Pestaña,ID_CNG)
+                    cursor.execute(sql_update,[ID_CNG])
+
 
     except Exception as e:
         pass
