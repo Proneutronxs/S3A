@@ -883,7 +883,8 @@ def listado_detalle_labores(request):
                             "IMPORTE":row[14],
                             "ID_QR_FILA":row[15],
                             "PRESUPUESTO":row[16],
-                            "SUPERFICIE":row[17]
+                            "SUPERFICIE":row[17],
+                            "TIPO_DIA":row[20]
                         })
                     return JsonResponse({'Message': 'Success', 'Datos': listado_data})
                 return JsonResponse({'Message': 'Error', 'Nota': 'No se encontraron datos.'})
@@ -900,6 +901,7 @@ def convert_json_labores(json_data,tipo):
     try:
         if tipo == 'L':
             result = {}
+            #print(json_data)
             for item in json_data:
                 nombre = item['NOMBRES']
                 legajo = item['LEGAJO']
@@ -907,6 +909,7 @@ def convert_json_labores(json_data,tipo):
                 detalle = {
                     'LEGAJO': str(legajo),  
                     'FECHA': item['FECHA'],
+                    'TIPO_DIA': item['TIPO_DIA'],
                     'PRODUCTOR': item['PRODUCTOR'],
                     'CHACRA': item['CHACRA'],
                     'CUADRO': item['CUADRO'],
@@ -1016,7 +1019,8 @@ def archivo_detalle_labores(request):
                             "PRESUPUESTO":row[16],
                             "SUPERFICIE":row[17],
                             "SUM_PLANTAS":row[18],
-                            "SUM_SUPERFICIE":row[19]
+                            "SUM_SUPERFICIE":row[19],
+                            "TIPO_DIA":row[20]
                         })
                         suma_plantas = row[18]
                         suma_superficie = row[19]
@@ -1112,7 +1116,7 @@ def crear_excel_labores(jsonData,tipo,filtros,totales,total_censo):
         try:
             df = pd.json_normalize(lista_data, 'DETALLES', ['NOMBRES'])
             output = BytesIO()
-            columns1 = ['NOMBRES', 'LEGAJO', 'CHACRA', 'FECHA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'PRESUPUESTO', 'VARIEDADES', 'PLANTAS', 'SUPERFICIE']
+            columns1 = ['NOMBRES', 'LEGAJO', 'CHACRA', 'FECHA', 'TIPO_DIA', 'PRODUCTOR', 'CUADRO', 'FILA', 'QR', 'LABOR', 'IMPORTE', 'PRESUPUESTO', 'VARIEDADES', 'PLANTAS', 'SUPERFICIE']
             df = df[columns1]
             #df.fillna('', inplace=True)
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -1352,7 +1356,6 @@ def crear_excel_resumido(tipo,lista_data,filtros):
 
             return nombre_excel
         except Exception as e:
-            print(e)
             return 'e'
 
 #/home/sides/MAIN S3A/S3A/Applications/Md_Chacras/Archivos/Excel

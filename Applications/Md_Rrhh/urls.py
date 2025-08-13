@@ -32,6 +32,22 @@ urlpatterns = [
 
     path('chacras/listado-sipreta/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Rrhh_descarga_archivo_excel"),
 
+
+
+    path('chacras/reportes-labores-personal/', views.Listado_Labores, name="Md_Rrhh_Listado_Labores"),
+
+    path('chacras/reportes-labores-personal/data-inicial/', views.carga_inicial_listado_labores, name="Md_Rrhh_carga_inicial_listado_labores"),
+
+    path('chacras/reportes-labores-personal/chacra-productor/', views.listado_combox_chacras_x_productor, name="Md_Rrhh_listado_combox_chacras_x_productor_X"),
+
+    path('chacras/reportes-labores-personal/chacra-personal-cuadros/', views.cuadro_personal_x_chacra, name="Md_Rrhh_uadro_personal_x_chacra_X"),
+    
+    path('chacras/reportes-labores-personal/detalle-labores/', views.listado_detalle_labores, name="Md_Rrhh_listado_detalle_labores"),
+    
+    path('chacras/reportes-labores-personal/descarga-archivo/', views.archivo_detalle_labores, name="Md_Rrhh_archivo_detalle_labores"),
+    
+    path('chacras/reportes-labores-personal/archivo=<str:filename>', views.descarga_archivo_excel, name="Md_Rrhh_descarga_archivo_excel"),
+
     
 
 ]
