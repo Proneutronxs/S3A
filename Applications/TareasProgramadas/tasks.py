@@ -1777,7 +1777,7 @@ def envio_notificaciones_al_canal():
                     Pestaña = str(row[3])
                     Id_Firebase = str(row[5])
                     enviar_notificacion_Tres_Ases(Id_Firebase,Body,Pestaña,ID_CNG)
-                    cursor.execute(sql_update,[ID_CNG])
+                    #cursor.execute(sql_update,[ID_CNG])
 
 
     except Exception as e:
