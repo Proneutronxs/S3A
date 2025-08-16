@@ -45,26 +45,27 @@ def notificaciones_Fruit_Truck(Token, Body, Tipo, Habilitado, ID_CVN, Destinos):
     except Exception as e:
         return 'excepcion ' 
     
-def enviar_notificacion_Tres_Ases(token, body, pestaña,ID_CNG):
-    ID_CNG = ""
+
+    
+def enviar_notificacion_Tres_Ases(token, body, pestaña, ID_CNG):
     inicio = inicializar_firebase()
     if not token or not body or not pestaña:
-        return 'bodys' 
+        return 'Faltan parámetros requeridos' 
     try:
         message = messaging.Message(
             data={
                 "Title": "Tres Ases",
                 "Body": body,
                 "Pestaña": pestaña,
-                "ID_CNG": ID_CNG #ID_CNG
+                "ID_CNG": ID_CNG # Usar el ID_CNG pasado como parámetro
             },
             token=token,
         )
         response = messaging.send(message)
         return '1' if response else '0'
     except Exception as e:
-        debug_error("FIREBASE",ID_CNG, str(e))
-        return 'excepcion ' + str(inicio)
+        debug_error("FIREBASE", ID_CNG, str(e))
+        return 'Excepción en envío de notificación: ' + str(e)
     
 
 def debug_error(usuario, body, error):
