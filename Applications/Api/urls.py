@@ -16,7 +16,7 @@ urlpatterns = [
 
     path('data-general/sim-remito/', demoCRC.tabla_sim_remito, name="tabla_sim_remito"),
 
-    path('data-general/precio-condiciones-romaneo/', demoCRC.data_Precio_Condiciones_Romaneo, name="data_Precio_Condiciones_Romaneo"),
+    path('data-general/precio-condiciones-romaneo/ID_PCR=<str:ID_PCR>/', demoCRC.data_Precio_Condiciones_Romaneo, name="data_Precio_Condiciones_Romaneo"),
     
 
 

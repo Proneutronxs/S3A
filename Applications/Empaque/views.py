@@ -107,9 +107,6 @@ def buscaCentroCostos(codigo,usuario):
             error = str(e)
             insertar_registro_error_sql("LOGISTICA","BUSCA CENTRSO DE COSTO",usuario,error)
             return lista_json
-        finally:
-            cursor.close()
-            connections['ISISPayroll'].close()
     return lista_json
 
 ###BUSCA POR EL LAGAJO DEL SPINNER
@@ -478,7 +475,7 @@ def listaHorasProcesadas(request):
                                             RTRIM(HorasExtras_Procesadas.TipoHoraExtra) AS TIPO, UPPER((DATENAME(WEEKDAY, CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde)))) AS DIA, 
                                             '--:--' AS HORA_TURNO,
                                             CONVERT(VARCHAR(10), HorasExtras_Procesadas.FechaHoraDesde, 120) AS FECHA_120
-                                FFROM            HorasExtras_Procesadas INNER JOIN
+                                FROM            HorasExtras_Procesadas INNER JOIN
                                             TresAses_ISISPayroll.dbo.Empleados ON HorasExtras_Procesadas.Legajo = TresAses_ISISPayroll.dbo.Empleados.CodEmpleado
                                 WHERE        (HorasExtras_Procesadas.EstadoEnvia = '4') AND (TRY_CONVERT(DATE, HorasExtras_Procesadas.FechaHoraDesde) = TRY_CONVERT(DATE, %s))
                                             AND (TresAses_ISISPayroll.dbo.Empleados.Regis_CCo = %s)
