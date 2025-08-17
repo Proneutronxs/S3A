@@ -35,8 +35,6 @@ def dataGeneral(request):
             error = str(e)
             insertar_registro_error_sql("GeneralApp","personal_por_Ccostos_asistencia","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
@@ -188,8 +186,6 @@ def dataConCRC(request):
         
         except Exception as e:
             return JsonResponse({'Message': 'Error', 'nota': str(e)}, safe=False)
-        finally:
-            connections['S3A'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -333,8 +329,6 @@ def crc_ultimo_remito(request):
             
             except Exception as e:
                 return JsonResponse({'Message': 'Error', 'nota': str(e)})
-            finally:
-                connections['S3A'].close()
         else:
             return JsonResponse({'Message': 'No data found', 'Nota':'No se cargaron os remitos.'})
     else:
@@ -356,9 +350,9 @@ def guarda_remitos_enviados(listado):
             cursor.execute(sql)
     except Exception as e:
         return ""
-    finally:
-        cursor.close()
-        connections['S3A'].close()
+    
+
+
 
 def tabla_sim_remito(request):
     if request.method == 'GET':
@@ -389,7 +383,91 @@ def tabla_sim_remito(request):
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
-
+@csrf_exempt
+def data_Precio_Condiciones_Romaneo(request):
+    if request.method == 'POST':
+        id_pcr = request.POST.get('ID_PCR')
+        try:
+            with connections['S3A'].cursor() as cursor:
+                sql = """ 
+                    SELECT  ID_PCR, NroRomaneo, Item, P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, PrecioPallet, 
+                            Moneda, FechaAlta, UserID, FechaUltimaModificacion, UserIDModificacion, NroRemito, NroItem, NroSubItem,
+                            IdVariedad, IdEnvase, IdEtiqueta, IdCalidad, Precio, Bultos, Total, T01, T02, T03, T04, T05, T06, T07, 
+                            T08, T09, T10, T11, Calibres, CRCT01, CRCT02, CRCT03, CRCT04, CRCT05, CRCT06, CRCT07, CRCT08, CRCT09, 
+                            CRCT10, CRCT11, SIM
+                    FROM    PrecioCondiciones_Romaneo
+                    WHERE (ID_PCR = %s)
+                    """
+                cursor.execute(sql, [id_pcr])
+                consulta = cursor.fetchall()
+                if consulta:
+                    lista_data = []
+                    for row in consulta:
+                        lista_data.append({
+                            "ID_PCR":str(row[0]),
+                            "NRO_ROMANEO":str(row[1]),
+                            "ITEM":str(row[2]),
+                            "P01":str(row[3]),
+                            "P02":str(row[4]),
+                            "P03":str(row[5]),
+                            "P04":str(row[6]),
+                            "P05":str(row[7]),
+                            "P06":str(row[8]),
+                            "P07":str(row[9]),
+                            "P08":str(row[10]),
+                            "P09":str(row[11]),
+                            "P10":str(row[12]),
+                            "P11":str(row[13]),
+                            "PRECIO_PALLET":str(row[14]),
+                            "MONEDA":str(row[15]),
+                            "FECHA_ALTA":str(row[16]),
+                            "USER_ID":str(row[17]),
+                            "FECHA_ULTIMA_MODIFICACION":str(row[18]),
+                            "USER_ID_MODIFICACION":str(row[19]),
+                            "NRO_REMITO":str(row[20]),
+                            "NRO_ITEM":str(row[21]),
+                            "NRO_SUB_ITEM":str(row[22]),
+                            "ID_VARIEDAD":str(row[23]),
+                            "ID_ENVASE":str(row[24]),
+                            "ID_ETIQUETA":str(row[25]),
+                            "ID_CALIDAD":str(row[26]),
+                            "PRECIO":str(row[27]),
+                            "BULTOS":str(row[28]),
+                            "TOTAL":str(row[29]),
+                            "T01":str(row[30]),
+                            "T02":str(row[31]),
+                            "T03":str(row[32]),
+                            "T04":str(row[33]),
+                            "T05":str(row[34]),
+                            "T06":str(row[35]),
+                            "T07":str(row[36]),
+                            "T08":str(row[37]),
+                            "T09":str(row[38]),
+                            "T10":str(row[39]),
+                            "T11":str(row[40]),
+                            "CALIBRES":str(row[41]),
+                            "CRCT01":str(row[42]),
+                            "CRCT02":str(row[43]),
+                            "CRCT03":str(row[44]),
+                            "CRCT04":str(row[45]),
+                            "CRCT05":str(row[46]),
+                            "CRCT06":str(row[47]),
+                            "CRCT07":str(row[48]),
+                            "CRCT08":str(row[49]),
+                            "CRCT09":str(row[50]),
+                            "CRCT10":str(row[51]),
+                            "CRCT11":str(row[52]),
+                            "SIM":str(row[53]),
+                        })
+                    return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                else:
+                    return JsonResponse({'Message': 'Not Found', 'Nota': 'No se encontraron datos.'})
+        except Exception as e:
+            error = str(e)
+            insertar_registro_error_sql("GeneralApp","personal_por_Ccostos_asistencia","usuario",error)
+            return JsonResponse({'Message': 'Error', 'Nota': error})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
