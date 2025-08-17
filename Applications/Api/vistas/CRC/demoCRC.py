@@ -396,7 +396,7 @@ def data_Precio_Condiciones_Romaneo(request):
                             T08, T09, T10, T11, Calibres, CRCT01, CRCT02, CRCT03, CRCT04, CRCT05, CRCT06, CRCT07, CRCT08, CRCT09, 
                             CRCT10, CRCT11, SIM
                     FROM    PrecioCondiciones_Romaneo
-                    WHERE (ID_PCR = %s)
+                    WHERE (ID_PCR > %s)
                     """
                 cursor.execute(sql, [id_pcr])
                 consulta = cursor.fetchall()
