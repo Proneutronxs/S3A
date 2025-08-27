@@ -1755,7 +1755,7 @@ def inserta_resgistros_al_canal():
 
 
 def envio_notificaciones_al_canal():
-    debug_error("FIRECRON","EJECUTA")
+    debug_error("FIRECRON","EJECUTA","")
     try:
         with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """
@@ -1769,7 +1769,7 @@ def envio_notificaciones_al_canal():
             cursor.execute(sql)
             consulta = cursor.fetchall()
             if consulta:
-                debug_error("FIRECRON","ENCUENTRA E INICIA FOR")
+                debug_error("FIRECRON","ENCUENTRA E INICIA FOR","")
                 for row in consulta:
                     ID_CNG = str(row[0])
                     Body = str(row[2])
@@ -1779,7 +1779,7 @@ def envio_notificaciones_al_canal():
 
 
     except Exception as e:
-        debug_error("FIRECRON","EXCEPTION - " + str(e))
+        debug_error("FIRECRON","EXCEPTION - ", str(e))
         pass
 
 
