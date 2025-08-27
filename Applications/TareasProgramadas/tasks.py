@@ -1,5 +1,5 @@
 from django.db import connections
-from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck, enviar_notificacion_Tres_Ases
+from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck, enviar_notificacion_Tres_Ases, debug_error
 from S3A.funcionesGenerales import *
 from django.core.mail import send_mail
 import datetime
@@ -1755,6 +1755,7 @@ def inserta_resgistros_al_canal():
 
 
 def envio_notificaciones_al_canal():
+    debug_error("FIRECRON","EJECUTA")
     try:
         with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
             sql = """
@@ -1767,8 +1768,8 @@ def envio_notificaciones_al_canal():
                 """
             cursor.execute(sql)
             consulta = cursor.fetchall()
-
             if consulta:
+                debug_error("FIRECRON","ENCUENTRA E INICIA FOR")
                 for row in consulta:
                     ID_CNG = str(row[0])
                     Body = str(row[2])
@@ -1778,6 +1779,7 @@ def envio_notificaciones_al_canal():
 
 
     except Exception as e:
+        debug_error("FIRECRON","EXCEPTION - " + str(e))
         pass
 
 
