@@ -1,5 +1,6 @@
 from django.db import connections
-from Applications.NotificacionesPush.notificaciones_push import notificaciones_Fruit_Truck, enviar_notificacion_Tres_Ases, debug_error
+from Applications.NotificacionesPush.notificaciones_push import enviar_notificacion_Tres_Ases_Cron, debug_error
+from S3A.firebase_config import inicializar_firebase_cron
 from S3A.funcionesGenerales import *
 from django.core.mail import send_mail
 import datetime
@@ -1755,32 +1756,31 @@ def inserta_resgistros_al_canal():
 
 
 def envio_notificaciones_al_canal():
-    debug_error("FIRECRON","EJECUTA","")
-    try:
-        with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
-            sql = """
-                SELECT TOP(7) CNG.ID_CNG, CNG.Titulo, CNG.Body, CNG.Pestaña, CNG.CodEmpleado, US.IdAndroid
-                FROM Canal_Notificaciones_Generales AS CNG INNER JOIN
-                    USUARIOS AS US ON US.CodEmpleado = CNG.CodEmpleado
-                WHERE CNG.FechaAlta >= DATEADD(HOUR, -1, GETDATE())  --CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
-                    AND CNG.Estado = 'P'
-                    --AND CNG.CodEmpleado = '58015'
-                """
-            cursor.execute(sql)
-            consulta = cursor.fetchall()
-            if consulta:
-                debug_error("FIRECRON","ENCUENTRA E INICIA FOR","")
-                for row in consulta:
-                    ID_CNG = str(row[0])
-                    Body = str(row[2])
-                    Pestaña = str(row[3])
-                    Id_Firebase = str(row[5])
-                    enviar_notificacion_Tres_Ases(Id_Firebase,Body,Pestaña,ID_CNG)
-
-
-    except Exception as e:
-        debug_error("FIRECRON","EXCEPTION - ", str(e))
-        pass
+    valor = inicializar_firebase_cron()
+    if valor in ("1","0"):
+        try:
+            with connections ['TRESASES_APLICATIVO'].cursor() as cursor:
+                sql = """
+                    SELECT TOP(7) CNG.ID_CNG, CNG.Titulo, CNG.Body, CNG.Pestaña, CNG.CodEmpleado, US.IdAndroid
+                    FROM Canal_Notificaciones_Generales AS CNG INNER JOIN
+                        USUARIOS AS US ON US.CodEmpleado = CNG.CodEmpleado
+                    WHERE CNG.FechaAlta >= DATEADD(HOUR, -1, GETDATE())  --CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
+                        AND CNG.Estado = 'P'
+                        AND CNG.CodEmpleado = '58015'
+                    """
+                cursor.execute(sql)
+                consulta = cursor.fetchall()
+                if consulta:
+                    debug_error("FIRECRON","ENCUENTRA E INICIA FOR","")
+                    for row in consulta:
+                        ID_CNG = str(row[0])
+                        Body = str(row[2])
+                        Pestaña = str(row[3])
+                        Id_Firebase = str(row[5])
+                        enviar_notificacion_Tres_Ases_Cron(Id_Firebase,Body,Pestaña,ID_CNG)
+        except Exception as e:
+            debug_error("FIRECRON", "EXCEPCION NO CONTROLADA", str(e))
+            pass
 
 
 
