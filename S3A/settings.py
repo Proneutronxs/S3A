@@ -306,10 +306,13 @@ CRONJOBS = [
 
     ('*/15 * * * *', 'Applications.TareasProgramadas.tasks.enviaCorreosAnticipos'),  # Ejecutar cada 5 minutos
     #('15 7 * * *', 'Applications.TareasProgramadas.tasks.sumar_numeros')  # Ejecutar a las 07:15
+
     ('20,50 * * * *', 'Applications.TareasProgramadas.tasks.procesa_arreglos'), # EJECUTAR CADA HORA A LOS 20 MIN y 50 MIN
 
     ('20 8,12,14,18 * * 1-5', 'Applications.TareasProgramadas.tasks.inserta_resgistros_al_canal'), # EJECUTAR CADA HORA A LOS 20 MIN y 50 MIN
 
-    ('*/10 * * * 1-5', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal'),
+    #('*/10 * * * 1-5', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal'),
+
+    ('*/10 * * * *', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal')
     
 ]
