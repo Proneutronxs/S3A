@@ -1766,7 +1766,7 @@ def envio_notificaciones_al_canal():
                         USUARIOS AS US ON US.CodEmpleado = CNG.CodEmpleado
                     WHERE CNG.FechaAlta >= DATEADD(HOUR, -1, GETDATE())  --CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
                         AND CNG.Estado = 'P'
-                        AND CNG.CodEmpleado = '58015'
+                        --AND CNG.CodEmpleado = '58015'
                     """
                 cursor.execute(sql)
                 consulta = cursor.fetchall()
