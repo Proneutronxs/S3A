@@ -1764,7 +1764,7 @@ def envio_notificaciones_al_canal():
                     SELECT CNG.ID_CNG, CNG.Titulo, CNG.Body, CNG.Pestaña, CNG.CodEmpleado, US.IdAndroid
                     FROM Canal_Notificaciones_Generales AS CNG INNER JOIN
                         USUARIOS AS US ON US.CodEmpleado = CNG.CodEmpleado
-                    WHERE CNG.FechaAlta >= DATEADD(HOUR, -1, GETDATE())  --CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
+                    WHERE CNG.FechaAlta >= DATEADD(HOUR, -2, GETDATE())  --CONVERT(DATE,CNG.FechaAlta) = CONVERT(DATE,GETDATE())
                         AND CNG.Estado = 'P'
                         --AND CNG.CodEmpleado = '58015'
                     """
