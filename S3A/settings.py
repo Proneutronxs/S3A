@@ -311,7 +311,7 @@ CRONJOBS = [
 
     ('20 8,12,14,18 * * 1-5', 'Applications.TareasProgramadas.tasks.inserta_resgistros_al_canal'), # EJECUTAR CADA HORA A LOS 20 MIN y 50 MIN
 
-    ('*/10 * * * 1-5', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal'),
+    ('*/6 * * * 1-5', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal'),
 
     #('*/10 * * * *', 'Applications.TareasProgramadas.tasks.envio_notificaciones_al_canal')
     
