@@ -214,7 +214,7 @@ def crc_ultimo_remito(request):
         remitos = data.get('Remitos', [])
         if remitos:
             remitos_str = ','.join(remitos) 
-            guarda_remitos_enviados(remitos_str)
+            guarda_remitos_enviados(remitos_str,None)
             try:
                 with connections['S3A'].cursor() as cursor:
                     sql = f""" 
@@ -330,16 +330,16 @@ def crc_ultimo_remito(request):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
-def guarda_remitos_enviados(listado):
+def guarda_remitos_enviados(listado,tipo):
     try:
         with connections['S3A'].cursor() as cursor:
             sql = f"""   
 
-                INSERT TRESASES_APLICATIVO.dbo.Registro_Demo_DLC (ListaDLC,FechaAlta) 
+                INSERT TRESASES_APLICATIVO.dbo.Registro_Demo_DLC (ListaDLC,FechaAlta,Tipo) 
                         VALUES ((SELECT STUFF((SELECT DISTINCT ',' + CONVERT(VARCHAR, DLC.NroRemito)
                                     FROM VistaDemoDLC AS DLC
                                     WHERE DLC.NroRemito NOT IN ({listado})
-                                    FOR XML PATH('')), 1, 1, '')), GETDATE())
+                                    FOR XML PATH('')), 1, 1, '')), GETDATE(),{tipo})
 
                 """
             cursor.execute(sql)
@@ -373,7 +373,6 @@ def tabla_sim_remito(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
-
 
 def data_Precio_Condiciones_Romaneo(request,ID_PCR):
     if request.method == 'GET':
@@ -459,6 +458,82 @@ def data_Precio_Condiciones_Romaneo(request,ID_PCR):
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
+@csrf_exempt
+def vista_demo_pcr(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        remitos = data.get('Remitos', [])
+        if remitos:
+            remitos_str = ','.join(remitos) 
+            guarda_remitos_enviados(remitos_str,"S")
+            try:
+                with connections['S3A'].cursor() as cursor:
+                    sql = f""" 
+
+                        SELECT  DLC.Mercado AS MERCADO, ISNULL(DLC.NombreEmbarque, '') AS VAPOR, DLC.PaisDestino AS DESTINO, DLC.IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30), DLC.Cliente) AS CLIENTE, CONVERT(VARCHAR(10), DLC.Fecha, 
+                                103) AS FECHA_FACTURA, CONVERT(VARCHAR, DLC.IdEspecie) AS ID_ESPECIE, DLC.Especie AS ESPECIE, DLC.IdVariedad AS ID_VARIEDAD, DLC.Variedad AS VARIEDAD, DLC.IdEnvase AS ID_ENVASE, DLC.Envase AS ENVASE, 
+                                DLC.IdEtiqueta AS ID_MARCA, DLC.Etiqueta AS MARCA, DLC.Calibres AS CALIBRES, FORMAT(DLC.PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(DLC.PesoEnvase * DLC.Bultos, 'N2') AS TOTAL_KGS, FORMAT(DLC.Bultos, 'N0') 
+                                AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(DLC.Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), COALESCE(SUM(DLC.Precio2) * PCR.CANTIDAD,'0')) AS IMP_TOTAL, PCR.SIM AS SIM, 
+                                DATEPART(wk, DLC.FECH_FAC) AS ID_SEMANA, 'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, DLC.FECH_FAC)) AS CHAR_SEMANA, ISNULL(DLC.NRO_FAC, '-') AS NRO_FAC, CONVERT(VARCHAR, DLC.NroRemito) AS NRO_REM, 
+                                DATEPART(SECOND, DLC.ALTA_REMITO) AS SEGUNDOS, COALESCE(PCR.CANTIDAD,0) AS CANTIDAD, COALESCE(CONVERT(VARCHAR, PCR.CRC),'0') AS CRC, DLC.Moneda AS TIPO_MONEDA, DLC.FUNCION AS FUNC, DLC.Fecha AS FECHA,
+                                YEAR(GETDATE()) AS AÑO
+                        FROM    VistaDemoDLC AS DLC LEFT OUTER JOIN
+                                VistaDemoPCR AS PCR ON PCR.NRO_REMITO = DLC.NroRemito AND PCR.ID_VARIEDAD = DLC.IdVariedad AND PCR.ID_ENVASE = DLC.IdEnvase AND PCR.ID_ETIQUETA = DLC.IdEtiqueta
+                        WHERE   (DLC.NroRemito NOT IN ({remitos_str}))
+                        GROUP BY DLC.IdCliente, DLC.Cliente, DLC.IdEspecie, DLC.Especie, DLC.IdVariedad, DLC.Variedad, DLC.IdEnvase, DLC.Envase, DLC.IdEtiqueta, DLC.Etiqueta, DLC.Mercado, DATEPART(wk, DLC.FECH_FAC), DLC.Calibres, DLC.NRO_FAC, 
+                                DLC.NombreEmbarque, CONVERT(VARCHAR(10), DLC.FECH_FAC, 103), DLC.PaisDestino, DLC.PesoEnvase, DLC.PesoEnvase * DLC.Bultos, DLC.Bultos, DLC.NroRemito, DATEPART(SECOND, DLC.ALTA_REMITO), PCR.CANTIDAD, PCR.CRC, 
+                                DLC.Moneda, DLC.FUNCION, DLC.Fecha,PCR.SIM
+                        ORDER BY FECHA, CLIENTE
+
+                        """
+                    cursor.execute(sql)
+                    consulta = cursor.fetchall()
+                    lista_data = []
+                    if consulta:
+                        for row in consulta:
+                            lista_data.append({
+                                "MERCADO":row[0],
+                                "VAPOR":row[1],
+                                "DESTINO":row[2],
+                                "ID_CLIENTE":row[3],
+                                "CLIENTE":row[4],
+                                "FECHA_FACTURA":row[5],
+                                "ID_ESPECIE":row[6],
+                                "ESPECIE":row[7],
+                                "ID_VARIEDAD":row[8],
+                                "VARIEDAD":row[9],
+                                "ID_ENVASE":row[10],
+                                "ENVASE":row[11],
+                                "ID_MARCA":row[12],
+                                "MARCA":row[13],
+                                "CALIBRES":row[14],
+                                "PESO_ENVASE":row[15],
+                                "TOTAL_KGS":row[16],
+                                "CANT_BULTOS":row[17],
+                                "IMP_UNI":row[18],
+                                "IMP_TOTAL":row[19],
+                                "SIM":row[20],
+                                "ID_SEMANA":row[21],
+                                "CHAR_SEMANA":row[22],
+                                "NRO_FAC":row[23],
+                                "NRO_REM":row[24],
+                                "SEGUNDOS":row[25],
+                                "CANTIDAD":row[26],
+                                "CRC":row[27],
+                                "TIPO_MONEDA":row[28],
+                                "FUNC":row[29],
+                                "FECHA":row[30],
+                                "AÑO":row[31],
+                            })
+
+                        return JsonResponse({'Message': 'Success', 'Datos': lista_data})
+                    return JsonResponse({'Message': 'No data found', 'Nota':'No se encontraron datos.'})  
+            except Exception as e:
+                return JsonResponse({'Message': 'Error', 'nota': str(e)})
+        else:
+            return JsonResponse({'Message': 'No data found', 'Nota':'No se cargaron os remitos.'})
+    else:
+        return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
 
 
