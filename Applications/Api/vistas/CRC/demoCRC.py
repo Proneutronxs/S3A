@@ -472,7 +472,7 @@ def vista_demo_pcr(request):
 
                         SELECT  DLC.Mercado AS MERCADO, ISNULL(DLC.NombreEmbarque, '') AS VAPOR, DLC.PaisDestino AS DESTINO, DLC.IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30), DLC.Cliente) AS CLIENTE, DLC.Fecha 
                                 AS FECHA_FACTURA, CONVERT(VARCHAR, DLC.IdEspecie) AS ID_ESPECIE, DLC.Especie AS ESPECIE, DLC.IdVariedad AS ID_VARIEDAD, DLC.Variedad AS VARIEDAD, DLC.IdEnvase AS ID_ENVASE, DLC.Envase AS ENVASE, 
-                                DLC.IdEtiqueta AS ID_MARCA, DLC.Etiqueta AS MARCA, DLC.Calibres AS CALIBRES, FORMAT(DLC.PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(DLC.PesoEnvase * DLC.Bultos, 'N2') AS TOTAL_KGS, FORMAT(DLC.Bultos, 'N0') 
+                                DLC.IdEtiqueta AS ID_MARCA, DLC.Etiqueta AS MARCA, DLC.Calibres AS CALIBRES, REPLACE(REPLACE(FORMAT(DLC.PesoEnvase, 'N2'), '.', ''), ',', '.') AS PESO_ENVASE, REPLACE(REPLACE(FORMAT(DLC.PesoEnvase * DLC.Bultos, 'N2'), '.', ''), ',', '.') AS TOTAL_KGS, FORMAT(DLC.Bultos, 'N0') 
                                 AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(DLC.Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), COALESCE(SUM(DLC.Precio2) * PCR.CANTIDAD,'0')) AS IMP_TOTAL, PCR.SIM AS SIM, 
                                 DATEPART(wk, DLC.FECH_FAC) AS ID_SEMANA, 'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, DLC.FECH_FAC)) AS CHAR_SEMANA, ISNULL(DLC.NRO_FAC, '-') AS NRO_FAC, CONVERT(VARCHAR, DLC.NroRemito) AS NRO_REM, 
                                 DATEPART(SECOND, DLC.ALTA_REMITO) AS SEGUNDOS, COALESCE(PCR.CANTIDAD,0) AS CANTIDAD, COALESCE(CONVERT(VARCHAR, PCR.CRC),'0') AS CRC, DLC.Moneda AS TIPO_MONEDA, DLC.FUNCION AS FUNC, DLC.Fecha AS FECHA,
