@@ -19,23 +19,22 @@ def insert_fichada(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            for item in datos:
-                legajo = item['Legajo'] ### LEGAJO
-                tarjeta = traeLegTarjeta(str(item['Codigo']), str(item['Tarjeta']))### TARJETA
-                fecha = item['Fecha'] ### FECHA
-                hora = item['Hora'] ### HORA 
-                tipo = item['Tipo'] ### E para ENTRADA y S para SALIDA
-                nodo = item['Nodo'] ### NODO HACE REFERENCIA A SALIDA O ENTRADA (RELOJ-ID)
-                codigo = item['Codigo'] ### CODIGO HACE REFERENCIA AL ID DONDE SE REGISTRO EL LEGAJO
-                simulacion = "1" ### DATO SIEMPRE EN 1
-                estado = "0"  ### DATO SIEMPRE EN 0
-                orden = "3" ### DATO VARIABLE 0 O 3
-                with connections['principal'].cursor() as cursor:
+            debug_error(usuario,datos,"")
+            with connections['principal'].cursor() as cursor:
+                for item in datos:
+                    legajo = item['Legajo'] ### LEGAJO
+                    tarjeta = traeLegTarjeta(str(item['Codigo']), str(item['Tarjeta']))### TARJETA
+                    fecha = item['Fecha'] ### FECHA
+                    hora = item['Hora'] ### HORA 
+                    tipo = item['Tipo'] ### E para ENTRADA y S para SALIDA
+                    nodo = item['Nodo'] ### NODO HACE REFERENCIA A SALIDA O ENTRADA (RELOJ-ID)
+                    codigo = item['Codigo'] ### CODIGO HACE REFERENCIA AL ID DONDE SE REGISTRO EL LEGAJO
+                    simulacion = "1" ### DATO SIEMPRE EN 1
+                    estado = "0"  ### DATO SIEMPRE EN 0
+                    orden = "3" ### DATO VARIABLE 0 O 3
                     sql = "INSERT INTO T_Fichadas (ficTarjeta, ficFecha, ficHora, ficES12, ficNodo, ficSimulacion, legCodigo, ficEstado, ficOrden) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (tarjeta, fecha, hora, tipo, nodo, simulacion, codigo, estado, orden)
                     cursor.execute(sql, values)
-                    #cursor.close()
-                #print(legajo + " - " + tarjeta + " - " + fecha + " - " + hora + " - " + tipo + " - " + nodo + " - " + simulacion + " - " + codigo + " - " + estado + " - " + orden)
             nota = "Los registros se guardaron exitosamente."
             est = "E"
             insertaRegistro(usuario,fechaHora,registro,est)
@@ -46,17 +45,13 @@ def insert_fichada(request):
             est = "F"
             insertaRegistro(usuario,fechaHora,registro,est)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['principal'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
 def traeLegTarjeta(legCodigo, legTarjeta):
     try:
         with connections['principal'].cursor() as cursor:
-            sql = "SELECT legTarjeta " \
-                    "FROM T_Legajos " \
-                    "WHERE legCodigo = %s "
+            sql = """ SELECT legTarjeta FROM T_Legajos WHERE legCodigo = %s """
             cursor.execute(sql, [legCodigo])
             consulta = cursor.fetchone()
             if consulta:
@@ -66,10 +61,8 @@ def traeLegTarjeta(legCodigo, legTarjeta):
                 return legTarjeta
     except Exception as e:
         error = str(e)
-        insertar_registro_error_sql("Presentismo","traeLegTarjeta","usuario",error)
+        debug_error(legCodigo,"",error)
         return error
-    finally:
-        connections['principal'].close()
 
 @csrf_exempt
 def data(request):
@@ -86,3 +79,20 @@ def data(request):
             return JsonResponse({'Message': 'Error', 'Nota': error})
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
+    
+
+
+
+def debug_error(usuario, body, error):
+    try:
+        with connections['BD_DEBUG'].cursor() as cursor:
+            sql = """ 
+                    INSERT INTO TB_DEBUG (USUARIO, FECHA, BODY)
+                    VALUES (%s, NOW(), %s)
+                """
+            if error:
+                body += f" - Error: {error}"
+            cursor.execute(sql, (usuario, body))
+            connections['BD_DEBUG'].commit()
+    except Exception as e:
+        pass

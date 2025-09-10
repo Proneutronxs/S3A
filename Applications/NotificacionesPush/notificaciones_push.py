@@ -86,7 +86,7 @@ def debug_error(usuario, body, error):
     
 def enviar_notificacion_Tres_Ases_Cron(token, body, pestaña, ID_CNG):
     if not token or not body or not pestaña:
-        debug_error("FIREBASE-NT", ID_CNG, "FALTAN PARAMETROS")
+        #debug_error("FIREBASE-NT", ID_CNG, "FALTAN PARAMETROS")
         return 'Faltan parámetros requeridos' 
     try:
         message = messaging.Message(
@@ -99,8 +99,8 @@ def enviar_notificacion_Tres_Ases_Cron(token, body, pestaña, ID_CNG):
             token=token,
         )
         response = messaging.send(message)
-        debug_error("FIREBASE-NT", ID_CNG, "-" + str(response))
+        #debug_error("FIREBASE-NT", ID_CNG, "-" + str(response))
         return '1' if response else '0'
     except Exception as e:
-        debug_error("FIREBASE-NT", ID_CNG, str(e))
+        debug_error("FIREBASE-NT-IN", ID_CNG, str(e))
         return 'Excepción en envío de notificación: ' + str(e)

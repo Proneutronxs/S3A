@@ -1771,7 +1771,7 @@ def envio_notificaciones_al_canal():
                 cursor.execute(sql)
                 consulta = cursor.fetchall()
                 if consulta:
-                    debug_error("FIRECRON","ENCUENTRA E INICIA FOR","")
+                    #debug_error("FIRECRON","ENCUENTRA E INICIA FOR","")
                     for row in consulta:
                         ID_CNG = str(row[0])
                         Body = str(row[2])
