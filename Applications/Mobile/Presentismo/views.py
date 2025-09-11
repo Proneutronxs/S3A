@@ -19,7 +19,7 @@ def insert_fichada(request):
             fechaHora = str(json.loads(body)['actual'])
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
-            debug_error(usuario,datos,"")
+            #debug_error(usuario,datos,"")
             registroRealizado(usuario,"FC",datos)
             with connections['principal'].cursor() as cursor:
                 for item in datos:
