@@ -20,7 +20,7 @@ def insert_fichada(request):
             registro = str(json.loads(body)['registro'])
             datos = json.loads(body)['Data']
             #debug_error(usuario,datos,"")
-            registroRealizado(usuario,"FC",datos)
+            registroRealizado(usuario,"FC",str(datos))
             with connections['principal'].cursor() as cursor:
                 for item in datos:
                     legajo = item['Legajo'] ### LEGAJO
