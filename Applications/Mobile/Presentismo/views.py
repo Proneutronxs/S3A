@@ -21,6 +21,7 @@ def insert_fichada(request):
             datos = json.loads(body)['Data']
             #debug_error(usuario,datos,"")
             registroRealizado(usuario,"FC",str(datos))
+            cantidad = len(datos)
             with connections['principal'].cursor() as cursor:
                 for item in datos:
                     legajo = item['Legajo'] ### LEGAJO
@@ -36,7 +37,7 @@ def insert_fichada(request):
                     sql = "INSERT INTO T_Fichadas (ficTarjeta, ficFecha, ficHora, ficES12, ficNodo, ficSimulacion, legCodigo, ficEstado, ficOrden) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
                     values = (tarjeta, fecha, hora, tipo, nodo, simulacion, codigo, estado, orden)
                     cursor.execute(sql, values)
-            nota = "Los registros se guardaron exitosamente."
+            nota = "Los registros se guardaron exitosamente.\nCANTIDAD PERSONAL ENVÍADO: " + str(cantidad)
             est = "E"
             insertaRegistro(usuario,fechaHora,registro,est)
             return JsonResponse({'Message': 'Success', 'Nota': nota})
