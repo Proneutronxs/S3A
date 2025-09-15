@@ -105,8 +105,6 @@ def login_app(request):
                 'Nota': error
             }
             return JsonResponse(response_data)
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
@@ -249,8 +247,6 @@ def id_Nombre_Ccostos(request, legajo):
             error = str(e)
             insertar_registro_error_sql("GeneralApp","id_Nombre_Ccostos","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -265,7 +261,7 @@ def personal_por_Ccostos_asistencia(request, codigo):
                 sql = """ SELECT        Empleados.CodEmpleado AS LEGAJO, principal.dbo.T_Legajos.legCodigo AS LEGCODIGO, Empleados.ApellidoEmple + ' ' + Empleados.NombresEmple AS NOMBREyAPELLIDO 
                       FROM          Empleados INNER JOIN 
                                     principal.dbo.T_Legajos ON CONVERT(VARCHAR, Empleados.CodEmpleado) = principal.dbo.T_Legajos.legLegajo 
-                      WHERE        (Empleados.Regis_CCo = %s AND Empleados.BajaDefinitivaEmple='2')
+                      WHERE        Empleados.Regis_CCo = %s AND Empleados.BajaDefinitivaEmple = '2' AND Empleados.BajaTransiEmple = '2'
                       ORDER BY Empleados.ApellidoEmple """
                 cursor.execute(sql, [idCC])
                 consulta = cursor.fetchall()
@@ -284,8 +280,6 @@ def personal_por_Ccostos_asistencia(request, codigo):
             error = str(e)
             insertar_registro_error_sql("GeneralApp","personal_por_Ccostos_asistencia","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['ISISPayroll'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
     
@@ -451,8 +445,6 @@ def buscaParametro(request, codigo):
                 'Nota': error
             }
             return JsonResponse(response_data)
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         response_data = {
             'Message': 'No se pudo resolver la petición.'
@@ -484,8 +476,6 @@ def Actualiza_Datos():
     except Exception as e:
         error = str(e)
         return False
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def Datos_usuario_aplicacion():
     listado_usuarios = []
@@ -521,8 +511,6 @@ def Datos_usuario_aplicacion():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","Datos_usuario_aplicacion","usuario",error)
         return listado_usuarios
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def Datos_centros_aplicacion():
     listado_centros = []
@@ -551,8 +539,6 @@ def Datos_centros_aplicacion():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","Datos_usuario_aplicacion","usuario",error)
         return listado_centros
-    finally:
-        connections['ISISPayroll'].close()
 
 def Datos_usuario_permisos():
     listado_permisos = []
@@ -585,8 +571,6 @@ def Datos_usuario_permisos():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","Datos_usuario_permisos","usuario",error)
         return listado_permisos
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def Datos_legajos():
     listado_legajos = []
@@ -615,8 +599,6 @@ def Datos_legajos():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","Datos_legajos","usuario",error)
         return listado_legajos
-    finally:
-        connections['ISISPayroll'].close()
 
 def Datos_Chacras_Aplicacion():
     listado = listado_Chacras()
@@ -646,8 +628,6 @@ def Datos_Chacras_Aplicacion():
         error = str(e)
         insertar_registro_error_sql("GeneralApp","Datos_Chacras_Aplicacion","usuario",error)
         return listado_chacras_dev
-    finally:
-        connections['S3A'].close()
 
 def listado_Chacras():
     listado_chacras = set()  # Usar un conjunto para evitar duplicados

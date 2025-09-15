@@ -139,8 +139,6 @@ def obtieneNombres(Regis_Epl):
         error = str(e)
         insertar_registro_error_sql("Anticipos","obtiene_nobres","usuario",error)
         return nombre
-    finally:
-        connections['ISISPayroll'].close()
 
 def auditaAnticipos(usuario, Fechahora, Destino, Monto,motivoAuditoria):
     estado = '1'
@@ -152,8 +150,6 @@ def auditaAnticipos(usuario, Fechahora, Destino, Monto,motivoAuditoria):
     except Exception as e:
         error = str(e)
         insertar_registro_error_sql("Anticipos","AuditaAnticipos","usuario",error)
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def enviar_correo_sendMail(asunto, mensaje, destinatario):
     remitente = 'aplicativo@tresases.com.ar'
@@ -215,8 +211,6 @@ def verificaAnticipoMesAño(Regis_Epl, Mes, Año):
         insertar_registro_error_sql("Anticipos","verificaAnticipoMesAño","usuario",error)
         print(error)
         return True
-    finally:
-        connections['ISISPayroll'].close()
 
 def verificaAdelantoIngresoHora(Regis_Epl, Mes, Año):
     values = (Regis_Epl, Mes, Año)
@@ -238,8 +232,6 @@ def verificaAdelantoIngresoHora(Regis_Epl, Mes, Año):
         insertar_registro_error_sql("Anticipos","verificaAdelantoIngresoMes","Aplicacion",error)
         print(error)
         return True
-    finally:
-        connections['ISISPayroll'].close()
 
 @csrf_exempt
 def verAnticipos(request):
@@ -277,9 +269,6 @@ def verAnticipos(request):
             error = str(e)
             insertar_registro_error_sql("Anticipos","verAnticipos","usuario",error)
             return JsonResponse({'Message': 'Not Found', 'Nota': 'Se produjo un error, intente nuevamente.'})
-        finally:
-            cursor.close()
-            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
@@ -309,8 +298,6 @@ def cargaFechasDeAnticipos(request, mes, usuario):
             error = str(e)
             insertar_registro_error_sql("Anticipos","cargaFechasAnticipos","usuario",error)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['TRESASES_APLICATIVO'].close()
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'})
 
