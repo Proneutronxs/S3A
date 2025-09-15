@@ -470,19 +470,20 @@ def vista_demo_pcr(request):
                 with connections['S3A'].cursor() as cursor:
                     sql = f""" 
 
-                        SELECT  DLC.Mercado AS MERCADO, ISNULL(DLC.NombreEmbarque, '') AS VAPOR, DLC.PaisDestino AS DESTINO, DLC.IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30), DLC.Cliente) AS CLIENTE, DLC.Fecha 
-                                AS FECHA_FACTURA, CONVERT(VARCHAR, DLC.IdEspecie) AS ID_ESPECIE, DLC.Especie AS ESPECIE, DLC.IdVariedad AS ID_VARIEDAD, DLC.Variedad AS VARIEDAD, DLC.IdEnvase AS ID_ENVASE, DLC.Envase AS ENVASE, 
-                                DLC.IdEtiqueta AS ID_MARCA, DLC.Etiqueta AS MARCA, DLC.Calibres AS CALIBRES, REPLACE(REPLACE(FORMAT(DLC.PesoEnvase, 'N2'), '.', ''), ',', '.') AS PESO_ENVASE, REPLACE(REPLACE(FORMAT(DLC.PesoEnvase * DLC.Bultos, 'N2'), '.', ''), ',', '.') AS TOTAL_KGS, FORMAT(DLC.Bultos, 'N0') 
-                                AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(DLC.Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), COALESCE(SUM(DLC.Precio2) * PCR.CANTIDAD,'0')) AS IMP_TOTAL, PCR.SIM AS SIM, 
-                                DATEPART(wk, DLC.FECH_FAC) AS ID_SEMANA, 'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, DLC.FECH_FAC)) AS CHAR_SEMANA, ISNULL(DLC.NRO_FAC, '-') AS NRO_FAC, CONVERT(VARCHAR, DLC.NroRemito) AS NRO_REM, 
-                                DATEPART(SECOND, DLC.ALTA_REMITO) AS SEGUNDOS, COALESCE(PCR.CANTIDAD,0) AS CANTIDAD, COALESCE(CONVERT(VARCHAR, PCR.CRC),'0') AS CRC, DLC.Moneda AS TIPO_MONEDA, DLC.FUNCION AS FUNC, DLC.Fecha AS FECHA,
-                                YEAR(GETDATE()) AS AÑO
-                        FROM    VistaDemoDLC AS DLC LEFT OUTER JOIN
-                                VistaDemoPCR AS PCR ON PCR.NRO_REMITO = DLC.NroRemito AND PCR.ID_VARIEDAD = DLC.IdVariedad AND PCR.ID_ENVASE = DLC.IdEnvase AND PCR.ID_ETIQUETA = DLC.IdEtiqueta
+                        SELECT        DLC.Mercado AS MERCADO, ISNULL(DLC.NombreEmbarque, '') AS VAPOR, DLC.PaisDestino AS DESTINO, DLC.IdCliente AS ID_CLIENTE, CONVERT(VARCHAR(30), DLC.Cliente) AS CLIENTE, CONVERT(VARCHAR(10), DLC.Fecha, 
+                                                103) AS FECHA_FACTURA, CONVERT(VARCHAR, DLC.IdEspecie) AS ID_ESPECIE, DLC.Especie AS ESPECIE, DLC.IdVariedad AS ID_VARIEDAD, DLC.Variedad AS VARIEDAD, DLC.IdEnvase AS ID_ENVASE, DLC.Envase AS ENVASE, 
+                                                DLC.IdEtiqueta AS ID_MARCA, DLC.Etiqueta AS MARCA, DLC.Calibres AS CALIBRES, FORMAT(DLC.PesoEnvase, 'N2') AS PESO_ENVASE, FORMAT(DLC.PesoEnvase * DLC.Bultos, 'N2') AS TOTAL_KGS, FORMAT(DLC.Bultos, 'N0') 
+                                                AS CANT_BULTOS, CONVERT(DECIMAL(18, 2), SUM(DLC.Precio2)) AS IMP_UNI, CONVERT(DECIMAL(18, 2), SUM(DLC.Precio2) * PCR.CANTIDAD) AS IMP_TOTAL, DATEPART(wk, DLC.FECH_FAC) AS ID_SEMANA, 
+                                                'SEMANA - ' + CONVERT(VARCHAR(3), DATEPART(wk, DLC.FECH_FAC)) AS CHAR_SEMANA, ISNULL(DLC.NRO_FAC, '-') AS NRO_FAC, CONVERT(VARCHAR, DLC.NroRemito) AS NRO_REM, CONVERT(VARCHAR, 
+                                                SUM(ISNULL(DLC.CRCT01, 0) + ISNULL(DLC.CRCT02, 0) + ISNULL(DLC.CRCT03, 0) + ISNULL(DLC.CRCT04, 0) + ISNULL(DLC.CRCT05, 0) + ISNULL(DLC.CRCT06, 0) + ISNULL(DLC.CRCT07, 0) + ISNULL(DLC.CRCT08, 0) 
+                                                + ISNULL(DLC.CRCT09, 0) + ISNULL(DLC.CRCT10, 0) + ISNULL(DLC.CRCT11, 0))) AS CRC_TOTAL, DATEPART(SECOND, DLC.ALTA_REMITO) AS SEGUNDOS, '' AS CALIBRE, PCR.CANTIDAD, CONVERT(VARCHAR, PCR.CRC) AS CRC, 
+                                                PCR.CALIBRE AS CALIBRE, DLC.Moneda AS TIPO_MONEDA, DLC.FUNCION AS FUNC, DLC.Fecha AS FECHA
+                        FROM            VistaDemoDLC AS DLC LEFT OUTER JOIN
+                                        VistaTamañoPorPCR AS PCR ON PCR.NRO_REMITO = DLC.NroRemito AND PCR.ID_VARIEDAD = DLC.IdVariedad AND PCR.ID_ENVASE = DLC.IdEnvase AND PCR.ID_ETIQUETA = DLC.IdEtiqueta
                         WHERE   (DLC.NroRemito NOT IN ({remitos_str}))
                         GROUP BY DLC.IdCliente, DLC.Cliente, DLC.IdEspecie, DLC.Especie, DLC.IdVariedad, DLC.Variedad, DLC.IdEnvase, DLC.Envase, DLC.IdEtiqueta, DLC.Etiqueta, DLC.Mercado, DATEPART(wk, DLC.FECH_FAC), DLC.Calibres, DLC.NRO_FAC, 
                                 DLC.NombreEmbarque, CONVERT(VARCHAR(10), DLC.FECH_FAC, 103), DLC.PaisDestino, DLC.PesoEnvase, DLC.PesoEnvase * DLC.Bultos, DLC.Bultos, DLC.NroRemito, DATEPART(SECOND, DLC.ALTA_REMITO), PCR.CANTIDAD, PCR.CRC, 
-                                DLC.Moneda, DLC.FUNCION, DLC.Fecha,PCR.SIM
+                                DLC.Moneda, DLC.FUNCION, DLC.Fecha,PCR.SIM,PCR.CALIBRE
                         ORDER BY FECHA, CLIENTE
 
                         """
@@ -520,12 +521,12 @@ def vista_demo_pcr(request):
                                 "SEGUNDOS":row[25],
                                 "CANTIDAD":row[26],
                                 "CRC":row[27],
-                                "TIPO_MONEDA":row[28],
-                                "FUNC":row[29],
-                                "FECHA":row[30],
-                                "AÑO":row[31],
+                                "CALIBRE":row[28],
+                                "TIPO_MONEDA":row[29],
+                                "FUNC":row[30],
+                                "FECHA":row[31],
+                                "AÑO":row[32],
                             })
-
                         return JsonResponse({'Message': 'Success', 'Datos': lista_data})
                     return JsonResponse({'Message': 'No data found', 'Nota':'No se encontraron datos.'})  
             except Exception as e:
