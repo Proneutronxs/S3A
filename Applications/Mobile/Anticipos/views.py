@@ -27,6 +27,9 @@ def insert_anticipos(request):
             Hora = obtenerHoraActual()
             Mes = obtenerMesActual()
             Año = obtenerAñoActual()
+            import datetime
+            hoy = datetime.date.today()
+            dia_actual = hoy.day
             for item in datos:
                 Regis_Epl = item['Regis_Epl'] ### ID LEGAJO
                 Fecha = item['Fecha']### FECHA DEL ADELANTO
@@ -37,25 +40,25 @@ def insert_anticipos(request):
                 Tipo = item['Regis_TLE'] ### TIPO DE LIQUIDACIÓN ADELANTO     
 
                 if motivoAuditoria == 'ADELANTO SUELDO':
-                    if verificaAnticipoMesAño(Regis_Epl,Mes,Año):
-                        listadoAdelantosMes.append(Regis_Epl)
-                        listadoRepetidos.append(Regis_Epl)
+                    if dia_actual > 15:
+                        raise ValueError("Ya no se pueden realizar el ADELANTOS DE SUELDO después del día 15")
                     else:
-                        auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
-                        try:
-                            with connections['ISISPayroll'].cursor() as cursor:
-                                sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                                values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
-                                cursor.execute(sql, values)
-                                listadoRepetidos.append(Regis_Epl)
-                        except Exception as e:
-                            error = str(e)
-                            insertar_registro_error_sql("Anticipos","insert_anticipos","Aplicacion",error)
-                            estado = "F"
-                            insertaRegistro(usuario, fechaHora, registro, estado)
-                            return JsonResponse({'Message': 'Error', 'Nota': error})
-                        finally:
-                            connections['ISISPayroll'].close()
+                        if verificaAnticipoMesAño(Regis_Epl,Mes,Año):
+                            listadoAdelantosMes.append(Regis_Epl)
+                            listadoRepetidos.append(Regis_Epl)
+                        else:
+                            auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
+                            try:
+                                with connections['ISISPayroll'].cursor() as cursor:
+                                    sql = "INSERT INTO EmpleadoAdelantos (Regis_Epl, FechaAde, ImporteAde, MotivoAde, SaldoAde, Regis_TEA, Regis_TLE, CantCuotasPrest, ImporteCuotaPrest, UltCuotaDesconPrest, SenDadoBajaPrest, LapsoReorganizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                    values = (Regis_Epl, Fecha, Importe, Motivo, Importe, Estado, Tipo, '0', '0.00', '0', '0', '0')
+                                    cursor.execute(sql, values)
+                                    listadoRepetidos.append(Regis_Epl)
+                            except Exception as e:
+                                error = str(e)
+                                estado = "F"
+                                insertaRegistro(usuario, fechaHora, registro, estado)
+                                return JsonResponse({'Message': 'Error', 'Nota': error})
                 else:
                     if verificaAdelantoIngresoHora(Regis_Epl, Mes, Año) is False:
                         auditaAnticipos(usuario, fechaHora,Regis_Epl, Importe, motivoAuditoria)
@@ -67,12 +70,9 @@ def insert_anticipos(request):
                                 listadoRepetidos.append(Regis_Epl)
                         except Exception as e:
                             error = str(e)
-                            insertar_registro_error_sql("Anticipos","insert_anticipos","Aplicacion",error)
                             estado = "F"
                             insertaRegistro(usuario, fechaHora, registro, estado)
                             return JsonResponse({'Message': 'Error', 'Nota': error})
-                        finally:
-                            connections['ISISPayroll'].close()
                     else:
                         listadoAdelantosMes.append(Regis_Epl)
                 
@@ -96,8 +96,6 @@ def insert_anticipos(request):
             estado = "F"
             insertaRegistro(usuario, fechaHora, registro, estado)
             return JsonResponse({'Message': 'Error', 'Nota': error})
-        finally:
-            connections['ISISPayroll'].close()
         
     else:
         return JsonResponse({'Message': 'No se pudo resolver la petición.'}) 
@@ -120,8 +118,6 @@ def correosChacras():
         error = str(e)
         insertar_registro_error_sql("Anticipos","correosChacras","usuario",error)
         return listadoCorreos
-    finally:
-        connections['TRESASES_APLICATIVO'].close()
 
 def obtieneNombres(Regis_Epl):
     nombre = ''
